@@ -165,20 +165,12 @@ func collectGitCommits(path, branch string, limit int) []core.GitCommit {
 	return commits
 }
 
-// branchLogRef returns a git log ref scoped to commits introduced on branch.
-// Trunk branches (main/master/develop) show full history; feature branches use base..branch.
+// branchLogRef returns the branch name directly to show its full history.
 func branchLogRef(path, branch string) string {
 	if branch == "" || branch == "HEAD" {
 		return "HEAD"
 	}
-	if isTrunkBranch(path, branch) {
-		return branch
-	}
-	base := findBranchBase(path, branch)
-	if base == "" {
-		return branch
-	}
-	return base + ".." + branch
+	return branch
 }
 
 func isTrunkBranch(path, branch string) bool {

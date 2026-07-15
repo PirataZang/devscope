@@ -219,7 +219,7 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 	a.syncGitBranchesFrom(p)
 
 	if msg.err != nil {
-		a.gitStatusMsg = msg.action + ": " + msg.err.Error()
+		a.gitStatusMsg = gitCompactError(msg.action, msg.err.Error())
 		return
 	}
 
@@ -393,4 +393,33 @@ func shortGitHash(hash string) string {
 		return hash[:8]
 	}
 	return hash
+}
+
+// gitCompactError converte mensagens de erro multi-linha do git em uma única linha
+// compacta para exibição na notifLine da aba Git.
+func gitCompactError(action, errText string) string {
+	lines := strings.Split(strings.TrimSpace(errText), "\n")
+	if len(lines) <= 1 {
+		return action + ": " + errText
+	}
+
+	// Conta arquivos com alterações locais (indentados com tab pelo git)
+	fileCount := 0
+	for _, l := range lines {
+		if strings.HasPrefix(l, "\t") {
+			fileCount++
+		}
+	}
+	if fileCount > 0 {
+		return fmt.Sprintf("%s: %d arquivo(s) com alterações locais — faça commit ou stash antes", action, fileCount)
+	}
+
+	// Pega a última linha não-vazia e não genérica como resumo
+	for i := len(lines) - 1; i >= 0; i-- {
+		l := strings.TrimSpace(lines[i])
+		if l != "" && l != "Aborting" && l != "error" {
+			return action + ": " + l
+		}
+	}
+	return action + ": " + strings.TrimSpace(lines[0])
 }

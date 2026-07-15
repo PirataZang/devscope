@@ -241,8 +241,8 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case containerShellDoneMsg:
-		a.handleContainerShellDone(msg)
-		return a, nil
+		cmd := a.handleContainerShellDone(msg)
+		return a, cmd
 
 	case composeDoneMsg:
 		a.handleComposeDone(msg)
@@ -421,7 +421,8 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.containerSubview == containerSubviewShellReturn {
 		switch msg.String() {
 		case "enter", "esc":
-			a.dismissContainerShellReturn()
+			cmd := a.dismissContainerShellReturn()
+			return a, cmd
 		}
 		return a, nil
 	}

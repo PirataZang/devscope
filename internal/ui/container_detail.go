@@ -43,6 +43,28 @@ func (t containerDetailTab) label() string {
 	}
 }
 
+// shortLabel retorna um nome curto para uso na barra de abas compacta.
+func (t containerDetailTab) shortLabel() string {
+	switch t {
+	case containerDetailTabLogs:
+		return "Logs"
+	case containerDetailTabStats:
+		return "Stats"
+	case containerDetailTabEnv:
+		return "Env"
+	case containerDetailTabConfig:
+		return "Config"
+	case containerDetailTabTop:
+		return "Top"
+	case containerDetailTabCompose:
+		return "Compose"
+	case containerDetailTabFile:
+		return "File"
+	default:
+		return "?"
+	}
+}
+
 func (a *App) renderContainerDetail(p *core.Project) string {
 	name := a.containerDetailName
 	if name == "" {
@@ -51,39 +73,65 @@ func (a *App) renderContainerDetail(p *core.Project) string {
 		}
 	}
 
-	lines := []string{
-		StyleSection.Render(name) + "  " + StyleMuted.Render("(monitoramento)"),
-		a.renderContainerDetailTabBar(),
-		"",
-	}
+	viewport := a.containerDetailViewport()
 
+	// Constrói o conteúdo sempre com exatamente viewport linhas.
+	// Os indicadores de scroll CONSOMEM do orçamento em vez de serem adicionados por cima.
+	var contentLines []string
 	if a.containerDetailLoading {
-		lines = append(lines, StyleMuted.Render("Carregando..."))
+		contentLines = append(contentLines, StyleMuted.Render("Carregando..."))
 	} else {
-		contentLines := a.containerDetailLines()
-		viewport := a.containerDetailViewport()
-		a.containerDetailScroll = clampScroll(a.containerDetailScroll, viewport, len(contentLines))
+		allLines := a.containerDetailLines()
+		a.containerDetailScroll = clampScroll(a.containerDetailScroll, viewport, len(allLines))
 		start := a.containerDetailScroll
-		end := minInt(start+viewport, len(contentLines))
+		available := viewport // linhas disponíveis para usar
 
+		// Reserva 1 linha para indicador de scroll-up, se necessário
 		if start > 0 {
-			lines = append(lines, StyleMuted.Render(fmt.Sprintf("  ↑ %d acima", start)))
+			contentLines = append(contentLines, StyleMuted.Render(fmt.Sprintf("  ↑ %d acima", start)))
+			available--
 		}
+
+		// Verifica se haverá linhas abaixo e reserva 1 linha para o indicador
+		remaining := len(allLines) - start
+		showScrollDown := remaining > available
+		if showScrollDown {
+			available-- // reserva 1 linha para o indicador de scroll-down
+		}
+
+		end := minInt(start+available, len(allLines))
 		for i := start; i < end; i++ {
-			line := contentLines[i]
+			line := allLines[i]
 			if line == "" {
 				line = " "
 			}
-			lines = append(lines, a.renderContainerDetailLine(a.containerDetailTab, line))
+			contentLines = append(contentLines, a.renderContainerDetailLine(a.containerDetailTab, line))
 		}
-		if end < len(contentLines) {
-			lines = append(lines, StyleMuted.Render(fmt.Sprintf("  ↓ %d abaixo", len(contentLines)-end)))
+
+		if showScrollDown {
+			contentLines = append(contentLines, StyleMuted.Render(fmt.Sprintf("  ↓ %d abaixo", len(allLines)-end)))
 		}
 	}
 
-	lines = append(lines, "",
+	// Garante exatamente viewport linhas — preenche se curto, corta se longo (segurança)
+	for len(contentLines) < viewport {
+		contentLines = append(contentLines, "")
+	}
+	if len(contentLines) > viewport {
+		contentLines = contentLines[:viewport]
+	}
+
+	// Mostra [X/total] no cabeçalho para orientação rápida
+	tabCounter := StyleMuted.Render(fmt.Sprintf("[%d/%d]", int(a.containerDetailTab)+1, containerDetailTabTotal))
+
+	lines := []string{
+		StyleSection.Render(name) + "  " + tabCounter,
+		a.renderContainerDetailTabBar(),
+		"",
+		strings.Join(contentLines, "\n"),
+		"",
 		StyleMuted.Render("←→ tabs  ↑↓ scroll  esc voltar"),
-	)
+	}
 
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
@@ -92,14 +140,14 @@ func (a *App) renderContainerDetailTabBar() string {
 	var parts []string
 	for i := 0; i < containerDetailTabTotal; i++ {
 		tab := containerDetailTab(i)
-		label := tab.label()
+		label := tab.shortLabel()
 		if tab == a.containerDetailTab {
-			parts = append(parts, StyleTabActive.Render(label))
+			parts = append(parts, StyleTabActive.Render("▶ "+label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	return "─ " + strings.Join(parts, " ─ ") + " ─"
+	return strings.Join(parts, "  │  ")
 }
 
 func (a *App) renderContainerDetailLine(tab containerDetailTab, line string) string {
@@ -125,7 +173,12 @@ func (a *App) containerDetailLines() []string {
 }
 
 func (a *App) containerDetailViewport() int {
-	return a.gitListViewport()
+	// Panel chrome: name(1) + tabbar(1) + blank(1) + blank(1) + hints(1) = 5 lines
+	v := a.contentPanelHeight() - 5
+	if v < 8 {
+		return 8
+	}
+	return v
 }
 
 func (a *App) containerDetailSwitchTab(delta int) tea.Cmd {

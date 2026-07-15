@@ -304,13 +304,23 @@ func (a *App) handleContainerActionDone(msg containerActionDoneMsg) {
 	a.syncContainerScroll(len(containers))
 }
 
-func (a *App) handleContainerShellDone(msg containerShellDoneMsg) {
-	a.containerSubview = containerSubviewShellReturn
+func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {
 	if msg.err != nil {
+		a.containerSubview = containerSubviewShellReturn
 		a.containerShellExitErr = "shell: " + msg.err.Error()
 	} else {
+		// Sucesso: volta direto para a lista
+		a.containerSubview = containerSubviewList
 		a.containerShellExitErr = ""
+		collectors.RefreshProjectsDocker(a.store)
+		a.snapshot = a.store.Get()
+		containers := a.currentProjectContainers()
+		if len(containers) > 0 {
+			a.tabCursor = clampCursor(a.tabCursor, len(containers))
+			a.syncContainerScroll(len(containers))
+		}
 	}
+	return tea.ClearScreen
 }
 
 func (a *App) openContainerDetail(c core.Container, projectPath string) tea.Cmd {

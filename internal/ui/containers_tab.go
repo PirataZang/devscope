@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -40,7 +41,7 @@ func (a *App) renderContainersTab(p *core.Project) string {
 	}
 }
 
-func (a *App) dismissContainerShellReturn() {
+func (a *App) dismissContainerShellReturn() tea.Cmd {
 	collectors.RefreshProjectsDocker(a.store)
 	a.snapshot = a.store.Get()
 	a.containerSubview = containerSubviewList
@@ -53,6 +54,7 @@ func (a *App) dismissContainerShellReturn() {
 		a.tabCursor = clampCursor(a.tabCursor, len(containers))
 		a.syncContainerScroll(len(containers))
 	}
+	return tea.ClearScreen
 }
 
 func (a *App) renderContainerList(p *core.Project) string {
@@ -83,16 +85,21 @@ func (a *App) renderContainerList(p *core.Project) string {
 		title,
 		StyleMuted.Render(fmt.Sprintf("%d containers  •  %d running", len(containers), running)),
 	}
+
+	// Linha de status fixa (1 linha) — evita salto de altura
 	if a.containerStatusMsg != "" {
 		style := StyleWarning
 		if strings.Contains(a.containerStatusMsg, "✓") {
 			style = StyleHealthy
 		}
 		lines = append(lines, style.Render(a.containerStatusMsg))
+	} else {
+		lines = append(lines, "")
 	}
-	lines = append(lines, "",
-		StyleMuted.Render("STATE        NAME                      IMAGE                     PORTS"),
-		StyleMuted.Render(strings.Repeat("─", maxInt(a.width-28, 60))),
+
+	lines = append(lines,
+		StyleTableHeader.Render("  STATE         NAME                      IMAGE                     PORTS"),
+		StyleMuted.Render("  "+strings.Repeat("─", maxInt(a.width-12, 60))),
 	)
 
 	if start > 0 {
@@ -105,14 +112,15 @@ func (a *App) renderContainerList(p *core.Project) string {
 		lines = append(lines, line)
 	}
 
+	// Preenche linhas vazias até o viewport para manter altura fixa
+	for i := end - start; i < viewport; i++ {
+		lines = append(lines, "")
+	}
+
 	remaining := len(containers) - end
 	if remaining > 0 {
 		lines = append(lines, StyleMuted.Render(fmt.Sprintf("  ↓ %d abaixo", remaining)))
 	}
-
-	lines = append(lines, "",
-		StyleMuted.Render("shift+e shell  s stop  r start/restart  p pause  d remove  enter detalhe  m detalhe  shift+u up  shift+d down"),
-	)
 
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
@@ -196,8 +204,8 @@ func containerStateStyled(status string) string {
 }
 
 func (a *App) containerListViewport() int {
-	h := a.gitPanelHeight()
-	v := h - 8
+	// chrome: title(1) + count(1) + status-or-blank(1) + header(1) + separator(1) = 5
+	v := a.contentPanelHeight() - 5
 	if v < 4 {
 		return 4
 	}

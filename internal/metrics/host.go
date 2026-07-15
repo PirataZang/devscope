@@ -27,6 +27,9 @@ func NewHostCollector() *HostCollector {
 }
 
 func (c *HostCollector) Collect() core.HostMetrics {
+	if runtime.GOOS == "windows" {
+		return c.collectWindows()
+	}
 	return core.HostMetrics{
 		CPUPercent:    c.cpuPercent(),
 		MemoryPercent: c.memoryPercent(),
@@ -257,4 +260,95 @@ func readOSInfo() string {
 		osName = strings.ToUpper(osName[:1]) + osName[1:]
 	}
 	return osName + " " + arch
+}
+
+func (c *HostCollector) collectWindows() core.HostMetrics {
+	// Executa query PowerShell em 1 comando rápido para obter CPU, RAM, Memória Virtual e Uptime
+	cmd := exec.Command("powershell", "-NoProfile", "-Command",
+		`$os = Get-CimInstance Win32_OperatingSystem; `+
+		`$cpu = (Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average; `+
+		`$uptime = [math]::Round([DateTime]::Now.Subtract($os.LastBootUpTime).TotalSeconds); `+
+		`Write-Host ("{0}|{1}|{2}|{3}|{4}|{5}" -f $cpu, $os.TotalVisibleMemorySize, $os.FreePhysicalMemory, $os.TotalVirtualMemorySize, $os.FreeVirtualMemory, $uptime)`)
+
+	out, err := cmd.Output()
+	if err != nil {
+		return core.HostMetrics{
+			OSInfo:        readOSInfo(),
+			DockerRunning: countDockerRunning(),
+			LoadAvg:       "N/A",
+		}
+	}
+
+	parts := strings.Split(strings.TrimSpace(string(out)), "|")
+	if len(parts) < 6 {
+		return core.HostMetrics{
+			OSInfo:        readOSInfo(),
+			DockerRunning: countDockerRunning(),
+			LoadAvg:       "N/A",
+		}
+	}
+
+	cpu, _ := strconv.ParseFloat(parts[0], 64)
+	memTotalKB, _ := strconv.ParseInt(parts[1], 10, 64)
+	memFreeKB, _ := strconv.ParseInt(parts[2], 10, 64)
+	virtualTotalKB, _ := strconv.ParseInt(parts[3], 10, 64)
+	virtualFreeKB, _ := strconv.ParseInt(parts[4], 10, 64)
+	uptimeSecs, _ := strconv.ParseInt(parts[5], 10, 64)
+
+	memTotalMB := memTotalKB / 1024
+	memFreeMB := memFreeKB / 1024
+	memUsedMB := memTotalMB - memFreeMB
+	if memUsedMB < 0 {
+		memUsedMB = 0
+	}
+
+	memPercent := 0.0
+	if memTotalMB > 0 {
+		memPercent = float64(memUsedMB) / float64(memTotalMB) * 100
+	}
+
+	// Swap virtual = total virtual - físico
+	swapTotalKB := virtualTotalKB - memTotalKB
+	swapFreeKB := virtualFreeKB - memFreeKB
+	if swapTotalKB < 0 {
+		swapTotalKB = 0
+	}
+	if swapFreeKB < 0 {
+		swapFreeKB = 0
+	}
+	swapUsedKB := swapTotalKB - swapFreeKB
+	if swapUsedKB < 0 {
+		swapUsedKB = 0
+	}
+
+	swapPercent := 0.0
+	if swapTotalKB > 0 {
+		swapPercent = float64(swapUsedKB) / float64(swapTotalKB) * 100
+	}
+
+	return core.HostMetrics{
+		CPUPercent:    cpu,
+		MemoryPercent: memPercent,
+		MemoryUsedMB:  memUsedMB,
+		MemoryTotalMB: memTotalMB,
+		DiskPercent:   c.diskPercent("C:"),
+		DiskUsedGB:    c.diskUsedGB("C:"),
+		DiskTotalGB:   c.diskTotalGB("C:"),
+		SwapPercent:   swapPercent,
+		Uptime:        time.Duration(uptimeSecs) * time.Second,
+		LoadAvg:       "N/A",
+		ProcessCount:  countProcessesWindows(),
+		DockerRunning: countDockerRunning(),
+		LoggedInUsers: 1,
+		OSInfo:        readOSInfo(),
+	}
+}
+
+func countProcessesWindows() int {
+	out, err := exec.Command("tasklist", "/nh").Output()
+	if err != nil {
+		return 0
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	return len(lines)
 }

@@ -11,6 +11,26 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
+// contentPanelHeight returns the fixed height (in lines) available for the
+// scrollable content area inside any detail panel (Git, Container, etc.).
+// It subtracts the constant chrome: header (2 lines) + project name/status (3)
+// + tabs (1) + blank gaps (4) + status bar (1) + StylePanel border+padding (4).
+// The result is capped so that the UI looks consistent on both small (24-line)
+// and large terminals.
+func (a *App) contentPanelHeight() int {
+	if a.height <= 0 {
+		return 18
+	}
+	h := a.height - 15 // ~15 lines of fixed chrome outside the panel
+	if h < 10 {
+		return 10
+	}
+	if h > 28 {
+		return 28 // prevent absurdly tall panels on huge monitors
+	}
+	return h
+}
+
 func padRight(s string, width int) string {
 	n := runewidth.StringWidth(s)
 	if n >= width {

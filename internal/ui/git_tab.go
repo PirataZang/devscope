@@ -37,16 +37,11 @@ const (
 )
 
 func (a *App) gitListViewport() int {
-	// ~500px de altura ≈ 22–26 linhas de lista (depende da fonte do terminal)
-	if a.height <= 0 {
-		return 22
-	}
-	v := a.height - 26
-	if v < 14 {
-		v = 14
-	}
-	if v > 26 {
-		v = 26
+	// Viewport = total panel content height minus internal git-panel chrome:
+	// title(1) + status-bar(1) + scroll-up(1) + scroll-down(1) + remote(1) + 2 hint lines = 7
+	v := a.contentPanelHeight() - 7
+	if v < 8 {
+		return 8
 	}
 	return v
 }
@@ -56,7 +51,17 @@ func (a *App) gitPanelInnerLines() int {
 }
 
 func (a *App) gitBranchColWidth() int {
-	return gitBranchColWidthMin
+	if a.width <= 0 {
+		return gitBranchColWidthMin
+	}
+	w := a.width / 4
+	if w < gitBranchColWidthMin {
+		return gitBranchColWidthMin
+	}
+	if w > 50 {
+		return 50
+	}
+	return w
 }
 
 func (a *App) gitCommitColWidth() int {
@@ -85,50 +90,55 @@ func (a *App) renderGitTab(p *core.Project) string {
 		viewBranch = g.Branch
 	}
 
-	var sections []string
-	sections = append(sections, title)
-	sections = append(sections, a.renderGitStatusBar(g, viewBranch))
+	// Status bar — inclui remote compacto ao final se disponível
+	statusBar := a.renderGitStatusBar(g, viewBranch)
+	if g.Remote != "" {
+		remote := g.Remote
+		remote = strings.TrimPrefix(remote, "https://")
+		remote = strings.TrimPrefix(remote, "http://")
+		remote = strings.TrimPrefix(remote, "git@")
+		remote = strings.TrimSuffix(remote, ".git")
+		statusBar += "   " + StyleMuted.Render("↗ "+truncate(remote, 45))
+	}
 
-	if a.gitStatusMsg != "" {
+	// Linha de notificação — sempre 1 linha fixa para evitar saltos de altura
+	var notifLine string
+	switch {
+	case a.gitStatusMsg != "":
 		style := StyleMuted
 		if strings.Contains(a.gitStatusMsg, "✓") {
 			style = StyleHealthy
 		} else if strings.Contains(a.gitStatusMsg, "erro") || strings.Contains(a.gitStatusMsg, ":") {
 			style = StyleWarning
 		}
-		sections = append(sections, style.Render(a.gitStatusMsg))
-	}
-	if a.gitCherryPickActive {
+		notifLine = style.Render(a.gitStatusMsg)
+	case a.gitCherryPickActive:
 		src := a.gitCherryPickSourceBranch
 		if src == "" {
 			src = "?"
 		}
-		sections = append(sections, StyleGitCherry.Render(
-			"🍒 Cherry-pick de "+src+": "+a.gitCherryPickSummary()+" — shift+v na branch destino",
-		))
-	} else if n := a.gitSelectedCommitCount(); n > 0 {
-		sections = append(sections, StyleGitSelected.Render(
-			fmt.Sprintf("✓ %d commit(s) selecionado(s) — shift+c para copiar cherry-pick", n),
-		))
-	}
-	if a.gitActionLoading {
-		sections = append(sections, StyleMuted.Render("executando..."))
+		notifLine = StyleGitCherry.Render(
+			"🍒 Cherry-pick de " + src + ": " + a.gitCherryPickSummary() + " — shift+v na branch destino",
+		)
+	case a.gitSelectedCommitCount() > 0:
+		notifLine = StyleGitSelected.Render(
+			fmt.Sprintf("✓ %d commit(s) selecionado(s) — shift+c para copiar cherry-pick", a.gitSelectedCommitCount()),
+		)
+	case a.gitActionLoading:
+		notifLine = StyleMuted.Render("executando...")
 	}
 
-	sections = append(sections, "", a.renderGitMainColumns(g, viewBranch))
+	sections := []string{
+		title,
+		statusBar,
+		notifLine, // 1 linha fixa (vazia ou com mensagem)
+		"",
+		a.renderGitMainColumns(g, viewBranch),
+	}
 
 	if a.gitShowWorkingTree() {
 		sections = append(sections, "", a.renderGitFiles(g, viewBranch))
 	}
-
-	if g.Remote != "" {
-		sections = append(sections, "", StyleMuted.Render("Remote: "+truncate(g.Remote, maxInt(a.width-12, 40))))
-	}
-
-	sections = append(sections, "",
-		StyleMuted.Render("space checkout  shift+↑↓ range  x toggle  shift+c copy  shift+v paste  b filter  enter detail"),
-		StyleMuted.Render("n new  d delete  D mark origin  shift+R rename  o PR  shift+m merge  p pull  shift+P push"),
-	)
 
 	return StylePanel.Render(strings.Join(sections, "\n"))
 }
@@ -313,8 +323,9 @@ func (a *App) gitCommitMessageViewport() int {
 	return 6
 }
 
+// gitPanelHeight is kept for compatibility but delegates to contentPanelHeight.
 func (a *App) gitPanelHeight() int {
-	return 24
+	return a.contentPanelHeight()
 }
 
 func (a *App) renderGitBranches(g *core.GitInfo, viewBranch string) string {
