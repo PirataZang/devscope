@@ -1,0 +1,19 @@
+# Binaries
+bin/
+dist/
+
+# Go
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config local
+config.yaml
