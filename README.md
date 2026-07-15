@@ -7,44 +7,54 @@
 <p align="center">
   <a href="https://github.com/PirataZang/devscope/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/PirataZang/devscope/ci.yml?branch=main&label=CI&style=flat-square" alt="CI"></a>
   <a href="https://github.com/PirataZang/devscope/releases"><img src="https://img.shields.io/github/v/release/PirataZang/devscope?label=release&style=flat-square" alt="Release"></a>
-  <a href="https://github.com/PirataZang/devscope/blob/main/LICENSE"><img src="img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License MIT"></a>
-  <a href="https://go.dev/"><img src="https://img.shields.io/badge/go-1.22+-00ADD8?logo=go&logoColor=white&style=flat-square" alt="Go 1.22+"></a>
+  <a href="https://github.com/PirataZang/devscope/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License MIT"></a>
+  <img src="https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-informational?style=flat-square" alt="Platforms">
 </p>
 
 ---
 
 ## ⚡ Instalação Rápida
 
-Escolha o comando correspondente ao seu sistema operacional para instalar o DevScope instantaneamente:
+> **Nenhuma dependência necessária** — não precisa de Go, Docker ou qualquer runtime instalado. Apenas execute o comando abaixo e use.
 
 ### 🐧 Linux & 🍎 macOS
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
 ```
 
 ### 🪟 Windows (PowerShell)
+
 ```powershell
 irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
 ```
 
-> 💡 *Deseja customizar a instalação (mudar diretório, versão ou instalar via Go)? Veja a seção [Instalação Avançada](#-instalação-avançada).*
-
----
-
-## 🚀 Como Usar (Quick Start)
-
-Após instalar, basta rodar o comando abaixo no seu terminal. O DevScope fará um scan automático nos diretórios mais comuns (`/var/www`, `/home`, `/opt`):
+Após a instalação (reinicie o terminal se necessário):
 
 ```bash
 devscope
 ```
 
-### 🔧 Outros Modos de Uso (Sem TUI)
-Se você precisar extrair dados para automações ou monitoramento rápido:
+> 💡 Instalar uma versão específica, mudar o diretório de instalação ou fazer build from source? Veja [Instalação Avançada](#️-instalação-avançada).
+
+---
+
+## 🚀 Como Usar (Quick Start)
+
+Após instalar, basta rodar:
+
 ```bash
-devscope scan --json          # Retorna um snapshot completo do servidor em formato JSON
-devscope watch                # Executa o painel com auto-refresh direto no terminal
-devscope version              # Exibe informações detalhadas de versão e build
+devscope
+```
+
+O DevScope faz um scan automático nos diretórios mais comuns (`/var/www`, `/home`, `/opt`) e exibe o painel interativo.
+
+### 🔧 Outros Modos de Uso
+
+```bash
+devscope scan --json          # Snapshot completo do servidor em JSON (útil para automações)
+devscope watch                # Painel com auto-refresh no terminal
+devscope version              # Informações de versão e build
 ```
 
 ---
@@ -52,27 +62,29 @@ devscope version              # Exibe informações detalhadas de versão e buil
 ## 🔍 O Problema
 
 Gerenciar uma VPS Linux típica exige monitorar dezenas de utilitários isolados:
+
 ```bash
-docker ps -a                 # Para ver os contêineres rodando
-docker stats --no-stream     # Para monitorar uso de recursos de Docker
-pm2 list                     # Para processos Node.js/PM2
-git -C /var/www/projeto status # Para verificar alterações de código
-ss -ltn | grep LISTEN        # Para ver quais portas estão abertas
-nginx -T | grep server_name  # Para ver domínios configurados
-certbot certificates         # Para monitorar validade do SSL
+docker ps -a                    # Ver contêineres rodando
+docker stats --no-stream        # Monitorar uso de recursos
+pm2 list                        # Processos Node.js/PM2
+git -C /var/www/projeto status  # Verificar alterações de código
+ss -ltn | grep LISTEN           # Ver portas abertas
+nginx -T | grep server_name     # Ver domínios configurados
+certbot certificates            # Monitorar validade do SSL
 ```
-Cada ferramenta expõe uma unidade diferente (contêiner, processo, porta). No entanto, como desenvolvedor, **você pensa em projetos**.
+
+Cada ferramenta expõe uma unidade diferente. No entanto, como desenvolvedor, **você pensa em projetos**.
 
 ## 💡 A Solução
 
-O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projetos automaticamente e agrupa todas as informações em uma única tela interativa de terminal (TUI).
+O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projetos automaticamente e agrupa tudo em uma única tela interativa:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
 │ DevScope v0.1.0          CPU 21%   RAM 54%   DISK 31%        14:32:01 │
 ├───────────────────────────────────────────────────────────────────────┤
 │ SYSTEM OVERVIEW                                                       │
-│ Uptime: 12d 4h  •  Load: 0.42  •  Docker: 8  •  RAM: 8192/16384 MB    │
+│ Uptime: 12d 4h  •  Load: 0.42  •  Docker: 8  •  RAM: 8192/16384 MB   │
 ├───────────────────────────────────────────────────────────────────────┤
 │ PROJECTS (12)                                                         │
 │   NAME              STATUS    BRANCH   CPU   RAM    PORTS             │
@@ -103,28 +115,26 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 ### 🟢 Disponível Agora
 * 📂 **Descoberta Automática** — Varre os diretórios `/var/www`, `/home`, `/opt` e caminhos configurados.
 * 🏷️ **Detecção Inteligente de Frameworks** — Suporte nativo para NestJS, Laravel, Django, Next.js, Vue, React, Nuxt, Go, Python, Rust, PHP, Java, etc.
-* 📊 **Métricas do Sistema** — Monitoramento de uso de CPU, RAM, Disco, Swap, Load e Uptime direto do host.
-* 🐳 **Integração com Docker** — Status de contêineres, estatísticas de uso em tempo real e correlação automática com seus projetos.
-* 🐙 **Integração com Git** — Detecção de branch atual, status da working tree (arquivos modificados), histórico de commits e visualização de diff.
+* 📊 **Métricas do Sistema** — Monitoramento de CPU, RAM, Disco, Swap, Load e Uptime direto do host.
+* 🐳 **Integração com Docker** — Status de contêineres, estatísticas em tempo real e correlação automática com seus projetos.
+* 🐙 **Integração com Git** — Branch atual, status da working tree, histórico de commits e diff.
 * ⚙️ **Suporte a PM2** — Identifica e lista workers vinculados a cada projeto.
-* 🩺 **Health Checks** — Validação ativa de endpoints via HTTP/TCP com status inteligente (`Running`, `Degraded`, `Stopped`).
-* 🔒 **Nginx & SSL** — Mapeamento de domínios reversos e monitoramento de expiração de certificados Let's Encrypt.
-* ⚡ **Ações Interativas** — Abrir terminal no projeto ou dentro de contêineres, pausar, reiniciar, remover recursos e monitorar logs em tempo real (*follow*).
+* 🩺 **Health Checks** — Validação de endpoints via HTTP/TCP com status inteligente (`Running`, `Degraded`, `Stopped`).
+* 🔒 **Nginx & SSL** — Mapeamento de domínios reversos e monitoramento de certificados Let's Encrypt.
+* ⚡ **Ações Interativas** — Terminal no projeto, pausar/reiniciar/remover contêineres, logs em tempo real.
 
 ### 🟡 Em Desenvolvimento
 * [ ] Conexão e monitoramento multi-host via SSH (v2.0)
 * [ ] Alertas e notificações via Webhooks (Slack, Discord)
-* [ ] Integração com esteiras de CI/CD (GitHub Actions / GitLab CI)
-* [ ] Gravação demonstrativa em GIF na página principal
+* [ ] Integração com CI/CD (GitHub Actions / GitLab CI)
+* [ ] Demo em GIF na página principal
 
 ---
 
 ## ⌨️ Atalhos do Teclado
 
-Para facilitar a navegação rápida, o DevScope é totalmente operável pelo teclado:
-
 <details>
-<summary>📂 <b>Atalhos do Dashboard Principal</b> (Clique para expandir)</summary>
+<summary>📂 <b>Dashboard Principal</b> (Clique para expandir)</summary>
 
 | Tecla | Ação |
 |---|---|
@@ -142,23 +152,23 @@ Para facilitar a navegação rápida, o DevScope é totalmente operável pelo te
 </details>
 
 <details>
-<summary>📄 <b>Atalhos de Detalhes do Projeto</b> (Clique para expandir)</summary>
+<summary>📄 <b>Detalhes do Projeto</b> (Clique para expandir)</summary>
 
 | Tecla | Ação |
 |---|---|
 | `Esc` | Voltar para o Dashboard principal |
-| `Tab` / `Shift+Tab` | Ir para a próxima / aba anterior |
+| `Tab` / `Shift+Tab` | Próxima / aba anterior |
 | `1` – `6` | Atalhos para abas: Overview, Git, Containers, Health, Logs, Metrics |
 | `L` | Abrir o **LazyGit** no contexto do projeto atual |
 | `D` | Executar script de Deploy (com confirmação) |
 | `o` | Abrir URL do projeto no navegador |
-| `h` | Acessar aba de monitoramento de Saúde (Health) |
-| `l` | Acessar aba de Logs |
+| `h` | Aba de monitoramento de Saúde (Health) |
+| `l` | Aba de Logs |
 
 </details>
 
 <details>
-<summary>🐙 <b>Atalhos de Controle Git</b> (Clique para expandir)</summary>
+<summary>🐙 <b>Controle Git</b> (Clique para expandir)</summary>
 
 | Tecla | Ação |
 |---|---|
@@ -169,7 +179,7 @@ Para facilitar a navegação rápida, o DevScope é totalmente operável pelo te
 </details>
 
 <details>
-<summary>🐳 <b>Atalhos de Controle de Contêineres</b> (Clique para expandir)</summary>
+<summary>🐳 <b>Controle de Contêineres</b> (Clique para expandir)</summary>
 
 | Tecla | Ação |
 |---|---|
@@ -186,38 +196,75 @@ Para facilitar a navegação rápida, o DevScope é totalmente operável pelo te
 
 ## 🛠️ Instalação Avançada
 
-### Instalação via Go
-Se você tem o Go instalado no seu ambiente (versão 1.22+):
-```bash
-go install github.com/devscope/devscope/cmd/devscope@latest
-```
-*Certifique-se de que o diretório `$GOPATH/bin` ou `$HOME/go/bin` esteja configurado na sua variável de ambiente `PATH`.*
+### Instalar uma versão específica
 
-### Compilação Manual (Build from Source)
+**Linux/macOS:**
+```bash
+DEVSCOPE_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:DEVSCOPE_VERSION="0.1.0"
+irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
+```
+
+### Instalar em diretório personalizado
+
+**Linux/macOS:**
+```bash
+DEVSCOPE_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:DEVSCOPE_INSTALL_DIR="C:\Tools\devscope"
+irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
+```
+
+### Download Direto (Manual)
+
+Baixe o binário pré-compilado para a sua plataforma em [GitHub Releases](https://github.com/PirataZang/devscope/releases):
+
+| Plataforma | Arquivo |
+|---|---|
+| 🐧 Linux x64 | `devscope_*_linux_amd64.tar.gz` |
+| 🐧 Linux ARM64 | `devscope_*_linux_arm64.tar.gz` |
+| 🍎 macOS x64 | `devscope_*_darwin_amd64.tar.gz` |
+| 🍎 macOS Apple Silicon | `devscope_*_darwin_arm64.tar.gz` |
+| 🪟 Windows x64 | `devscope_*_windows_amd64.zip` |
+| 🪟 Windows ARM64 | `devscope_*_windows_arm64.zip` |
+
+Cada release inclui um arquivo `checksums.txt` para verificar a integridade do download.
+
+### Build from Source (requer Go 1.22+)
+
 ```bash
 git clone https://github.com/PirataZang/devscope.git
 cd devscope
-make run          # Compila e executa localmente (ambiente de desenvolvimento)
-make install-dev  # Compila e move o binário para o seu PATH de desenvolvimento
-make build        # Apenas compila o binário em ./bin/devscope
+make build        # Compila o binário em ./bin/devscope
+make run          # Compila e executa localmente
+make install-dev  # Compila e instala no PATH de desenvolvimento
 ```
 
-### Download Direto
-Você também pode baixar os binários compilados manualmente acessando a página de [GitHub Releases](https://github.com/PirataZang/devscope/releases). Os arquivos acompanham um arquivo `checksums.txt` para você validar a integridade do download.
+Ou via `go install`:
+```bash
+go install github.com/devscope/devscope/cmd/devscope@latest
+```
+*Certifique-se de que `$GOPATH/bin` ou `$HOME/go/bin` esteja no seu `PATH`.*
 
 ---
 
 ## ⚙️ Configuração
 
-O DevScope roda totalmente sem configuração prévia, mas você pode customizar seu comportamento criando um arquivo de configuração.
+O DevScope funciona sem configuração prévia. Para customizar, copie o arquivo de exemplo:
 
-Para começar, copie o modelo padrão:
 ```bash
 mkdir -p ~/.config/devscope
 cp configs/devscope.example.yaml ~/.config/devscope/config.yaml
 ```
 
-O arquivo de configuração suporta os seguintes parâmetros ([configs/devscope.example.yaml](configs/devscope.example.yaml)):
+Parâmetros disponíveis ([configs/devscope.example.yaml](configs/devscope.example.yaml)):
 
 ```yaml
 scan:
@@ -249,31 +296,35 @@ pinned:
 ```
 
 ### Variáveis de Ambiente
-Você também pode sobrescrever as configurações usando variáveis com o prefixo `DEVSCOPE_`. 
-*Exemplo:* `DEVSCOPE_SCAN_PATHS=/var/www,/home/usuario/projetos`
+
+Sobrescreva configurações com variáveis prefixadas com `DEVSCOPE_`:
+
+```bash
+DEVSCOPE_SCAN_PATHS=/var/www,/home/usuario/projetos devscope
+```
 
 ---
 
 ## 🏗️ Arquitetura
 
-O funcionamento interno segue o seguinte fluxo de dados unidirecional:
 ```
 Caminhos de Scan (ScanPaths) ──> Varredura do Disco (Walk filesystem) ──> Detectores de Framework
                                                                                │
                                                                                ▼
 Bubble Tea UI <── Snapshot Imutável <── Coletores (Docker, PM2, Git, Health, Nginx)
 ```
-Para saber mais detalhes técnicos, consulte a nossa documentação em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+Para detalhes técnicos, consulte [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
 ## 🤝 Contribuindo
 
-Adoramos contribuições! Se você encontrou um bug ou quer propor melhorias, siga os passos descritos em [CONTRIBUTING.md](CONTRIBUTING.md).
+Adoramos contribuições! Se você encontrou um bug ou quer propor melhorias, siga os passos em [CONTRIBUTING.md](CONTRIBUTING.md).
 
 * 🐛 Encontrou um bug? [Abra uma Issue de Bug](https://github.com/PirataZang/devscope/issues/new?template=bug_report.md)
-* 💡 Tem uma ideia de funcionalidade? [Solicite uma Feature](https://github.com/PirataZang/devscope/issues/new?template=feature_request.md)
-* ⚙️ Quer adicionar suporte a um novo framework? [Abra uma solicitação de detector](https://github.com/PirataZang/devscope/issues/new?template=detector_request.md)
+* 💡 Tem uma ideia? [Solicite uma Feature](https://github.com/PirataZang/devscope/issues/new?template=feature_request.md)
+* ⚙️ Novo framework? [Abra uma solicitação de detector](https://github.com/PirataZang/devscope/issues/new?template=detector_request.md)
 
 ---
 

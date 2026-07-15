@@ -18,6 +18,17 @@ need_cmd() {
 	command -v "$1" >/dev/null 2>&1 || err "comando obrigatório não encontrado: $1"
 }
 
+# Detecta o comando correto de sha256 (Linux vs macOS)
+sha256() {
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum "$1" | awk '{print $1}'
+	elif command -v shasum >/dev/null 2>&1; then
+		shasum -a 256 "$1" | awk '{print $1}'
+	else
+		echo ""
+	fi
+}
+
 need_cmd curl
 
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -32,13 +43,13 @@ darwin)
 	EXT="tar.gz"
 	BIN_NAME="devscope"
 	;;
-mingw*|msys*|cygwin*)
+mingw* | msys* | cygwin*)
 	OS=windows
 	EXT="zip"
 	BIN_NAME="devscope.exe"
 	;;
 *)
-	err "sistema operacional não suportado: $OS (use: go install github.com/${REPO}/cmd/devscope@latest)"
+	err "sistema operacional não suportado: $OS"
 	;;
 esac
 
@@ -70,12 +81,13 @@ fi
 mkdir -p "$INSTALL_DIR"
 
 if [[ "$VERSION" == "latest" ]]; then
+	info "obtendo a versão mais recente..."
 	VERSION=$(
 		curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" |
 			sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' |
 			head -1
 	)
-	[[ -n "$VERSION" ]] || err "não foi possível obter a versão mais recente (release publicada?)"
+	[[ -n "$VERSION" ]] || err "não foi possível obter a versão mais recente. Existe uma release publicada em https://github.com/${REPO}/releases?"
 fi
 
 TAG="$VERSION"
@@ -87,16 +99,22 @@ BASE_URL="https://github.com/${REPO}/releases/download/${TAG}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-info "baixando ${ASSET}..."
-curl -fsSL "${BASE_URL}/${ASSET}" -o "${TMP}/${ASSET}"
+info "baixando DevScope ${TAG} para ${OS}/${ARCH}..."
+if ! curl -fsSL "${BASE_URL}/${ASSET}" -o "${TMP}/${ASSET}"; then
+	err "falha ao baixar '${ASSET}'. Verifique se a release '${TAG}' existe em https://github.com/${REPO}/releases"
+fi
 
+# Verificação de checksum (opcional — continua se checksums.txt não existir)
 if curl -fsSL "${BASE_URL}/checksums.txt" -o "${TMP}/checksums.txt" 2>/dev/null; then
 	EXPECTED=$(grep " ${ASSET}$" "${TMP}/checksums.txt" | awk '{print $1}')
 	if [[ -n "$EXPECTED" ]]; then
-		need_cmd sha256sum
-		ACTUAL=$(sha256sum "${TMP}/${ASSET}" | awk '{print $1}')
-		[[ "$ACTUAL" == "$EXPECTED" ]] || err "checksum inválido"
-		info "checksum ok"
+		ACTUAL=$(sha256 "${TMP}/${ASSET}")
+		if [[ -n "$ACTUAL" ]]; then
+			[[ "$ACTUAL" == "$EXPECTED" ]] || err "checksum inválido — o download pode estar corrompido"
+			info "checksum verificado ✓"
+		else
+			info "aviso: nenhuma ferramenta de sha256 encontrada, pulando verificação de checksum"
+		fi
 	fi
 fi
 
@@ -112,8 +130,9 @@ else
 	tar -xzf "${TMP}/${ASSET}" -C "$TMP"
 fi
 
-BINARY="${TMP}/${BIN_NAME}"
-[[ -f "$BINARY" ]] || err "binário não encontrado no arquivo"
+# Busca o binário em qualquer subdiretório extraído
+BINARY=$(find "$TMP" -name "$BIN_NAME" -type f | head -1)
+[[ -n "$BINARY" && -f "$BINARY" ]] || err "binário '${BIN_NAME}' não encontrado no arquivo extraído"
 
 if [[ "$OS" == "windows" ]]; then
 	cp "$BINARY" "${INSTALL_DIR}/${BIN_NAME}"
@@ -126,12 +145,47 @@ else
 	fi
 fi
 
-info "instalado em ${INSTALL_DIR}/${BIN_NAME}"
+info "DevScope instalado em ${INSTALL_DIR}/${BIN_NAME} ✓"
+
+# Adiciona ao PATH automaticamente se necessário
+add_to_path() {
+	local dir="$1"
+	local profile_file="$2"
+
+	if [[ -f "$profile_file" ]]; then
+		if ! grep -q "$dir" "$profile_file" 2>/dev/null; then
+			echo "" >> "$profile_file"
+			echo "# DevScope" >> "$profile_file"
+			echo "export PATH=\"${dir}:\$PATH\"" >> "$profile_file"
+			echo "  adicionado ao ${profile_file}"
+		fi
+	fi
+}
 
 if ! command -v devscope >/dev/null 2>&1; then
-	echo "adicione ao PATH: export PATH=\"${INSTALL_DIR}:\$PATH\""
+	echo ""
+	echo "==> Adicionando ${INSTALL_DIR} ao seu PATH..."
+
+	ADDED=0
+	if [[ -n "${BASH_VERSION:-}" ]] || [[ -f "$HOME/.bashrc" ]]; then
+		add_to_path "$INSTALL_DIR" "$HOME/.bashrc"
+		ADDED=1
+	fi
+	if [[ -n "${ZSH_VERSION:-}" ]] || [[ -f "$HOME/.zshrc" ]]; then
+		add_to_path "$INSTALL_DIR" "$HOME/.zshrc"
+		ADDED=1
+	fi
+	if [[ $ADDED -eq 0 ]]; then
+		add_to_path "$INSTALL_DIR" "$HOME/.profile"
+	fi
+
+	echo ""
+	echo "  Para aplicar agora, execute:"
+	echo "    export PATH=\"${INSTALL_DIR}:\$PATH\""
+	echo "  Ou abra um novo terminal."
 fi
 
-if command -v devscope >/dev/null 2>&1; then
-	devscope version
-fi
+echo ""
+echo "  ✅ DevScope ${TAG} instalado com sucesso!"
+echo "  Execute: devscope"
+echo ""
