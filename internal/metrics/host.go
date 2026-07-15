@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/devscope/devscope/internal/core"
@@ -155,34 +154,26 @@ func parseMemLine(lines map[string]int64, key string) (int64, bool) {
 }
 
 func (c *HostCollector) diskPercent(path string) float64 {
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs(path, &stat); err != nil {
-		return 0
-	}
-	total := stat.Blocks * uint64(stat.Bsize)
-	free := stat.Bavail * uint64(stat.Bsize)
-	if total == 0 {
+	total, free, err := getDiskSpace(path)
+	if err != nil || total == 0 {
 		return 0
 	}
 	return float64(total-free) / float64(total) * 100
 }
 
 func (c *HostCollector) diskUsedGB(path string) float64 {
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs(path, &stat); err != nil {
+	total, free, err := getDiskSpace(path)
+	if err != nil {
 		return 0
 	}
-	total := stat.Blocks * uint64(stat.Bsize)
-	free := stat.Bavail * uint64(stat.Bsize)
 	return float64(total-free) / (1024 * 1024 * 1024)
 }
 
 func (c *HostCollector) diskTotalGB(path string) float64 {
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs(path, &stat); err != nil {
+	total, _, err := getDiskSpace(path)
+	if err != nil {
 		return 0
 	}
-	total := stat.Blocks * uint64(stat.Bsize)
 	return float64(total) / (1024 * 1024 * 1024)
 }
 

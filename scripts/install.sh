@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="${DEVSCOPE_REPO:-devscope/devscope}"
+REPO="${DEVSCOPE_REPO:-PirataZang/devscope}"
 VERSION="${DEVSCOPE_VERSION:-latest}"
 INSTALL_DIR="${DEVSCOPE_INSTALL_DIR:-}"
 
@@ -21,7 +21,12 @@ need_cmd() {
 need_cmd curl
 need_cmd tar
 
-[[ "$(uname -s)" == "Linux" ]] || err "suportado apenas em Linux (use: go install github.com/${REPO}/cmd/devscope@latest)"
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+case "$OS" in
+linux) OS=linux ;;
+darwin) OS=darwin ;;
+*) err "sistema operacional não suportado: $OS (use: go install github.com/${REPO}/cmd/devscope@latest)" ;;
+esac
 
 ARCH=$(uname -m)
 case "$ARCH" in
@@ -55,7 +60,7 @@ TAG="$VERSION"
 [[ "$TAG" == v* ]] || TAG="v${TAG}"
 VER="${TAG#v}"
 
-ASSET="devscope_${VER}_linux_${ARCH}.tar.gz"
+ASSET="devscope_${VER}_${OS}_${ARCH}.tar.gz"
 BASE_URL="https://github.com/${REPO}/releases/download/${TAG}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT

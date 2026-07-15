@@ -649,7 +649,7 @@ Semver: `MAJOR.MINOR.PATCH`
 | Canal | Método |
 |-------|--------|
 | GitHub Releases | Binários pré-compilados (.tar.gz) |
-| Script | `curl -fsSL https://raw.githubusercontent.com/devscope/devscope/main/scripts/install.sh \| bash` |
+| Script | `curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh \| bash` |
 | `go install` | `go install github.com/devscope/devscope/cmd/devscope@latest` |
 
 ### 10.3 Binário
