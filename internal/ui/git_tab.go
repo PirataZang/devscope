@@ -37,11 +37,10 @@ const (
 )
 
 func (a *App) gitListViewport() int {
-	// Viewport = total panel content height minus internal git-panel chrome:
-	// title(1) + status-bar(1) + scroll-up(1) + scroll-down(1) + remote(1) + 2 hint lines = 7
-	v := a.contentPanelHeight() - 7
-	if v < 8 {
-		return 8
+	// Total panel height = gitListViewport() + 3 (internal column chrome) + 6 (external git panel chrome)
+	v := a.contentPanelHeight() - 9
+	if v < 6 {
+		return 6
 	}
 	return v
 }
@@ -139,6 +138,10 @@ func (a *App) renderGitTab(p *core.Project) string {
 	if a.gitShowWorkingTree() {
 		sections = append(sections, "", a.renderGitFiles(g, viewBranch))
 	}
+
+	sections = append(sections, "",
+		StyleMuted.Render("Atalhos: space checkout │ x/shift+c/shift+v cherry-pick │ n/d/R/M branch │ p/P pull/push"),
+	)
 
 	return StylePanel.Render(strings.Join(sections, "\n"))
 }

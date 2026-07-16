@@ -40,10 +40,17 @@ func TestDockerfileFromCompose(t *testing.T) {
 
 func TestResolveDockerfilePath(t *testing.T) {
 	base := "/project"
-	if got := resolveDockerfilePath(base, "docker/Dockerfile"); got != "/project/docker/Dockerfile" {
+	if got := filepath.ToSlash(resolveDockerfilePath(base, "docker/Dockerfile")); got != "/project/docker/Dockerfile" {
 		t.Fatalf("unexpected relative path: %s", got)
 	}
-	if got := resolveDockerfilePath(base, "/abs/Dockerfile"); got != "/abs/Dockerfile" {
+
+	absPath := "/abs/Dockerfile"
+	if filepath.Separator == '\\' {
+		absPath = "C:/abs/Dockerfile"
+	}
+	got := filepath.ToSlash(resolveDockerfilePath(base, absPath))
+	expected := filepath.ToSlash(absPath)
+	if got != expected {
 		t.Fatalf("unexpected absolute path: %s", got)
 	}
 }

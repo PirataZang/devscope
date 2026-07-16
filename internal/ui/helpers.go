@@ -25,8 +25,8 @@ func (a *App) contentPanelHeight() int {
 	if h < 10 {
 		return 10
 	}
-	if h > 28 {
-		return 28 // prevent absurdly tall panels on huge monitors
+	if h > 18 {
+		return 18 // prevent absurdly tall panels on huge monitors, keep it compact and clean
 	}
 	return h
 }

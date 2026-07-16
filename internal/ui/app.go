@@ -25,6 +25,9 @@ type App struct {
 	filterOn bool
 	filterInput string
 
+	helpOn      bool
+	helpScroll  int
+
 	selectedProject *core.Project
 	tab             Tab
 	tabCursor       int
@@ -133,6 +136,17 @@ func (a *App) Run() error {
 func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if a.helpOn {
+			return a.updateHelp(msg)
+		}
+		if a.containerSubview == containerSubviewShellReturn {
+			switch msg.String() {
+			case "enter", "esc":
+				cmd := a.dismissContainerShellReturn()
+				return a, cmd
+			}
+			return a, nil
+		}
 		if a.gitPromptOn {
 			return a.updateGitPrompt(msg)
 		}
@@ -324,11 +338,8 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, tea.Quit
 
 	case msg.String() == "?":
-		if a.view == ViewHelp {
-			a.view = ViewDashboard
-		} else {
-			a.view = ViewHelp
-		}
+		a.helpOn = true
+		a.helpScroll = 0
 		return a, nil
 
 	case msg.String() == "/":
@@ -347,9 +358,39 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a.updateDashboard(msg)
 	case ViewProject:
 		return a.updateProject(msg)
-	case ViewHelp:
-		if msg.String() == "esc" || msg.String() == "?" {
-			a.view = ViewDashboard
+	}
+	return a, nil
+}
+
+func (a *App) updateHelp(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
+	viewport := 12 // altura do conteúdo na telinha de ajuda
+	maxScroll := len(helpLines) - viewport
+	if maxScroll < 0 {
+		maxScroll = 0
+	}
+
+	switch msg.String() {
+	case "esc", "?":
+		a.helpOn = false
+		a.helpScroll = 0
+	case "up", "k":
+		if a.helpScroll > 0 {
+			a.helpScroll--
+		}
+	case "down", "j":
+		if a.helpScroll < maxScroll {
+			a.helpScroll++
+		}
+	case "pgup":
+		a.helpScroll -= viewport
+		if a.helpScroll < 0 {
+			a.helpScroll = 0
+		}
+	case "pgdown":
+		a.helpScroll += viewport
+		if a.helpScroll > maxScroll {
+			a.helpScroll = maxScroll
 		}
 	}
 	return a, nil
@@ -790,6 +831,10 @@ func (a *App) View() string {
 		return ""
 	}
 
+	if a.helpOn {
+		return a.renderHelpPopup()
+	}
+
 	if a.fuzzyOn {
 		return a.renderFuzzyPrompt()
 	}
@@ -815,8 +860,6 @@ func (a *App) View() string {
 	}
 
 	switch a.view {
-	case ViewHelp:
-		return a.renderHelp()
 	case ViewProject:
 		return a.renderProject()
 	default:
@@ -1025,81 +1068,123 @@ func (a *App) renderMetricsTab(p *core.Project) string {
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
 
+func (a *App) renderHelpPopup() string {
+	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
+	viewport := 12 // Altura visível de conteúdo
+	
+	maxScroll := len(helpLines) - viewport
+	if maxScroll < 0 {
+		maxScroll = 0
+	}
+	if a.helpScroll > maxScroll {
+		a.helpScroll = maxScroll
+	}
+	if a.helpScroll < 0 {
+		a.helpScroll = 0
+	}
 
-func (a *App) renderHelp() string {
-	help := `DevScope — htop dos projetos
+	var visibleLines []string
+	start := a.helpScroll
+	end := minInt(start+viewport, len(helpLines))
 
-Navigation:
-  ↑/k, ↓/j     Navigate list
-  Enter        Open project
-  Esc          Go back
-  Tab          Next tab (project view)
-  /            Filter projects
-  ctrl+p       Fuzzy search
-  ?            Toggle help
-  q            Quit
+	if start > 0 {
+		visibleLines = append(visibleLines, StyleMuted.Render(fmt.Sprintf("  ↑ %d comandos acima", start)))
+	} else {
+		visibleLines = append(visibleLines, "")
+	}
 
-Dashboard shortcuts:
-  shift+e      Terminal in project directory
-  g            Git tab
-  c            Containers tab
-  r            Refresh
+	for i := start; i < end; i++ {
+		visibleLines = append(visibleLines, helpLines[i])
+	}
 
-Project tabs:
-  1-6          Overview, Git, Containers, Health, Logs, Metrics
-  h            Health tab
-  l            Logs tab
-  L            LazyGit
-  D            Deploy (confirm y/n)
-  shift+u      Docker compose up -d
-  shift+d      Docker compose down
-  R            Compose restart
-  o            Open URL in browser
+	for len(visibleLines) < viewport+1 {
+		visibleLines = append(visibleLines, "")
+	}
 
-Git tab:
-  space        Checkout branch (ou toggle commit)
-  shift+↑↓     Selecionar range de commits
-  x            Toggle commit individual
-  shift+c      Copiar commits (cherry-pick)
-  shift+v      Colar cherry-pick na branch destino
-  b            Filtrar branches
-  enter        Ver detalhe do commit
-  n            Nova branch
-  d            Apagar branch (y/esc)
-  D            Marcar branch de origem (vermelho)
-  shift+R / R  Renomear branch
-  o            Abrir PR no GitHub
-  shift+m / M  Mesclar branch em HEAD (y/esc)
-  p            Pull origin da branch pai
-  shift+P / P  Push
-  ←/→ or h/l   Trocar seção
+	if end < len(helpLines) {
+		visibleLines = append(visibleLines, StyleMuted.Render(fmt.Sprintf("  ↓ %d comandos abaixo", len(helpLines)-end)))
+	} else {
+		visibleLines = append(visibleLines, "")
+	}
 
-Containers tab:
-  enter / m    Detalhe do container (logs, stats, env, compose…)
-  shift+e      Shell in container
-  s            Stop container
-  r            Start (stopped) / Restart (running)
-  p            Pause/unpause container
-  d            Remove container (confirm y/n)
-  shift+u      Docker compose up -d
-  shift+d      Docker compose down
+	title := StyleSection.Render("Ajuda — Atalhos do DevScope")
+	footer := StyleMuted.Render("↑/↓ scroll  │  esc ou ? fechar")
 
-Container detail (monitoramento):
-  ←/→          Trocar aba
-  ↑/↓          Scroll do conteúdo
-  esc          Voltar à lista
+	helpBox := StylePanel.Render(title + "\n\n" + strings.Join(visibleLines, "\n") + "\n\n" + footer)
 
-CLI:
-  devscope scan --json
-  devscope watch
-
-Config: ~/.config/devscope/config.yaml`
 	return lipgloss.JoinVertical(lipgloss.Left,
 		a.renderHeader(),
 		"",
-		StylePanel.Render(help),
-		a.renderStatusBar("? or esc to close"),
+		helpBox,
+		a.renderStatusBar("ajuda aberta | esc ou ? para fechar"),
 	)
+}
+
+func getHelpText() string {
+	return `Navigation:
+  ↑/k, ↓/j     Navegar na lista
+  Enter        Abrir projeto / Ver detalhes
+  Esc          Voltar / Fechar
+  Tab          Próxima aba (na view de projeto)
+  /            Filtrar projetos
+  ctrl+p       Filtro fuzzy de projetos
+  ?            Alternar exibição de ajuda
+  q            Sair do DevScope
+
+Dashboard:
+  shift+e      Abrir terminal no diretório do projeto
+  g            Abrir direto na aba Git
+  c            Abrir direto na aba Containers
+  r            Forçar atualização rápida
+
+Abas de Projeto:
+  1-6          Overview, Git, Containers, Health, Logs, Metrics
+  h            Ir para aba Health
+  l            Ir para aba Logs
+  L            Abrir LazyGit no projeto
+  D            Executar Deploy script (confirmação y/n)
+  shift+u      Docker compose up -d
+  shift+d      Docker compose down
+  R            Docker compose restart
+  o            Abrir URL do projeto no navegador
+
+Aba Git:
+  space        Checkout de branch (ou toggle commit)
+  shift+↑/↓    Selecionar range de commits
+  x            Toggle de seleção de commit individual
+  shift+c      Copiar commits selecionados (cherry-pick)
+  shift+v      Colar commits (cherry-pick) na branch destino
+  b            Filtrar lista de branches
+  enter        Ver detalhes do commit
+  n            Criar nova branch
+  d            Apagar branch (confirmação y/esc)
+  D            Marcar branch de origem
+  shift+R / R  Renomear branch
+  o            Abrir Pull Request no GitHub
+  shift+m / M  Mesclar branch na atual (confirmação y/esc)
+  p            Pull origin da branch pai
+  shift+P / P  Push
+  ←/→ or h/l   Alternar foco entre colunas (Branches / Commits)
+
+Aba Containers:
+  enter / m    Monitoramento de detalhes do container
+  shift+e      Abrir shell interativo dentro do container
+  s            Parar container (stop)
+  r            Iniciar/Reiniciar container
+  p            Pausar/Retomar container
+  d            Remover container (confirmação y/n)
+  shift+u      Docker compose up -d
+  shift+d      Docker compose down
+
+Detalhes do Container:
+  ←/→          Alternar abas (Logs, Stats, Env, Config, etc.)
+  ↑/↓          Rolar conteúdo do log / stats
+  esc          Voltar para a lista de containers
+
+CLI & Configuração:
+  devscope scan --json
+  devscope watch
+  Configuração em: ~/.config/devscope/config.yaml`
 }
 
 func (a *App) renderStatusBar(hints string) string {

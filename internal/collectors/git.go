@@ -24,21 +24,27 @@ func CollectAt(path string) *core.GitInfo {
 
 	info := &core.GitInfo{IsRepo: true}
 
-	info.Branch = gitOutput(path, "rev-parse", "--abbrev-ref", "HEAD")
-	info.LastCommit = strings.TrimSpace(gitOutput(path, "rev-parse", "--short", "HEAD"))
-	info.LastCommitMsg = strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=%s"))
-	info.Author = strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=%an"))
+	// 1. Coleta branch atual
+	info.Branch = strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "HEAD"))
 
-	dateStr := strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=%ci"))
-	if t, err := time.Parse("2006-01-02 15:04:05 -0700", dateStr); err == nil {
-		info.LastCommitDate = t
+	// 2. Coleta dados do último commit (hash, msg, autor, data) em uma ÚNICA chamada!
+	commitData := strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=format:%h|%s|%an|%ci"))
+	if commitData != "" {
+		parts := strings.SplitN(commitData, "|", 4)
+		if len(parts) == 4 {
+			info.LastCommit = parts[0]
+			info.LastCommitMsg = parts[1]
+			info.Author = parts[2]
+			if t, err := time.Parse("2006-01-02 15:04:05 -0700", parts[3]); err == nil {
+				info.LastCommitDate = t
+			}
+		}
 	}
 
-	info.Remote = strings.TrimSpace(gitOutput(path, "remote", "get-url", "origin"))
-	if info.Remote == "" {
-		info.Remote = strings.TrimSpace(gitOutput(path, "config", "--get", "remote.origin.url"))
-	}
+	// 3. Coleta remote url
+	info.Remote = strings.TrimSpace(gitOutput(path, "config", "--get", "remote.origin.url"))
 
+	// 4. Arquivos modificados/não rastreados
 	info.Files = collectGitFiles(path)
 	info.Modified = 0
 	info.Untracked = 0
@@ -50,16 +56,22 @@ func CollectAt(path string) *core.GitInfo {
 		}
 	}
 
+	// 5. Commits e Branches
 	info.Commits = collectGitCommits(path, info.Branch, 20)
 	info.Branches = collectGitBranches(path)
 
-	aheadBehind := gitOutput(path, "rev-list", "--left-right", "--count", "HEAD...@{upstream}")
-	parts := strings.Fields(aheadBehind)
-	if len(parts) == 2 {
-		info.Ahead, _ = strconv.Atoi(parts[0])
-		info.Behind, _ = strconv.Atoi(parts[1])
+	// 6. Ahead / Behind (só executa se a branch tiver upstream associado)
+	upstream := strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "@{upstream}"))
+	if upstream != "" && !strings.Contains(upstream, "fatal:") && !strings.Contains(upstream, "@") {
+		aheadBehind := gitOutput(path, "rev-list", "--left-right", "--count", "HEAD..."+upstream)
+		parts := strings.Fields(aheadBehind)
+		if len(parts) == 2 {
+			info.Ahead, _ = strconv.Atoi(parts[0])
+			info.Behind, _ = strconv.Atoi(parts[1])
+		}
 	}
 
+	// 7. Stashes
 	stash := strings.TrimSpace(gitOutput(path, "stash", "list"))
 	if stash != "" {
 		info.StashCount = len(strings.Split(stash, "\n"))

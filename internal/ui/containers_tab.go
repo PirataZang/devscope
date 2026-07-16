@@ -122,6 +122,10 @@ func (a *App) renderContainerList(p *core.Project) string {
 		lines = append(lines, StyleMuted.Render(fmt.Sprintf("  ↓ %d abaixo", remaining)))
 	}
 
+	lines = append(lines, "",
+		StyleMuted.Render("  Atalhos: enter/m detalhe │ shift+e shell │ s/r/p container │ d remover │ shift+u/d/R compose"),
+	)
+
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
 
@@ -204,8 +208,8 @@ func containerStateStyled(status string) string {
 }
 
 func (a *App) containerListViewport() int {
-	// chrome: title(1) + count(1) + status-or-blank(1) + header(1) + separator(1) = 5
-	v := a.contentPanelHeight() - 5
+	// chrome: title(1) + count(1) + status-or-blank(1) + header(1) + separator(1) + blank(1) + shortcuts(1) = 7
+	v := a.contentPanelHeight() - 7
 	if v < 4 {
 		return 4
 	}

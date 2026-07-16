@@ -75,11 +75,14 @@ func TestCollectCommitsAtBranch(t *testing.T) {
 	runGit(t, dir, "commit", "-m", "feature commit")
 
 	commits := CollectCommitsAt(dir, "feature", 10)
-	if len(commits) != 1 {
-		t.Fatalf("expected 1 branch-only commit on feature, got %d", len(commits))
+	if len(commits) != 2 {
+		t.Fatalf("expected 2 commits on feature branch, got %d", len(commits))
 	}
 	if commits[0].Message != "feature commit" {
-		t.Fatalf("expected feature commit only, got %q", commits[0].Message)
+		t.Fatalf("expected first commit to be feature commit, got %q", commits[0].Message)
+	}
+	if commits[1].Message != "main commit" {
+		t.Fatalf("expected second commit to be main commit, got %q", commits[1].Message)
 	}
 
 	mainBranch := defaultBranch
