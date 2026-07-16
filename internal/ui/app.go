@@ -1,4 +1,4 @@
-package ui
+						package ui
 
 import (
 	"fmt"
@@ -144,6 +144,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "enter", "esc":
 				cmd := a.dismissContainerShellReturn()
 				return a, cmd
+			case "q", "ctrl+c":
+				a.quitting = true
+				return a, tea.Quit
 			}
 			return a, nil
 		}
@@ -257,6 +260,15 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case containerShellDoneMsg:
 		cmd := a.handleContainerShellDone(msg)
 		return a, cmd
+
+	case dockerRefreshedMsg:
+		a.snapshot = a.store.Get()
+		containers := a.currentProjectContainers()
+		if len(containers) > 0 {
+			a.tabCursor = clampCursor(a.tabCursor, len(containers))
+			a.syncContainerScroll(len(containers))
+		}
+		return a, nil
 
 	case composeDoneMsg:
 		a.handleComposeDone(msg)
@@ -401,6 +413,9 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter", "esc":
 			a.dismissProjectShellReturn()
+		case "q", "ctrl+c":
+			a.quitting = true
+			return a, tea.Quit
 		}
 		return a, nil
 	}
@@ -1071,7 +1086,7 @@ func (a *App) renderMetricsTab(p *core.Project) string {
 func (a *App) renderHelpPopup() string {
 	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
 	viewport := 12 // Altura visível de conteúdo
-	
+
 	maxScroll := len(helpLines) - viewport
 	if maxScroll < 0 {
 		maxScroll = 0

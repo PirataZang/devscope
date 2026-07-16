@@ -6,7 +6,6 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -42,8 +41,6 @@ func (a *App) renderContainersTab(p *core.Project) string {
 }
 
 func (a *App) dismissContainerShellReturn() tea.Cmd {
-	collectors.RefreshProjectsDocker(a.store)
-	a.snapshot = a.store.Get()
 	a.containerSubview = containerSubviewList
 	if a.containerShellExitErr != "" {
 		a.containerStatusMsg = a.containerShellExitErr
@@ -54,7 +51,10 @@ func (a *App) dismissContainerShellReturn() tea.Cmd {
 		a.tabCursor = clampCursor(a.tabCursor, len(containers))
 		a.syncContainerScroll(len(containers))
 	}
-	return tea.ClearScreen
+	return tea.Batch(
+		tea.ClearScreen,
+		a.refreshDocker(),
+	)
 }
 
 func (a *App) renderContainerList(p *core.Project) string {

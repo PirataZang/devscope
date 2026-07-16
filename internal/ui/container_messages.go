@@ -308,20 +308,32 @@ func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {
 	if msg.err != nil {
 		a.containerSubview = containerSubviewShellReturn
 		a.containerShellExitErr = "shell: " + msg.err.Error()
-	} else {
-		// Sucesso: volta direto para a lista
-		a.containerSubview = containerSubviewList
-		a.containerShellExitErr = ""
-		collectors.RefreshProjectsDocker(a.store)
-		a.snapshot = a.store.Get()
-		containers := a.currentProjectContainers()
-		if len(containers) > 0 {
-			a.tabCursor = clampCursor(a.tabCursor, len(containers))
-			a.syncContainerScroll(len(containers))
-		}
+		return tea.ClearScreen
 	}
-	return tea.ClearScreen
+
+	// Sucesso: volta direto para a lista
+	a.containerSubview = containerSubviewList
+	a.containerShellExitErr = ""
+	containers := a.currentProjectContainers()
+	if len(containers) > 0 {
+		a.tabCursor = clampCursor(a.tabCursor, len(containers))
+		a.syncContainerScroll(len(containers))
+	}
+	return tea.Batch(
+		tea.ClearScreen,
+		a.refreshDocker(),
+	)
 }
+
+type dockerRefreshedMsg struct{}
+
+func (a *App) refreshDocker() tea.Cmd {
+	return func() tea.Msg {
+		collectors.RefreshProjectsDocker(a.store)
+		return dockerRefreshedMsg{}
+	}
+}
+
 
 func (a *App) openContainerDetail(c core.Container, projectPath string) tea.Cmd {
 	a.containerSubview = containerSubviewDetail
