@@ -474,6 +474,12 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 }
 
 func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	if msg.String() == "?" {
+		a.helpOn = true
+		a.helpScroll = 0
+		return a, nil
+	}
+
 	if a.containerSubview == containerSubviewShellReturn {
 		switch msg.String() {
 		case "enter", "esc":

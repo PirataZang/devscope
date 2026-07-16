@@ -17,3 +17,6 @@ Thumbs.db
 
 # Config local
 config.yaml
+
+# opencode
+*.opencode
