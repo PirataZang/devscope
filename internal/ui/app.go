@@ -1,4 +1,4 @@
-						package ui
+package ui
 
 import (
 	"fmt"
@@ -8,103 +8,163 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
-	"github.com/devscope/devscope/internal/collectors"
+	"github.com/mattn/go-runewidth"
 )
 
 type tickMsg struct{}
 
 type App struct {
-	store    *core.StateStore
-	cfg      *config.Config
-	snapshot core.Snapshot
-	view     View
-	cursor   int
-	filter   string
-	filterOn bool
+	store       *core.StateStore
+	cfg         *config.Config
+	snapshot    core.Snapshot
+	view        View
+	cursor      int
+	filter      string
+	filterOn    bool
 	filterInput string
 
-	helpOn      bool
-	helpScroll  int
+	helpOn     bool
+	helpScroll int
 
-	selectedProject *core.Project
-	tab             Tab
-	tabCursor       int
-	gitFocus        gitFocus
-	gitSubview      gitSubview
-	gitBranchCursor int
-	gitBranchScroll int
-	gitCommitCursor int
-	gitCommitScroll int
-	gitFileCursor   int
-	gitFileScroll   int
-	gitViewBranch   string
-	gitBranchCommits []core.GitCommit
-	gitBranchLoading bool
-	gitSelectedCommit core.GitCommit
-	gitCommitFiles []core.GitCommitFileChange
-	gitCommitFilesLoading bool
-	gitCommitFileCursor int
-	gitCommitFileScroll int
-	gitBranchFilterOn   bool
-	gitBranchFilterInput string
-	gitBranchFilter     string
-	gitSelectedCommits  map[string]bool
-	gitCommitSelectAnchor int
-	gitCherryPickBuffer []string
-	gitCherryPickMarked map[string]bool
-	gitCherryPickActive bool
-	gitCherryPickSourceBranch string
-	gitStatusMsg        string
-	gitActionLoading    bool
-	gitPromptOn         bool
-	gitPromptKind       gitPromptKind
-	gitPromptInput      string
-	gitPromptBranch     string
-	gitConfirmOn        bool
-	gitConfirmAction    string
-	gitConfirmBranch    string
-	gitBranchLoadGen    int
-	gitRenderCache      *core.GitInfo
-	gitMarkedBranch     string
-	gitBranches         []core.GitBranch
-	gitBranchDenylist   map[string]struct{}
-	dashboardScroll     int
-	dashboardSubview    dashboardSubview
-	projectShellExitErr string
-	gitCommitFullMsg    string
-	gitCommitMsgScroll  int
-	gitCommitMsgCursor  int
-	gitCommitDetailFocus gitCommitDetailFocus
-	containerSubview      containerSubview
-	containerScroll       int
-	containerStatusMsg    string
-	containerActions      map[string]string
-	containerShellExitErr string
-	containerDetailTab         containerDetailTab
-	containerDetailID          string
-	containerDetailName        string
-	containerDetailProjectPath string
-	containerDetailScroll      int
-	containerDetailContent     string
-	containerDetailLoading     bool
-	containerDetailCache       map[containerDetailTab]string
-	fuzzyOn               bool
-	fuzzyInput            string
-	deployConfirm         bool
-	containerConfirmRemove bool
-	projectLogs           string
-	projectLogsLoading    bool
-	projectLogsFollow     bool
-	projectLogsPaused     bool
-	projectLogContainerID string
-	projectLogSource      string
-	statusMsg             string
-	width           int
-	height          int
-	now             time.Time
-	quitting        bool
+	selectedProject             *core.Project
+	tab                         Tab
+	tabCursor                   int
+	gitFocus                    gitFocus
+	gitSubview                  gitSubview
+	gitBranchCursor             int
+	gitBranchScroll             int
+	gitCommitCursor             int
+	gitCommitScroll             int
+	gitFileCursor               int
+	gitFileScroll               int
+	gitViewBranch               string
+	gitBranchCommits            []core.GitCommit
+	gitBranchLoading            bool
+	gitSelectedCommit           core.GitCommit
+	gitCommitFiles              []core.GitCommitFileChange
+	gitCommitFilesLoading       bool
+	gitCommitFileCursor         int
+	gitCommitFileScroll         int
+	gitBranchFilterOn           bool
+	gitBranchFilterInput        string
+	gitBranchFilter             string
+	gitSelectedCommits          map[string]bool
+	gitCommitSelectAnchor       int
+	gitCherryPickBuffer         []string
+	gitCherryPickMarked         map[string]bool
+	gitCherryPickActive         bool
+	gitCherryPickSourceBranch   string
+	gitStatusMsg                string
+	gitActionLoading            bool
+	gitPromptOn                 bool
+	gitPromptKind               gitPromptKind
+	gitPromptInput              string
+	gitPromptCursor             int
+	gitPromptBranch             string
+	gitConfirmOn                bool
+	gitConfirmAction            string
+	gitConfirmBranch            string
+	gitBranchLoadGen            int
+	gitRenderCache              *core.GitInfo
+	gitMarkedBranch             string
+	gitBranches                 []core.GitBranch
+	gitBranchDenylist           map[string]struct{}
+	dashboardScroll             int
+	dashboardSubview            dashboardSubview
+	projectShellExitErr         string
+	gitCommitFullMsg            string
+	gitCommitMsgScroll          int
+	gitCommitMsgCursor          int
+	gitCommitDetailFocus        gitCommitDetailFocus
+	gitCommitDiff               string
+	gitCommitDiffLoading        bool
+	gitCommitDiffScroll         int
+	gitCommitDiffHScroll        int
+	gitCommitDiffCache          map[string]string
+	gitCommitDiffGen            int
+	gitCommitMsgExpanded        bool
+	gitDiffSearchOn             bool
+	gitDiffSearchInput          string
+	gitDiffSearchQuery          string
+	gitDiffSearchIdx            int
+	containerSubview            containerSubview
+	containerScroll             int
+	containerStatusMsg          string
+	containerActions            map[string]string
+	containerShellExitErr       string
+	containerDetailTab          containerDetailTab
+	containerDetailID           string
+	containerDetailName         string
+	containerDetailProjectPath  string
+	containerDetailScroll       int
+	containerDetailHScroll      int
+	containerDetailContent      string
+	containerDetailLoading      bool
+	containerDetailCache        map[containerDetailTab]string
+	containerDetailFollow       bool
+	containerDetailFollowPaused bool
+	containerDetailFollowGen    int
+	containerDetailSearchOn     bool
+	containerDetailSearchInput  string
+	containerDetailSearchQuery  string
+	containerDetailSearchIdx    int
+	apiMethod                   string
+	apiURL                      string
+	apiHeaders                  string
+	apiAuthType                 apiAuthType
+	apiAuthToken                string
+	apiAuthUser                 string
+	apiAuthPass                 string
+	apiAuthEditPass             bool
+	apiBody                     string
+	apiBlock                    apiBlock
+	apiRightTab                 apiRightTab
+	apiMethodCursor             int
+	apiEditing                  bool
+	apiOpen                     bool // true = fullscreen API client; false = tab 7 landing
+	apiEditorCursor             int
+	apiEditorAnchor             int // selection anchor; -1 = none
+	apiEditorScroll             int
+	apiResponseScroll           int
+	apiHScroll                  int
+	apiLoading                  bool
+	apiResponseStatus           string
+	apiResponseCode             int
+	apiResponseTime             time.Duration
+	apiResponseHeaders          string
+	apiResponseBody             string
+	apiResponseErr              string
+	apiShowResponseHeaders      bool
+	apiHistory                  []apiHistoryItem
+	apiPortIndex                int
+	apiSearchOn                 bool
+	apiSearchInput              string
+	apiSearchQuery              string
+	apiSearchIdx                int
+	fuzzyOn                     bool
+	fuzzyInput                  string
+	deployConfirm               bool
+	containerConfirmRemove      bool
+	projectLogs                 string
+	projectLogsLoading          bool
+	projectLogsFollow           bool
+	projectLogsPaused           bool
+	projectLogContainerID       string
+	projectLogSource            string
+	statusMsg                   string
+	projectGitLoading           bool
+	projectDockerLoading        bool
+	projectLoadGen              int
+	projectContentScroll        int
+	projectContentTab           Tab
+	width                       int
+	height                      int
+	now                         time.Time
+	quitting                    bool
 }
 
 func NewApp(store *core.StateStore, cfg *config.Config) *App {
@@ -122,9 +182,13 @@ func NewApp(store *core.StateStore, cfg *config.Config) *App {
 }
 
 func (a *App) Init() tea.Cmd {
-	return tea.Batch(
+	cmds := []tea.Cmd{
 		tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }),
-	)
+	}
+	if a.selectedProject != nil {
+		cmds = append(cmds, a.startProjectLoad(a.selectedProject.Path))
+	}
+	return tea.Batch(cmds...)
 }
 
 func (a *App) Run() error {
@@ -159,6 +223,15 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.gitBranchFilterOn {
 			return a.updateGitBranchFilter(msg)
 		}
+		if a.gitDiffSearchOn {
+			return a.updateGitDiffSearch(msg)
+		}
+		if a.containerDetailSearchOn {
+			return a.updateContainerDetailSearch(msg)
+		}
+		if a.apiSearchOn {
+			return a.updateApiSearch(msg)
+		}
 		if a.fuzzyOn {
 			return a.updateFuzzy(msg)
 		}
@@ -185,9 +258,17 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		a.snapshot = a.store.Get()
 		a.now = time.Now()
-		if a.view == ViewProject && a.tab == TabGit {
-			if p := a.currentProject(); p != nil && p.Git != nil && p.Git.IsRepo {
-				a.syncGitBranchesFrom(p)
+		if a.view == ViewProject {
+			if p := a.currentProject(); p != nil {
+				if a.projectGitLoading && p.Git != nil {
+					a.projectGitLoading = false
+					if p.Git.IsRepo {
+						a.initGitTab(p)
+					}
+				}
+				if a.tab == TabGit && p.Git != nil && p.Git.IsRepo {
+					a.syncGitBranchesFrom(p)
+				}
 			}
 		}
 		return a, tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} })
@@ -197,7 +278,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case gitCommitDetailLoadedMsg:
-		a.handleGitCommitDetailLoaded(msg)
+		return a, a.handleGitCommitDetailLoaded(msg)
+
+	case gitCommitDiffLoadedMsg:
+		a.handleGitCommitDiffLoaded(msg)
 		return a, nil
 
 	case gitActionDoneMsg:
@@ -219,7 +303,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case containerDetailLoadedMsg:
-		a.handleContainerDetailLoaded(msg)
+		cmd := a.handleContainerDetailLoaded(msg)
+		return a, cmd
+
+	case containerDetailFollowMsg:
+		return a, a.handleContainerDetailFollow(msg)
+
+	case apiResponseMsg:
+		a.handleApiResponse(msg)
 		return a, nil
 
 	case projectLogFollowMsg:
@@ -268,6 +359,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.tabCursor = clampCursor(a.tabCursor, len(containers))
 			a.syncContainerScroll(len(containers))
 		}
+		return a, nil
+
+	case projectGitLoadedMsg:
+		cmd := a.handleProjectGitLoaded(msg)
+		return a, cmd
+
+	case projectDockerLoadedMsg:
+		a.handleProjectDockerLoaded(msg)
 		return a, nil
 
 	case composeDoneMsg:
@@ -344,6 +443,11 @@ func (a *App) updateFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	// API field editing must receive every key (incl. q/k/?//) — like a normal text editor.
+	if a.view == ViewProject && a.tab == TabAPI && a.apiOpen && a.apiEditing {
+		return a.updateProject(msg)
+	}
+
 	switch {
 	case key.Matches(msg, key.NewBinding(key.WithKeys("q", "ctrl+c"))):
 		a.quitting = true
@@ -376,7 +480,7 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 func (a *App) updateHelp(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
-	viewport := 12 // altura do conteúdo na telinha de ajuda
+	viewport := a.helpViewport()
 	maxScroll := len(helpLines) - viewport
 	if maxScroll < 0 {
 		maxScroll = 0
@@ -435,7 +539,7 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			a.openProject(projects[a.cursor], TabOverview)
+			return a, a.openProject(projects[a.cursor], TabOverview)
 		}
 	case "E", "shift+e":
 		if len(projects) > 0 && a.cursor < len(projects) {
@@ -443,11 +547,11 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "g":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			a.openProject(projects[a.cursor], TabGit)
+			return a, a.openProject(projects[a.cursor], TabGit)
 		}
 	case "c":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			a.openProject(projects[a.cursor], TabContainers)
+			return a, a.openProject(projects[a.cursor], TabContainers)
 		}
 	case "r":
 		a.snapshot = a.store.Get()
@@ -456,10 +560,19 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
+	a.snapshot = a.store.Get()
 	cp := p
+	for _, sp := range a.snapshot.Projects {
+		if pathsMatch(sp.Path, p.Path) {
+			cp = sp
+			break
+		}
+	}
 	a.selectedProject = &cp
 	a.view = ViewProject
 	a.tab = tab
+	a.projectContentTab = tab
+	a.projectContentScroll = 0
 	a.tabCursor = 0
 	if tab == TabGit {
 		a.initGitTab(&cp)
@@ -467,10 +580,15 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabContainers {
 		a.initContainersTab()
 	}
-	if tab == TabLogs {
-		return a.initLogsTab(&cp)
+	if tab == TabAPI {
+		a.apiOpen = false
 	}
-	return nil
+	var cmds []tea.Cmd
+	cmds = append(cmds, a.startProjectLoad(cp.Path))
+	if tab == TabLogs {
+		cmds = append(cmds, a.initLogsTab(&cp))
+	}
+	return tea.Batch(cmds...)
 }
 
 func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -497,13 +615,15 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
 		return a.handleContainerDetailKeys(msg, p)
 	}
+	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit) {
+		return a.handleGitDedicatedKeys(msg, p)
+	}
+	if a.tab == TabAPI && a.apiOpen {
+		return a.handleApiKeys(msg, p)
+	}
 
 	switch msg.String() {
 	case "esc":
-		if a.tab == TabGit && a.gitSubview == gitSubviewCommit {
-			a.gitSubview = gitSubviewMain
-			return a, nil
-		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
 			a.containerSubview = containerSubviewList
 			a.containerDetailCache = nil
@@ -512,22 +632,16 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.view = ViewDashboard
 		a.selectedProject = nil
 		a.gitRenderCache = nil
+		a.projectGitLoading = false
+		a.projectDockerLoading = false
+		a.apiOpen = false
 		return a, nil
 	case "tab":
-		if a.tab == TabGit && a.gitSubview == gitSubviewCommit {
-			if a.gitCommitDetailFocus == gitCommitFocusMessage {
-				a.gitCommitDetailFocus = gitCommitFocusFiles
-			} else {
-				a.gitCommitDetailFocus = gitCommitFocusMessage
-			}
-			return a, nil
-		}
 		a.tab = Tab((int(a.tab) + 1) % len(AllTabs))
 		a.tabCursor = 0
+		a.apiOpen = false
 		if a.tab == TabGit {
-			if p := a.currentProject(); p != nil {
-				a.initGitTab(p)
-			}
+			a.initGitTab(p)
 		}
 		if a.tab == TabContainers {
 			a.initContainersTab()
@@ -539,39 +653,55 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		a.tab = Tab(i)
 		a.tabCursor = 0
+		a.apiOpen = false
 		if a.tab == TabGit {
-			if p := a.currentProject(); p != nil {
-				a.initGitTab(p)
-			}
+			a.initGitTab(p)
 		}
 		if a.tab == TabContainers {
 			a.initContainersTab()
 		}
 	case "1":
+		a.apiOpen = false
 		a.tab = TabOverview
 		a.tabCursor = 0
 	case "2":
+		a.apiOpen = false
 		a.tab = TabGit
 		a.tabCursor = 0
 		if p := a.currentProject(); p != nil {
 			a.initGitTab(p)
 		}
 	case "3":
+		a.apiOpen = false
 		a.tab = TabContainers
 		a.tabCursor = 0
 		a.initContainersTab()
 	case "4":
+		a.apiOpen = false
 		a.tab = TabHealth
 		a.tabCursor = 0
 	case "5":
+		a.apiOpen = false
 		a.tab = TabLogs
 		a.tabCursor = 0
 		if cmd := a.initLogsTab(p); cmd != nil {
 			return a, cmd
 		}
 	case "6":
+		a.apiOpen = false
 		a.tab = TabMetrics
 		a.tabCursor = 0
+	case "7":
+		a.enterApiTab(p)
+	case "pgup":
+		a.projectContentScroll -= maxInt(1, a.projectPanelHeight()-4)
+		if a.projectContentScroll < 0 {
+			a.projectContentScroll = 0
+		}
+		return a, nil
+	case "pgdown":
+		a.projectContentScroll += maxInt(1, a.projectPanelHeight()-4)
+		return a, nil
 	case "L":
 		return a, a.openLazyGit(p.Path)
 	case "o", "O":
@@ -719,40 +849,52 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.gitCherryPickPaste(p)
 		}
 	case "up", "k", "shift+up", "shift+k":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			shift := strings.HasPrefix(msg.String(), "shift+")
 			return a, a.updateGitCursor(-1, p, shift)
 		}
 		if cmd := a.tabNav(-1, p); cmd != nil {
 			return a, cmd
 		}
+		if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+			if a.projectContentScroll > 0 {
+				a.projectContentScroll--
+			}
+			return a, nil
+		}
 	case "down", "j", "shift+down", "shift+j":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			shift := strings.HasPrefix(msg.String(), "shift+")
 			return a, a.updateGitCursor(1, p, shift)
 		}
 		if cmd := a.tabNav(1, p); cmd != nil {
 			return a, cmd
 		}
+		if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+			a.projectContentScroll++
+			return a, nil
+		}
 	case "left":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			a.gitFocusPrev()
 		}
 	case "h", "H":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			a.gitFocusPrev()
 		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
+			a.apiOpen = false
 			a.tab = TabHealth
 			a.tabCursor = 0
 		}
 	case "right":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			a.gitFocusNext()
 		}
 	case "l":
-		if a.tab == TabGit && a.gitSubview != gitSubviewCommit {
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			a.gitFocusNext()
 		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
+			a.apiOpen = false
 			a.tab = TabLogs
 			a.tabCursor = 0
 			if cmd := a.initLogsTab(p); cmd != nil {
@@ -760,25 +902,22 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case "enter":
+		if a.tab == TabAPI && !a.apiOpen {
+			a.openApiClient(p)
+			return a, nil
+		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
 				return a, a.openContainerDetail(c, p.Path)
 			}
 		}
-		if a.tab == TabGit && p.Git != nil && p.Git.IsRepo {
-			if a.gitSubview == gitSubviewCommit {
-				return a, nil
-			}
+		if a.tab == TabGit && p.Git != nil && p.Git.IsRepo && a.gitSubview == gitSubviewMain {
 			if a.gitFocus == gitFocusBranches {
-				branches := a.filteredGitBranches(p.Git.Branches)
+				branches := a.filteredGitBranches(a.gitBranchesForUI())
 				if a.gitBranchCursor < len(branches) {
-					branch := branches[a.gitBranchCursor].Name
-					if cmd := a.selectGitBranch(p, branch); cmd != nil {
-						a.gitFocus = gitFocusCommits
-						return a, cmd
-					}
-					a.gitFocus = gitFocusCommits
+					return a, a.openGitBranchHistory(p, branches[a.gitBranchCursor].Name)
 				}
+				return a, nil
 			}
 			if a.gitFocus == gitFocusCommits {
 				commits := a.gitDisplayedCommits()
@@ -804,20 +943,20 @@ func (a *App) currentProject() *core.Project {
 		return nil
 	}
 	for _, p := range a.snapshot.Projects {
-		if p.ID == a.selectedProject.ID {
-			cp := p
-			a.selectedProject = &cp
-			return &cp
-		}
-	}
-	for _, p := range a.snapshot.Projects {
-		if p.Path == a.selectedProject.Path {
+		if pathsMatch(p.Path, a.selectedProject.Path) {
 			cp := p
 			a.selectedProject = &cp
 			return &cp
 		}
 	}
 	return a.selectedProject
+}
+
+func (a *App) currentProjectPath() string {
+	if p := a.currentProject(); p != nil {
+		return p.Path
+	}
+	return ""
 }
 
 func (a *App) filteredProjects() []core.Project {
@@ -853,7 +992,7 @@ func (a *App) View() string {
 	}
 
 	if a.helpOn {
-		return a.renderHelpPopup()
+		return a.renderHelpPopup(a.renderCurrentView())
 	}
 
 	if a.fuzzyOn {
@@ -868,6 +1007,18 @@ func (a *App) View() string {
 		return a.renderGitBranchFilterPrompt()
 	}
 
+	if a.gitDiffSearchOn {
+		return a.renderGitDiffSearchPrompt()
+	}
+
+	if a.containerDetailSearchOn {
+		return a.renderContainerDetailSearchPrompt()
+	}
+
+	if a.apiSearchOn {
+		return a.renderApiSearchPrompt()
+	}
+
 	if a.gitPromptOn {
 		return a.renderGitPrompt()
 	}
@@ -880,6 +1031,10 @@ func (a *App) View() string {
 		return a.renderFullShellReturn(a.containerShellExitErr)
 	}
 
+	return a.renderCurrentView()
+}
+
+func (a *App) renderCurrentView() string {
 	switch a.view {
 	case ViewProject:
 		return a.renderProject()
@@ -915,10 +1070,7 @@ func (a *App) renderFilterPrompt() string {
 func (a *App) renderHeader() string {
 	m := a.snapshot.HostMetrics
 	title := StyleTitle.Render("DevScope")
-	metrics := StyleMetric.Render(fmt.Sprintf(
-		"CPU %.0f%%  RAM %.0f%%  DISK %.0f%%",
-		m.CPUPercent, m.MemoryPercent, m.DiskPercent,
-	))
+	metrics := renderMetricPills(m)
 	line := strings.Repeat("─", maxInt(a.width-2, 40))
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, title, "  ", metrics),
@@ -931,16 +1083,43 @@ func (a *App) renderProject() string {
 	if p == nil {
 		return a.renderDashboard()
 	}
+	if a.projectContentTab != a.tab {
+		a.projectContentTab = a.tab
+		a.projectContentScroll = 0
+	}
+	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
+		return a.renderContainerTextScreen()
+	}
+	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit) {
+		return a.renderGitTab(p)
+	}
+	if a.tab == TabAPI && a.apiOpen {
+		return a.renderApiTab(p)
+	}
 
-	tabs := a.renderTabs()
+	sidebar := a.renderProjectSidebar()
+	contentWidth := maxInt(50, a.width-lipgloss.Width(sidebar)-3)
+	panelH := a.projectPanelHeight()
+	accent := tabAccentColor(a.tab)
+
+	originalWidth := a.width
+	originalPanel := StylePanel
+	a.width = contentWidth
+	StylePanel = StylePanel.
+		Width(maxInt(40, contentWidth-6)).
+		BorderForeground(accent)
 	content := a.renderTabContent(p)
-	hints := "tab switch  esc back  q quit"
+	a.width = originalWidth
+	StylePanel = originalPanel
+	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
+		content = fitProjectPanel(content, contentWidth, panelH)
+	} else {
+		content = a.renderProjectPanel(content, contentWidth, panelH)
+	}
+
+	hints := "tab switch  pgup/pgdown scroll  esc back  q quit"
 	if a.tab == TabGit {
-		if a.gitSubview == gitSubviewCommit {
-			hints = "↑↓ scroll  tab message/files  esc back  " + hints
-		} else {
-			hints = "space checkout  shift+↑↓ range  x toggle  shift+c copy  shift+v paste  b filter  " + hints
-		}
+		hints = "enter branch/commit  space checkout  shift+↑↓ range  x toggle  shift+c/v cherry  b filter  " + hints
 	}
 	if a.tab == TabContainers {
 		if a.containerSubview == containerSubviewDetail {
@@ -949,42 +1128,122 @@ func (a *App) renderProject() string {
 			hints = "↑↓ navigate  enter detalhe  shift+e shell  s stop  r start/restart  p pause  d remove  shift+u up  shift+d down  " + hints
 		}
 	}
+	if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+		hints = "↑↓ scroll  " + hints
+	}
+	if a.tab == TabAPI && !a.apiOpen {
+		hints = "enter abrir API  " + hints
+	}
+	compact := a.projectCompact()
+	if compact {
+		hints = "tab switch  ↑↓/pg scroll  esc back  ? help"
+		if a.tab == TabAPI && !a.apiOpen {
+			hints = "enter abrir API  " + hints
+		}
+	}
 
-	header := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderHeader(),
-		"",
-		StyleTitle.Render(p.Name),
-		StyleMuted.Render(fmt.Sprintf("%s  •  %s  •  %d containers",
-			p.Status, p.Health, p.ContainerCount)),
-		"",
-		tabs,
-		"",
-	)
-
+	// Dual-pane shell: brand lives in the rail — keep top chrome light.
+	chrome := a.renderHeader()
+	layout := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, " ", content)
+	if compact {
+		return lipgloss.JoinVertical(lipgloss.Left,
+			layout,
+			a.renderStatusBar(hints),
+		)
+	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		header,
-		content,
+		chrome,
+		"",
+		layout,
 		"",
 		a.renderStatusBar(hints),
 	)
 }
 
-func (a *App) renderTabs() string {
-	var parts []string
-	for _, t := range AllTabs {
-		label := t.String()
-		if t == TabContainers && a.selectedProject != nil {
-			if n := a.containersCount(a.currentProject()); n > 0 {
-				label = fmt.Sprintf("%s (%d)", label, n)
-			}
-		}
-		if t == a.tab {
-			parts = append(parts, StyleTabActive.Render(label))
-		} else {
-			parts = append(parts, StyleTab.Render(label))
-		}
+func (a *App) projectPanelHeight() int {
+	if a.height <= 0 {
+		return 20
 	}
-	return strings.Join(parts, " │ ")
+	if a.projectCompact() {
+		return maxInt(12, a.height-2)
+	}
+	// Header + status bar only (project brand moved into the rail).
+	return maxInt(14, a.height-6)
+}
+
+func (a *App) projectCompact() bool {
+	return (a.height > 0 && a.height < 34) || (a.width > 0 && a.width < 110)
+}
+
+func (a *App) renderProjectPanel(content string, width, height int) string {
+	lines := strings.Split(content, "\n")
+	if len(lines) < 2 {
+		return lipgloss.Place(width, height, lipgloss.Left, lipgloss.Top, content)
+	}
+
+	top, bottom := lines[0], lines[len(lines)-1]
+	body := lines[1 : len(lines)-1]
+	for len(body) > 0 && strings.TrimSpace(ansi.Strip(body[0])) == "" {
+		body = body[1:]
+	}
+	for len(body) > 0 && strings.TrimSpace(ansi.Strip(body[len(body)-1])) == "" {
+		body = body[:len(body)-1]
+	}
+
+	bodyHeight := maxInt(1, height-4)
+	maxScroll := maxInt(0, len(body)-bodyHeight)
+	if a.projectContentScroll > maxScroll {
+		a.projectContentScroll = maxScroll
+	}
+	start := a.projectContentScroll
+	end := minInt(start+bodyHeight, len(body))
+
+	rendered := []string{
+		top,
+		projectPanelIndicator(width, start > 0, fmt.Sprintf("↑ %d linhas", start)),
+	}
+	rendered = append(rendered, body[start:end]...)
+	for len(rendered) < height-2 {
+		rendered = append(rendered, projectPanelIndicator(width, false, ""))
+	}
+	rendered = append(rendered,
+		projectPanelIndicator(width, end < len(body), fmt.Sprintf("↓ %d linhas", len(body)-end)),
+		bottom,
+	)
+	return strings.Join(rendered, "\n")
+}
+
+func projectPanelIndicator(width int, visible bool, text string) string {
+	if width < 4 {
+		return ""
+	}
+	content := ""
+	if visible {
+		content = StyleMuted.Render(" " + text)
+	}
+	inside := lipgloss.NewStyle().
+		Width(width - 2).
+		Background(ColorBgPanel).
+		Render(content)
+	border := lipgloss.NewStyle().Foreground(ColorBorder).Render("│")
+	return border + inside + border
+}
+
+func fitProjectPanel(content string, width, height int) string {
+	lines := strings.Split(content, "\n")
+	if len(lines) < 2 {
+		return lipgloss.Place(width, height, lipgloss.Left, lipgloss.Top, content)
+	}
+
+	top, bottom := lines[0], lines[len(lines)-1]
+	body := lines[1 : len(lines)-1]
+	if len(body) > height-2 {
+		body = body[:height-2]
+	}
+	for len(body) < height-2 {
+		body = append(body, projectPanelIndicator(width, false, ""))
+	}
+	return strings.Join(append(append([]string{top}, body...), bottom), "\n")
 }
 
 func (a *App) renderTabContent(p *core.Project) string {
@@ -999,18 +1258,25 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderHealthTab(p)
 	case TabLogs:
 		return a.renderLogsTab(p)
+	case TabAPI:
+		return a.renderApiLanding(p)
 	default:
 		return a.renderOverviewTab(p)
 	}
 }
 
 func (a *App) renderOverviewTab(p *core.Project) string {
+	kv := func(k, v string) string {
+		return StyleMuted.Render(fmt.Sprintf("%-12s", k)) + " " + v
+	}
+
 	lines := []string{
-		fmt.Sprintf("Path:         %s", p.Path),
-		fmt.Sprintf("Status:       %s", p.Status),
-		fmt.Sprintf("Health:       %s", p.Health),
+		StyleSection.Render("PROJETO"),
+		kv("Path", StyleNormal.Render(p.Path)),
+		kv("Status", projectStatusStyle(p.Status).Render(string(p.Status))),
+		kv("Health", healthLabel(p.Health)),
 		"",
-		"Frameworks:",
+		StyleSection.Render("STACK"),
 	}
 
 	frameworks := p.Frameworks
@@ -1018,53 +1284,73 @@ func (a *App) renderOverviewTab(p *core.Project) string {
 		frameworks = []core.FrameworkInfo{p.Framework}
 	}
 	if len(frameworks) == 0 {
-		lines = append(lines, "  (nenhum detectado ainda — aguarde o scan)")
+		lines = append(lines, StyleMuted.Render("  (nenhum detectado ainda — aguarde o scan)"))
 	} else {
 		for _, fw := range frameworks {
-			line := fmt.Sprintf("  • %s (%s)", fw.Name, fw.Language)
+			ver := ""
 			if fw.Version != "" {
-				line += fmt.Sprintf("  v%s", fw.Version)
+				ver = StyleMuted.Render("  v" + fw.Version)
 			}
-			lines = append(lines, line)
+			lines = append(lines, fmt.Sprintf("  %s %s %s%s",
+				frameworkIcon(fw.Name),
+				StyleNormal.Render(fw.Name),
+				StyleMuted.Render("("+fw.Language+")"),
+				ver,
+			))
 		}
 	}
 
+	lines = append(lines, "", StyleSection.Render("RUNTIME"))
 	if p.HasDockerCompose {
-		lines = append(lines, "", "Docker:       docker-compose detectado")
+		lines = append(lines, kv("Docker", StyleIconDocker.Render("compose")+" "+StyleMuted.Render("detectado")))
 	}
 	if p.HasDockerfile {
-		lines = append(lines, "Docker:       Dockerfile detectado")
+		lines = append(lines, kv("Docker", StyleIconDocker.Render("Dockerfile")+" "+StyleMuted.Render("detectado")))
 	}
 	if p.ContainerCount > 0 {
-		lines = append(lines, fmt.Sprintf("Containers:   %d vinculados", p.ContainerCount))
+		lines = append(lines, kv("Containers", StyleNormal.Render(fmt.Sprintf("%d vinculados", p.ContainerCount))))
 	}
 	if p.WorkerCount > 0 {
-		lines = append(lines, fmt.Sprintf("PM2 Workers:  %d", p.WorkerCount))
+		lines = append(lines, kv("PM2", StyleNormal.Render(fmt.Sprintf("%d workers", p.WorkerCount))))
 		for _, w := range p.Workers {
-			lines = append(lines, fmt.Sprintf("  • %s [%s] CPU %.1f%%", w.Name, w.Status, w.CPU))
+			st := StyleMuted
+			if strings.EqualFold(w.Status, "online") {
+				st = StyleRunning
+			}
+			lines = append(lines, fmt.Sprintf("  %s %s %s",
+				st.Render("•"),
+				StyleNormal.Render(w.Name),
+				StyleMuted.Render(fmt.Sprintf("[%s] CPU %.1f%%", w.Status, w.CPU)),
+			))
 		}
 	}
 	if p.Metrics.CPUPercent > 0 || p.Metrics.MemoryMB > 0 {
-		lines = append(lines, fmt.Sprintf("Metrics:      CPU %.1f%%  RAM %d MB", p.Metrics.CPUPercent, p.Metrics.MemoryMB))
+		lines = append(lines, kv("Metrics",
+			StyleMetricCPU.Render(fmt.Sprintf("CPU %.1f%%", p.Metrics.CPUPercent))+"  "+
+				StyleMetricRAM.Render(fmt.Sprintf("RAM %d MB", p.Metrics.MemoryMB))))
 	}
 	if len(p.Ports) > 0 {
-		lines = append(lines, fmt.Sprintf("Ports:        %s", collectors.FormatPortsShort(p.Ports, 5)))
+		lines = append(lines, kv("Ports", StyleAccent.Render(collectors.FormatPortsShort(p.Ports, 5))))
 	}
 	if p.DeployScript != "" {
-		lines = append(lines, fmt.Sprintf("Deploy:       %s (D)", p.DeployScript))
+		lines = append(lines, kv("Deploy", StyleKey.Render(p.DeployScript)+" "+StyleMuted.Render("(D)")))
 	}
 
 	if len(p.Modules) > 0 {
-		lines = append(lines, "", "Modules:")
+		lines = append(lines, "", StyleSection.Render("MODULES"))
 		for _, m := range p.Modules {
-			lines = append(lines, fmt.Sprintf("  • %s [%s] — %s", m.Name, m.Role, m.Path))
+			lines = append(lines, fmt.Sprintf("  %s %s %s",
+				StyleTabActive.Render("•"),
+				StyleNormal.Render(m.Name),
+				StyleMuted.Render(fmt.Sprintf("[%s] — %s", m.Role, m.Path)),
+			))
 		}
 	}
 
 	if p.Git != nil && p.Git.IsRepo {
-		lines = append(lines, "",
-			fmt.Sprintf("Git Branch:   %s", p.Git.Branch),
-			fmt.Sprintf("Last Commit:  %s — %s", p.Git.LastCommit, p.Git.LastCommitMsg),
+		lines = append(lines, "", StyleSection.Render("GIT"),
+			kv("Branch", StyleWarning.Render(p.Git.Branch)),
+			kv("Commit", StyleMuted.Render(p.Git.LastCommit)+" "+StyleNormal.Render(p.Git.LastCommitMsg)),
 		)
 	}
 
@@ -1072,26 +1358,64 @@ func (a *App) renderOverviewTab(p *core.Project) string {
 }
 
 func (a *App) renderMetricsTab(p *core.Project) string {
-	m := a.snapshot.HostMetrics
+	cpu, memoryMB := projectRuntimeMetrics(p)
 	lines := []string{
-		"Host Metrics:",
-		fmt.Sprintf("  CPU:    %.1f%%", m.CPUPercent),
-		fmt.Sprintf("  RAM:    %.1f%% (%d / %d MB)", m.MemoryPercent, m.MemoryUsedMB, m.MemoryTotalMB),
-		fmt.Sprintf("  Disk:   %.1f%% (%.1f / %.1f GB)", m.DiskPercent, m.DiskUsedGB, m.DiskTotalGB),
-		fmt.Sprintf("  Swap:   %.1f%%", m.SwapPercent),
-		"",
-		"Project Metrics:",
-		fmt.Sprintf("  CPU:        %.1f%%", p.Metrics.CPUPercent),
-		fmt.Sprintf("  Memory:     %d MB", p.Metrics.MemoryMB),
+		StyleSection.Render("PROJECT METRICS"),
+		fmt.Sprintf("  CPU:        %.1f%%", cpu),
+		fmt.Sprintf("  Memory:     %d MB", memoryMB),
 		fmt.Sprintf("  Containers: %d", p.ContainerCount),
 		fmt.Sprintf("  Workers:    %d", p.WorkerCount),
 	}
+
+	if len(p.Containers) > 0 {
+		lines = append(lines, "", StyleSection.Render("CONTAINERS"))
+		for _, c := range p.Containers {
+			lines = append(lines, fmt.Sprintf(
+				"  %-28s %-9s CPU %6.1f%%  RAM %6d MB",
+				c.Name, c.Status, c.CPU, c.Memory/(1024*1024),
+			))
+		}
+	}
+
+	if len(p.Workers) > 0 {
+		lines = append(lines, "", StyleSection.Render("WORKERS"))
+		for _, w := range p.Workers {
+			lines = append(lines, fmt.Sprintf(
+				"  %-28s %-9s CPU %6.1f%%  RAM %6d MB",
+				w.Name, w.Status, w.CPU, w.Memory/(1024*1024),
+			))
+		}
+	}
+
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
 
-func (a *App) renderHelpPopup() string {
+func projectRuntimeMetrics(p *core.Project) (float64, int64) {
+	var cpu float64
+	var memory int64
+	for _, c := range p.Containers {
+		cpu += c.CPU
+		memory += c.Memory
+	}
+	for _, w := range p.Workers {
+		if strings.EqualFold(w.Status, "online") {
+			cpu += w.CPU
+			memory += w.Memory
+		}
+	}
+	return cpu, memory / (1024 * 1024)
+}
+
+func (a *App) helpViewport() int {
+	if a.height <= 0 {
+		return 12
+	}
+	return maxInt(8, a.height-10)
+}
+
+func (a *App) renderHelpPopup(background string) string {
 	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
-	viewport := 12 // Altura visível de conteúdo
+	viewport := minInt(a.helpViewport(), len(helpLines))
 
 	maxScroll := len(helpLines) - viewport
 	if maxScroll < 0 {
@@ -1130,15 +1454,55 @@ func (a *App) renderHelpPopup() string {
 
 	title := StyleSection.Render("Ajuda — Atalhos do DevScope")
 	footer := StyleMuted.Render("↑/↓ scroll  │  esc ou ? fechar")
+	boxWidth := minInt(76, maxInt(44, a.width-8))
+	helpBox := StylePanel.
+		Width(boxWidth).
+		Background(ColorBgPanel).
+		Render(title + "\n\n" + strings.Join(visibleLines, "\n") + "\n\n" + footer)
+	return overlayCentered(background, helpBox, a.width, a.height)
+}
 
-	helpBox := StylePanel.Render(title + "\n\n" + strings.Join(visibleLines, "\n") + "\n\n" + footer)
+func overlayCentered(background, popup string, width, height int) string {
+	if width <= 0 || height <= 0 {
+		return popup
+	}
+	popupWidth := lipgloss.Width(popup)
+	popupLines := strings.Split(popup, "\n")
+	x := maxInt(0, (width-popupWidth)/2)
+	y := maxInt(0, (height-len(popupLines))/2)
 
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderHeader(),
-		"",
-		helpBox,
-		a.renderStatusBar("ajuda aberta | esc ou ? para fechar"),
-	)
+	backgroundLines := strings.Split(ansi.Strip(background), "\n")
+	for len(backgroundLines) < height {
+		backgroundLines = append(backgroundLines, "")
+	}
+	for i, popupLine := range popupLines {
+		row := y + i
+		if row >= len(backgroundLines) {
+			break
+		}
+		line := backgroundLines[row]
+		left := padRight(cellSlice(line, 0, x), x)
+		rightWidth := maxInt(0, width-x-popupWidth)
+		right := padRight(cellSlice(line, x+popupWidth, width), rightWidth)
+		backgroundLines[row] = left + popupLine + right
+	}
+	return strings.Join(backgroundLines, "\n")
+}
+
+func cellSlice(s string, start, end int) string {
+	var out strings.Builder
+	column := 0
+	for _, r := range s {
+		w := runewidth.RuneWidth(r)
+		if column >= end {
+			break
+		}
+		if column >= start && column+w <= end {
+			out.WriteRune(r)
+		}
+		column += w
+	}
+	return out.String()
 }
 
 func getHelpText() string {
@@ -1159,7 +1523,7 @@ Dashboard:
   r            Forçar atualização rápida
 
 Abas de Projeto:
-  1-6          Overview, Git, Containers, Health, Logs, Metrics
+  1-7          Overview, Git, Containers, Health, Logs, Metrics, API
   h            Ir para aba Health
   l            Ir para aba Logs
   L            Abrir LazyGit no projeto
@@ -1168,6 +1532,16 @@ Abas de Projeto:
   shift+d      Docker compose down
   R            Docker compose restart
   o            Abrir URL do projeto no navegador
+
+Aba API:
+  tab          Request → URL → Headers → Auth
+  []           Body │ Response
+  ↑↓           Método (no Request) / scroll
+  digitar      Edita URL / Headers / Auth / Body
+  enter        Enviar request
+  /            Buscar (só em Body/Response)
+  u            Porta do projeto (no Request/URL)
+  a            Tipo de Auth (no Auth)
 
 Aba Git:
   space        Checkout de branch (ou toggle commit)

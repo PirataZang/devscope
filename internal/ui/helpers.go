@@ -40,10 +40,46 @@ func padRight(s string, width int) string {
 }
 
 func truncate(s string, max int) string {
+	if max <= 0 {
+		return ""
+	}
 	if runewidth.StringWidth(s) <= max {
 		return s
 	}
 	return runewidth.Truncate(s, max, "…")
+}
+
+// sliceColumns returns a horizontal window of s starting at column `start`.
+func sliceColumns(s string, start, width int) string {
+	if width <= 0 {
+		return ""
+	}
+	if start < 0 {
+		start = 0
+	}
+	if start == 0 {
+		return padRight(truncate(s, width), width)
+	}
+	var b strings.Builder
+	col := 0
+	for _, r := range s {
+		w := runewidth.RuneWidth(r)
+		if col+w <= start {
+			col += w
+			continue
+		}
+		if col < start {
+			// rune straddles the start edge; skip it
+			col += w
+			continue
+		}
+		if runewidth.StringWidth(b.String())+w > width {
+			break
+		}
+		b.WriteRune(r)
+		col += w
+	}
+	return padRight(b.String(), width)
 }
 
 func maxInt(a, b int) int {

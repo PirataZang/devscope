@@ -107,6 +107,7 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 | 🐙 [LazyGit](https://github.com/jesseduffield/lazygit) | Repositório | Integração direta (abre o LazyGit com a tecla `L` no contexto do projeto) |
 | 📊 `docker ps` / `htop` | Contêiner / Processo | Visão unificada orientada ao projeto (status, saúde, domínios, etc.) |
 | 🌐 Portainer | Web UI | TUI nativa leve, binário único, roda sem necessidade de navegador |
+| 📬 Postman / Insomnia | Request HTTP | Cliente API embutido no contexto do projeto (aba `7`) |
 
 ---
 
@@ -117,7 +118,8 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 * 🏷️ **Detecção Inteligente de Frameworks** — Suporte nativo para NestJS, Laravel, Django, Next.js, Vue, React, Nuxt, Go, Python, Rust, PHP, Java, etc.
 * 📊 **Métricas do Sistema** — Monitoramento de CPU, RAM, Disco, Swap, Load e Uptime direto do host.
 * 🐳 **Integração com Docker** — Status de contêineres, estatísticas em tempo real e correlação automática com seus projetos.
-* 🐙 **Integração com Git** — Branch atual, status da working tree, histórico de commits e diff.
+* 🐙 **Integração com Git** — Branch atual, status da working tree, histórico de commits e diff colorido (estilo LazyGit).
+* 📡 **Cliente API (estilo Postman)** — Aba dedicada para testar HTTP no contexto do projeto: métodos coloridos, URL, headers, auth, body editor e response viewer.
 * ⚙️ **Suporte a PM2** — Identifica e lista workers vinculados a cada projeto.
 * 🩺 **Health Checks** — Validação de endpoints via HTTP/TCP com status inteligente (`Running`, `Degraded`, `Stopped`).
 * 🔒 **Nginx & SSL** — Mapeamento de domínios reversos e monitoramento de certificados Let's Encrypt.
@@ -158,12 +160,49 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 |---|---|
 | `Esc` | Voltar para o Dashboard principal |
 | `Tab` / `Shift+Tab` | Próxima / aba anterior |
-| `1` – `6` | Atalhos para abas: Overview, Git, Containers, Health, Logs, Metrics |
+| `1` – `7` | Atalhos para abas: Overview, Git, Containers, Health, Logs, Metrics, **API** |
+| `7` | Abrir a aba **API** (cliente HTTP do projeto) |
 | `L` | Abrir o **LazyGit** no contexto do projeto atual |
 | `D` | Executar script de Deploy (com confirmação) |
 | `o` | Abrir URL do projeto no navegador |
 | `h` | Aba de monitoramento de Saúde (Health) |
 | `l` | Aba de Logs |
+
+</details>
+
+<details>
+<summary>📡 <b>Aba API</b> (Clique para expandir)</summary>
+
+Cliente HTTP fullscreen no estilo LazyDocker/Postman: painéis à esquerda e Body/Response à direita.
+
+| Tecla | Ação |
+|---|---|
+| `Tab` / `Shift+Tab` | Ciclar **Request → URL → Headers → Auth** |
+| `1` – `4` | Ir direto para Request / URL / Headers / Auth |
+| `→` | Focar o painel direito (Body / Response) |
+| `[` / `]` | Alternar abas **Body** / **Response** (fora da edição) |
+| `↑` / `↓` | Trocar método HTTP (no Request) ou rolar conteúdo |
+| `m` | Ciclar método (GET, POST, PUT, PATCH, DELETE) |
+| Digitar | Edita URL / Headers / Auth automaticamente |
+| `e` | Entrar no editor do **Body** (Auth também usa `e`) |
+| `Ctrl+A` | Selecionar tudo (URL / Headers / Auth / Body) |
+| `Shift+←→` (`Shift+↑↓` no Body/Headers) | Selecionar trecho |
+| `Backspace` / `Delete` / digitar | Apaga ou substitui a seleção |
+| `Enter` | Enviar o request |
+| `r` | Reenviar |
+| `u` | Ciclar porta detectada do projeto na URL |
+| `a` | Ciclar tipo de Auth (`none` / `bearer` / `basic`) |
+| `/` | Buscar na Response (somente no painel direito) |
+| `H` | Alternar headers da Response |
+| `Esc` | Sair da edição / voltar aos blocos / Dashboard |
+
+**Recursos:**
+* Métodos coloridos (GET verde, POST azul, PUT ciano, PATCH amarelo, DELETE vermelho)
+* Sugestão automática de `http://localhost:<porta>` a partir das portas do projeto
+* Auth Bearer / Basic
+* Editor de Body com indentação (`Tab`), navegação por linhas e expansão de `{|}` / `[|]`
+* Response com status, tempo, JSON formatado, scroll e busca
+* Histórico leve em memória dos últimos requests da sessão
 
 </details>
 
@@ -175,6 +214,10 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 | `←` / `→` / `h` / `l` | Alternar entre seções do Git |
 | `b` | Filtrar branches |
 | `Enter` | Ver detalhes de commits ou arquivos (somente leitura) |
+| `n` / `p` | Próximo / arquivo anterior no diff |
+| `m` | Expandir mensagem do commit |
+| `/` | Buscar no diff |
+| `←` / `→` | Scroll horizontal no diff |
 
 </details>
 
@@ -183,12 +226,14 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 
 | Tecla | Ação |
 |---|---|
+| `Enter` / `m` | Abrir detalhes do contêiner (Logs, Stats, Env, Config…) |
 | `Shift+E` | Entrar no Shell (`exec`) do contêiner |
-| `p` | Pausar contêiner |
-| `r` | Reiniciar contêiner |
+| `p` | Pausar / retomar contêiner |
+| `r` | Iniciar / reiniciar contêiner |
 | `d` | Remover contêiner (requer confirmação com `y`) |
-| `m` | Ver logs estáticos |
-| `f` | Seguir logs em tempo real (pausa com `p`) |
+| `f` | Seguir logs em tempo real |
+| `/` | Buscar nos logs |
+| `,` / `.` | Scroll horizontal nos logs |
 
 </details>
 

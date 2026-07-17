@@ -1,13 +1,12 @@
 package collectors
 
 import (
-	"context"
 	"fmt"
 	"os/exec"
 	"strings"
 
+	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
-	"github.com/devscope/devscope/internal/scanner"
 )
 
 func DockerPause(id string) error {
@@ -85,39 +84,9 @@ func dockerAction(id string, args ...string) error {
 	return exec.Command("docker", cmd...).Run()
 }
 
-// RefreshProjectsDocker re-links containers to projects after an action.
-func RefreshProjectsDocker(store *core.StateStore) {
-	ctx := context.Background()
-	snap := store.Get()
-	if len(snap.Projects) == 0 {
-		return
-	}
-	projects := make([]core.Project, len(snap.Projects))
-	copy(projects, snap.Projects)
-
-	containers, meta, err := CollectDocker(ctx)
-	if err != nil {
-		return
-	}
-	AssignContainersToProjects(projects, containers, meta)
-	stats := CollectDockerStats(ctx)
-	ApplyDockerStats(projects, stats)
-	pm2Apps := CollectPM2(ctx)
-	AssignWorkersToProjects(projects, pm2Apps)
-	AssignPortsToProjects(projects, ReadListeningPorts())
-	for i := range projects {
-		p := &projects[i]
-		pm2Roots := scanner.DiscoverRunningRoots(ctx)
-		switch {
-		case ProjectRunning(p.Containers):
-			p.Status = core.StatusRunning
-		case PM2ProjectRunning(p.Workers) || pm2Roots[p.Path]:
-			p.Status = core.StatusRunning
-		case p.HasDockerCompose || p.HasDockerfile:
-			p.Status = core.StatusStopped
-		}
-	}
-	store.SetProjects(projects)
+// RefreshProjectsDocker re-links containers to a project after an action.
+func RefreshProjectsDocker(store *core.StateStore, projectPath string, healthCfg config.HealthConfig) {
+	RefreshProjectDocker(store, projectPath, healthCfg)
 }
 
 func IsContainerRunning(c core.Container) bool {

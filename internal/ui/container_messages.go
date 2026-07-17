@@ -80,6 +80,9 @@ func (a *App) loadContainerDetailTab() tea.Cmd {
 	if content, ok := a.containerDetailCache[a.containerDetailTab]; ok {
 		a.containerDetailContent = content
 		a.containerDetailLoading = false
+		if a.containerDetailTab == containerDetailTabLogs {
+			a.containerDetailScroll = len(a.containerDetailLines())
+		}
 		return nil
 	}
 	a.containerDetailLoading = true
@@ -89,16 +92,23 @@ func (a *App) loadContainerDetailTab() tea.Cmd {
 	return loadContainerDetailTab(tab, c, a.containerDetailProjectPath)
 }
 
-func (a *App) handleContainerDetailLoaded(msg containerDetailLoadedMsg) {
+func (a *App) handleContainerDetailLoaded(msg containerDetailLoadedMsg) tea.Cmd {
 	if msg.id != a.containerDetailID || msg.tab != a.containerDetailTab {
-		return
+		return nil
 	}
 	a.containerDetailContent = msg.content
 	a.containerDetailLoading = false
+	if msg.tab == containerDetailTabLogs {
+		a.containerDetailScroll = len(a.containerDetailLines())
+	}
 	if a.containerDetailCache == nil {
 		a.containerDetailCache = make(map[containerDetailTab]string)
 	}
 	a.containerDetailCache[msg.tab] = msg.content
+	if msg.tab == containerDetailTabLogs && a.containerDetailFollow && !a.containerDetailFollowPaused {
+		return a.scheduleContainerDetailFollow()
+	}
+	return nil
 }
 
 func followProjectLogs(id string) tea.Cmd {
@@ -189,9 +199,12 @@ func (a *App) containerPause(c core.Container) tea.Cmd {
 	if !a.beginContainerAction(action, c) {
 		return nil
 	}
+	path := a.currentProjectPath()
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := run(collectors.DockerExecTarget(c))
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return containerActionDoneMsg{action: action, name: c.Name, err: err}
 	}
 }
@@ -200,9 +213,12 @@ func (a *App) containerStart(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("start", c) {
 		return nil
 	}
+	path := a.currentProjectPath()
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := collectors.DockerStart(collectors.DockerExecTarget(c))
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return containerActionDoneMsg{action: "start", name: c.Name, err: err}
 	}
 }
@@ -211,9 +227,12 @@ func (a *App) containerStop(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("stop", c) {
 		return nil
 	}
+	path := a.currentProjectPath()
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := collectors.DockerStop(collectors.DockerExecTarget(c))
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return containerActionDoneMsg{action: "stop", name: c.Name, err: err}
 	}
 }
@@ -222,9 +241,12 @@ func (a *App) containerRestart(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("restart", c) {
 		return nil
 	}
+	path := a.currentProjectPath()
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := collectors.DockerRestart(collectors.DockerExecTarget(c))
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return containerActionDoneMsg{action: "restart", name: c.Name, err: err}
 	}
 }
@@ -237,9 +259,12 @@ func (a *App) containerStartOrRestart(c core.Container) tea.Cmd {
 }
 
 func (a *App) containerRemove(c core.Container) tea.Cmd {
+	path := a.currentProjectPath()
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := collectors.DockerRemove(collectors.DockerExecTarget(c))
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return containerActionDoneMsg{action: "remove", name: c.Name, err: err}
 	}
 }
@@ -328,12 +353,18 @@ func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {
 type dockerRefreshedMsg struct{}
 
 func (a *App) refreshDocker() tea.Cmd {
+	p := a.currentProject()
+	if p == nil {
+		return nil
+	}
+	path := p.Path
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
 		return dockerRefreshedMsg{}
 	}
 }
-
 
 func (a *App) openContainerDetail(c core.Container, projectPath string) tea.Cmd {
 	a.containerSubview = containerSubviewDetail
@@ -342,9 +373,17 @@ func (a *App) openContainerDetail(c core.Container, projectPath string) tea.Cmd 
 	a.containerDetailName = c.Name
 	a.containerDetailProjectPath = projectPath
 	a.containerDetailScroll = 0
+	a.containerDetailHScroll = 0
 	a.containerDetailContent = ""
 	a.containerDetailCache = nil
 	a.containerDetailLoading = true
+	a.containerDetailFollow = false
+	a.containerDetailFollowPaused = false
+	a.containerDetailFollowGen++
+	a.containerDetailSearchOn = false
+	a.containerDetailSearchInput = ""
+	a.containerDetailSearchQuery = ""
+	a.containerDetailSearchIdx = 0
 	return a.loadContainerDetailTab()
 }
 

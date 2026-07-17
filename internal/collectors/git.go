@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/devscope/devscope/internal/core"
@@ -17,6 +18,25 @@ func Collect(path string) *core.GitInfo {
 	return CollectAt(path)
 }
 
+// CollectGitSummary reads only .git/HEAD for the dashboard.
+func CollectGitSummary(path string) *core.GitInfo {
+	root := gitRepoRoot(path)
+	if root == "" {
+		return &core.GitInfo{IsRepo: false}
+	}
+	head, err := os.ReadFile(filepath.Join(root, ".git", "HEAD"))
+	if err != nil {
+		return &core.GitInfo{IsRepo: true}
+	}
+	branch := strings.TrimSpace(string(head))
+	if strings.HasPrefix(branch, "ref: refs/heads/") {
+		branch = strings.TrimPrefix(branch, "ref: refs/heads/")
+	} else {
+		branch = "HEAD"
+	}
+	return &core.GitInfo{IsRepo: true, Branch: branch}
+}
+
 func CollectAt(path string) *core.GitInfo {
 	if !isGitRepo(path) {
 		return &core.GitInfo{IsRepo: false}
@@ -24,11 +44,44 @@ func CollectAt(path string) *core.GitInfo {
 
 	info := &core.GitInfo{IsRepo: true}
 
-	// 1. Coleta branch atual
-	info.Branch = strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "HEAD"))
+	var (
+		branch     string
+		commitData string
+		remote     string
+		files      []core.GitFileStatus
+		branches   []core.GitBranch
+		stash      string
+		upstream   string
+	)
+	var wg sync.WaitGroup
+	wg.Add(6)
+	go func() {
+		defer wg.Done()
+		branch = strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "HEAD"))
+	}()
+	go func() {
+		defer wg.Done()
+		commitData = strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=format:%h|%s|%an|%ci"))
+	}()
+	go func() {
+		defer wg.Done()
+		remote = strings.TrimSpace(gitOutput(path, "config", "--get", "remote.origin.url"))
+	}()
+	go func() {
+		defer wg.Done()
+		files = collectGitFiles(path)
+	}()
+	go func() {
+		defer wg.Done()
+		branches = collectGitBranches(path)
+	}()
+	go func() {
+		defer wg.Done()
+		stash = strings.TrimSpace(gitOutput(path, "stash", "list"))
+	}()
+	wg.Wait()
 
-	// 2. Coleta dados do último commit (hash, msg, autor, data) em uma ÚNICA chamada!
-	commitData := strings.TrimSpace(gitOutput(path, "log", "-1", "--pretty=format:%h|%s|%an|%ci"))
+	info.Branch = branch
 	if commitData != "" {
 		parts := strings.SplitN(commitData, "|", 4)
 		if len(parts) == 4 {
@@ -40,12 +93,8 @@ func CollectAt(path string) *core.GitInfo {
 			}
 		}
 	}
-
-	// 3. Coleta remote url
-	info.Remote = strings.TrimSpace(gitOutput(path, "config", "--get", "remote.origin.url"))
-
-	// 4. Arquivos modificados/não rastreados
-	info.Files = collectGitFiles(path)
+	info.Remote = remote
+	info.Files = files
 	info.Modified = 0
 	info.Untracked = 0
 	for _, f := range info.Files {
@@ -55,13 +104,10 @@ func CollectAt(path string) *core.GitInfo {
 			info.Modified++
 		}
 	}
-
-	// 5. Commits e Branches
+	info.Branches = branches
 	info.Commits = collectGitCommits(path, info.Branch, 20)
-	info.Branches = collectGitBranches(path)
 
-	// 6. Ahead / Behind (só executa se a branch tiver upstream associado)
-	upstream := strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "@{upstream}"))
+	upstream = strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "@{upstream}"))
 	if upstream != "" && !strings.Contains(upstream, "fatal:") && !strings.Contains(upstream, "@") {
 		aheadBehind := gitOutput(path, "rev-list", "--left-right", "--count", "HEAD..."+upstream)
 		parts := strings.Fields(aheadBehind)
@@ -70,9 +116,6 @@ func CollectAt(path string) *core.GitInfo {
 			info.Behind, _ = strconv.Atoi(parts[1])
 		}
 	}
-
-	// 7. Stashes
-	stash := strings.TrimSpace(gitOutput(path, "stash", "list"))
 	if stash != "" {
 		info.StashCount = len(strings.Split(stash, "\n"))
 	}
@@ -131,6 +174,17 @@ func CollectCommitFullMessage(path, hash string) string {
 		msg = strings.TrimSpace(gitOutput(path, "log", "-1", "--format=%s", full))
 	}
 	return msg
+}
+
+func CollectCommitFileDiff(path, hash, filePath string) string {
+	if filePath == "" {
+		return ""
+	}
+	full := strings.TrimSpace(gitOutput(path, "rev-parse", hash))
+	if full == "" {
+		full = hash
+	}
+	return gitOutput(path, "show", "--format=", "--no-ext-diff", full, "--", filePath)
 }
 
 func parseCommitFileChanges(out string) []core.GitCommitFileChange {
@@ -503,9 +557,17 @@ func RefreshGitBranches(path string, prev *core.GitInfo) *core.GitInfo {
 	return &copy
 }
 
-func RefreshProjectGit(store *core.StateStore, path string) {
-	info := CollectAt(path)
-	store.UpdateProjectGit(path, *info)
+func RefreshProjectGit(store *core.StateStore, projectPath string) {
+	projectPath = filepath.Clean(projectPath)
+	root := gitRepoRoot(projectPath)
+	if root == "" {
+		store.UpdateProjectGit(projectPath, core.GitInfo{IsRepo: false})
+		return
+	}
+	info := CollectAt(root)
+	if info != nil {
+		store.UpdateProjectGit(projectPath, *info)
+	}
 }
 
 func preserveGitForProjects(store *core.StateStore, projects []core.Project) []core.Project {
@@ -531,6 +593,24 @@ func preserveGitForProjects(store *core.StateStore, projects []core.Project) []c
 }
 
 func isGitRepo(path string) bool {
-	_, err := os.Stat(filepath.Join(path, ".git"))
-	return err == nil
+	gitPath := filepath.Join(path, ".git")
+	fi, err := os.Stat(gitPath)
+	if err != nil {
+		return false
+	}
+	return fi.IsDir() || fi.Mode().IsRegular()
+}
+
+func gitRepoRoot(path string) string {
+	path = filepath.Clean(path)
+	for {
+		if isGitRepo(path) {
+			return path
+		}
+		parent := filepath.Dir(path)
+		if parent == path {
+			return ""
+		}
+		path = parent
+	}
 }

@@ -23,6 +23,14 @@ type gitCommitDetailLoadedMsg struct {
 	fullMessage string
 }
 
+type gitCommitDiffLoadedMsg struct {
+	path string
+	hash string
+	file string
+	diff string
+	gen  int
+}
+
 type gitActionDoneMsg struct {
 	path      string
 	action    string
@@ -54,6 +62,16 @@ func loadGitCommitDetail(path, hash string) tea.Cmd {
 			files:       collectors.CollectCommitFiles(path, hash),
 			fullMessage: collectors.CollectCommitFullMessage(path, hash),
 		}
+	}
+}
+
+func loadGitCommitFileDiff(path, hash, file string, gen int) tea.Cmd {
+	return func() tea.Msg {
+		diff := collectors.CollectCommitFileDiff(path, hash, file)
+		if diff == "" {
+			diff = "(sem diff para este arquivo)"
+		}
+		return gitCommitDiffLoadedMsg{path: path, hash: hash, file: file, diff: diff, gen: gen}
 	}
 }
 
@@ -182,16 +200,66 @@ func (a *App) handleGitCommitsLoaded(msg gitCommitsLoadedMsg) {
 	a.gitBranchCommits = msg.commits
 }
 
-func (a *App) handleGitCommitDetailLoaded(msg gitCommitDetailLoadedMsg) {
+func (a *App) handleGitCommitDetailLoaded(msg gitCommitDetailLoadedMsg) tea.Cmd {
 	if a.selectedProject == nil || msg.path != a.selectedProject.Path {
-		return
+		return nil
 	}
 	if msg.hash != a.gitSelectedCommit.Hash {
-		return
+		return nil
 	}
 	a.gitCommitFiles = msg.files
 	a.gitCommitFullMsg = msg.fullMessage
 	a.gitCommitFilesLoading = false
+	a.gitCommitFileCursor = 0
+	a.gitCommitFileScroll = 0
+	if len(msg.files) == 0 {
+		a.gitCommitDiff = "(nenhum arquivo alterado)"
+		a.gitCommitDiffLoading = false
+		return nil
+	}
+	return a.requestGitCommitFileDiff(msg.path, msg.hash, msg.files[0].Path)
+}
+
+func (a *App) requestGitCommitFileDiff(path, hash, file string) tea.Cmd {
+	if file == "" {
+		a.gitCommitDiff = "(nenhum arquivo)"
+		a.gitCommitDiffLoading = false
+		return nil
+	}
+	if a.gitCommitDiffCache != nil {
+		if diff, ok := a.gitCommitDiffCache[file]; ok {
+			a.gitCommitDiff = diff
+			a.gitCommitDiffLoading = false
+			a.gitCommitDiffScroll = 0
+			a.gitCommitDiffHScroll = 0
+			return nil
+		}
+	}
+	a.gitCommitDiffGen++
+	gen := a.gitCommitDiffGen
+	a.gitCommitDiffLoading = true
+	a.gitCommitDiff = ""
+	a.gitCommitDiffScroll = 0
+	a.gitCommitDiffHScroll = 0
+	return loadGitCommitFileDiff(path, hash, file, gen)
+}
+
+func (a *App) handleGitCommitDiffLoaded(msg gitCommitDiffLoadedMsg) {
+	if a.selectedProject == nil || msg.path != a.selectedProject.Path {
+		return
+	}
+	if msg.hash != a.gitSelectedCommit.Hash || msg.gen != a.gitCommitDiffGen {
+		return
+	}
+	if a.gitCommitFileCursor < len(a.gitCommitFiles) && a.gitCommitFiles[a.gitCommitFileCursor].Path != msg.file {
+		return
+	}
+	a.gitCommitDiff = msg.diff
+	a.gitCommitDiffLoading = false
+	if a.gitCommitDiffCache == nil {
+		a.gitCommitDiffCache = make(map[string]string)
+	}
+	a.gitCommitDiffCache[msg.file] = msg.diff
 }
 
 func needsGitBranchCommitsReload(action string) bool {

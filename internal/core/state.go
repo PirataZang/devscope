@@ -1,6 +1,7 @@
 package core
 
 import (
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -51,15 +52,35 @@ func (s *Snapshot) Clone() Snapshot {
 func (s *StateStore) SetProjects(projects []Project) {
 	s.Update(func(snap *Snapshot) {
 		prevGit := make(map[string]*GitInfo, len(snap.Projects))
+		prevContainers := make(map[string][]Container, len(snap.Projects))
 		for i := range snap.Projects {
+			key := filepath.Clean(snap.Projects[i].Path)
 			if snap.Projects[i].Git != nil {
-				prevGit[snap.Projects[i].Path] = snap.Projects[i].Git
+				prevGit[key] = snap.Projects[i].Git
+			}
+			if len(snap.Projects[i].Containers) > 0 {
+				prevContainers[key] = snap.Projects[i].Containers
 			}
 		}
 		for i := range projects {
-			if projects[i].Git == nil {
-				if git, ok := prevGit[projects[i].Path]; ok {
-					projects[i].Git = git
+			key := filepath.Clean(projects[i].Path)
+			if prev, ok := prevGit[key]; ok {
+				incomingIsSummary := projects[i].Git != nil &&
+					projects[i].Git.IsRepo &&
+					len(projects[i].Git.Branches) == 0 &&
+					len(projects[i].Git.Commits) == 0 &&
+					projects[i].Git.LastCommit == ""
+				prevHasDetails := len(prev.Branches) > 0 ||
+					len(prev.Commits) > 0 ||
+					prev.LastCommit != ""
+				if projects[i].Git == nil || !projects[i].Git.IsRepo || (incomingIsSummary && prevHasDetails) {
+					projects[i].Git = prev
+				}
+			}
+			if len(projects[i].Containers) == 0 {
+				if containers, ok := prevContainers[key]; ok {
+					projects[i].Containers = containers
+					projects[i].ContainerCount = len(containers)
 				}
 			}
 		}
@@ -76,13 +97,35 @@ func (s *StateStore) SetHostMetrics(m HostMetrics) {
 }
 
 func (s *StateStore) UpdateProjectGit(path string, git GitInfo) {
+	path = filepath.Clean(path)
 	s.Update(func(snap *Snapshot) {
 		for i := range snap.Projects {
-			if snap.Projects[i].Path == path {
+			if filepath.Clean(snap.Projects[i].Path) == path {
 				copy := git
 				snap.Projects[i].Git = &copy
 				return
 			}
+		}
+	})
+}
+
+func (s *StateStore) UpdateProjectRuntime(path string, src Project) {
+	path = filepath.Clean(path)
+	s.Update(func(snap *Snapshot) {
+		for i := range snap.Projects {
+			if filepath.Clean(snap.Projects[i].Path) != path {
+				continue
+			}
+			p := &snap.Projects[i]
+			p.Containers = src.Containers
+			p.ContainerCount = src.ContainerCount
+			p.Metrics = src.Metrics
+			p.Health = src.Health
+			p.HealthChecks = src.HealthChecks
+			p.Workers = src.Workers
+			p.WorkerCount = src.WorkerCount
+			p.Status = src.Status
+			return
 		}
 	})
 }

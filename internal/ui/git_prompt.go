@@ -62,6 +62,7 @@ func (a *App) startGitNewBranch(p *core.Project) {
 	a.gitPromptOn = true
 	a.gitPromptKind = gitPromptNewBranch
 	a.gitPromptInput = ""
+	a.gitPromptCursor = 0
 	a.gitPromptBranch = from
 	a.gitStatusMsg = "nova branch a partir de " + from
 }
@@ -81,6 +82,7 @@ func (a *App) startGitRenameBranch(p *core.Project) {
 	a.gitPromptOn = true
 	a.gitPromptKind = gitPromptRenameBranch
 	a.gitPromptInput = ""
+	a.gitPromptCursor = 0
 	a.gitPromptBranch = branch
 }
 
@@ -174,10 +176,12 @@ func (a *App) gitOpenPullRequest(p *core.Project) {
 }
 
 func (a *App) updateGitPrompt(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	a.gitPromptCursor = minInt(a.gitPromptCursor, len([]rune(a.gitPromptInput)))
 	switch msg.String() {
 	case "esc":
 		a.gitPromptOn = false
 		a.gitPromptInput = ""
+		a.gitPromptCursor = 0
 		a.gitPromptBranch = ""
 		a.gitStatusMsg = ""
 	case "enter":
@@ -197,22 +201,53 @@ func (a *App) updateGitPrompt(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			from := a.gitPromptBranch
 			a.gitPromptBranch = ""
 			a.gitPromptInput = ""
+			a.gitPromptCursor = 0
 			return a, a.gitCreateBranch(p, name, from)
 		case gitPromptRenameBranch:
 			oldName := a.gitPromptBranch
 			a.gitPromptBranch = ""
 			a.gitPromptInput = ""
+			a.gitPromptCursor = 0
 			return a, a.gitRenameBranch(p, oldName, name)
 		}
+	case "left":
+		if a.gitPromptCursor > 0 {
+			a.gitPromptCursor--
+		}
+	case "right":
+		if a.gitPromptCursor < len([]rune(a.gitPromptInput)) {
+			a.gitPromptCursor++
+		}
+	case "home":
+		a.gitPromptCursor = 0
+	case "end":
+		a.gitPromptCursor = len([]rune(a.gitPromptInput))
 	case "backspace":
-		if len(a.gitPromptInput) > 0 {
-			a.gitPromptInput = a.gitPromptInput[:len(a.gitPromptInput)-1]
+		runes := []rune(a.gitPromptInput)
+		if a.gitPromptCursor > 0 {
+			runes = append(runes[:a.gitPromptCursor-1], runes[a.gitPromptCursor:]...)
+			a.gitPromptCursor--
+			a.gitPromptInput = string(runes)
+		}
+	case "delete":
+		runes := []rune(a.gitPromptInput)
+		if a.gitPromptCursor < len(runes) {
+			runes = append(runes[:a.gitPromptCursor], runes[a.gitPromptCursor+1:]...)
+			a.gitPromptInput = string(runes)
 		}
 	default:
-		if len(msg.Runes) == 1 {
-			a.gitPromptInput += string(msg.Runes)
+		if len(msg.Runes) > 0 {
+			runes := []rune(a.gitPromptInput)
+			inserted := append([]rune(nil), msg.Runes...)
+			runes = append(runes[:a.gitPromptCursor], append(inserted, runes[a.gitPromptCursor:]...)...)
+			a.gitPromptCursor += len(inserted)
+			a.gitPromptInput = string(runes)
 		} else if len(msg.String()) == 1 {
-			a.gitPromptInput += msg.String()
+			runes := []rune(a.gitPromptInput)
+			inserted := []rune(msg.String())
+			runes = append(runes[:a.gitPromptCursor], append(inserted, runes[a.gitPromptCursor:]...)...)
+			a.gitPromptCursor += len(inserted)
+			a.gitPromptInput = string(runes)
 		}
 	}
 	return a, nil
@@ -256,11 +291,14 @@ func (a *App) renderGitPrompt() string {
 	} else if a.gitPromptBranch != "" {
 		label += " (de " + a.gitPromptBranch + ")"
 	}
-	prompt := StylePanel.Render(label + ": " + a.gitPromptInput + "█")
+	runes := []rune(a.gitPromptInput)
+	a.gitPromptCursor = minInt(a.gitPromptCursor, len(runes))
+	input := string(runes[:a.gitPromptCursor]) + "█" + string(runes[a.gitPromptCursor:])
+	prompt := StylePanel.Render(label + ": " + input)
 	return lipgloss.JoinVertical(lipgloss.Left,
 		content,
 		"",
 		prompt,
-		a.renderStatusBar("digite o nome | enter confirmar | esc cancelar"),
+		a.renderStatusBar("←/→ mover  home/end  backspace/delete editar  enter confirmar  esc cancelar"),
 	)
 }

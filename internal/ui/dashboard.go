@@ -8,7 +8,6 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
-	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/pkg/version"
 )
 
@@ -65,7 +64,7 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 	cols := tableColumns(tableW)
 	separator := StyleMuted.Render(strings.Repeat("─", tableW))
 	tableHeader := renderTableRow(cols, tableRow{
-		icon: " ", name: "NAME", status: "STATUS", branch: "BRANCH", cpu: "CPU", ram: "RAM", ports: "PORTS", ctrs: "CTRS",
+		icon: " ", name: "NAME", branch: "BRANCH", status: "STATUS", ctrs: "CTRS", path: "PATH",
 	}, StyleTableHeader, nil, false)
 
 	viewport := a.dashboardProjectsViewport()
@@ -88,24 +87,14 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 	} else {
 		for i := start; i < end; i++ {
 			p := projects[i]
-			branch := "-"
-			if p.Git != nil && p.Git.IsRepo && p.Git.Branch != "" {
-				branch = p.Git.Branch
-			}
 			ctrs := "-"
 			if p.ContainerCount > 0 {
 				ctrs = fmt.Sprintf("%d", p.ContainerCount)
 			}
-
-			cpu := "-"
-			if p.Metrics.CPUPercent > 0 {
-				cpu = fmt.Sprintf("%.0f%%", p.Metrics.CPUPercent)
+			branch := "-"
+			if p.Git != nil && p.Git.IsRepo && p.Git.Branch != "" {
+				branch = p.Git.Branch
 			}
-			ram := "-"
-			if p.Metrics.MemoryMB > 0 {
-				ram = fmt.Sprintf("%dM", p.Metrics.MemoryMB)
-			}
-			ports := collectors.FormatPortsShort(p.Ports, 2)
 
 			style := StyleNormal
 			selected := i == a.cursor
@@ -116,10 +105,8 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 			lines = append(lines, renderTableRow(cols, tableRow{
 				icon:   frameworkIconPlain(p.Framework.Name),
 				name:   p.Name,
+				path:   p.Path,
 				branch: branch,
-				cpu:    cpu,
-				ram:    ram,
-				ports:  ports,
 				ctrs:   ctrs,
 			}, style, &p.Status, selected))
 		}
@@ -215,37 +202,24 @@ func safeTableWidth(termWidth int) int {
 }
 
 type tableCols struct {
-	icon, name, status, branch, cpu, ram, ports, ctrs, gap, total int
+	icon, name, path, status, branch, ctrs, gap, total int
 }
 
 type tableRow struct {
-	icon, name, status, branch, cpu, ram, ports, ctrs string
+	icon, name, path, status, branch, ctrs string
 }
 
 func tableColumns(tableW int) tableCols {
 	c := tableCols{
-		icon:   2,
+		icon:   3,
 		status: 10,
-		cpu:    5,
-		ram:    5,
-		ports:  10,
+		branch: 16,
 		ctrs:   4,
 		gap:    1,
 	}
-	gaps := c.gap * 7
-	flex := tableW - c.icon - c.status - c.cpu - c.ram - c.ports - c.ctrs - gaps
-	c.name = flex * 35 / 100
-	if c.name < 12 {
-		c.name = 12
-	}
-	c.branch = flex - c.name
-	if c.branch < 10 {
-		c.branch = 10
-		c.name = flex - c.branch
-		if c.name < 10 {
-			c.name = 10
-		}
-	}
+	flexible := tableW - c.icon - c.status - c.branch - c.ctrs - c.gap*5
+	c.name = maxInt(12, flexible/3)
+	c.path = maxInt(18, flexible-c.name)
 	c.total = tableW
 	return c
 }
@@ -266,17 +240,13 @@ func renderTableRow(c tableCols, r tableRow, style lipgloss.Style, status *core.
 		gap,
 		cell(c.name, r.name),
 		gap,
-		statusCell(),
-		gap,
 		cell(c.branch, r.branch),
 		gap,
-		cell(c.cpu, r.cpu),
-		gap,
-		cell(c.ram, r.ram),
-		gap,
-		cell(c.ports, r.ports),
+		statusCell(),
 		gap,
 		cell(c.ctrs, r.ctrs),
+		gap,
+		cell(c.path, r.path),
 	)
 }
 

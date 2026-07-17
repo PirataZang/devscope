@@ -23,9 +23,11 @@ func (a *App) composeRestart(path string) tea.Cmd {
 }
 
 func (a *App) runCompose(path, action string, fn func(string) error) tea.Cmd {
+	store := a.store
+	healthCfg := a.cfg.Health
 	return func() tea.Msg {
 		err := fn(path)
-		collectors.RefreshProjectsDocker(a.store)
+		collectors.RefreshProjectsDocker(store, path, healthCfg)
 		return composeDoneMsg{action: action, err: err}
 	}
 }

@@ -17,6 +17,14 @@ func TestMatchScoreComposeRoot(t *testing.T) {
 	}
 }
 
+func TestMatchScoreComposeRootInsideProject(t *testing.T) {
+	project := "/home/user/myapp"
+	m := containerMeta{WorkingDir: filepath.Join(project, "docker")}
+	if score := matchScore(project, m); score < 9000 {
+		t.Fatalf("expected nested compose root to match parent project, got %d", score)
+	}
+}
+
 func TestMatchScoreMountInsideProject(t *testing.T) {
 	project := "/home/user/myapp"
 	m := containerMeta{
@@ -44,6 +52,23 @@ func TestParseHealthFromStatus(t *testing.T) {
 	}
 	if parseHealthFromStatus("Up 1 minute (unhealthy)") != "unhealthy" {
 		t.Fatal("expected unhealthy")
+	}
+}
+
+func TestParseDockerPSLine(t *testing.T) {
+	line := "b724a57533c2\tdigiliza-chat-v2-base-1\tchatwoot:development\texited\tExited (0) 40 hours ago\t\tdigiliza-chat-v2\t/home/user/proj\t/home/user/proj/docker-compose.yaml"
+	c, m, ok := parseDockerPSLine(line)
+	if !ok {
+		t.Fatal("expected parse ok")
+	}
+	if c.ID != "b724a57533c2" || c.Name != "digiliza-chat-v2-base-1" {
+		t.Fatalf("unexpected container: %+v", c)
+	}
+	if m.WorkingDir != "/home/user/proj" || m.ComposeProject != "digiliza-chat-v2" {
+		t.Fatalf("unexpected meta: %+v", m)
+	}
+	if c.ProjectPath != "/home/user/proj" {
+		t.Fatalf("project path %q", c.ProjectPath)
 	}
 }
 
@@ -79,5 +104,19 @@ func TestAssignContainersProjectPathFallback(t *testing.T) {
 	AssignContainersToProjects(projects, containers, nil)
 	if len(projects[0].Containers) != 1 {
 		t.Fatalf("expected fallback match, got %+v", projects[0].Containers)
+	}
+}
+
+func TestAssignStoppedContainerFromNestedCompose(t *testing.T) {
+	projects := []core.Project{{Path: "/apps/alpha", Name: "alpha"}}
+	containers := []core.Container{{ID: "abc123", Name: "web", Status: "exited"}}
+	meta := map[string]containerMeta{
+		"abc123": {WorkingDir: "/apps/alpha/docker"},
+	}
+
+	AssignContainersToProjects(projects, containers, meta)
+
+	if len(projects[0].Containers) != 1 || projects[0].Containers[0].Status != "exited" {
+		t.Fatalf("expected stopped container, got %+v", projects[0].Containers)
 	}
 }

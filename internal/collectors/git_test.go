@@ -10,6 +10,21 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
+func TestCollectGitSummary(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	head, err := os.ReadFile(filepath.Join(dir, ".git", "HEAD"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := strings.TrimPrefix(strings.TrimSpace(string(head)), "ref: refs/heads/")
+
+	got := CollectGitSummary(dir)
+	if !got.IsRepo || got.Branch != want {
+		t.Fatalf("expected branch %q, got %+v", want, got)
+	}
+}
+
 func TestCollectGitBranchesOrder(t *testing.T) {
 	dir := t.TempDir()
 	runGit(t, dir, "init")
@@ -126,6 +141,27 @@ func TestCollectCommitFiles(t *testing.T) {
 	}
 }
 
+func TestCollectCommitFileDiff(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+
+	writeFile(t, filepath.Join(dir, "a.txt"), "old\n")
+	runGit(t, dir, "add", "a.txt")
+	runGit(t, dir, "commit", "-m", "add a")
+
+	writeFile(t, filepath.Join(dir, "a.txt"), "new\n")
+	runGit(t, dir, "add", "a.txt")
+	runGit(t, dir, "commit", "-m", "change a")
+
+	hash := strings.TrimSpace(gitOutput(dir, "rev-parse", "--short", "HEAD"))
+	diff := CollectCommitFileDiff(dir, hash, "a.txt")
+	if !strings.Contains(diff, "-old") || !strings.Contains(diff, "+new") {
+		t.Fatalf("expected colored-ready diff with old/new lines, got %q", diff)
+	}
+}
+
 func TestCollectCommitFullMessage(t *testing.T) {
 	dir := t.TempDir()
 	runGit(t, dir, "init")
@@ -145,9 +181,9 @@ func TestCollectCommitFullMessage(t *testing.T) {
 
 func TestParseGitHubRepo(t *testing.T) {
 	cases := []struct {
-		remote       string
-		owner, repo  string
-		ok           bool
+		remote      string
+		owner, repo string
+		ok          bool
 	}{
 		{"git@github.com:acme/app.git", "acme", "app", true},
 		{"https://github.com/acme/app.git", "acme", "app", true},

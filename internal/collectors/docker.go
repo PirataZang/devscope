@@ -2,22 +2,12 @@ package collectors
 
 import (
 	"context"
-	"encoding/json"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/devscope/devscope/internal/core"
 )
-
-type dockerPSRow struct {
-	ID     string `json:"ID"`
-	Names  string `json:"Names"`
-	Image  string `json:"Image"`
-	Status string `json:"Status"`
-	State  string `json:"State"`
-	Ports  string `json:"Ports"`
-}
 
 type containerMeta struct {
 	ComposeProject string
@@ -43,49 +33,84 @@ func (m containerMeta) composeRoot() string {
 }
 
 func CollectDocker(ctx context.Context) ([]core.Container, map[string]containerMeta, error) {
+	containers, meta, err := CollectDockerPS(ctx)
+	if err != nil || len(containers) == 0 {
+		return containers, meta, err
+	}
+	// Full inspect adds mount paths for better project matching (CLI / deep scan).
+	if full := inspectContainerMeta(ctx); len(full) > 0 {
+		meta = full
+		for i := range containers {
+			m := lookupMeta(containers[i].ID, meta)
+			containers[i].ProjectPath = m.composeRoot()
+			if m.Health != "" {
+				containers[i].Health = m.Health
+			}
+		}
+	}
+	return containers, meta, nil
+}
+
+// dockerPSFormat uses tabs — JSON templates break docker's Label quoting.
+const dockerPSFormat = "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.State}}\t{{.Status}}\t{{.Ports}}\t{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.project.working_dir\"}}\t{{.Label \"com.docker.compose.project.config_files\"}}"
+
+// CollectDockerPS lists containers via docker ps only (no inspect) — fast path for the dashboard.
+func CollectDockerPS(ctx context.Context) ([]core.Container, map[string]containerMeta, error) {
 	if _, err := exec.LookPath("docker"); err != nil {
 		return nil, nil, nil
 	}
 
-	out, err := exec.CommandContext(ctx, "docker", "ps", "-a",
-		"--format", `{"ID":"{{.ID}}","Names":"{{.Names}}","Image":"{{.Image}}","Status":"{{.Status}}","State":"{{.State}}","Ports":"{{.Ports}}"}`,
-	).Output()
+	out, err := exec.CommandContext(ctx, "docker", "ps", "-a", "--format", dockerPSFormat).Output()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	meta := inspectContainerMeta(ctx)
+	meta := make(map[string]containerMeta)
 	var containers []core.Container
 	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
 		if line == "" {
 			continue
 		}
-		var row dockerPSRow
-		if json.Unmarshal([]byte(line), &row) != nil {
+		c, m, ok := parseDockerPSLine(line)
+		if !ok {
 			continue
 		}
-		id := row.ID
-		if len(id) > 12 {
-			id = id[:12]
-		}
-		m := lookupMeta(id, meta)
-		name := strings.TrimPrefix(row.Names, "/")
-		health := m.Health
-		if health == "" {
-			health = parseHealthFromStatus(row.Status)
-		}
-		containers = append(containers, core.Container{
-			ID:          id,
-			Name:        name,
-			Image:       row.Image,
-			Status:      strings.ToLower(row.State),
-			State:       row.State,
-			Health:      health,
-			Ports:       row.Ports,
-			ProjectPath: m.composeRoot(),
-		})
+		meta[c.ID] = m
+		containers = append(containers, c)
 	}
 	return containers, meta, nil
+}
+
+func parseDockerPSLine(line string) (core.Container, containerMeta, bool) {
+	parts := strings.Split(line, "\t")
+	if len(parts) < 6 {
+		return core.Container{}, containerMeta{}, false
+	}
+	id := parts[0]
+	if len(id) > 12 {
+		id = id[:12]
+	}
+	m := containerMeta{}
+	if len(parts) > 6 {
+		m.ComposeProject = parts[6]
+	}
+	if len(parts) > 7 {
+		m.WorkingDir = parts[7]
+	}
+	if len(parts) > 8 {
+		m.ConfigFiles = parts[8]
+	}
+	name := strings.TrimPrefix(parts[1], "/")
+	return core.Container{
+		ID:          id,
+		Name:        name,
+		Image:       parts[2],
+		Status:      strings.ToLower(parts[3]),
+		State:       parts[3],
+		Health:      parseHealthFromStatus(parts[4]),
+		Ports:       parts[5],
+		ProjectPath: m.composeRoot(),
+	}, m, true
 }
 
 func inspectContainerMeta(ctx context.Context) map[string]containerMeta {
@@ -188,6 +213,9 @@ func matchScore(projectPath string, m containerMeta) int {
 	if root := m.composeRoot(); root != "" {
 		if root == projectPath {
 			return 10000 + len(projectPath)
+		}
+		if strings.HasPrefix(root, projectPath+string(filepath.Separator)) {
+			return 9000 + len(projectPath)
 		}
 	}
 

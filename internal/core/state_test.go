@@ -51,9 +51,28 @@ func TestSetProjectsPreservesGit(t *testing.T) {
 	}
 }
 
+func TestSetProjectsDoesNotReplaceFullGitWithSummary(t *testing.T) {
+	store := NewStateStore([]string{"/tmp"})
+	full := &GitInfo{
+		IsRepo:     true,
+		Branch:     "main",
+		LastCommit: "abc123",
+		Branches:   []GitBranch{{Name: "main", Current: true}},
+	}
+	store.SetProjects([]Project{{Path: "/p1", Git: full}})
+
+	summary := &GitInfo{IsRepo: true, Branch: "main"}
+	store.SetProjects([]Project{{Path: "/p1", Git: summary}})
+
+	got := store.Get().Projects[0].Git
+	if got == nil || len(got.Branches) != 1 || got.LastCommit != "abc123" {
+		t.Fatalf("full git data was replaced by summary: %+v", got)
+	}
+}
+
 func TestSnapshotClone(t *testing.T) {
 	orig := &Snapshot{
-		Projects: []Project{{Name: "a"}, {Name: "b"}},
+		Projects:  []Project{{Name: "a"}, {Name: "b"}},
 		ScanPaths: []string{"/tmp"},
 	}
 	clone := orig.Clone()

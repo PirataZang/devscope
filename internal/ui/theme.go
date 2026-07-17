@@ -29,12 +29,19 @@ func InitTheme(theme string) {
 	applyDarkTheme()
 }
 
+var (
+	colorDiffAddBg    = lipgloss.Color("#052E16")
+	colorDiffRemoveBg = lipgloss.Color("#4A044E")
+	colorDiffMatchBg  = lipgloss.Color("#854D0E")
+)
+
 func applyDarkTheme() {
 	ColorPrimary = lipgloss.Color("#7C3AED")
 	ColorAccent = lipgloss.Color("#60A5FA")
 	ColorSuccess = lipgloss.Color("#22C55E")
 	ColorWarning = lipgloss.Color("#EAB308")
 	ColorDanger = lipgloss.Color("#EF4444")
+	ColorPink = lipgloss.Color("#F472B6")
 	ColorMuted = lipgloss.Color("#6B7280")
 	ColorText = lipgloss.Color("#F9FAFB")
 	ColorSubtext = lipgloss.Color("#9CA3AF")
@@ -42,6 +49,9 @@ func applyDarkTheme() {
 	ColorBg = lipgloss.Color("#111827")
 	ColorBgPanel = lipgloss.Color("#1F2937")
 	ColorHighlight = lipgloss.Color("#A78BFA")
+	colorDiffAddBg = lipgloss.Color("#052E16")
+	colorDiffRemoveBg = lipgloss.Color("#4A044E")
+	colorDiffMatchBg = lipgloss.Color("#854D0E")
 	rebuildStyles()
 }
 
@@ -51,6 +61,7 @@ func applyLightTheme() {
 	ColorSuccess = lipgloss.Color("#16A34A")
 	ColorWarning = lipgloss.Color("#CA8A04")
 	ColorDanger = lipgloss.Color("#DC2626")
+	ColorPink = lipgloss.Color("#DB2777")
 	ColorMuted = lipgloss.Color("#6B7280")
 	ColorText = lipgloss.Color("#111827")
 	ColorSubtext = lipgloss.Color("#4B5563")
@@ -58,6 +69,9 @@ func applyLightTheme() {
 	ColorBg = lipgloss.Color("#F9FAFB")
 	ColorBgPanel = lipgloss.Color("#F3F4F6")
 	ColorHighlight = lipgloss.Color("#5B21B6")
+	colorDiffAddBg = lipgloss.Color("#DCFCE7")
+	colorDiffRemoveBg = lipgloss.Color("#FCE7F3")
+	colorDiffMatchBg = lipgloss.Color("#FEF3C7")
 	rebuildStyles()
 }
 
@@ -86,6 +100,12 @@ func rebuildStyles() {
 	StyleTabActive = lipgloss.NewStyle().Bold(true).Foreground(ColorPrimary).Underline(true)
 	StyleTab = lipgloss.NewStyle().Foreground(ColorMuted)
 	StyleWarning = lipgloss.NewStyle().Foreground(ColorWarning)
+	StyleDiffAdd = lipgloss.NewStyle().Foreground(ColorSuccess).Background(colorDiffAddBg)
+	StyleDiffRemove = lipgloss.NewStyle().Foreground(ColorPink).Background(colorDiffRemoveBg)
+	StyleDiffHunk = lipgloss.NewStyle().Foreground(ColorAccent).Bold(true).Background(ColorBgPanel)
+	StyleDiffMeta = lipgloss.NewStyle().Foreground(ColorMuted)
+	StyleDiffNum = lipgloss.NewStyle().Foreground(ColorMuted)
+	StyleDiffMatch = lipgloss.NewStyle().Foreground(ColorText).Background(colorDiffMatchBg).Bold(true)
 	StyleSection = lipgloss.NewStyle().Bold(true).Foreground(ColorAccent)
 	StyleKey = lipgloss.NewStyle().Foreground(ColorPrimary).Bold(true)
 	StyleKeyDesc = lipgloss.NewStyle().Foreground(ColorSubtext)

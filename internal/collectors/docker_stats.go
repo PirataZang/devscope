@@ -26,12 +26,31 @@ func CollectDockerStats(ctx context.Context) map[string]struct {
 	CPU    float64
 	Memory int64
 } {
+	return collectDockerStats(ctx, nil)
+}
+
+// CollectDockerStatsForIDs returns stats only for the given container IDs.
+func CollectDockerStatsForIDs(ctx context.Context, ids []string) map[string]struct {
+	CPU    float64
+	Memory int64
+} {
+	return collectDockerStats(ctx, ids)
+}
+
+func collectDockerStats(ctx context.Context, ids []string) map[string]struct {
+	CPU    float64
+	Memory int64
+} {
 	if _, err := exec.LookPath("docker"); err != nil {
 		return nil
 	}
-	out, err := exec.CommandContext(ctx, "docker", "stats", "--no-stream",
+	args := []string{"stats", "--no-stream",
 		"--format", `{"ID":"{{.ID}}","CPUPerc":"{{.CPUPerc}}","MemUsage":"{{.MemUsage}}","Name":"{{.Name}}"}`,
-	).Output()
+	}
+	if len(ids) > 0 {
+		args = append(args, ids...)
+	}
+	out, err := exec.CommandContext(ctx, "docker", args...).Output()
 	if err != nil {
 		return nil
 	}

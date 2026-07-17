@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -58,6 +58,12 @@ func (a *App) dismissContainerShellReturn() tea.Cmd {
 }
 
 func (a *App) renderContainerList(p *core.Project) string {
+	if a.projectDockerLoading && len(p.Containers) == 0 {
+		title := StyleSection.Render("Containers") + "  " +
+			StyleMuted.Render(shortenPath(p.Path))
+		return StylePanel.Render(title + "\n\n" + StyleMuted.Render("Carregando containers..."))
+	}
+
 	containers := p.Containers
 	title := StyleSection.Render("Containers") + "  " +
 		StyleMuted.Render(shortenPath(p.Path))
@@ -98,8 +104,8 @@ func (a *App) renderContainerList(p *core.Project) string {
 	}
 
 	lines = append(lines,
-		StyleTableHeader.Render("  STATE         NAME                      IMAGE                     PORTS"),
-		StyleMuted.Render("  "+strings.Repeat("─", maxInt(a.width-12, 60))),
+		a.renderContainerHeader(),
+		StyleMuted.Render("  "+strings.Repeat("─", maxInt(a.width-12, 30))),
 	)
 
 	if start > 0 {
@@ -134,24 +140,66 @@ func (a *App) renderContainerRow(c core.Container, selected bool) string {
 	if selected {
 		style = StyleSelected
 	}
-	gap := lipgloss.NewStyle().Width(2).Render("")
+	cols := a.containerColumns()
+	gap := lipgloss.NewStyle().Width(1).Render("")
 	cell := func(width int, text string) string {
 		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
 	}
 	state := a.containerStateCell(c, selected)
-	return lipgloss.JoinHorizontal(lipgloss.Top,
+	parts := []string{
 		lipgloss.NewStyle().Width(2).Render(""),
 		state,
 		gap,
-		cell(24, c.Name),
+		cell(cols.name, c.Name),
 		gap,
-		cell(24, c.Image),
+		cell(cols.image, c.Image),
+	}
+	if cols.ports > 0 {
+		parts = append(parts, gap, cell(cols.ports, c.Ports))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+type containerCols struct {
+	state, name, image, ports int
+}
+
+func (a *App) containerColumns() containerCols {
+	tableWidth := maxInt(38, a.width-10)
+	cols := containerCols{state: 10}
+	flexible := tableWidth - 2 - cols.state - 2
+	if a.width < 80 {
+		cols.name = flexible * 45 / 100
+		cols.image = flexible - cols.name
+		return cols
+	}
+	flexible--
+	cols.name = flexible * 30 / 100
+	cols.image = flexible * 30 / 100
+	cols.ports = flexible - cols.name - cols.image
+	return cols
+}
+
+func (a *App) renderContainerHeader() string {
+	cols := a.containerColumns()
+	style := StyleTableHeader
+	gap := lipgloss.NewStyle().Width(1).Render("")
+	parts := []string{
+		lipgloss.NewStyle().Width(2).Render(""),
+		style.Width(cols.state).Render("STATE"),
 		gap,
-		cell(36, c.Ports),
-	)
+		style.Width(cols.name).Render("NAME"),
+		gap,
+		style.Width(cols.image).Render("IMAGE"),
+	}
+	if cols.ports > 0 {
+		parts = append(parts, gap, style.Width(cols.ports).Render("PORTS"))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
 }
 
 func (a *App) containerStateCell(c core.Container, selected bool) string {
+	width := a.containerColumns().state
 	if kind := a.containerActionKind(c.Name); kind != "" {
 		var label string
 		switch kind {
@@ -172,38 +220,37 @@ func (a *App) containerStateCell(c core.Container, selected bool) string {
 		if selected {
 			s = StyleWarning.Bold(true).Background(lipgloss.Color("#78350F"))
 		}
-		return s.Width(12).MaxWidth(12).Render(truncate(label, 12))
+		return s.Width(width).MaxWidth(width).Render(truncate(label, width))
 	}
-	state := containerStateStyled(c.Status)
 	if selected {
-		return styleSelectedState(c.Status)
+		return styleSelectedState(c.Status, width)
 	}
-	return state
+	return containerStateStyled(c.Status, width)
 }
 
-func styleSelectedState(status string) string {
+func styleSelectedState(status string, width int) string {
 	switch strings.ToLower(status) {
 	case "running":
-		return StyleSelected.Width(12).MaxWidth(12).Render("RUNNING")
+		return StyleSelected.Width(width).MaxWidth(width).Render("RUNNING")
 	case "exited", "stopped":
-		return StyleSelected.Width(12).MaxWidth(12).Render("EXITED")
+		return StyleSelected.Width(width).MaxWidth(width).Render("EXITED")
 	case "paused":
-		return StyleSelected.Width(12).MaxWidth(12).Render("PAUSED")
+		return StyleSelected.Width(width).MaxWidth(width).Render("PAUSED")
 	default:
-		return StyleSelected.Width(12).MaxWidth(12).Render(strings.ToUpper(truncate(status, 12)))
+		return StyleSelected.Width(width).MaxWidth(width).Render(strings.ToUpper(truncate(status, width)))
 	}
 }
 
-func containerStateStyled(status string) string {
+func containerStateStyled(status string, width int) string {
 	switch strings.ToLower(status) {
 	case "running":
-		return StyleRunning.Width(12).Render("running")
+		return StyleRunning.Width(width).Render("running")
 	case "exited", "stopped":
-		return StyleStopped.Width(12).Render("exited")
+		return StyleStopped.Width(width).Render("exited")
 	case "paused":
-		return StyleWarning.Width(12).Render("paused")
+		return StyleWarning.Width(width).Render("paused")
 	default:
-		return StyleMuted.Width(12).Render(truncate(status, 12))
+		return StyleMuted.Width(width).Render(truncate(status, width))
 	}
 }
 
