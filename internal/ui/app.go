@@ -145,6 +145,48 @@ type App struct {
 	apiSearchInput              string
 	apiSearchQuery              string
 	apiSearchIdx                int
+	dbOpen                      bool
+	dbEngine                    dbEngine
+	dbHost                      string
+	dbPort                      int
+	dbUser                      string
+	dbPassword                  string
+	dbDatabase                  string
+	dbContainer                 string
+	dbQuery                     string
+	dbTargets                   []dbTarget
+	dbTargetCursor              int
+	dbTargetScroll              int
+	dbConnField                 int // 0 host, 1 port, 2 database, 3 user, 4 pass
+	dbBlock                     dbBlock
+	dbRightTab                  dbRightTab
+	dbEditing                   bool
+	dbAuthEditPass              bool
+	dbEditorCursor              int
+	dbEditorAnchor              int
+	dbEditorScroll              int
+	dbResultScroll              int
+	dbHScroll                   int
+	dbLoading                   bool
+	dbResultBody                string
+	dbResultErr                 string
+	dbResultHint                string
+	dbResultTime                time.Duration
+	dbHistory                   []dbHistoryItem
+	dbSearchOn                  bool
+	dbSearchInput               string
+	dbSearchQuery               string
+	dbSearchIdx                 int
+	dbTables                    []string
+	dbTableCursor               int
+	dbTableScroll               int
+	dbColumns                   []dbColumnInfo
+	dbColumnScroll              int
+	dbColHScroll                int
+	dbSchemaLoading             bool
+	dbSchemaErr                 string
+	dbSchemaTable               string
+	dbColumnsLoading            bool
 	fuzzyOn                     bool
 	fuzzyInput                  string
 	deployConfirm               bool
@@ -313,6 +355,16 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleApiResponse(msg)
 		return a, nil
 
+	case dbResultMsg:
+		return a, a.handleDbResult(msg)
+
+	case dbSchemaMsg:
+		return a, a.handleDbSchema(msg)
+
+	case dbColumnsMsg:
+		a.handleDbColumns(msg)
+		return a, nil
+
 	case projectLogFollowMsg:
 		if a.projectLogContainerID == msg.id && a.projectLogsFollow && !a.projectLogsPaused {
 			if msg.logs != "" {
@@ -443,8 +495,11 @@ func (a *App) updateFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	// API field editing must receive every key (incl. q/k/?//) — like a normal text editor.
+	// API/DB field editing must receive every key (incl. q/k/?//) — like a normal text editor.
 	if a.view == ViewProject && a.tab == TabAPI && a.apiOpen && a.apiEditing {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabDB && a.dbOpen && a.dbEditing {
 		return a.updateProject(msg)
 	}
 
@@ -583,6 +638,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabAPI {
 		a.apiOpen = false
 	}
+	if tab == TabDB {
+		a.dbOpen = false
+	}
 	var cmds []tea.Cmd
 	cmds = append(cmds, a.startProjectLoad(cp.Path))
 	if tab == TabLogs {
@@ -621,6 +679,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabAPI && a.apiOpen {
 		return a.handleApiKeys(msg, p)
 	}
+	if a.tab == TabDB && a.dbOpen {
+		return a.handleDbKeys(msg, p)
+	}
 
 	switch msg.String() {
 	case "esc":
@@ -635,11 +696,13 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.projectGitLoading = false
 		a.projectDockerLoading = false
 		a.apiOpen = false
+		a.dbOpen = false
 		return a, nil
 	case "tab":
 		a.tab = Tab((int(a.tab) + 1) % len(AllTabs))
 		a.tabCursor = 0
 		a.apiOpen = false
+		a.dbOpen = false
 		if a.tab == TabGit {
 			a.initGitTab(p)
 		}
@@ -654,6 +717,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.tab = Tab(i)
 		a.tabCursor = 0
 		a.apiOpen = false
+		a.dbOpen = false
 		if a.tab == TabGit {
 			a.initGitTab(p)
 		}
@@ -662,10 +726,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "1":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabOverview
 		a.tabCursor = 0
 	case "2":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabGit
 		a.tabCursor = 0
 		if p := a.currentProject(); p != nil {
@@ -673,15 +739,18 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "3":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabContainers
 		a.tabCursor = 0
 		a.initContainersTab()
 	case "4":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabHealth
 		a.tabCursor = 0
 	case "5":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabLogs
 		a.tabCursor = 0
 		if cmd := a.initLogsTab(p); cmd != nil {
@@ -689,10 +758,15 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "6":
 		a.apiOpen = false
+		a.dbOpen = false
 		a.tab = TabMetrics
 		a.tabCursor = 0
 	case "7":
+		a.dbOpen = false
 		a.enterApiTab(p)
+	case "8":
+		a.apiOpen = false
+		a.enterDbTab(p)
 	case "pgup":
 		a.projectContentScroll -= maxInt(1, a.projectPanelHeight()-4)
 		if a.projectContentScroll < 0 {
@@ -883,6 +957,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.gitFocusPrev()
 		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
 			a.apiOpen = false
+			a.dbOpen = false
 			a.tab = TabHealth
 			a.tabCursor = 0
 		}
@@ -895,6 +970,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.gitFocusNext()
 		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
 			a.apiOpen = false
+			a.dbOpen = false
 			a.tab = TabLogs
 			a.tabCursor = 0
 			if cmd := a.initLogsTab(p); cmd != nil {
@@ -905,6 +981,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabAPI && !a.apiOpen {
 			a.openApiClient(p)
 			return a, nil
+		}
+		if a.tab == TabDB && !a.dbOpen {
+			return a, a.openDbClient(p)
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
@@ -1019,6 +1098,10 @@ func (a *App) View() string {
 		return a.renderApiSearchPrompt()
 	}
 
+	if a.dbSearchOn {
+		return a.renderDbSearchPrompt()
+	}
+
 	if a.gitPromptOn {
 		return a.renderGitPrompt()
 	}
@@ -1096,6 +1179,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabAPI && a.apiOpen {
 		return a.renderApiTab(p)
 	}
+	if a.tab == TabDB && a.dbOpen {
+		return a.renderDbTab(p)
+	}
 
 	sidebar := a.renderProjectSidebar()
 	contentWidth := maxInt(50, a.width-lipgloss.Width(sidebar)-3)
@@ -1134,11 +1220,17 @@ func (a *App) renderProject() string {
 	if a.tab == TabAPI && !a.apiOpen {
 		hints = "enter abrir API  " + hints
 	}
+	if a.tab == TabDB && !a.dbOpen {
+		hints = "enter abrir Database  " + hints
+	}
 	compact := a.projectCompact()
 	if compact {
 		hints = "tab switch  ↑↓/pg scroll  esc back  ? help"
 		if a.tab == TabAPI && !a.apiOpen {
 			hints = "enter abrir API  " + hints
+		}
+		if a.tab == TabDB && !a.dbOpen {
+			hints = "enter abrir Database  " + hints
 		}
 	}
 
@@ -1260,6 +1352,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderLogsTab(p)
 	case TabAPI:
 		return a.renderApiLanding(p)
+	case TabDB:
+		return a.renderDbLanding(p)
 	default:
 		return a.renderOverviewTab(p)
 	}
@@ -1523,7 +1617,7 @@ Dashboard:
   r            Forçar atualização rápida
 
 Abas de Projeto:
-  1-7          Overview, Git, Containers, Health, Logs, Metrics, API
+  1-8          Overview, Git, Containers, Health, Logs, Metrics, API, Database
   h            Ir para aba Health
   l            Ir para aba Logs
   L            Abrir LazyGit no projeto
@@ -1542,6 +1636,17 @@ Aba API:
   /            Buscar (só em Body/Response)
   u            Porta do projeto (no Request/URL)
   a            Tipo de Auth (no Auth)
+
+Aba Database:
+  tab          Conn → Tables → Query → Result
+  digitar      Edita SQL (no Query) ou campo (no Conn)
+  ctrl+enter   Executar query
+  enter        Edita campo / SELECT * na tabela
+  ↑↓           Campos / tabelas / scroll do Result
+  ←→           Target (Conn) ou scroll horizontal
+  s            Carregar schema
+  /            Buscar no Result
+  esc          Sair do client
 
 Aba Git:
   space        Checkout de branch (ou toggle commit)

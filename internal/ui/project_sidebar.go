@@ -110,7 +110,7 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 	}{
 		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers}},
 		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI}},
+		{"TOOLS", []Tab{TabAPI, TabDB}},
 	}
 	var rows []string
 	for gi, g := range groups {
@@ -134,7 +134,7 @@ func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []strin
 		lipgloss.NewStyle().Foreground(accent).Bold(true).Render(tabGlyph(a.tab) + " " + a.tab.String()),
 		StyleMuted.Render("cpu ") + meterBar(cpu, 7) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", cpu)),
 		StyleMuted.Render("ram ") + meterBar(float64(minInt(100, int(ram/8))), 7) + StyleMuted.Render(fmt.Sprintf(" %dM", ram)),
-		StyleMuted.Render("1-7 · tab · esc"),
+		StyleMuted.Render("1-8 · tab · esc"),
 	}
 }
 
@@ -190,6 +190,8 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorPython
 	case TabAPI:
 		return ColorPrimary
+	case TabDB:
+		return ColorDocker
 	default:
 		return ColorHighlight
 	}
@@ -211,6 +213,8 @@ func tabGlyph(t Tab) string {
 		return "▦"
 	case TabAPI:
 		return "↯"
+	case TabDB:
+		return "⬡"
 	default:
 		return "·"
 	}
@@ -230,6 +234,8 @@ func tabActiveBg(t Tab) lipgloss.Color {
 		return lipgloss.Color("#3A3414")
 	case TabAPI:
 		return lipgloss.Color("#2A1A3F")
+	case TabDB:
+		return lipgloss.Color("#0F2A3D")
 	default:
 		return lipgloss.Color("#2A2440")
 	}

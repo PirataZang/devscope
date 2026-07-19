@@ -110,7 +110,7 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	got := a.renderProjectSidebar()
 	plain := stripANSI(got)
 
-	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "Overview", "Containers", "API", "1-7", "cpu"} {
+	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "Overview", "Containers", "API", "Database", "1-8", "cpu"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
 		}

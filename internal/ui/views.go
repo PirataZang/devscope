@@ -25,6 +25,7 @@ const (
 	TabLogs
 	TabMetrics
 	TabAPI
+	TabDB
 )
 
 func (t Tab) String() string {
@@ -43,9 +44,11 @@ func (t Tab) String() string {
 		return "Metrics"
 	case TabAPI:
 		return "API"
+	case TabDB:
+		return "Database"
 	default:
 		return "Overview"
 	}
 }
 
-var AllTabs = []Tab{TabOverview, TabGit, TabContainers, TabHealth, TabLogs, TabMetrics, TabAPI}
+var AllTabs = []Tab{TabOverview, TabGit, TabContainers, TabHealth, TabLogs, TabMetrics, TabAPI, TabDB}
