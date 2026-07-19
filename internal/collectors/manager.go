@@ -18,6 +18,7 @@ type Manager struct {
 	hostCollector *metrics.HostCollector
 	nginxDomains  []core.Domain
 	sslCerts      []core.SSLCert
+	dockerErr     error
 }
 
 func NewManager(store *core.StateStore, cfg *config.Config) *Manager {
@@ -124,8 +125,12 @@ func (m *Manager) refreshDocker(ctx context.Context) {
 func (m *Manager) refreshProjects(ctx context.Context, projects []core.Project) {
 	populateGitSummaries(projects)
 	if containers, meta, err := CollectDockerPS(ctx); err != nil {
-		log.Printf("docker ps error: %v", err)
+		if m.dockerErr == nil || err.Error() != m.dockerErr.Error() {
+			log.Printf("docker ps error: %v", err)
+			m.dockerErr = err
+		}
 	} else {
+		m.dockerErr = nil
 		AssignContainersToProjects(projects, containers, meta)
 	}
 

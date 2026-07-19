@@ -396,6 +396,13 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return a, nil
 
+	case opencodeDoneMsg:
+		a.snapshot = a.store.Get()
+		if msg.err != nil {
+			a.statusMsg = "opencode: " + msg.err.Error()
+		}
+		return a, nil
+
 	case containerActionDoneMsg:
 		a.handleContainerActionDone(msg)
 		return a, nil
@@ -600,6 +607,10 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if len(projects) > 0 && a.cursor < len(projects) {
 			return a, a.projectExecShell(projects[a.cursor].Path)
 		}
+	case "O", "shift+o":
+		if len(projects) > 0 && a.cursor < len(projects) {
+			return a, a.openOpencode(projects[a.cursor].Path)
+		}
 	case "g":
 		if len(projects) > 0 && a.cursor < len(projects) {
 			return a, a.openProject(projects[a.cursor], TabGit)
@@ -778,7 +789,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, nil
 	case "L":
 		return a, a.openLazyGit(p.Path)
-	case "o", "O":
+	case "O", "shift+o":
+		return a, a.openOpencode(p.Path)
+	case "o":
 		if a.gitTabReady(p) {
 			a.gitOpenPullRequest(p)
 			return a, nil
@@ -1211,7 +1224,7 @@ func (a *App) renderProject() string {
 		if a.containerSubview == containerSubviewDetail {
 			hints = "←→ tabs  ↑↓ scroll  esc back  " + hints
 		} else {
-			hints = "↑↓ navigate  enter detalhe  shift+e shell  s stop  r start/restart  p pause  d remove  shift+u up  shift+d down  " + hints
+			hints = "↑↓ navigate  enter detalhe  shift+e shell  shift+o opencode  s stop  r start/restart  p pause  d remove  shift+u up  shift+d down  " + hints
 		}
 	}
 	if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
@@ -1274,6 +1287,7 @@ func (a *App) renderProjectPanel(content string, width, height int) string {
 	}
 
 	top, bottom := lines[0], lines[len(lines)-1]
+	panelW := lipgloss.Width(top)
 	body := lines[1 : len(lines)-1]
 	for len(body) > 0 && strings.TrimSpace(ansi.Strip(body[0])) == "" {
 		body = body[1:]
@@ -1292,14 +1306,14 @@ func (a *App) renderProjectPanel(content string, width, height int) string {
 
 	rendered := []string{
 		top,
-		projectPanelIndicator(width, start > 0, fmt.Sprintf("↑ %d linhas", start)),
+		projectPanelIndicator(panelW, start > 0, fmt.Sprintf("↑ %d linhas", start)),
 	}
 	rendered = append(rendered, body[start:end]...)
 	for len(rendered) < height-2 {
-		rendered = append(rendered, projectPanelIndicator(width, false, ""))
+		rendered = append(rendered, projectPanelIndicator(panelW, false, ""))
 	}
 	rendered = append(rendered,
-		projectPanelIndicator(width, end < len(body), fmt.Sprintf("↓ %d linhas", len(body)-end)),
+		projectPanelIndicator(panelW, end < len(body), fmt.Sprintf("↓ %d linhas", len(body)-end)),
 		bottom,
 	)
 	return strings.Join(rendered, "\n")
@@ -1612,6 +1626,7 @@ func getHelpText() string {
 
 Dashboard:
   shift+e      Abrir terminal no diretório do projeto
+  shift+o      Abrir Opencode no diretório do projeto
   g            Abrir direto na aba Git
   c            Abrir direto na aba Containers
   r            Forçar atualização rápida

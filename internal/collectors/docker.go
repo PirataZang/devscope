@@ -2,6 +2,7 @@ package collectors
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -62,6 +63,9 @@ func CollectDockerPS(ctx context.Context) ([]core.Container, map[string]containe
 
 	out, err := exec.CommandContext(ctx, "docker", "ps", "-a", "--format", dockerPSFormat).Output()
 	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok && len(exitErr.Stderr) > 0 {
+			return nil, nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(string(exitErr.Stderr)))
+		}
 		return nil, nil, err
 	}
 

@@ -29,7 +29,7 @@ func (a *App) renderLogsTab(p *core.Project) string {
 		if content == "" {
 			content = "(aguardando logs...)"
 		}
-		lines := wrapText(content, maxInt(a.width-8, 40))
+		lines := wrapText(content, maxInt(a.width-10, 40))
 		if len(lines) > 40 {
 			start := len(lines) - 40
 			lines = lines[start:]
@@ -49,7 +49,7 @@ func (a *App) renderLogsTab(p *core.Project) string {
 	if a.projectLogSource != "" {
 		header = StyleSection.Render("SOURCE: "+a.projectLogSource) + "\n\n"
 	}
-	lines := wrapText(a.projectLogs, maxInt(a.width-8, 40))
+	lines := wrapText(a.projectLogs, maxInt(a.width-10, 40))
 	return StylePanel.Render(header + strings.Join(lines, "\n"))
 }
 
