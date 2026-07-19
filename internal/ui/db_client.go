@@ -206,42 +206,43 @@ func execDBViaHost(req dbRequest) (string, error) {
 	}
 	cmd := exec.Command(path, args...)
 	cmd.Env = append(os.Environ(), env...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	runErr := cmd.Run()
-	out := strings.TrimSpace(stdout.String())
-	errText := strings.TrimSpace(stderr.String())
-	if runErr != nil {
-		if errText != "" {
-			return "", fmt.Errorf("%s", errText)
-		}
-		return "", runErr
-	}
-	if out == "" && errText != "" {
-		return errText, nil
-	}
-	return out, nil
+	return runDBCommand(cmd)
 }
 
 func execDBViaDocker(req dbRequest) (string, error) {
-	if _, err := exec.LookPath("docker"); err != nil {
+	dockerPath, err := exec.LookPath("docker")
+	if err != nil {
 		return "", fmt.Errorf("docker não encontrado no PATH")
+	}
+	container := strings.TrimSpace(req.Container)
+	if container == "" {
+		return "", fmt.Errorf("container docker vazio")
 	}
 	inner, envPass, err := dbDockerInner(req)
 	if err != nil {
 		return "", err
 	}
+	// Do not use -i: under a bubbletea TUI on Windows, inheriting the
+	// console stdin makes CreateProcess fail with "invalid argument".
 	args := []string{"exec"}
 	if envPass != "" {
 		args = append(args, "-e", envPass)
 	}
-	args = append(args, "-i", req.Container)
+	args = append(args, container)
 	args = append(args, inner...)
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(dockerPath, args...)
+	return runDBCommand(cmd)
+}
+
+// runDBCommand executes a DB CLI/docker command without attaching the TUI stdin.
+func runDBCommand(cmd *exec.Cmd) (string, error) {
+	// Empty stdin avoids Windows console-handle inheritance issues while the TUI is in raw mode.
+	cmd.Stdin = bytes.NewReader(nil)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	// Platform-specific: detach from TUI console on Windows (see db_exec_*.go).
+	configureDBCommand(cmd)
 	runErr := cmd.Run()
 	out := strings.TrimSpace(stdout.String())
 	errText := strings.TrimSpace(stderr.String())
@@ -249,7 +250,8 @@ func execDBViaDocker(req dbRequest) (string, error) {
 		if errText != "" {
 			return "", fmt.Errorf("%s", errText)
 		}
-		return "", runErr
+		// Surface the command so "invalid argument" is diagnosable.
+		return "", fmt.Errorf("%s\ncmd: %s %s", runErr.Error(), cmd.Path, strings.Join(cmd.Args[1:], " "))
 	}
 	if out == "" && errText != "" {
 		return errText, nil
