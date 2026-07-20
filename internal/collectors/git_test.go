@@ -302,6 +302,34 @@ func TestGitCheckoutAndCherryPick(t *testing.T) {
 	}
 }
 
+func TestCollectWorkingTreeDiffModifiedAndUntracked(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	if err := os.MkdirAll(filepath.Join(dir, "src"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, filepath.Join(dir, "src", "Hero.astro"), "old\n")
+	runGit(t, dir, "add", "src/Hero.astro")
+	runGit(t, dir, "commit", "-m", "base")
+
+	writeFile(t, filepath.Join(dir, "src", "Hero.astro"), "new line\n")
+	mod := CollectWorkingTreeDiff(dir, "src/Hero.astro")
+	if !strings.Contains(mod, "-old") || !strings.Contains(mod, "+new line") {
+		t.Fatalf("modified diff missing changes:\n%s", mod)
+	}
+	if strings.Contains(mod, "untracked") {
+		t.Fatalf("modified file must not look untracked:\n%s", mod)
+	}
+
+	writeFile(t, filepath.Join(dir, "src", "New.astro"), "fresh\n")
+	unt := CollectWorkingTreeDiff(dir, "src/New.astro")
+	if !strings.Contains(unt, "+fresh") && !strings.Contains(unt, "fresh") {
+		t.Fatalf("untracked should show content:\n%s", unt)
+	}
+}
+
 func runGit(t *testing.T, dir string, args ...string) {
 	t.Helper()
 	cmd := exec.Command("git", args...)

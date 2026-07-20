@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/devscope/devscope/internal/collectors"
@@ -38,6 +39,43 @@ type gitActionDoneMsg struct {
 	newBranch string
 	count     int
 	err       error
+}
+
+type gitWTDiffMsg struct {
+	file string
+	diff string
+}
+
+func (a *App) requestGitWorkingTreeDiff(path, file string) tea.Cmd {
+	if path == "" || file == "" {
+		return nil
+	}
+	a.gitWTDiffFile = file
+	return func() tea.Msg {
+		return gitWTDiffMsg{file: file, diff: collectors.CollectWorkingTreeDiff(path, file)}
+	}
+}
+
+func (a *App) pushGitActivity(msg gitActionDoneMsg) {
+	if msg.err != nil {
+		return
+	}
+	label := msg.action
+	if msg.branch != "" {
+		label += " " + msg.branch
+	}
+	if msg.action == "checkout" {
+		label = "Checkout " + msg.branch
+	}
+	entry := timeNowHHMM() + " " + label
+	a.gitActivity = append([]string{entry}, a.gitActivity...)
+	if len(a.gitActivity) > 20 {
+		a.gitActivity = a.gitActivity[:20]
+	}
+}
+
+func timeNowHHMM() string {
+	return time.Now().Format("15:04")
 }
 
 func loadGitBranchCommits(path, branch string, gen int) tea.Cmd {

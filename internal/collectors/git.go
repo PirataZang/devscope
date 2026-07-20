@@ -96,16 +96,28 @@ func CollectAt(path string) *core.GitInfo {
 	info.Remote = remote
 	info.Files = files
 	info.Modified = 0
+	info.Staged = 0
 	info.Untracked = 0
 	for _, f := range info.Files {
-		if f.Worktree == "?" || f.Staging == "?" {
+		if f.Staging == "?" || f.Worktree == "?" {
 			info.Untracked++
-		} else {
+			continue
+		}
+		if f.Staging != " " && f.Staging != "" {
+			info.Staged++
+		}
+		if f.Worktree != " " && f.Worktree != "" {
 			info.Modified++
 		}
 	}
 	info.Branches = branches
 	info.Commits = collectGitCommits(path, info.Branch, 20)
+	info.Stashes = parseGitStashes(stash)
+	info.StashCount = len(info.Stashes)
+	info.Remotes = collectGitRemotes(path)
+	if info.Remote == "" && len(info.Remotes) > 0 {
+		info.Remote = info.Remotes[0].URL
+	}
 
 	upstream = strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "@{upstream}"))
 	if upstream != "" && !strings.Contains(upstream, "fatal:") && !strings.Contains(upstream, "@") {
@@ -116,11 +128,93 @@ func CollectAt(path string) *core.GitInfo {
 			info.Behind, _ = strconv.Atoi(parts[1])
 		}
 	}
-	if stash != "" {
-		info.StashCount = len(strings.Split(stash, "\n"))
-	}
 
 	return info
+}
+
+func parseGitStashes(stashList string) []core.GitStash {
+	stashList = strings.TrimSpace(stashList)
+	if stashList == "" {
+		return nil
+	}
+	var out []core.GitStash
+	for _, line := range strings.Split(stashList, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		// stash@{0}: WIP on main: abc message
+		ref := line
+		msg := ""
+		if i := strings.Index(line, ":"); i >= 0 {
+			ref = strings.TrimSpace(line[:i])
+			msg = strings.TrimSpace(line[i+1:])
+		}
+		out = append(out, core.GitStash{Ref: ref, Message: msg})
+		if len(out) >= 40 {
+			break
+		}
+	}
+	return out
+}
+
+func collectGitRemotes(path string) []core.GitRemote {
+	out := strings.TrimSpace(gitOutput(path, "remote", "-v"))
+	if out == "" {
+		return nil
+	}
+	seen := map[string]bool{}
+	var remotes []core.GitRemote
+	for _, line := range strings.Split(out, "\n") {
+		f := strings.Fields(line)
+		if len(f) < 2 {
+			continue
+		}
+		name, url := f[0], f[1]
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		remotes = append(remotes, core.GitRemote{Name: name, URL: url})
+	}
+	return remotes
+}
+
+// CollectWorkingTreeDiff returns unstaged/staged/HEAD diff for a path.
+func CollectWorkingTreeDiff(repo, file string) string {
+	if repo == "" || file == "" {
+		return ""
+	}
+	file = strings.TrimSpace(file)
+	if diff := strings.TrimSpace(gitDiffOutput(repo, "diff", "--", file)); diff != "" {
+		return diff
+	}
+	if diff := strings.TrimSpace(gitDiffOutput(repo, "diff", "--cached", "--", file)); diff != "" {
+		return diff
+	}
+	if diff := strings.TrimSpace(gitDiffOutput(repo, "diff", "HEAD", "--", file)); diff != "" {
+		return diff
+	}
+
+	st := strings.TrimSpace(gitOutput(repo, "status", "--porcelain", "--", file))
+	if st == "" {
+		return "(sem alterações neste arquivo)"
+	}
+	xy := st
+	if len(xy) >= 2 {
+		xy = xy[:2]
+	}
+	// Untracked file or directory
+	if strings.HasPrefix(xy, "??") || strings.HasPrefix(xy, "A ") {
+		if strings.HasSuffix(file, "/") {
+			return "(diretório untracked — abra um arquivo dentro)"
+		}
+		if diff := strings.TrimSpace(gitDiffOutput(repo, "diff", "--no-index", "/dev/null", file)); diff != "" {
+			return diff
+		}
+		return "(untracked — sem conteúdo para diff)"
+	}
+	return "(sem diff textual — binário ou mudança de modo)"
 }
 
 func collectGitFiles(path string) []core.GitFileStatus {
@@ -133,10 +227,20 @@ func collectGitFiles(path string) []core.GitFileStatus {
 		if len(line) < 3 {
 			continue
 		}
+		staging, worktree := string(line[0]), string(line[1])
+		rest := strings.TrimSpace(line[2:])
+		// renames: "old -> new"
+		if i := strings.Index(rest, " -> "); i >= 0 {
+			rest = strings.TrimSpace(rest[i+4:])
+		}
+		rest = strings.Trim(rest, `"`)
+		if rest == "" {
+			continue
+		}
 		files = append(files, core.GitFileStatus{
-			Staging:  string(line[0]),
-			Worktree: string(line[1]),
-			Path:     strings.TrimSpace(line[3:]),
+			Staging:  staging,
+			Worktree: worktree,
+			Path:     rest,
 		})
 	}
 	return files
@@ -317,6 +421,20 @@ func gitOutput(path string, args ...string) string {
 	cmd.Dir = path
 	out, err := cmd.Output()
 	if err != nil {
+		return ""
+	}
+	return string(out)
+}
+
+// gitDiffOutput keeps stdout even when git exits 1 (differences found / --no-index).
+func gitDiffOutput(path string, args ...string) string {
+	cmd := exec.Command("git", args...)
+	cmd.Dir = path
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); ok && len(out) > 0 {
+			return string(out)
+		}
 		return ""
 	}
 	return string(out)

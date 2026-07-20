@@ -61,6 +61,16 @@ type GitBranch struct {
 	Remote  bool   `json:"remote"`
 }
 
+type GitStash struct {
+	Ref     string `json:"ref"`
+	Message string `json:"message"`
+}
+
+type GitRemote struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 type GitInfo struct {
 	Branch         string          `json:"branch"`
 	Ahead          int             `json:"ahead"`
@@ -70,6 +80,7 @@ type GitInfo struct {
 	LastCommitDate time.Time       `json:"last_commit_date"`
 	Author         string          `json:"author"`
 	Modified       int             `json:"modified"`
+	Staged         int             `json:"staged"`
 	Untracked      int             `json:"untracked"`
 	StashCount     int             `json:"stash_count"`
 	Remote         string          `json:"remote"`
@@ -77,6 +88,8 @@ type GitInfo struct {
 	Files          []GitFileStatus `json:"files,omitempty"`
 	Commits        []GitCommit     `json:"commits,omitempty"`
 	Branches       []GitBranch     `json:"branches,omitempty"`
+	Stashes        []GitStash      `json:"stashes,omitempty"`
+	Remotes        []GitRemote     `json:"remotes,omitempty"`
 }
 
 type Service struct {

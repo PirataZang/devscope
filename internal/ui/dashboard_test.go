@@ -110,7 +110,7 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	got := a.renderProjectSidebar()
 	plain := stripANSI(got)
 
-	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "Overview", "Containers", "API", "Database", "1-8", "cpu"} {
+	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "API", "Database", "WS", "Ngrok", "JSON", "JWT", "Rotas", "tab · shift+tab", "CPU", "RESUMO"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
 		}
@@ -137,8 +137,11 @@ func TestProjectSidebarShowsLiveMeta(t *testing.T) {
 		snapshot:        core.Snapshot{Projects: []core.Project{p}},
 	}
 	got := stripANSI(a.renderProjectSidebar())
+	if !strings.Contains(got, "devscope") {
+		t.Fatalf("app brand missing: %q", got)
+	}
 	if !strings.Contains(got, "demo") {
-		t.Fatalf("project brand missing: %q", got)
+		t.Fatalf("project name missing: %q", got)
 	}
 	if !strings.Contains(got, "Deg") {
 		t.Fatalf("status missing in brand: %q", got)
@@ -149,7 +152,7 @@ func TestProjectSidebarShowsLiveMeta(t *testing.T) {
 	if strings.Contains(got, "containers") {
 		t.Fatalf("brand must not show containers: %q", got)
 	}
-	if !strings.Contains(got, "cpu") || !strings.Contains(got, "ram") {
+	if !strings.Contains(got, "CPU") || !strings.Contains(got, "RAM") || !strings.Contains(got, "RESUMO") {
 		t.Fatalf("footer meters missing: %q", got)
 	}
 }
@@ -201,7 +204,7 @@ func TestCompactProjectViewHidesHeader(t *testing.T) {
 	if strings.Contains(got, "DevScope") {
 		t.Fatal("compact project view should hide the header")
 	}
-	if !strings.Contains(stripANSI(got), "Overview") || !strings.Contains(stripANSI(got), "SCOPE") {
+	if !strings.Contains(stripANSI(got), "Visão Geral") || !strings.Contains(stripANSI(got), "SCOPE") {
 		t.Fatal("compact project view should keep the sidebar")
 	}
 }
@@ -223,8 +226,40 @@ func TestCompactContainerRowFitsContent(t *testing.T) {
 		Name:   "long-container-name",
 		Image:  "registry/example/long-image-name",
 	}, false)
-	if lipgloss.Width(row) > a.width-10 {
+	if lipgloss.Width(row) > a.width-8 {
 		t.Fatalf("container row width %d exceeds content width", lipgloss.Width(row))
+	}
+}
+
+func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
+	project := core.Project{
+		Path: "/tmp/digiliza",
+		Name: "digiliza",
+		Containers: []core.Container{
+			{ID: "abc", Name: "laradock-workspace-1", Image: "laradock/workspace", Status: "running", State: "Up 2 hours", Ports: "80:80", CPU: 12.6, Memory: 400 << 20},
+			{ID: "def", Name: "laradock-nginx-1", Image: "nginx", Status: "running", State: "Up 2 hours"},
+		},
+		Metrics: core.ProjectMetrics{CPUPercent: 12.6, MemoryMB: 400},
+	}
+	a := &App{
+		width:                   120,
+		height:                  40,
+		view:                    ViewProject,
+		tab:                     TabContainers,
+		containerSubview:        containerSubviewList,
+		containerPreviewLogs:    "2026-07-20 INFO boot ok\n2026-07-20 WARN slow query",
+		containerPreviewStats:   "CPU (%): 12.6%\nMemory: 400MiB / 16GiB\nNet I/O: 1.2MB / 800KB",
+		containerPreviewVolumes: []string{"laradock_data", "laradock_mysql"},
+		containerCPUHistory:     []float64{4, 8, 12, 10, 14},
+		containerPreviewID:      "abc",
+		selectedProject:         &project,
+		snapshot:                core.Snapshot{Projects: []core.Project{project}},
+	}
+	got := stripANSI(a.renderContainersTab(&project))
+	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS", "VOLUMES", "laradock-workspace-1", "laradock_data"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("containers main missing %q in:\n%s", want, got)
+		}
 	}
 }
 

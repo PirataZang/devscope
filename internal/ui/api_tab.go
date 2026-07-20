@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -89,7 +90,56 @@ func (a *App) openApiClient(p *core.Project) {
 	}
 }
 
-// leaveApiTab closes the fullscreen client and returns to tab 7 landing.
+// openApiWithPreset opens the API client with method + path prefilled from Routes.
+func (a *App) openApiWithPreset(p *core.Project, method, path string) tea.Cmd {
+	a.routesOpen = false
+	a.tab = TabAPI
+	a.tabCursor = 0
+	a.apiOpen = true
+	a.apiEditing = false
+	if p != nil {
+		a.initApiTab(p)
+	}
+	method = strings.ToUpper(strings.TrimSpace(method))
+	if method == "" {
+		method = "GET"
+	}
+	a.apiMethod = method
+	a.syncApiMethodCursor()
+
+	path = strings.TrimSpace(path)
+	if path != "" && !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+	base := a.apiBaseURL(p)
+	a.apiURL = base + path
+	a.apiBlock = apiBlockURL
+	a.apiRightTab = apiRightBody
+	if a.apiHeaders == "" {
+		a.apiHeaders = "Accept: application/json\n"
+	}
+	a.statusMsg = "rota → " + method + " " + path
+	return nil
+}
+
+func (a *App) apiBaseURL(p *core.Project) string {
+	u := strings.TrimSpace(a.apiURL)
+	if u != "" {
+		if i := strings.Index(u, "://"); i >= 0 {
+			rest := u[i+3:]
+			if slash := strings.IndexByte(rest, '/'); slash >= 0 {
+				return u[:i+3+slash]
+			}
+			return u
+		}
+	}
+	if ports := a.apiProjectPorts(p); len(ports) > 0 {
+		return fmt.Sprintf("http://localhost:%d", ports[0])
+	}
+	return "http://localhost:8080"
+}
+
+// leaveApiTab closes the fullscreen client and returns to tab 8 landing.
 func (a *App) leaveApiTab() tea.Cmd {
 	a.apiOpen = false
 	a.apiEditing = false
@@ -102,36 +152,59 @@ func (a *App) leaveApiTab() tea.Cmd {
 }
 
 func (a *App) renderApiLanding(p *core.Project) string {
-	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabAPI)).Bold(true)
+	w, h := a.moduleSize()
 	url := strings.TrimSpace(a.apiURL)
 	if url == "" && p != nil {
 		if ports := a.apiProjectPorts(p); len(ports) > 0 {
 			url = fmt.Sprintf("http://localhost:%d", ports[0])
 		}
 	}
-	lines := []string{
-		accent.Render("↯  API"),
-		StyleMuted.Render("cliente HTTP no contexto do projeto"),
-		"",
-		StyleSection.Render("ABRIR"),
-		StyleNormal.Render("  pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para entrar"),
-		StyleMuted.Render("  esc na API volta para esta aba"),
-	}
+	status := "pronto"
 	if url != "" {
-		lines = append(lines, "",
-			StyleSection.Render("ÚLTIMA URL"),
-			StyleMuted.Render("  "+truncate(url, 48)),
-		)
+		status = truncate(url, 36)
 	}
-	if len(a.apiHistory) > 0 {
-		lines = append(lines, "", StyleSection.Render("HISTÓRICO"))
-		n := minInt(5, len(a.apiHistory))
+	ctx := a.renderModuleContext(p, w, "API", status)
+	bodyH := maxInt(12, h-lipgloss.Height(ctx))
+	rightW := a.moduleRightWidth(w)
+	centerW := maxInt(36, w-rightW-1)
+
+	openH := maxInt(5, bodyH*28/100)
+	histH := maxInt(6, bodyH-openH)
+	openLines := append([]string{StyleMuted.Render("cliente HTTP no contexto do projeto")}, moduleOpenHint()...)
+	if url != "" {
+		openLines = append(openLines, "", StyleMuted.Render("URL  ")+StyleNormal.Render(truncate(url, centerW-8)))
+	}
+	histLines := make([]string, 0, histH-2)
+	if len(a.apiHistory) == 0 {
+		histLines = append(histLines, StyleMuted.Render("(vazio — requests aparecem aqui)"))
+	} else {
+		n := minInt(histH-2, len(a.apiHistory))
 		for i := 0; i < n; i++ {
-			h := a.apiHistory[i]
-			lines = append(lines, StyleMuted.Render(fmt.Sprintf("  %-6s %s", h.Method, truncate(h.URL, 40))))
+			hitem := a.apiHistory[i]
+			histLines = append(histLines, StyleMuted.Render(fmt.Sprintf("%-6s %s", hitem.Method, truncate(hitem.URL, centerW-10))))
 		}
 	}
-	return StylePanel.Render(strings.Join(lines, "\n"))
+	center := lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("API", fitExactLines(openLines, openH-2), centerW, openH, true),
+		renderApiTitledBox(fmt.Sprintf("HISTÓRICO (%d)", len(a.apiHistory)), fitExactLines(histLines, histH-2), centerW, histH, false),
+	)
+	ports := ""
+	if p != nil {
+		ports = collectors.FormatPortsShort(a.apiProjectPorts(p), 6)
+	}
+	details := []string{
+		StyleMuted.Render("URL    ") + StyleNormal.Render(truncate(url, rightW-10)),
+		StyleMuted.Render("Ports  ") + StyleAccent.Render(ports),
+		StyleMuted.Render("Hist   ") + StyleNormal.Render(fmt.Sprintf("%d", len(a.apiHistory))),
+	}
+	actions := moduleActionLines(
+		[2]string{"enter", "abrir cliente"},
+		[2]string{"=", "descobrir rotas"},
+		[2]string{"o", "abrir browser"},
+		[2]string{"esc", "voltar"},
+	)
+	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
+	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
 }
 
 func (a *App) syncApiMethodCursor() {
@@ -1484,6 +1557,55 @@ func apiLineEnd(runes []rune, cursor int) int {
 	return cursor
 }
 
+func apiIsWordChar(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '_' || r == '$'
+}
+
+func apiIsSpace(r rune) bool {
+	return r == ' ' || r == '\t' || r == '\n' || r == '\r'
+}
+
+// apiMoveWordLeft jumps like VS Code: skip whitespace, then a word or one punct char.
+func apiMoveWordLeft(runes []rune, cursor int) int {
+	if cursor <= 0 {
+		return 0
+	}
+	i := cursor
+	for i > 0 && apiIsSpace(runes[i-1]) {
+		i--
+	}
+	if i == 0 {
+		return 0
+	}
+	if !apiIsWordChar(runes[i-1]) {
+		return i - 1
+	}
+	for i > 0 && apiIsWordChar(runes[i-1]) {
+		i--
+	}
+	return i
+}
+
+func apiMoveWordRight(runes []rune, cursor int) int {
+	if cursor >= len(runes) {
+		return len(runes)
+	}
+	i := cursor
+	for i < len(runes) && apiIsSpace(runes[i]) {
+		i++
+	}
+	if i >= len(runes) {
+		return len(runes)
+	}
+	if !apiIsWordChar(runes[i]) {
+		return i + 1
+	}
+	for i < len(runes) && apiIsWordChar(runes[i]) {
+		i++
+	}
+	return i
+}
+
 func apiMoveLine(runes []rune, cursor, delta int) int {
 	if len(runes) == 0 {
 		return 0
@@ -1611,7 +1733,7 @@ func (a *App) handleApiKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 			a.syncApiMethodCursor()
 			return a, nil
 		}
-		// Leave fullscreen client → tab 7 landing (TOOLS hub).
+		// Leave fullscreen client → tab 8 landing (TOOLS hub).
 		return a, a.leaveApiTab()
 	case "1":
 		a.apiEditing = false

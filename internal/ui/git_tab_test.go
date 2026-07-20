@@ -9,6 +9,112 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
+func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
+	project := core.Project{
+		Path: "/tmp/repo",
+		Name: "repo",
+		Git: &core.GitInfo{
+			IsRepo:     true,
+			Branch:     "DES-2834",
+			Ahead:      3,
+			Modified:   2,
+			Staged:     1,
+			Untracked:  1,
+			StashCount: 2,
+			LastCommit: "dc23f83a",
+			Files: []core.GitFileStatus{
+				{Path: "app.go", Staging: " ", Worktree: "M"},
+				{Path: "new.go", Staging: "A", Worktree: " "},
+			},
+			Branches: []core.GitBranch{{Name: "DES-2834", Current: true}, {Name: "develop"}},
+			Commits:  []core.GitCommit{{Hash: "dc23f83a", Message: "fix", Date: "2h ago"}},
+			Stashes:  []core.GitStash{{Ref: "stash@{0}", Message: "wip"}},
+			Remotes:  []core.GitRemote{{Name: "origin", URL: "git@github.com:org/repo.git"}},
+		},
+	}
+	a := &App{
+		width:            120,
+		height:           40,
+		view:             ViewProject,
+		tab:              TabGit,
+		gitSubview:       gitSubviewMain,
+		gitFocus:         gitFocusBranches,
+		gitViewBranch:    "DES-2834",
+		gitBranches:      project.Git.Branches,
+		gitBranchCommits: project.Git.Commits,
+		gitActivity:      []string{"14:30 Checkout DES-2834"},
+		gitWTDiff:        "@@ -1 +1 @@\n-old\n+new\n",
+		gitWTDiffFile:    "app.go",
+		selectedProject:  &project,
+		snapshot:         core.Snapshot{Projects: []core.Project{project}},
+	}
+	got := stripANSI(a.renderGitTab(&project))
+	for _, want := range []string{
+		"BRANCHES", "COMMITS", "MODIFIED FILES", "DIFF",
+		"RECENT ACTIVITY", "STASHES", "REMOTES",
+		"DES-2834", "stash@{0}", "origin",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("git main missing %q in:\n%s", want, got)
+		}
+	}
+}
+
+func TestOpenGitFileDiffAllowsScroll(t *testing.T) {
+	project := core.Project{
+		Path: "/tmp/repo",
+		Git: &core.GitInfo{
+			IsRepo: true,
+			Branch: "main",
+			Files: []core.GitFileStatus{
+				{Path: "src/Hero.astro", Staging: " ", Worktree: "M"},
+			},
+		},
+	}
+	diff := "diff --git a/src/Hero.astro b/src/Hero.astro\n@@ -1,2 +1,2 @@\n-old line that is quite long " + strings.Repeat("x", 80) + "\n+new line that is also long " + strings.Repeat("y", 80) + "\n"
+	a := &App{
+		width:           80,
+		height:          24,
+		view:            ViewProject,
+		tab:             TabGit,
+		gitSubview:      gitSubviewMain,
+		gitFocus:        gitFocusFiles,
+		gitViewBranch:   "main",
+		gitFileCursor:   0,
+		selectedProject: &project,
+		snapshot:        core.Snapshot{Projects: []core.Project{project}},
+		gitWTDiff:       diff,
+		gitWTDiffFile:   "src/Hero.astro",
+	}
+	cmd := a.openGitFileDiff(&project)
+	if cmd != nil {
+		t.Fatal("cached diff should not reload")
+	}
+	if a.gitSubview != gitSubviewFileDiff {
+		t.Fatalf("expected file diff subview, got %v", a.gitSubview)
+	}
+	got := stripANSI(a.renderGitFileDiff(&project))
+	if !strings.Contains(got, "DIFF") || !strings.Contains(got, "Hero.astro") {
+		t.Fatalf("file diff missing header: %q", got)
+	}
+	if !strings.Contains(got, "old line") && !strings.Contains(got, "new line") {
+		t.Fatalf("file diff missing content: %q", got)
+	}
+	a.gitWTDiffHScrollBy(10)
+	if a.gitWTDiffHScroll == 0 {
+		t.Fatal("horizontal scroll should move")
+	}
+	a.gitWTDiffScrollBy(1)
+	scrolled := stripANSI(a.renderGitFileDiff(&project))
+	if scrolled == "" {
+		t.Fatal("empty after scroll")
+	}
+	_, _ = a.handleGitDedicatedKeys(tea.KeyMsg{Type: tea.KeyEsc}, &project)
+	if a.gitSubview != gitSubviewMain || a.gitFocus != gitFocusFiles {
+		t.Fatalf("esc should return to files focus, got sub=%v focus=%v", a.gitSubview, a.gitFocus)
+	}
+}
+
 func TestFilteredGitBranches(t *testing.T) {
 	a := &App{}
 	branches := []core.GitBranch{

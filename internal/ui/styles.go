@@ -19,6 +19,7 @@ var (
 
 	ColorGo      = lipgloss.Color("#00ADD8")
 	ColorDocker  = lipgloss.Color("#2496ED")
+	ColorK8s     = lipgloss.Color("#326CE5")
 	ColorVue     = lipgloss.Color("#42B883")
 	ColorLaravel = lipgloss.Color("#FF2D20")
 	ColorNode    = lipgloss.Color("#68A063")

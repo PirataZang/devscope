@@ -107,7 +107,7 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 | 🐙 [LazyGit](https://github.com/jesseduffield/lazygit) | Repositório | Integração direta (abre o LazyGit com a tecla `L` no contexto do projeto) |
 | 📊 `docker ps` / `htop` | Contêiner / Processo | Visão unificada orientada ao projeto (status, saúde, domínios, etc.) |
 | 🌐 Portainer | Web UI | TUI nativa leve, binário único, roda sem necessidade de navegador |
-| 📬 Postman / Insomnia | Request HTTP | Cliente API embutido no contexto do projeto (aba `7`) |
+| 📬 Postman / Insomnia | Request HTTP | Cliente API embutido no contexto do projeto (aba `8`) |
 
 ---
 
@@ -120,6 +120,12 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 * 🐳 **Integração com Docker** — Status de contêineres, estatísticas em tempo real e correlação automática com seus projetos.
 * 🐙 **Integração com Git** — Branch atual, status da working tree, histórico de commits e diff colorido (estilo LazyGit).
 * 📡 **Cliente API (estilo Postman)** — Aba dedicada para testar HTTP no contexto do projeto: métodos coloridos, URL, headers, auth, body editor e response viewer.
+* ⚡ **WebSocket Inspector (TOOLS)** — Overview 3 colunas (connections/stats/filters · messages+send · inspector), abas Messages/Send/History/Settings, busca e filtros de frames.
+* 🗃️ **Database** — Aba TOOLS para listar tabelas e rodar SQL em Postgres/MySQL detectados nos containers do projeto.
+* ⎈ **Kubernetes** — Aba SCOPE estilo LazyDocker: pods, deployments, services, apply/edit/delete YAML e manifests do projeto via `kubectl`.
+* `{ }` **JSON (UTILS)** — Pretty/minify/validate, sort keys, strip nulls, convert JSON⇄YAML/TOML/XML, diff e busca por chave.
+* ⚿ **JWT (UTILS)** — Decode/verify/generate/sign estilo jwt.io (HMAC HS256/384/512), copy claims e export JSON.
+* ⇄ **Rotas (UTILS)** — Detecta a stack do projeto, descobre endpoints (OpenAPI + parsers) e abre na aba API com method + URL.
 * ⚙️ **Suporte a PM2** — Identifica e lista workers vinculados a cada projeto.
 * 🩺 **Health Checks** — Validação de endpoints via HTTP/TCP com status inteligente (`Running`, `Degraded`, `Stopped`).
 * 🔒 **Nginx & SSL** — Mapeamento de domínios reversos e monitoramento de certificados Let's Encrypt.
@@ -147,6 +153,7 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 | `g` | Alternar diretamente para a aba Git |
 | `c` | Alternar diretamente para a aba Containers |
 | `Shift+E` | Abrir terminal no diretório do projeto |
+| `Shift+O` | Abrir OpenCode no diretório do projeto |
 | `r` | Atualizar dados do sistema manualmente |
 | `?` | Abrir menu de ajuda |
 | `q` | Sair do DevScope |
@@ -160,13 +167,41 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 |---|---|
 | `Esc` | Voltar para o Dashboard principal |
 | `Tab` / `Shift+Tab` | Próxima / aba anterior |
-| `1` – `7` | Atalhos para abas: Overview, Git, Containers, Health, Logs, Metrics, **API** |
-| `7` | Abrir a aba **API** (cliente HTTP do projeto) |
+| `1` – `9` / `0` / `-` / `=` / `+` | Atalhos: … **JSON** (`0`), **JWT** (`-`), **Rotas** (`=`), **WebSocket** (`+`) |
+| `4` | Aba **Kubernetes** (Enter abre cliente pods/deploy/svc/manifests) |
+| `8` | Aba **API** (Enter abre o cliente HTTP) |
+| `9` | Aba **Database** (Enter abre tabelas/SQL do Postgres/MySQL do projeto) |
+| `+` | Aba **WebSocket** (Enter abre connect/send/messages) |
+| `0` | Aba **JSON** (Enter abre utilitário input/output) |
+| `-` | Aba **JWT** (Enter abre decode/verify/sign) |
+| `=` | Aba **Rotas** (Enter escaneia; Enter numa rota abre a API) |
 | `L` | Abrir o **LazyGit** no contexto do projeto atual |
 | `D` | Executar script de Deploy (com confirmação) |
 | `o` | Abrir URL do projeto no navegador |
 | `h` | Aba de monitoramento de Saúde (Health) |
 | `l` | Aba de Logs |
+
+</details>
+
+<details>
+<summary>⎈ <b>Aba Kubernetes</b> (Clique para expandir)</summary>
+
+Cliente fullscreen via `kubectl` (estilo LazyDocker): lista pods/deployments/services, manifests do projeto, create/edit/apply/delete.
+
+| Tecla | Ação |
+|---|---|
+| `Enter` (na landing) | Abrir o cliente |
+| `[` / `]` | Alternar kind: pods / deploy / svc / yaml |
+| `n` / `N` | Namespace seguinte / anterior |
+| `Enter` | Describe / ver YAML |
+| `a` | Apply (recurso ou manifesto do projeto) |
+| `c` | Criar template Deployment + Service |
+| `e` | Editar YAML (`Ctrl+Enter` aplica) |
+| `d` | Delete (confirmação `y`) |
+| `l` | Logs do pod |
+| `+` / `-` | Scale deployment |
+| `r` | Refresh |
+| `Esc` | Voltar painel / landing |
 
 </details>
 

@@ -49,6 +49,33 @@ func DockerContainerStats(target string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
+// DockerContainerVolumes returns named volumes / bind mount sources for a container.
+func DockerContainerVolumes(target string) []string {
+	row, err := dockerInspect(target)
+	if err != nil {
+		return nil
+	}
+	var out []string
+	for _, m := range row.Mounts {
+		name := m.Source
+		if m.Type == "volume" {
+			// Source is usually /var/lib/docker/volumes/<name>/_data — prefer basename of volume
+			base := filepath.Base(strings.TrimSuffix(m.Source, "/_data"))
+			if base != "" && base != "." {
+				name = base
+			}
+		}
+		if name == "" {
+			name = m.Destination
+		}
+		out = append(out, name)
+		if len(out) >= 20 {
+			break
+		}
+	}
+	return out
+}
+
 func DockerContainerEnv(target string) (string, error) {
 	out, err := exec.Command("docker", "inspect", "-f", "{{range .Config.Env}}{{println .}}{{end}}", target).CombinedOutput()
 	if err != nil {

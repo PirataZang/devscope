@@ -163,7 +163,7 @@ func TestApiLandingEnterAndEsc(t *testing.T) {
 
 	_, _ = a.handleApiKeys(tea.KeyMsg{Type: tea.KeyEsc}, &p)
 	if a.apiOpen || a.tab != TabAPI || a.view != ViewProject {
-		t.Fatalf("esc should return to tab 7 landing, open=%v tab=%v view=%v", a.apiOpen, a.tab, a.view)
+		t.Fatalf("esc should return to tab 8 landing, open=%v tab=%v view=%v", a.apiOpen, a.tab, a.view)
 	}
 }
 

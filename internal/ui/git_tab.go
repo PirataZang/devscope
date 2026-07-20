@@ -15,6 +15,7 @@ const (
 	gitSubviewMain gitSubview = iota
 	gitSubviewBranch
 	gitSubviewCommit
+	gitSubviewFileDiff
 )
 
 type gitFocus int
@@ -45,6 +46,9 @@ const (
 )
 
 func (a *App) gitListViewport() int {
+	if a.gitListViewportOverride > 0 {
+		return a.gitListViewportOverride
+	}
 	// Total panel height = gitListViewport() + 3 (internal column chrome) + 6 (external git panel chrome)
 	v := a.contentPanelHeight() - 9
 	if v < 6 {
@@ -88,38 +92,104 @@ func (a *App) renderGitTab(p *core.Project) string {
 		return a.renderGitBranchHistory(p)
 	case gitSubviewCommit:
 		return a.renderGitCommitDetail(p)
+	case gitSubviewFileDiff:
+		return a.renderGitFileDiff(p)
 	}
 
 	current := a.currentProject()
 	if current == nil {
 		current = p
 	}
-	title := StyleSection.Render("Git") + "  " + StyleMuted.Render(shortenPath(current.Path))
 	g := current.Git
+	w := maxInt(60, a.width)
+	h := maxInt(18, a.projectPanelHeight())
+
 	if a.projectGitLoading && (g == nil || !g.IsRepo || len(g.Branches) == 0) {
-		return StylePanel.Render(title + "\n\n" + StyleMuted.Render("Carregando informações do Git..."))
+		return renderApiTitledBox("GIT", fitExactLines([]string{StyleMuted.Render("Carregando informações do Git...")}, h-2), w, h, true)
 	}
 	if g == nil || !g.IsRepo {
-		return StylePanel.Render(title + "\n\n" + StyleMuted.Render("Este diretório não é um repositório git."))
+		return renderApiTitledBox("GIT", fitExactLines([]string{StyleMuted.Render("Este diretório não é um repositório git.")}, h-2), w, h, true)
 	}
 	viewBranch := a.gitViewBranch
 	if viewBranch == "" {
 		viewBranch = g.Branch
 	}
 
-	// Status bar — inclui remote compacto ao final se disponível
-	statusBar := a.renderGitStatusBar(g, viewBranch)
-	if g.Remote != "" {
-		remote := g.Remote
-		remote = strings.TrimPrefix(remote, "https://")
-		remote = strings.TrimPrefix(remote, "http://")
-		remote = strings.TrimPrefix(remote, "git@")
-		remote = strings.TrimSuffix(remote, ".git")
-		statusBar += "   " + StyleMuted.Render("↗ "+truncate(remote, 45))
-	}
+	header := a.renderGitHeader(current, g, w)
+	stats := a.renderGitStatsRow(g, w)
+	notif := a.renderGitNotifLine()
+	chromeH := lipgloss.Height(header) + lipgloss.Height(stats) + lipgloss.Height(notif) + 1
+	bodyH := maxInt(12, h-chromeH-1)
 
-	// Linha de notificação — sempre 1 linha fixa para evitar saltos de altura
-	var notifLine string
+	bottomH := maxInt(5, bodyH*22/100)
+	midH := maxInt(5, (bodyH-bottomH)/2)
+	topH := maxInt(5, bodyH-bottomH-midH)
+
+	top := a.renderGitMainColumnsSized(g, viewBranch, w, topH)
+	mid := a.renderGitWorkingRow(g, viewBranch, w, midH)
+	bottom := a.renderGitBottomBoxes(g, w, bottomH)
+	actions := StyleMuted.Render("space checkout  enter detail/diff  x cherry  p/P pull/push  ←→ painel  n/d/R/M branch")
+
+	return lipgloss.JoinVertical(lipgloss.Left, header, stats, notif, top, mid, bottom, actions)
+}
+
+func (a *App) renderGitHeader(p *core.Project, g *core.GitInfo, width int) string {
+	path := shortenPath(p.Path)
+	clean := StyleHealthy.Render("✓ clean")
+	if g.Modified > 0 || g.Staged > 0 || g.Untracked > 0 {
+		clean = StyleWarning.Render("● dirty")
+	}
+	remote := compactGitRemote(g.Remote)
+	left := StyleSection.Render("GIT") + StyleMuted.Render("  "+path) + "  " + clean
+	if g.StashCount > 0 {
+		left += StyleMuted.Render(fmt.Sprintf("  stash:%d", g.StashCount))
+	}
+	if remote != "" {
+		left += StyleMuted.Render("  ↗ "+truncate(remote, 36))
+	}
+	right := StyleMuted.Render("HEAD ") + StyleWarning.Render(g.Branch)
+	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
+	if pad < 1 {
+		pad = 1
+	}
+	return left + strings.Repeat(" ", pad) + right
+}
+
+func compactGitRemote(u string) string {
+	u = strings.TrimPrefix(u, "https://")
+	u = strings.TrimPrefix(u, "http://")
+	u = strings.TrimPrefix(u, "git@")
+	u = strings.TrimSuffix(u, ".git")
+	u = strings.ReplaceAll(u, ":", "/")
+	return u
+}
+
+func (a *App) renderGitStatsRow(g *core.GitInfo, width int) string {
+	boxW := maxInt(10, width/6)
+	cards := []struct{ title, value string }{
+		{"BRANCH", g.Branch},
+		{"AHEAD/BEHIND", fmt.Sprintf("↑ %d / ↓ %d", g.Ahead, g.Behind)},
+		{"MODIFIED", fmt.Sprintf("%d", g.Modified)},
+		{"STAGED", fmt.Sprintf("%d", g.Staged)},
+		{"UNTRACKED", fmt.Sprintf("%d", g.Untracked)},
+		{"STASHES", fmt.Sprintf("%d", g.StashCount)},
+	}
+	var parts []string
+	for _, c := range cards {
+		val := StyleNormal.Render(truncate(c.value, boxW-4))
+		if c.title == "BRANCH" {
+			val = StyleWarning.Render(truncate(c.value, boxW-4))
+		}
+		if c.title == "AHEAD/BEHIND" && (g.Ahead > 0 || g.Behind > 0) {
+			val = StyleAccent.Render(truncate(c.value, boxW-4))
+		}
+		body := []string{val}
+		parts = append(parts, renderApiTitledBox(c.title, fitExactLines(body, 1), boxW, 3, false))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+func (a *App) renderGitNotifLine() string {
 	switch {
 	case a.gitStatusMsg != "":
 		style := StyleMuted
@@ -128,40 +198,20 @@ func (a *App) renderGitTab(p *core.Project) string {
 		} else if strings.Contains(a.gitStatusMsg, "erro") || strings.Contains(a.gitStatusMsg, ":") {
 			style = StyleWarning
 		}
-		notifLine = style.Render(a.gitStatusMsg)
+		return style.Render(truncate(a.gitStatusMsg, maxInt(40, a.width-4)))
 	case a.gitCherryPickActive:
 		src := a.gitCherryPickSourceBranch
 		if src == "" {
 			src = "?"
 		}
-		notifLine = StyleGitCherry.Render(
-			"🍒 Cherry-pick de " + src + ": " + a.gitCherryPickSummary() + " — shift+v na branch destino",
-		)
+		return StyleGitCherry.Render("🍒 " + a.gitCherryPickSummary() + " de " + src + " — shift+v cola")
 	case a.gitSelectedCommitCount() > 0:
-		notifLine = StyleGitSelected.Render(
-			fmt.Sprintf("✓ %d commit(s) selecionado(s) — shift+c para copiar cherry-pick", a.gitSelectedCommitCount()),
-		)
+		return StyleGitSelected.Render(fmt.Sprintf("✓ %d selected — shift+c copia", a.gitSelectedCommitCount()))
 	case a.gitActionLoading:
-		notifLine = StyleMuted.Render("executando...")
+		return StyleMuted.Render("executando...")
+	default:
+		return StyleMuted.Render(" ")
 	}
-
-	sections := []string{
-		title,
-		statusBar,
-		notifLine, // 1 linha fixa (vazia ou com mensagem)
-		"",
-		a.renderGitMainColumns(g, viewBranch),
-	}
-
-	if a.gitShowWorkingTree() {
-		sections = append(sections, "", a.renderGitFiles(g, viewBranch))
-	}
-
-	sections = append(sections, "",
-		StyleMuted.Render("Atalhos: space checkout │ x/shift+c/shift+v cherry-pick │ n/d/R/M branch │ p/P pull/push"),
-	)
-
-	return StylePanel.Render(strings.Join(sections, "\n"))
 }
 
 func (a *App) renderGitStatusBar(g *core.GitInfo, viewBranch string) string {
@@ -200,13 +250,168 @@ func (a *App) renderGitStatusBar(g *core.GitInfo, viewBranch string) string {
 }
 
 func (a *App) renderGitMainColumns(g *core.GitInfo, viewBranch string) string {
-	inner := a.gitPanelInnerLines()
-	branchCol := fitGitPanelLines(a.renderGitBranches(g, viewBranch), inner)
-	commitCol := fitGitPanelLines(a.renderGitCommits(viewBranch), inner)
+	return a.renderGitMainColumnsSized(g, viewBranch, maxInt(60, a.width), a.gitPanelInnerLines()+2)
+}
 
-	branchBox := StyleGitColumn.Width(a.gitBranchColWidth()).Height(inner).Render(branchCol)
-	commitBox := StyleGitColumn.Width(a.gitCommitColWidth()).Height(inner).Render(commitCol)
-	return lipgloss.JoinHorizontal(lipgloss.Top, branchBox, " ", commitBox)
+func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, width, height int) string {
+	branchW := a.gitBranchColWidth()
+	if branchW > width/2 {
+		branchW = maxInt(14, width/3)
+	}
+	commitW := maxInt(24, width-branchW)
+	// Temporarily size list viewport from height for this render.
+	prevH := a.height
+	// viewport ≈ height - title/scroll chrome (3)
+	a.gitListViewportOverride = maxInt(3, height-3)
+	branchLines := strings.Split(a.renderGitBranches(g, viewBranch), "\n")
+	commitLines := strings.Split(a.renderGitCommits(viewBranch), "\n")
+	a.gitListViewportOverride = 0
+	_ = prevH
+	bfocus := a.gitFocus == gitFocusBranches
+	cfocus := a.gitFocus == gitFocusCommits
+	branchBody := branchLines
+	if len(branchBody) > 0 {
+		branchBody = branchBody[1:] // drop internal section title; box has its own
+	}
+	commitBody := commitLines
+	if len(commitBody) > 0 {
+		commitBody = commitBody[1:]
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top,
+		renderApiTitledBox("BRANCHES", fitExactLines(branchBody, height-2), branchW, height, bfocus),
+		renderApiTitledBox("COMMITS · "+truncate(viewBranch, 16), fitExactLines(commitBody, height-2), commitW, height, cfocus),
+	)
+}
+
+func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, height int) string {
+	filesW := maxInt(22, width*38/100)
+	diffW := maxInt(28, width-filesW)
+	filesFocus := a.gitFocus == gitFocusFiles
+	diffFocus := a.gitFocus == gitFocusFiles // same focus scrolls either with keys later
+
+	fileLines := a.gitFileLines(g, viewBranch, height-2)
+	diffLines := a.gitWorkingDiffLines(height-2, diffW-2)
+
+	filesTitle := "MODIFIED FILES"
+	if filesFocus {
+		filesTitle = "> MODIFIED FILES"
+	}
+	diffTitle := "DIFF"
+	if a.gitWTDiffFile != "" {
+		diffTitle = "DIFF · " + truncate(a.gitWTDiffFile, 20)
+	}
+	_ = diffFocus
+	return lipgloss.JoinHorizontal(lipgloss.Top,
+		renderApiTitledBox(filesTitle, fitExactLines(fileLines, height-2), filesW, height, filesFocus),
+		renderApiTitledBox(diffTitle, fitExactLines(diffLines, height-2), diffW, height, filesFocus),
+	)
+}
+
+func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []string {
+	if viewBranch != g.Branch {
+		return []string{StyleMuted.Render("checkout da branch para ver WT")}
+	}
+	if len(g.Files) == 0 {
+		return []string{StyleHealthy.Render("✓ working tree limpo")}
+	}
+	viewport := maxInt(1, maxLines)
+	a.gitFileScroll = ensureVisible(a.gitFileCursor, a.gitFileScroll, viewport, len(g.Files))
+	start := a.gitFileScroll
+	end := minInt(start+viewport, len(g.Files))
+	lines := make([]string, 0, viewport)
+	for i := start; i < end; i++ {
+		f := g.Files[i]
+		code := gitStatusLabel(f.Staging, f.Worktree)
+		mark := "  "
+		style := StyleMuted
+		if a.gitFocus == gitFocusFiles && a.gitFileCursor == i {
+			mark = "▸ "
+			style = StyleSelected
+		}
+		lines = append(lines, style.Render(mark+gitStatusStyle(code)+" "+f.Path))
+	}
+	return lines
+}
+
+func (a *App) gitWorkingDiffLines(maxLines, width int) []string {
+	body := a.gitWTDiff
+	if strings.TrimSpace(body) == "" {
+		return []string{StyleMuted.Render("selecione um arquivo (←→ files)")}
+	}
+	raw := strings.Split(body, "\n")
+	a.gitWTDiffScroll = clampScroll(a.gitWTDiffScroll, maxLines, len(raw))
+	start := a.gitWTDiffScroll
+	end := minInt(start+maxLines, len(raw))
+	lines := make([]string, 0, maxLines)
+	for _, line := range raw[start:end] {
+		style := StyleMuted
+		switch {
+		case strings.HasPrefix(line, "+") && !strings.HasPrefix(line, "+++"):
+			style = StyleDiffAdd
+		case strings.HasPrefix(line, "-") && !strings.HasPrefix(line, "---"):
+			style = StyleDiffRemove
+		case strings.HasPrefix(line, "@@"):
+			style = StyleDiffHunk
+		}
+		lines = append(lines, style.Render(truncate(line, width)))
+	}
+	return lines
+}
+
+func (a *App) renderGitBottomBoxes(g *core.GitInfo, width, height int) string {
+	w1 := width / 3
+	w2 := width / 3
+	w3 := width - w1 - w2
+
+	act := make([]string, 0, height-2)
+	if len(a.gitActivity) == 0 {
+		if g.LastCommit != "" {
+			act = append(act, StyleMuted.Render(timeNowHHMM())+" "+StyleNormal.Render("Commit "+g.LastCommit))
+		}
+		act = append(act, StyleMuted.Render("(ações recentes aparecem aqui)"))
+	} else {
+		for i, e := range a.gitActivity {
+			if i >= height-2 {
+				break
+			}
+			act = append(act, StyleNormal.Render(truncate(e, w1-4)))
+		}
+	}
+
+	stashes := make([]string, 0, height-2)
+	if len(g.Stashes) == 0 {
+		stashes = append(stashes, StyleMuted.Render("(nenhum stash)"))
+	} else {
+		for i, s := range g.Stashes {
+			if i >= height-2 {
+				break
+			}
+			stashes = append(stashes, StyleMuted.Render(s.Ref)+" "+StyleNormal.Render(truncate(s.Message, w2-14)))
+		}
+	}
+
+	remotes := make([]string, 0, height-2)
+	if len(g.Remotes) == 0 {
+		remotes = append(remotes, StyleMuted.Render("(sem remotes)"))
+	} else {
+		for _, r := range g.Remotes {
+			remotes = append(remotes, StyleWarning.Render(r.Name))
+			remotes = append(remotes, StyleMuted.Render("  "+truncate(compactGitRemote(r.URL), w3-6)))
+			if r.Name == "origin" || r.Name == g.Remotes[0].Name {
+				sync := StyleHealthy.Render("✓ up to date")
+				if g.Ahead > 0 || g.Behind > 0 {
+					sync = StyleAccent.Render(fmt.Sprintf("↑ %d ↓ %d", g.Ahead, g.Behind))
+				}
+				remotes = append(remotes, StyleMuted.Render("  "+g.Branch+"  ")+sync)
+			}
+		}
+	}
+
+	return lipgloss.JoinHorizontal(lipgloss.Top,
+		renderApiTitledBox("RECENT ACTIVITY", fitExactLines(act, height-2), w1, height, false),
+		renderApiTitledBox("STASHES", fitExactLines(stashes, height-2), w2, height, false),
+		renderApiTitledBox("REMOTES", fitExactLines(remotes, height-2), w3, height, false),
+	)
 }
 
 func fitGitPanelLines(content string, lines int) string {
@@ -578,7 +783,14 @@ func (a *App) gitCommitDiffLines() []string {
 }
 
 func (a *App) parseGitDiffLines() []gitDiffLine {
-	content := a.gitCommitDiff
+	return parseDiffContent(a.gitCommitDiff)
+}
+
+func (a *App) parseWTDiffLines() []gitDiffLine {
+	return parseDiffContent(a.gitWTDiff)
+}
+
+func parseDiffContent(content string) []gitDiffLine {
 	if content == "" {
 		return []gitDiffLine{{kind: "meta", text: "(vazio)"}}
 	}
@@ -916,11 +1128,11 @@ func (a *App) gitCommitsViewport() int {
 }
 
 func (a *App) gitFilesViewport() int {
-	return 3
+	return maxInt(3, a.gitListViewport()/2)
 }
 
 func (a *App) gitShowWorkingTree() bool {
-	return false
+	return true
 }
 
 func (a *App) gitBranchHistoryViewport() int {
@@ -960,6 +1172,10 @@ func (a *App) initGitTab(p *core.Project) {
 	a.gitCommitScroll = 0
 	a.gitFileCursor = 0
 	a.gitFileScroll = 0
+	a.gitWTDiffScroll = 0
+	a.gitWTDiffHScroll = 0
+	a.gitWTDiff = ""
+	a.gitWTDiffFile = ""
 	a.gitCommitFileCursor = 0
 	a.gitCommitFileScroll = 0
 	a.gitCommitMsgScroll = 0
@@ -1044,9 +1260,9 @@ func (a *App) syncGitBranchCursor(branches []core.GitBranch) {
 	a.gitBranchScroll = 0
 }
 
-func (a *App) gitFocusNext() {
+func (a *App) gitFocusNext() tea.Cmd {
 	if a.gitSubview != gitSubviewMain {
-		return
+		return nil
 	}
 	switch a.gitFocus {
 	case gitFocusBranches:
@@ -1054,17 +1270,29 @@ func (a *App) gitFocusNext() {
 	case gitFocusCommits:
 		if a.gitShowWorkingTree() {
 			a.gitFocus = gitFocusFiles
-		} else {
-			a.gitFocus = gitFocusBranches
+			return a.gitEnsureWTDiff(a.currentProject())
 		}
+		a.gitFocus = gitFocusBranches
 	default:
 		a.gitFocus = gitFocusBranches
 	}
+	return nil
 }
 
-func (a *App) gitFocusPrev() {
+func (a *App) gitEnsureWTDiff(p *core.Project) tea.Cmd {
+	if p == nil || p.Git == nil || len(p.Git.Files) == 0 {
+		return nil
+	}
+	if a.gitFileCursor >= len(p.Git.Files) {
+		a.gitFileCursor = 0
+	}
+	f := p.Git.Files[a.gitFileCursor]
+	return a.requestGitWorkingTreeDiff(p.Path, f.Path)
+}
+
+func (a *App) gitFocusPrev() tea.Cmd {
 	if a.gitSubview != gitSubviewMain {
-		return
+		return nil
 	}
 	switch a.gitFocus {
 	case gitFocusFiles:
@@ -1074,10 +1302,11 @@ func (a *App) gitFocusPrev() {
 	default:
 		if a.gitShowWorkingTree() {
 			a.gitFocus = gitFocusFiles
-		} else {
-			a.gitFocus = gitFocusCommits
+			return a.gitEnsureWTDiff(a.currentProject())
 		}
+		a.gitFocus = gitFocusCommits
 	}
+	return nil
 }
 
 func (a *App) updateGitCursor(delta int, p *core.Project, shift bool) tea.Cmd {
@@ -1153,9 +1382,14 @@ func (a *App) updateGitCursor(delta int, p *core.Project, shift bool) tea.Cmd {
 		if len(p.Git.Files) == 0 {
 			return nil
 		}
+		prev := a.gitFileCursor
 		viewport := a.gitFilesViewport()
 		a.gitFileCursor = clampCursor(a.gitFileCursor+delta, len(p.Git.Files))
 		a.gitFileScroll = ensureVisible(a.gitFileCursor, a.gitFileScroll, viewport, len(p.Git.Files))
+		if a.gitFileCursor != prev || a.gitWTDiff == "" {
+			f := p.Git.Files[a.gitFileCursor]
+			return a.requestGitWorkingTreeDiff(p.Path, f.Path)
+		}
 	}
 	return nil
 }
@@ -1206,6 +1440,121 @@ func (a *App) openGitBranchHistory(p *core.Project, branch string) tea.Cmd {
 	a.gitViewBranch = branch
 	a.clearGitCommitSelection()
 	return a.requestGitBranchCommits(p.Path, branch)
+}
+
+func (a *App) openGitFileDiff(p *core.Project) tea.Cmd {
+	if p == nil || p.Git == nil {
+		return nil
+	}
+	files := p.Git.Files
+	if a.gitViewBranch != "" && a.gitViewBranch != p.Git.Branch {
+		a.gitStatusMsg = "checkout da branch para ver o diff"
+		return nil
+	}
+	if len(files) == 0 || a.gitFileCursor >= len(files) {
+		a.gitStatusMsg = "nenhum arquivo modificado"
+		return nil
+	}
+	f := files[a.gitFileCursor]
+	a.gitSubview = gitSubviewFileDiff
+	a.gitFocus = gitFocusFiles
+	a.gitWTDiffScroll = 0
+	a.gitWTDiffHScroll = 0
+	if a.gitWTDiffFile == f.Path && strings.TrimSpace(a.gitWTDiff) != "" {
+		return nil
+	}
+	return a.requestGitWorkingTreeDiff(p.Path, f.Path)
+}
+
+func (a *App) renderGitFileDiff(p *core.Project) string {
+	height := maxInt(12, a.height-2)
+	panelW := maxInt(20, a.width)
+	innerW := maxInt(16, panelW-4)
+	file := a.gitWTDiffFile
+	if file == "" {
+		if p != nil && p.Git != nil && a.gitFileCursor < len(p.Git.Files) {
+			file = p.Git.Files[a.gitFileCursor].Path
+		}
+	}
+	code := ""
+	if p != nil && p.Git != nil {
+		for _, f := range p.Git.Files {
+			if f.Path == file {
+				code = gitStatusLabel(f.Staging, f.Worktree)
+				break
+			}
+		}
+	}
+	status := ""
+	if code != "" {
+		status = gitStatusStyle(code) + " "
+	}
+	title := StyleSection.Render("DIFF") + "  " + status + StyleNormal.Render(truncate(file, maxInt(20, innerW-12)))
+	footerH := 1
+	bodyH := maxInt(4, height-3-footerH) // title + blank + footer
+	textW := maxInt(8, innerW-11)
+	all := a.parseWTDiffLines()
+	maxLine := 0
+	for _, line := range all {
+		if w := lipgloss.Width(line.text); w > maxLine {
+			maxLine = w
+		}
+	}
+	a.gitWTDiffHScroll = clampScroll(a.gitWTDiffHScroll, textW, maxLine)
+	a.gitWTDiffScroll = clampScroll(a.gitWTDiffScroll, bodyH, len(all))
+	start := a.gitWTDiffScroll
+	end := minInt(start+bodyH, len(all))
+	lines := make([]string, 0, bodyH+2)
+	lines = append(lines, title, "")
+	if strings.TrimSpace(a.gitWTDiff) == "" {
+		lines = append(lines, StyleMuted.Render("Carregando diff..."))
+	} else {
+		for i := start; i < end; i++ {
+			lines = append(lines, renderGitDiffLine(all[i], innerW, a.gitWTDiffHScroll, false, false))
+		}
+	}
+	for len(lines) < bodyH+2 {
+		lines = append(lines, "")
+	}
+	pos := "0/0"
+	if len(all) > 0 {
+		pos = fmt.Sprintf("%d-%d/%d", start+1, end, len(all))
+	}
+	hHint := ""
+	if maxH := maxInt(0, maxLine-textW); maxH > 0 || a.gitWTDiffHScroll > 0 {
+		hHint = fmt.Sprintf("  ↔ col %d", a.gitWTDiffHScroll)
+	}
+	footer := StyleMuted.Render(truncate("↑↓ scroll  ←→ lateral  pgup/pgdown  esc voltar  "+pos+hHint, innerW))
+	content := append(lines[:bodyH+2], footer)
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(ColorAccent).
+		Width(panelW).
+		Render(strings.Join(content, "\n"))
+}
+
+func (a *App) gitWTDiffScrollBy(delta int) {
+	all := a.parseWTDiffLines()
+	viewport := maxInt(4, a.height-6)
+	a.gitWTDiffScroll = clampScroll(a.gitWTDiffScroll+delta, viewport, len(all))
+}
+
+func (a *App) gitWTDiffHScrollBy(delta int) {
+	textW := maxInt(8, a.width-4-11)
+	maxLine := 0
+	for _, line := range a.parseWTDiffLines() {
+		if w := lipgloss.Width(line.text); w > maxLine {
+			maxLine = w
+		}
+	}
+	maxH := maxInt(0, maxLine-textW)
+	a.gitWTDiffHScroll += delta
+	if a.gitWTDiffHScroll < 0 {
+		a.gitWTDiffHScroll = 0
+	}
+	if a.gitWTDiffHScroll > maxH {
+		a.gitWTDiffHScroll = maxH
+	}
 }
 
 func (a *App) openGitCommitDetail(p *core.Project, commit core.GitCommit) tea.Cmd {
@@ -1341,6 +1690,40 @@ func (a *App) renderGitDiffSearchPrompt() string {
 }
 
 func (a *App) handleGitDedicatedKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {
+	if a.gitSubview == gitSubviewFileDiff {
+		switch msg.String() {
+		case "esc":
+			a.gitSubview = gitSubviewMain
+			a.gitFocus = gitFocusFiles
+			return a, nil
+		case "up", "k":
+			a.gitWTDiffScrollBy(-1)
+			return a, nil
+		case "down", "j":
+			a.gitWTDiffScrollBy(1)
+			return a, nil
+		case "left", "h":
+			a.gitWTDiffHScrollBy(-4)
+			return a, nil
+		case "right", "l":
+			a.gitWTDiffHScrollBy(4)
+			return a, nil
+		case "pgup", "shift+up", "shift+k":
+			a.gitWTDiffScrollBy(-maxInt(4, a.height-8))
+			return a, nil
+		case "pgdown", "shift+down", "shift+j":
+			a.gitWTDiffScrollBy(maxInt(4, a.height-8))
+			return a, nil
+		case "home":
+			a.gitWTDiffScroll = 0
+			return a, nil
+		case "end":
+			a.gitWTDiffScrollBy(len(a.parseWTDiffLines()))
+			return a, nil
+		}
+		return a, nil
+	}
+
 	switch msg.String() {
 	case "esc":
 		if a.gitSubview == gitSubviewCommit {
@@ -1459,22 +1842,29 @@ func (a *App) handleGitDedicatedKeys(msg tea.KeyMsg, p *core.Project) (tea.Model
 }
 
 func (a *App) gitSpaceAction(p *core.Project) tea.Cmd {
-	if p.Git == nil || !p.Git.IsRepo {
+	if p == nil || p.Git == nil || !p.Git.IsRepo {
 		return nil
 	}
-	switch a.gitFocus {
-	case gitFocusBranches:
-		branches := a.filteredGitBranches(a.gitBranchesForUI())
-		if a.gitBranchCursor >= len(branches) {
-			return nil
-		}
-		branch := branches[a.gitBranchCursor].Name
-		if branch == p.Git.Branch {
-			return a.selectGitBranch(p, branch)
-		}
-		return a.gitCheckoutBranch(p, branch)
-	case gitFocusCommits:
-		a.toggleGitCommitSelection(p)
+	if a.gitActionLoading {
+		return nil
 	}
-	return nil
+	// space = checkout (toggle de commit fica no `x`)
+	branch := ""
+	if a.gitFocus == gitFocusBranches {
+		if name, ok := a.selectedGitBranch(p); ok {
+			branch = name
+		}
+	}
+	if branch == "" {
+		branch = a.gitViewBranch
+	}
+	if branch == "" {
+		return nil
+	}
+	if branch == p.Git.Branch {
+		a.gitFocus = gitFocusBranches
+		return a.selectGitBranch(p, branch)
+	}
+	a.gitFocus = gitFocusBranches
+	return a.gitCheckoutBranch(p, branch)
 }

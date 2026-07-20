@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/pkg/version"
 )
 
 // Premium left rail — brand, grouped nav, live badges, footer meters.
@@ -54,20 +54,20 @@ func (a *App) renderProjectSidebarH(height int) string {
 }
 
 func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
-	name := "project"
-	if p != nil && p.Name != "" {
-		name = p.Name
-	}
 	accent := tabAccentColor(a.tab)
 	mark := lipgloss.NewStyle().Foreground(accent).Bold(true).Render("◆")
-	title := lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render(truncate(name, maxInt(8, width-3)))
-	rows := []string{mark + " " + title}
+	title := lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render("devscope")
+	ver := StyleMuted.Render("v" + version.Version)
+	rows := []string{mark + " " + title + " " + ver}
 	if p == nil {
 		return rows
 	}
-	rows = append(rows, projectStatusStyle(p.Status).Render(statusText(p.Status))+
-		StyleMuted.Render("  ")+
-		healthDot(p.Health)+" "+healthShort(p.Health))
+	rows = append(rows,
+		StyleMuted.Render(truncate(p.Name, width)),
+		projectStatusStyle(p.Status).Render(statusText(p.Status))+
+			StyleMuted.Render("  ")+
+			healthDot(p.Health)+" "+healthShort(p.Health),
+	)
 	if branch := sidebarBranchLine(p, width); branch != "" {
 		rows = append(rows, branch)
 	}
@@ -108,9 +108,10 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 		title string
 		tabs  []Tab
 	}{
-		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers}},
+		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes}},
 		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI, TabDB}},
+		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok}},
+		{"UTILS", []Tab{TabJSON, TabJWT, TabRoutes}},
 	}
 	var rows []string
 	for gi, g := range groups {
@@ -119,22 +120,28 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 		}
 		rows = append(rows, sidebarGroupLabel(g.title, width, tabAccentColor(g.tabs[0])))
 		for _, t := range g.tabs {
-			rows = append(rows, a.renderProjectSidebarRow(t, int(t)+1, width, p))
+			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
 		}
 	}
 	return rows
 }
 
 func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []string {
-	cpu, ram := 0.0, int64(0)
-	if p != nil {
-		cpu, ram = projectRuntimeMetrics(p)
+	m := a.snapshot.HostMetrics
+	cpu := m.CPUPercent
+	ramPct := m.MemoryPercent
+	disk := m.DiskPercent
+	ramLabel := fmt.Sprintf("%.0f%%", ramPct)
+	if m.MemoryTotalMB > 0 {
+		ramLabel = fmt.Sprintf("%.1fG/%.0fG", float64(m.MemoryUsedMB)/1024, float64(m.MemoryTotalMB)/1024)
 	}
+	_ = p
 	return []string{
-		lipgloss.NewStyle().Foreground(accent).Bold(true).Render(tabGlyph(a.tab) + " " + a.tab.String()),
-		StyleMuted.Render("cpu ") + meterBar(cpu, 7) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", cpu)),
-		StyleMuted.Render("ram ") + meterBar(float64(minInt(100, int(ram/8))), 7) + StyleMuted.Render(fmt.Sprintf(" %dM", ram)),
-		StyleMuted.Render("1-8 · tab · esc"),
+		lipgloss.NewStyle().Foreground(accent).Bold(true).Render("RESUMO RÁPIDO"),
+		StyleMuted.Render("CPU  ") + meterBar(cpu, 8) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", cpu)),
+		StyleMuted.Render("RAM  ") + meterBar(ramPct, 8) + StyleMuted.Render(" "+ramLabel),
+		StyleMuted.Render("DISK ") + meterBar(disk, 8) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", disk)),
+		StyleMuted.Render("tab · shift+tab · esc"),
 	}
 }
 
@@ -182,6 +189,8 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorWarning
 	case TabContainers:
 		return ColorDocker
+	case TabKubernetes:
+		return ColorK8s
 	case TabHealth:
 		return ColorSuccess
 	case TabLogs:
@@ -190,8 +199,18 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorPython
 	case TabAPI:
 		return ColorPrimary
-	case TabDB:
+	case TabDatabase:
 		return ColorDocker
+	case TabJSON:
+		return ColorWarning
+	case TabJWT:
+		return ColorSuccess
+	case TabRoutes:
+		return ColorPrimary
+	case TabWebSocket:
+		return ColorAccent
+	case TabNgrok:
+		return ColorSuccess
 	default:
 		return ColorHighlight
 	}
@@ -205,6 +224,8 @@ func tabGlyph(t Tab) string {
 		return "⑂"
 	case TabContainers:
 		return "▣"
+	case TabKubernetes:
+		return "⎈"
 	case TabHealth:
 		return "✚"
 	case TabLogs:
@@ -213,8 +234,18 @@ func tabGlyph(t Tab) string {
 		return "▦"
 	case TabAPI:
 		return "↯"
-	case TabDB:
-		return "⬡"
+	case TabDatabase:
+		return "▤"
+	case TabJSON:
+		return "{"
+	case TabJWT:
+		return "⚿"
+	case TabRoutes:
+		return "⇄"
+	case TabWebSocket:
+		return "⚡"
+	case TabNgrok:
+		return "⇪"
 	default:
 		return "·"
 	}
@@ -226,6 +257,8 @@ func tabActiveBg(t Tab) lipgloss.Color {
 		return lipgloss.Color("#3F3A14")
 	case TabContainers:
 		return lipgloss.Color("#0F2A3D")
+	case TabKubernetes:
+		return lipgloss.Color("#0F1F3D")
 	case TabHealth:
 		return lipgloss.Color("#143324")
 	case TabLogs:
@@ -234,42 +267,46 @@ func tabActiveBg(t Tab) lipgloss.Color {
 		return lipgloss.Color("#3A3414")
 	case TabAPI:
 		return lipgloss.Color("#2A1A3F")
-	case TabDB:
+	case TabDatabase:
 		return lipgloss.Color("#0F2A3D")
+	case TabJSON:
+		return lipgloss.Color("#3F3A14")
+	case TabJWT:
+		return lipgloss.Color("#143324")
+	case TabRoutes:
+		return lipgloss.Color("#2A1A3F")
+	case TabWebSocket:
+		return lipgloss.Color("#1A2A3F")
+	case TabNgrok:
+		return lipgloss.Color("#143324")
 	default:
 		return lipgloss.Color("#2A2440")
 	}
 }
 
-func (a *App) renderProjectSidebarRow(t Tab, num, width int, _ *core.Project) string {
+func (a *App) renderProjectSidebarRow(t Tab, width int, _ *core.Project) string {
 	accentCol := tabAccentColor(t)
 	accent := lipgloss.NewStyle().Foreground(accentCol).Bold(true)
 	name := t.String()
-	key := fmt.Sprintf("%d", num)
 
 	if t == a.tab {
-		keycap := lipgloss.NewStyle().
-			Foreground(ColorBg).
-			Background(accentCol).
-			Bold(true).
-			Render(" " + key + " ")
 		left := "▌" + tabGlyph(t) + " " + name
-		pad := width - lipgloss.Width(left) - lipgloss.Width(ansi.Strip(keycap))
-		if pad < 1 {
-			pad = 1
+		pad := width - lipgloss.Width(left)
+		if pad < 0 {
+			pad = 0
 		}
 		line := accent.Render("▌"+tabGlyph(t)) + " " +
 			lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render(name) +
-			strings.Repeat(" ", pad) + keycap
+			strings.Repeat(" ", pad)
 		return lipgloss.NewStyle().Width(width).Background(tabActiveBg(t)).Render(line)
 	}
 
 	left := " " + tabGlyph(t) + " " + name
-	pad := width - lipgloss.Width(left) - lipgloss.Width(key)
-	if pad < 1 {
-		pad = 1
+	pad := width - lipgloss.Width(left)
+	if pad < 0 {
+		pad = 0
 	}
 	line := " " + accent.Render(tabGlyph(t)) + " " + StyleMuted.Render(name) +
-		strings.Repeat(" ", pad) + StyleMuted.Render(key)
+		strings.Repeat(" ", pad)
 	return lipgloss.NewStyle().Width(width).Render(line)
 }

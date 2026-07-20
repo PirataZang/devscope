@@ -17,10 +17,6 @@ type lazyGitDoneMsg struct {
 	err error
 }
 
-type opencodeDoneMsg struct {
-	err error
-}
-
 func (a *App) runDeploy(p *core.Project) tea.Cmd {
 	if p.DeployScript == "" {
 		return nil
@@ -56,17 +52,6 @@ func (a *App) openLazyGit(path string) tea.Cmd {
 	cmd.Dir = path
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
 		return lazyGitDoneMsg{err: err}
-	})
-}
-
-func (a *App) openOpencode(path string) tea.Cmd {
-	if _, err := exec.LookPath("opencode"); err != nil {
-		a.statusMsg = "opencode não encontrado no PATH"
-		return nil
-	}
-	cmd := exec.Command("opencode", path)
-	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return opencodeDoneMsg{err: err}
 	})
 }
 

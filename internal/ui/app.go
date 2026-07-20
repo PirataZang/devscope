@@ -12,6 +12,9 @@ import (
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/internal/ngrokutil"
+	"github.com/devscope/devscope/internal/routeutil"
+	"github.com/devscope/devscope/internal/wsutil"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -41,7 +44,13 @@ type App struct {
 	gitCommitScroll             int
 	gitFileCursor               int
 	gitFileScroll               int
+	gitWTDiffScroll             int
+	gitWTDiffHScroll            int
+	gitListViewportOverride     int
 	gitViewBranch               string
+	gitWTDiff                   string
+	gitWTDiffFile               string
+	gitActivity                 []string
 	gitBranchCommits            []core.GitCommit
 	gitBranchLoading            bool
 	gitSelectedCommit           core.GitCommit
@@ -96,6 +105,15 @@ type App struct {
 	containerStatusMsg          string
 	containerActions            map[string]string
 	containerShellExitErr       string
+	containerFilterOn           bool
+	containerFilterInput        string
+	containerFilter             string
+	containerPreviewID          string
+	containerPreviewLogs        string
+	containerPreviewStats       string
+	containerPreviewVolumes     []string
+	containerCPUHistory         []float64
+	containerPreviewGen         int
 	containerDetailTab          containerDetailTab
 	containerDetailID           string
 	containerDetailName         string
@@ -125,7 +143,7 @@ type App struct {
 	apiRightTab                 apiRightTab
 	apiMethodCursor             int
 	apiEditing                  bool
-	apiOpen                     bool // true = fullscreen API client; false = tab 7 landing
+	apiOpen                     bool // true = fullscreen API client; false = tab 8 landing
 	apiEditorCursor             int
 	apiEditorAnchor             int // selection anchor; -1 = none
 	apiEditorScroll             int
@@ -146,47 +164,143 @@ type App struct {
 	apiSearchQuery              string
 	apiSearchIdx                int
 	dbOpen                      bool
-	dbEngine                    dbEngine
-	dbHost                      string
-	dbPort                      int
-	dbUser                      string
-	dbPassword                  string
-	dbDatabase                  string
-	dbContainer                 string
-	dbQuery                     string
-	dbTargets                   []dbTarget
-	dbTargetCursor              int
-	dbTargetScroll              int
-	dbConnField                 int // 0 host, 1 port, 2 database, 3 user, 4 pass
-	dbBlock                     dbBlock
-	dbRightTab                  dbRightTab
 	dbEditing                   bool
-	dbAuthEditPass              bool
-	dbEditorCursor              int
-	dbEditorAnchor              int
-	dbEditorScroll              int
-	dbResultScroll              int
-	dbHScroll                   int
 	dbLoading                   bool
-	dbResultBody                string
-	dbResultErr                 string
-	dbResultHint                string
-	dbResultTime                time.Duration
-	dbHistory                   []dbHistoryItem
-	dbSearchOn                  bool
-	dbSearchInput               string
-	dbSearchQuery               string
-	dbSearchIdx                 int
+	dbPane                      dbPane
+	dbTargets                   []collectors.DBTarget
+	dbTargetIdx                 int
 	dbTables                    []string
 	dbTableCursor               int
-	dbTableScroll               int
-	dbColumns                   []dbColumnInfo
-	dbColumnScroll              int
-	dbColHScroll                int
-	dbSchemaLoading             bool
-	dbSchemaErr                 string
-	dbSchemaTable               string
-	dbColumnsLoading            bool
+	dbTablesScroll              int
+	dbSQL                       string
+	dbEditorCursor              int
+	dbResult                    string
+	dbResultScroll              int
+	dbResultHScroll             int
+	dbErr                       string
+	k8sOpen                     bool
+	k8sEditing                  bool
+	k8sLoading                  bool
+	k8sConfirmDelete            bool
+	k8sFilterOn                 bool
+	k8sKind                     k8sKind
+	k8sSubTab                   k8sSubTab
+	k8sFocus                    k8sFocus
+	k8sPane                     k8sPane
+	k8sNamespace                string
+	k8sContext                  string
+	k8sVersion                  string
+	k8sFilter                   string
+	k8sCursor                   int
+	k8sScroll                   int
+	k8sDetailScroll             int
+	k8sLogsScroll               int
+	k8sYAMLScroll               int
+	k8sEditorCursor             int
+	k8sNodeCount                int
+	k8sResources                []collectors.K8sResource
+	k8sManifests                []string
+	k8sDetail                   string
+	k8sLogs                     string
+	k8sYAML                     string
+	k8sEvents                   string
+	k8sStatus                   string
+	k8sErr                      string
+	k8sInspectName              string
+	jsonOpen                    bool
+	jsonEditing                 bool
+	jsonSearchOn                bool
+	jsonPane                    jsonPane
+	jsonInput                   string
+	jsonOutput                  string
+	jsonErr                     string
+	jsonStatus                  string
+	jsonEditorCursor            int
+	jsonEditorAnchor            int // selection anchor; -1 = none
+	jsonScrollIn                int
+	jsonScrollOut               int
+	jsonSearchInput             string
+	jwtOpen                     bool
+	jwtEditing                  bool
+	jwtPane                     jwtPane
+	jwtAlg                      string
+	jwtSecret                   string
+	jwtInput                    string
+	jwtLastToken                string
+	jwtOutput                   string
+	jwtErr                      string
+	jwtStatus                   string
+	jwtEdit                     editorState
+	jwtScrollIn                 int
+	jwtScrollOut                int
+	jwtHScrollIn                int
+	jwtHScrollOut               int
+	jwtHScrollSecret            int
+	routesOpen                  bool
+	routesLoading               bool
+	routes                      []routeutil.Route
+	routesCursor                int
+	routesScroll                int
+	routesErr                   string
+	routesStatus                string
+	routesFilterOn              bool
+	routesFilterInput           string
+	routesFilter                string
+	wsOpen                      bool
+	wsEditing                   bool
+	wsConnected                 bool
+	wsSubTab                    wsSubTab
+	wsFocus                     wsFocus
+	wsURL                       string
+	wsHeaders                   string
+	wsSend                      string
+	wsStatus                    string
+	wsErr                       string
+	wsFrames                    []wsFrame
+	wsFrameSeq                  int
+	wsFrameCursor               int
+	wsMsgScroll                 int
+	wsFilter                    wsFilterKind
+	wsSearchOn                  bool
+	wsSearchInput               string
+	wsSearch                    string
+	wsPayloadMode               wsPayloadMode
+	wsSendMode                  wsSendMode
+	wsHistory                   []string
+	wsRecent                    []string
+	wsRecentCursor              int
+	wsStats                     wsStats
+	wsInfo                      wsutil.Info
+	wsConnectedAt               time.Time
+	wsLastSendAt                time.Time
+	wsLatency                   time.Duration
+	wsAutoReconnect             bool
+	wsPortIndex                 int
+	wsEdit                      editorState
+	wsSess                      *wsutil.Session
+	ngrokOpen                   bool
+	ngrokLoading                bool
+	ngrokWizard                 bool
+	ngrokConfirmDelete          bool
+	ngrokSubTab                 ngrokSubTab
+	ngrokFocus                  ngrokFocus
+	ngrokCursor                 int
+	ngrokScroll                 int
+	ngrokReqCursor              int
+	ngrokReqScroll              int
+	ngrokLogScroll              int
+	ngrokNewPort                int
+	ngrokNewPortStr             string
+	ngrokNewName                string
+	ngrokNewProto               string
+	ngrokWizardField            int // 0 name, 1 port, 2 proto
+	ngrokWizardCursor           int
+	ngrokStatus                 string
+	ngrokErr                    string
+	ngrokTunnels                []ngrokutil.Tunnel
+	ngrokRequests               []ngrokutil.Request
+	ngrokCfg                    ngrokutil.ProjectConfig
+	ngrokAgent                  ngrokutil.AgentInfo
 	fuzzyOn                     bool
 	fuzzyInput                  string
 	deployConfirm               bool
@@ -265,8 +379,17 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.gitBranchFilterOn {
 			return a.updateGitBranchFilter(msg)
 		}
+		if a.routesFilterOn {
+			return a.updateRoutesFilter(msg)
+		}
+		if a.wsSearchOn {
+			return a.updateWsSearch(msg)
+		}
 		if a.gitDiffSearchOn {
 			return a.updateGitDiffSearch(msg)
+		}
+		if a.containerFilterOn {
+			return a.updateContainerFilter(msg)
 		}
 		if a.containerDetailSearchOn {
 			return a.updateContainerDetailSearch(msg)
@@ -326,8 +449,17 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleGitCommitDiffLoaded(msg)
 		return a, nil
 
+	case gitWTDiffMsg:
+		if msg.file == a.gitWTDiffFile || a.gitWTDiffFile == "" {
+			a.gitWTDiff = msg.diff
+			a.gitWTDiffFile = msg.file
+			a.gitWTDiffScroll = 0
+		}
+		return a, nil
+
 	case gitActionDoneMsg:
 		a.handleGitActionDone(msg)
+		a.pushGitActivity(msg)
 		if msg.err == nil && needsGitBranchCommitsReload(msg.action) {
 			branch := a.gitViewBranch
 			if msg.action == "rename-branch" && msg.newBranch != "" {
@@ -355,15 +487,22 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleApiResponse(msg)
 		return a, nil
 
-	case dbResultMsg:
-		return a, a.handleDbResult(msg)
+	case dbTablesMsg:
+		return a.handleDbMsg(msg)
+	case dbQueryMsg:
+		return a.handleDbMsg(msg)
 
-	case dbSchemaMsg:
-		return a, a.handleDbSchema(msg)
+	case k8sLoadedMsg, k8sActionMsg, k8sDetailMsg, k8sNsMsg, k8sEditReadyMsg, k8sInspectMsg, k8sMetaMsg:
+		return a.handleK8sMsg(msg)
 
-	case dbColumnsMsg:
-		a.handleDbColumns(msg)
+	case routesLoadedMsg:
+		a.handleRoutesLoaded(msg)
 		return a, nil
+
+	case wsConnectedMsg, wsEventMsg:
+		return a.handleWsMsg(msg)
+	case ngrokLoadedMsg, ngrokActionMsg:
+		return a.handleNgrokMsg(msg)
 
 	case projectLogFollowMsg:
 		if a.projectLogContainerID == msg.id && a.projectLogsFollow && !a.projectLogsPaused {
@@ -396,29 +535,26 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return a, nil
 
-	case opencodeDoneMsg:
-		a.snapshot = a.store.Get()
-		if msg.err != nil {
-			a.statusMsg = "opencode: " + msg.err.Error()
-		}
-		return a, nil
-
 	case containerActionDoneMsg:
 		a.handleContainerActionDone(msg)
-		return a, nil
+		return a, a.requestContainerPreview()
 
 	case containerShellDoneMsg:
 		cmd := a.handleContainerShellDone(msg)
 		return a, cmd
 
+	case containerPreviewMsg:
+		a.handleContainerPreview(msg)
+		return a, nil
+
 	case dockerRefreshedMsg:
 		a.snapshot = a.store.Get()
-		containers := a.currentProjectContainers()
+		containers := a.filteredContainers(a.currentProject())
 		if len(containers) > 0 {
 			a.tabCursor = clampCursor(a.tabCursor, len(containers))
 			a.syncContainerScroll(len(containers))
 		}
-		return a, nil
+		return a, a.requestContainerPreview()
 
 	case projectGitLoadedMsg:
 		cmd := a.handleProjectGitLoaded(msg)
@@ -426,6 +562,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case projectDockerLoadedMsg:
 		a.handleProjectDockerLoaded(msg)
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			return a, a.requestContainerPreview()
+		}
 		return a, nil
 
 	case composeDoneMsg:
@@ -506,7 +645,19 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.view == ViewProject && a.tab == TabAPI && a.apiOpen && a.apiEditing {
 		return a.updateProject(msg)
 	}
-	if a.view == ViewProject && a.tab == TabDB && a.dbOpen && a.dbEditing {
+	if a.view == ViewProject && a.tab == TabDatabase && a.dbOpen && a.dbEditing {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabKubernetes && a.k8sOpen && a.k8sEditing {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabJSON && a.jsonOpen && (a.jsonEditing || a.jsonSearchOn) {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabJWT && a.jwtOpen && a.jwtEditing {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabWebSocket && a.wsOpen && a.wsEditing {
 		return a.updateProject(msg)
 	}
 
@@ -609,7 +760,7 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "O", "shift+o":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			return a, a.openOpencode(projects[a.cursor].Path)
+			return a, a.projectExecOpenCode(projects[a.cursor].Path)
 		}
 	case "g":
 		if len(projects) > 0 && a.cursor < len(projects) {
@@ -623,6 +774,77 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.snapshot = a.store.Get()
 	}
 	return a, nil
+}
+
+func (a *App) closeToolClients() {
+	a.apiOpen = false
+	a.dbOpen = false
+	a.k8sOpen = false
+	a.jsonOpen = false
+	a.jwtOpen = false
+	a.routesOpen = false
+	a.routesLoading = false
+	a.routesFilterOn = false
+	if a.wsOpen || a.wsConnected {
+		a.wsCloseSession()
+	}
+	a.wsOpen = false
+	a.wsEditing = false
+	a.ngrokOpen = false
+	a.ngrokWizard = false
+	a.ngrokConfirmDelete = false
+}
+
+func tabIndex(t Tab) int {
+	for i, x := range AllTabs {
+		if x == t {
+			return i
+		}
+	}
+	return 0
+}
+
+func (a *App) cycleProjectTab(delta int, p *core.Project) tea.Cmd {
+	a.closeToolClients()
+	n := len(AllTabs)
+	i := (tabIndex(a.tab) + delta%n + n) % n
+	return a.switchProjectTab(AllTabs[i], p)
+}
+
+func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
+	a.tab = t
+	a.tabCursor = 0
+	a.projectContentScroll = 0
+	switch t {
+	case TabGit:
+		if p != nil {
+			a.initGitTab(p)
+		}
+	case TabContainers:
+		a.initContainersTab()
+		return a.requestContainerPreview()
+	case TabKubernetes:
+		a.enterK8sTab(p)
+	case TabLogs:
+		if p != nil {
+			return a.initLogsTab(p)
+		}
+	case TabAPI:
+		a.enterApiTab(p)
+	case TabDatabase:
+		a.enterDbTab(p)
+	case TabJSON:
+		a.enterJsonTab(p)
+	case TabJWT:
+		a.enterJwtTab(p)
+	case TabRoutes:
+		a.enterRoutesTab(p)
+	case TabWebSocket:
+		a.enterWsTab(p)
+	case TabNgrok:
+		a.enterNgrokTab(p)
+	}
+	return nil
 }
 
 func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
@@ -649,13 +871,34 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabAPI {
 		a.apiOpen = false
 	}
-	if tab == TabDB {
+	if tab == TabDatabase {
 		a.dbOpen = false
+	}
+	if tab == TabKubernetes {
+		a.k8sOpen = false
+	}
+	if tab == TabJSON {
+		a.jsonOpen = false
+	}
+	if tab == TabJWT {
+		a.jwtOpen = false
+	}
+	if tab == TabRoutes {
+		a.routesOpen = false
+	}
+	if tab == TabWebSocket {
+		a.wsOpen = false
+	}
+	if tab == TabNgrok {
+		a.ngrokOpen = false
 	}
 	var cmds []tea.Cmd
 	cmds = append(cmds, a.startProjectLoad(cp.Path))
 	if tab == TabLogs {
 		cmds = append(cmds, a.initLogsTab(&cp))
+	}
+	if tab == TabContainers {
+		cmds = append(cmds, a.requestContainerPreview())
 	}
 	return tea.Batch(cmds...)
 }
@@ -684,14 +927,32 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
 		return a.handleContainerDetailKeys(msg, p)
 	}
-	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit) {
+	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit || a.gitSubview == gitSubviewFileDiff) {
 		return a.handleGitDedicatedKeys(msg, p)
 	}
 	if a.tab == TabAPI && a.apiOpen {
 		return a.handleApiKeys(msg, p)
 	}
-	if a.tab == TabDB && a.dbOpen {
+	if a.tab == TabDatabase && a.dbOpen {
 		return a.handleDbKeys(msg, p)
+	}
+	if a.tab == TabKubernetes && a.k8sOpen {
+		return a.handleK8sKeys(msg, p)
+	}
+	if a.tab == TabJSON && a.jsonOpen {
+		return a.handleJsonKeys(msg, p)
+	}
+	if a.tab == TabJWT && a.jwtOpen {
+		return a.handleJwtKeys(msg, p)
+	}
+	if a.tab == TabRoutes && a.routesOpen {
+		return a.handleRoutesKeys(msg, p)
+	}
+	if a.tab == TabWebSocket && a.wsOpen {
+		return a.handleWsKeys(msg, p)
+	}
+	if a.tab == TabNgrok && a.ngrokOpen {
+		return a.handleNgrokKeys(msg, p)
 	}
 
 	switch msg.String() {
@@ -706,92 +967,32 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.gitRenderCache = nil
 		a.projectGitLoading = false
 		a.projectDockerLoading = false
-		a.apiOpen = false
-		a.dbOpen = false
+		a.closeToolClients()
 		return a, nil
 	case "tab":
-		a.tab = Tab((int(a.tab) + 1) % len(AllTabs))
-		a.tabCursor = 0
-		a.apiOpen = false
-		a.dbOpen = false
-		if a.tab == TabGit {
-			a.initGitTab(p)
-		}
-		if a.tab == TabContainers {
-			a.initContainersTab()
-		}
+		return a, a.cycleProjectTab(1, p)
 	case "shift+tab":
-		i := int(a.tab) - 1
-		if i < 0 {
-			i = len(AllTabs) - 1
-		}
-		a.tab = Tab(i)
-		a.tabCursor = 0
-		a.apiOpen = false
-		a.dbOpen = false
-		if a.tab == TabGit {
-			a.initGitTab(p)
-		}
-		if a.tab == TabContainers {
-			a.initContainersTab()
-		}
-	case "1":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabOverview
-		a.tabCursor = 0
-	case "2":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabGit
-		a.tabCursor = 0
-		if p := a.currentProject(); p != nil {
-			a.initGitTab(p)
-		}
-	case "3":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabContainers
-		a.tabCursor = 0
-		a.initContainersTab()
-	case "4":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabHealth
-		a.tabCursor = 0
-	case "5":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabLogs
-		a.tabCursor = 0
-		if cmd := a.initLogsTab(p); cmd != nil {
-			return a, cmd
-		}
-	case "6":
-		a.apiOpen = false
-		a.dbOpen = false
-		a.tab = TabMetrics
-		a.tabCursor = 0
-	case "7":
-		a.dbOpen = false
-		a.enterApiTab(p)
-	case "8":
-		a.apiOpen = false
-		a.enterDbTab(p)
+		return a, a.cycleProjectTab(-1, p)
 	case "pgup":
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitFocus == gitFocusFiles {
+			a.gitWTDiffScroll = maxInt(0, a.gitWTDiffScroll-5)
+			return a, nil
+		}
 		a.projectContentScroll -= maxInt(1, a.projectPanelHeight()-4)
 		if a.projectContentScroll < 0 {
 			a.projectContentScroll = 0
 		}
 		return a, nil
 	case "pgdown":
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitFocus == gitFocusFiles {
+			a.gitWTDiffScroll += 5
+			return a, nil
+		}
 		a.projectContentScroll += maxInt(1, a.projectPanelHeight()-4)
 		return a, nil
 	case "L":
 		return a, a.openLazyGit(p.Path)
-	case "O", "shift+o":
-		return a, a.openOpencode(p.Path)
-	case "o":
+	case "o", "O":
 		if a.gitTabReady(p) {
 			a.gitOpenPullRequest(p)
 			return a, nil
@@ -807,6 +1008,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.statusMsg = "confirmar deploy (" + p.DeployScript + ")? y/n"
 		} else {
 			a.statusMsg = "nenhum script de deploy detectado"
+		}
+	case "e":
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			if c, ok := a.selectedContainer(p); ok {
+				return a, a.containerExecShell(c)
+			}
 		}
 	case "E", "shift+e":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
@@ -916,6 +1123,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && p.Git != nil && p.Git.IsRepo && a.gitFocus == gitFocusCommits {
 			a.toggleGitCommitSelection(p)
 		}
+	case "/":
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			a.containerFilterOn = true
+			a.containerFilterInput = a.containerFilter
+			return a, nil
+		}
 	case "b":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && p.Git != nil && p.Git.IsRepo {
 			a.gitBranchFilterOn = true
@@ -923,9 +1136,11 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.gitFocus = gitFocusBranches
 			return a, nil
 		}
-	case " ":
-		if a.tab == TabGit && a.gitSubview == gitSubviewMain && p.Git != nil && p.Git.IsRepo {
-			return a, a.gitSpaceAction(p)
+	case " ", "space":
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
+			if g := a.projectGitInfo(p); g != nil && g.IsRepo {
+				return a, a.gitSpaceAction(p)
+			}
 		}
 	case "shift+c", "shift+C", "C":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && p.Git != nil && p.Git.IsRepo {
@@ -963,27 +1178,32 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "left":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
-			a.gitFocusPrev()
+			return a, a.gitFocusPrev()
 		}
 	case "h", "H":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
-			a.gitFocusPrev()
+			return a, a.gitFocusPrev()
 		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
-			a.apiOpen = false
-			a.dbOpen = false
+			a.closeToolClients()
 			a.tab = TabHealth
 			a.tabCursor = 0
 		}
 	case "right":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
-			a.gitFocusNext()
+			return a, a.gitFocusNext()
 		}
 	case "l":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
-			a.gitFocusNext()
-		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
-			a.apiOpen = false
-			a.dbOpen = false
+			return a, a.gitFocusNext()
+		}
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			if c, ok := a.selectedContainer(p); ok {
+				return a, a.openContainerDetail(c, p.Path)
+			}
+			return a, nil
+		}
+		if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
+			a.closeToolClients()
 			a.tab = TabLogs
 			a.tabCursor = 0
 			if cmd := a.initLogsTab(p); cmd != nil {
@@ -995,8 +1215,26 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.openApiClient(p)
 			return a, nil
 		}
-		if a.tab == TabDB && !a.dbOpen {
+		if a.tab == TabDatabase && !a.dbOpen {
 			return a, a.openDbClient(p)
+		}
+		if a.tab == TabKubernetes && !a.k8sOpen {
+			return a, a.openK8sClient(p)
+		}
+		if a.tab == TabJSON && !a.jsonOpen {
+			return a, a.openJsonClient(p)
+		}
+		if a.tab == TabJWT && !a.jwtOpen {
+			return a, a.openJwtClient(p)
+		}
+		if a.tab == TabRoutes && !a.routesOpen {
+			return a, a.openRoutesClient(p)
+		}
+		if a.tab == TabWebSocket && !a.wsOpen {
+			return a, a.openWsClient(p)
+		}
+		if a.tab == TabNgrok && !a.ngrokOpen {
+			return a, a.openNgrokClient(p)
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
@@ -1017,6 +1255,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 					return a, a.openGitCommitDetail(p, commits[a.gitCommitCursor])
 				}
 			}
+			if a.gitFocus == gitFocusFiles {
+				return a, a.openGitFileDiff(p)
+			}
 		}
 	}
 	return a, nil
@@ -1025,7 +1266,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 func (a *App) tabNav(delta int, p *core.Project) tea.Cmd {
 	switch a.tab {
 	case TabContainers:
-		a.updateContainerCursor(delta, p)
+		return a.updateContainerCursor(delta, p)
 	}
 	return nil
 }
@@ -1111,10 +1352,6 @@ func (a *App) View() string {
 		return a.renderApiSearchPrompt()
 	}
 
-	if a.dbSearchOn {
-		return a.renderDbSearchPrompt()
-	}
-
 	if a.gitPromptOn {
 		return a.renderGitPrompt()
 	}
@@ -1186,14 +1423,32 @@ func (a *App) renderProject() string {
 	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
 		return a.renderContainerTextScreen()
 	}
-	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit) {
+	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit || a.gitSubview == gitSubviewFileDiff) {
 		return a.renderGitTab(p)
 	}
 	if a.tab == TabAPI && a.apiOpen {
 		return a.renderApiTab(p)
 	}
-	if a.tab == TabDB && a.dbOpen {
+	if a.tab == TabDatabase && a.dbOpen {
 		return a.renderDbTab(p)
+	}
+	if a.tab == TabKubernetes && a.k8sOpen {
+		return a.renderK8sTab(p)
+	}
+	if a.tab == TabJSON && a.jsonOpen {
+		return a.renderJsonTab(p)
+	}
+	if a.tab == TabJWT && a.jwtOpen {
+		return a.renderJwtTab(p)
+	}
+	if a.tab == TabRoutes && a.routesOpen {
+		return a.renderRoutesTab(p)
+	}
+	if a.tab == TabWebSocket && a.wsOpen {
+		return a.renderWsTab(p)
+	}
+	if a.tab == TabNgrok && a.ngrokOpen {
+		return a.renderNgrokTab(p)
 	}
 
 	sidebar := a.renderProjectSidebar()
@@ -1210,31 +1465,61 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
+	moduleDash := a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs || a.tab == TabMetrics ||
+		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
+		(a.tab == TabContainers && a.containerSubview == containerSubviewList) ||
+		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
+		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
+		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen)
+	switch {
+	case moduleDash:
+		content = lipgloss.Place(contentWidth, panelH, lipgloss.Left, lipgloss.Top, content)
+	case a.tab == TabContainers && a.containerSubview == containerSubviewDetail:
 		content = fitProjectPanel(content, contentWidth, panelH)
-	} else {
+	default:
 		content = a.renderProjectPanel(content, contentWidth, panelH)
 	}
 
-	hints := "tab switch  pgup/pgdown scroll  esc back  q quit"
+	hints := "tab módulo  shift+tab anterior  enter abrir  r refresh  esc back  q sair"
+	if a.tab != TabOverview {
+		hints = "tab/shift+tab módulo  pgup/pgdown scroll  esc back  q quit"
+	}
 	if a.tab == TabGit {
-		hints = "enter branch/commit  space checkout  shift+↑↓ range  x toggle  shift+c/v cherry  b filter  " + hints
+		hints = "←→ painéis  enter detail/diff  space checkout  shift+↑↓ range  x cherry  b filter  " + hints
 	}
 	if a.tab == TabContainers {
 		if a.containerSubview == containerSubviewDetail {
 			hints = "←→ tabs  ↑↓ scroll  esc back  " + hints
 		} else {
-			hints = "↑↓ navigate  enter detalhe  shift+e shell  shift+o opencode  s stop  r start/restart  p pause  d remove  shift+u up  shift+d down  " + hints
+			hints = "↑↓ lista  enter/l detalhe  / buscar  e shell  s/r/p/d  shift+u/d compose  " + hints
 		}
 	}
-	if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+	if a.tab == TabHealth || a.tab == TabLogs {
 		hints = "↑↓ scroll  " + hints
 	}
 	if a.tab == TabAPI && !a.apiOpen {
 		hints = "enter abrir API  " + hints
 	}
-	if a.tab == TabDB && !a.dbOpen {
+	if a.tab == TabDatabase && !a.dbOpen {
 		hints = "enter abrir Database  " + hints
+	}
+	if a.tab == TabKubernetes && !a.k8sOpen {
+		hints = "enter abrir Kubernetes  " + hints
+	}
+	if a.tab == TabJSON && !a.jsonOpen {
+		hints = "enter abrir JSON  " + hints
+	}
+	if a.tab == TabJWT && !a.jwtOpen {
+		hints = "enter abrir JWT  " + hints
+	}
+	if a.tab == TabRoutes && !a.routesOpen {
+		hints = "enter abrir Rotas  " + hints
+	}
+	if a.tab == TabWebSocket && !a.wsOpen {
+		hints = "enter abrir WebSocket  " + hints
+	}
+	if a.tab == TabNgrok && !a.ngrokOpen {
+		hints = "enter abrir Ngrok  " + hints
 	}
 	compact := a.projectCompact()
 	if compact {
@@ -1242,8 +1527,26 @@ func (a *App) renderProject() string {
 		if a.tab == TabAPI && !a.apiOpen {
 			hints = "enter abrir API  " + hints
 		}
-		if a.tab == TabDB && !a.dbOpen {
+		if a.tab == TabDatabase && !a.dbOpen {
 			hints = "enter abrir Database  " + hints
+		}
+		if a.tab == TabKubernetes && !a.k8sOpen {
+			hints = "enter abrir Kubernetes  " + hints
+		}
+		if a.tab == TabJSON && !a.jsonOpen {
+			hints = "enter abrir JSON  " + hints
+		}
+		if a.tab == TabJWT && !a.jwtOpen {
+			hints = "enter abrir JWT  " + hints
+		}
+		if a.tab == TabRoutes && !a.routesOpen {
+			hints = "enter abrir Rotas  " + hints
+		}
+		if a.tab == TabWebSocket && !a.wsOpen {
+			hints = "enter abrir WebSocket  " + hints
+		}
+		if a.tab == TabNgrok && !a.ngrokOpen {
+			hints = "enter abrir Ngrok  " + hints
 		}
 	}
 
@@ -1287,7 +1590,6 @@ func (a *App) renderProjectPanel(content string, width, height int) string {
 	}
 
 	top, bottom := lines[0], lines[len(lines)-1]
-	panelW := lipgloss.Width(top)
 	body := lines[1 : len(lines)-1]
 	for len(body) > 0 && strings.TrimSpace(ansi.Strip(body[0])) == "" {
 		body = body[1:]
@@ -1306,14 +1608,14 @@ func (a *App) renderProjectPanel(content string, width, height int) string {
 
 	rendered := []string{
 		top,
-		projectPanelIndicator(panelW, start > 0, fmt.Sprintf("↑ %d linhas", start)),
+		projectPanelIndicator(width, start > 0, fmt.Sprintf("↑ %d linhas", start)),
 	}
 	rendered = append(rendered, body[start:end]...)
 	for len(rendered) < height-2 {
-		rendered = append(rendered, projectPanelIndicator(panelW, false, ""))
+		rendered = append(rendered, projectPanelIndicator(width, false, ""))
 	}
 	rendered = append(rendered,
-		projectPanelIndicator(panelW, end < len(body), fmt.Sprintf("↓ %d linhas", len(body)-end)),
+		projectPanelIndicator(width, end < len(body), fmt.Sprintf("↓ %d linhas", len(body)-end)),
 		bottom,
 	)
 	return strings.Join(rendered, "\n")
@@ -1366,152 +1668,23 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderLogsTab(p)
 	case TabAPI:
 		return a.renderApiLanding(p)
-	case TabDB:
+	case TabDatabase:
 		return a.renderDbLanding(p)
+	case TabKubernetes:
+		return a.renderK8sLanding(p)
+	case TabJSON:
+		return a.renderJsonLanding(p)
+	case TabJWT:
+		return a.renderJwtLanding(p)
+	case TabRoutes:
+		return a.renderRoutesLanding(p)
+	case TabWebSocket:
+		return a.renderWsLanding(p)
+	case TabNgrok:
+		return a.renderNgrokLanding(p)
 	default:
 		return a.renderOverviewTab(p)
 	}
-}
-
-func (a *App) renderOverviewTab(p *core.Project) string {
-	kv := func(k, v string) string {
-		return StyleMuted.Render(fmt.Sprintf("%-12s", k)) + " " + v
-	}
-
-	lines := []string{
-		StyleSection.Render("PROJETO"),
-		kv("Path", StyleNormal.Render(p.Path)),
-		kv("Status", projectStatusStyle(p.Status).Render(string(p.Status))),
-		kv("Health", healthLabel(p.Health)),
-		"",
-		StyleSection.Render("STACK"),
-	}
-
-	frameworks := p.Frameworks
-	if len(frameworks) == 0 && p.Framework.Name != "" && p.Framework.Name != "Unknown" {
-		frameworks = []core.FrameworkInfo{p.Framework}
-	}
-	if len(frameworks) == 0 {
-		lines = append(lines, StyleMuted.Render("  (nenhum detectado ainda — aguarde o scan)"))
-	} else {
-		for _, fw := range frameworks {
-			ver := ""
-			if fw.Version != "" {
-				ver = StyleMuted.Render("  v" + fw.Version)
-			}
-			lines = append(lines, fmt.Sprintf("  %s %s %s%s",
-				frameworkIcon(fw.Name),
-				StyleNormal.Render(fw.Name),
-				StyleMuted.Render("("+fw.Language+")"),
-				ver,
-			))
-		}
-	}
-
-	lines = append(lines, "", StyleSection.Render("RUNTIME"))
-	if p.HasDockerCompose {
-		lines = append(lines, kv("Docker", StyleIconDocker.Render("compose")+" "+StyleMuted.Render("detectado")))
-	}
-	if p.HasDockerfile {
-		lines = append(lines, kv("Docker", StyleIconDocker.Render("Dockerfile")+" "+StyleMuted.Render("detectado")))
-	}
-	if p.ContainerCount > 0 {
-		lines = append(lines, kv("Containers", StyleNormal.Render(fmt.Sprintf("%d vinculados", p.ContainerCount))))
-	}
-	if p.WorkerCount > 0 {
-		lines = append(lines, kv("PM2", StyleNormal.Render(fmt.Sprintf("%d workers", p.WorkerCount))))
-		for _, w := range p.Workers {
-			st := StyleMuted
-			if strings.EqualFold(w.Status, "online") {
-				st = StyleRunning
-			}
-			lines = append(lines, fmt.Sprintf("  %s %s %s",
-				st.Render("•"),
-				StyleNormal.Render(w.Name),
-				StyleMuted.Render(fmt.Sprintf("[%s] CPU %.1f%%", w.Status, w.CPU)),
-			))
-		}
-	}
-	if p.Metrics.CPUPercent > 0 || p.Metrics.MemoryMB > 0 {
-		lines = append(lines, kv("Metrics",
-			StyleMetricCPU.Render(fmt.Sprintf("CPU %.1f%%", p.Metrics.CPUPercent))+"  "+
-				StyleMetricRAM.Render(fmt.Sprintf("RAM %d MB", p.Metrics.MemoryMB))))
-	}
-	if len(p.Ports) > 0 {
-		lines = append(lines, kv("Ports", StyleAccent.Render(collectors.FormatPortsShort(p.Ports, 5))))
-	}
-	if p.DeployScript != "" {
-		lines = append(lines, kv("Deploy", StyleKey.Render(p.DeployScript)+" "+StyleMuted.Render("(D)")))
-	}
-
-	if len(p.Modules) > 0 {
-		lines = append(lines, "", StyleSection.Render("MODULES"))
-		for _, m := range p.Modules {
-			lines = append(lines, fmt.Sprintf("  %s %s %s",
-				StyleTabActive.Render("•"),
-				StyleNormal.Render(m.Name),
-				StyleMuted.Render(fmt.Sprintf("[%s] — %s", m.Role, m.Path)),
-			))
-		}
-	}
-
-	if p.Git != nil && p.Git.IsRepo {
-		lines = append(lines, "", StyleSection.Render("GIT"),
-			kv("Branch", StyleWarning.Render(p.Git.Branch)),
-			kv("Commit", StyleMuted.Render(p.Git.LastCommit)+" "+StyleNormal.Render(p.Git.LastCommitMsg)),
-		)
-	}
-
-	return StylePanel.Render(strings.Join(lines, "\n"))
-}
-
-func (a *App) renderMetricsTab(p *core.Project) string {
-	cpu, memoryMB := projectRuntimeMetrics(p)
-	lines := []string{
-		StyleSection.Render("PROJECT METRICS"),
-		fmt.Sprintf("  CPU:        %.1f%%", cpu),
-		fmt.Sprintf("  Memory:     %d MB", memoryMB),
-		fmt.Sprintf("  Containers: %d", p.ContainerCount),
-		fmt.Sprintf("  Workers:    %d", p.WorkerCount),
-	}
-
-	if len(p.Containers) > 0 {
-		lines = append(lines, "", StyleSection.Render("CONTAINERS"))
-		for _, c := range p.Containers {
-			lines = append(lines, fmt.Sprintf(
-				"  %-28s %-9s CPU %6.1f%%  RAM %6d MB",
-				c.Name, c.Status, c.CPU, c.Memory/(1024*1024),
-			))
-		}
-	}
-
-	if len(p.Workers) > 0 {
-		lines = append(lines, "", StyleSection.Render("WORKERS"))
-		for _, w := range p.Workers {
-			lines = append(lines, fmt.Sprintf(
-				"  %-28s %-9s CPU %6.1f%%  RAM %6d MB",
-				w.Name, w.Status, w.CPU, w.Memory/(1024*1024),
-			))
-		}
-	}
-
-	return StylePanel.Render(strings.Join(lines, "\n"))
-}
-
-func projectRuntimeMetrics(p *core.Project) (float64, int64) {
-	var cpu float64
-	var memory int64
-	for _, c := range p.Containers {
-		cpu += c.CPU
-		memory += c.Memory
-	}
-	for _, w := range p.Workers {
-		if strings.EqualFold(w.Status, "online") {
-			cpu += w.CPU
-			memory += w.Memory
-		}
-	}
-	return cpu, memory / (1024 * 1024)
 }
 
 func (a *App) helpViewport() int {
@@ -1626,13 +1799,14 @@ func getHelpText() string {
 
 Dashboard:
   shift+e      Abrir terminal no diretório do projeto
-  shift+o      Abrir Opencode no diretório do projeto
+  shift+o      Abrir OpenCode no diretório do projeto
   g            Abrir direto na aba Git
   c            Abrir direto na aba Containers
   r            Forçar atualização rápida
 
 Abas de Projeto:
-  1-8          Overview, Git, Containers, Health, Logs, Metrics, API, Database
+  tab          Próximo módulo (sidebar)
+  shift+tab    Módulo anterior
   h            Ir para aba Health
   l            Ir para aba Logs
   L            Abrir LazyGit no projeto
@@ -1641,6 +1815,86 @@ Abas de Projeto:
   shift+d      Docker compose down
   R            Docker compose restart
   o            Abrir URL do projeto no navegador
+
+Aba JSON (UTILS):
+  enter        Abrir editor input/output
+  p            Pretty
+  m            Minify
+  v            Validate (linha/coluna do erro)
+  s            Sort Keys
+  w            JSON ⇄ YAML
+  t            JSON ⇄ TOML
+  x            JSON ⇄ XML
+  d            Diff input ↔ output
+  n            Remover campos nulos
+  /            Buscar por chave
+  c            Copiar resultado
+  e            Editar input
+  shift+←→↑↓   Selecionar (na edição)
+  ctrl+←→      Pular palavra
+  ctrl+shift+←→ Selecionar palavra
+  ctrl+a/c/x/v Selecionar tudo / copiar / recortar / colar
+  esc          Voltar para a landing / sair edição
+
+Aba JWT (UTILS):
+  enter        Abrir cliente (secret + token/claims + result)
+  d            Decode
+  v            Verify (HMAC + secret)
+  g            Generate claims template
+  s            Sign claims → JWT
+  c            Copy Claims
+  x            Export JSON (header+payload)
+  y            Copy token (clipboard; sign já copia)
+  Y            Copy result (decode/export)
+  ctrl+y       Copy token (mesmo em modo edição)
+  []           Alg HS256 / HS384 / HS512
+  ←→ / h l     Scroll horizontal no painel focado
+  e / enter    Editar secret ou token/claims (VS Code keys)
+  tab          secret │ token │ result
+  esc          Voltar para a landing
+
+Aba Rotas (UTILS):
+  enter        Detectar stack + escanear rotas (OpenAPI/parsers)
+  ↑↓ / j k     Navegar rotas
+  b            Filtrar rotas por palavra no path (ex: users)
+  enter        Abrir na aba API (method + URL)
+  r            Reescanear
+  esc          Voltar para a landing / limpar filtro
+
+Aba WebSocket (TOOLS):
+  enter        Abrir Overview (3 colunas)
+  0-4          Overview / Messages / Send / History / Settings
+  c            Connect
+  d / x        Disconnect (x no Send limpa editor)
+  r            Reconnect
+  tab          Connections → Filters → Messages → Send → Inspector
+  f            Ciclar filtro (All/Text/JSON/Binary/Errors/In/Out)
+  /            Buscar no payload
+  m            Ciclar modo Send ou Payload view
+  []           Pretty / Raw / Hex no inspector
+  e            Editar Send (ou URL/Headers em Settings)
+  enter        Enviar / conectar / reenviar history
+  ctrl+enter   Enviar na edição
+  ctrl+l       Limpar frames
+  a            Auto reconnect (Settings)
+  u            Porta do projeto
+  esc          Voltar (desconecta)
+
+Aba Kubernetes:
+  enter        Abrir cliente (pods/deploy/svc/manifests)
+  esc          Voltar para a landing
+  []           Alternar kind (pods / deploy / svc / yaml)
+  n/N          Namespace seguinte / anterior
+  enter        Describe / ver yaml
+  a            Apply YAML do editor (create/edit) ou arquivo (kind yaml)
+  c            Criar (template → modo edição)
+  e            Editar recurso/manifest selecionado
+  enter        Nova linha (na edição YAML)
+  ctrl+s       Apply do YAML em edição (Ctrl+Enter costuma = Enter no terminal)
+  d            Delete (confirmação y)
+  l            Logs do pod
+  +/-          Scale deployment
+  r            Refresh
 
 Aba API:
   tab          Request → URL → Headers → Auth
@@ -1653,15 +1907,15 @@ Aba API:
   a            Tipo de Auth (no Auth)
 
 Aba Database:
-  tab          Conn → Tables → Query → Result
-  digitar      Edita SQL (no Query) ou campo (no Conn)
-  ctrl+enter   Executar query
-  enter        Edita campo / SELECT * na tabela
-  ↑↓           Campos / tabelas / scroll do Result
-  ←→           Target (Conn) ou scroll horizontal
-  s            Carregar schema
-  /            Buscar no Result
-  esc          Sair do client
+  enter        Abrir cliente (tabelas + SQL)
+  esc          Voltar para a landing
+  tab          Tables │ SQL │ Result
+  enter        Preview SELECT * LIMIT 50 na tabela
+  e            Editar SQL
+  ctrl+enter   Executar SQL
+  []           Trocar banco detectado
+  ←→ / h l     Scroll lateral no result
+  r            Recarregar tabelas
 
 Aba Git:
   space        Checkout de branch (ou toggle commit)

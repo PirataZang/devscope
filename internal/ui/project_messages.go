@@ -16,6 +16,17 @@ func (a *App) projectExecShell(path string) tea.Cmd {
 	})
 }
 
+func (a *App) projectExecOpenCode(path string) tea.Cmd {
+	cmd, err := collectors.ProjectOpenCode(path)
+	if err != nil {
+		a.statusMsg = "opencode não encontrado no PATH"
+		return nil
+	}
+	return tea.ExecProcess(cmd, func(err error) tea.Msg {
+		return projectShellDoneMsg{err: err}
+	})
+}
+
 func (a *App) handleProjectShellDone(msg projectShellDoneMsg) {
 	a.dashboardSubview = dashboardSubviewShellReturn
 	if msg.err != nil {

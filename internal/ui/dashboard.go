@@ -139,6 +139,7 @@ func (a *App) renderDashboardFooter(projects []core.Project) string {
 		renderKeybind("↑↓", "navigate"),
 		renderKeybind("ENTER", "open"),
 		renderKeybind("SHIFT+E", "terminal"),
+		renderKeybind("SHIFT+O", "opencode"),
 		renderKeybind("/", "filter"),
 		renderKeybind("g", "git"),
 		renderKeybind("c", "containers"),
