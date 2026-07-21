@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -69,5 +70,41 @@ func TestSidebarShowsDatabaseTool(t *testing.T) {
 	}
 	if !strings.Contains(got, "tab · shift+tab") {
 		t.Fatalf("footer should mention tab · shift+tab: %q", got)
+	}
+}
+
+func TestDbClientRenderAndFilter(t *testing.T) {
+	p := &core.Project{Name: "demo", Path: "/p"}
+	a := &App{
+		width:      120,
+		height:     40,
+		dbOpen:     true,
+		tab:        TabDatabase,
+		dbTargets:  []collectors.DBTarget{{Label: "db", Engine: collectors.DBEnginePostgres, User: "u", Database: "app"}},
+		dbTables:   []string{"users", "posts", "sessions"},
+		dbSchema: collectors.DBTableInfo{
+			Table: "users",
+			Rows:  120,
+			Columns: []collectors.DBColumn{
+				{Name: "id", Type: "bigint", Nullable: "NO", Key: "PK"},
+				{Name: "email", Type: "text", Nullable: "NO"},
+			},
+		},
+		dbSQL:    "SELECT 1;",
+		dbResult: " ?column? \n----------\n 1\n(1 row)",
+	}
+	a.dbResultRows = parseDBResultRows(a.dbResult)
+	view := stripANSI(a.renderDbTab(p))
+	for _, want := range []string{"TABELAS", "SCHEMA", "SQL", "RESULT", "users", "email", "postgres"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in %q", want, view)
+		}
+	}
+	a.dbFilter = "user"
+	if got := a.filteredDbTables(); len(got) != 1 || got[0] != "users" {
+		t.Fatalf("filter: %#v", got)
+	}
+	if a.dbResultRows != 1 {
+		t.Fatalf("rows=%d", a.dbResultRows)
 	}
 }

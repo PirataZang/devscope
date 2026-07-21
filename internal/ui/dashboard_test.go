@@ -110,7 +110,7 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	got := a.renderProjectSidebar()
 	plain := stripANSI(got)
 
-	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "API", "Database", "WS", "Ngrok", "JSON", "JWT", "Rotas", "tab · shift+tab", "CPU", "RESUMO"} {
+	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "API", "Database", "WS", "Ngrok", "Rotas", "tab · shift+tab", "CPU", "RESUMO"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
 		}
@@ -251,15 +251,35 @@ func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
 		containerPreviewStats:   "CPU (%): 12.6%\nMemory: 400MiB / 16GiB\nNet I/O: 1.2MB / 800KB",
 		containerPreviewVolumes: []string{"laradock_data", "laradock_mysql"},
 		containerCPUHistory:     []float64{4, 8, 12, 10, 14},
+		containerMemHistory:     []float64{10, 12, 11, 13, 12},
+		containerNetHistory:     []float64{100, 120, 90, 140, 110},
 		containerPreviewID:      "abc",
 		selectedProject:         &project,
 		snapshot:                core.Snapshot{Projects: []core.Project{project}},
 	}
 	got := stripANSI(a.renderContainersTab(&project))
-	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS", "VOLUMES", "laradock-workspace-1", "laradock_data"} {
+	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS · ALL", "VOLUMES", "laradock-workspace-1", "laradock_data", "CPU ", "MEM ", "NET "} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("containers main missing %q in:\n%s", want, got)
 		}
+	}
+	a.containerStatsMode = 1
+	got = stripANSI(a.renderContainersBottom(80, 10))
+	if !strings.Contains(got, "STATS · CPU") {
+		t.Fatalf("cpu focus title missing: %s", got)
+	}
+}
+
+func TestParseDockerStatsSample(t *testing.T) {
+	cpu, mem, net := parseDockerStatsSample("CPU (%): 12.6%\nMemory: 400MiB / 16GiB (3.34%)\nNet I/O: 1.2MB / 800KB")
+	if cpu < 12 || cpu > 13 {
+		t.Fatalf("cpu=%v", cpu)
+	}
+	if mem < 3 || mem > 4 {
+		t.Fatalf("mem=%v", mem)
+	}
+	if net < 1000 { // ~1.2MB + 800KB
+		t.Fatalf("net=%v", net)
 	}
 }
 
@@ -396,7 +416,7 @@ func TestContainerLogsUseDedicatedFullScreen(t *testing.T) {
 }
 
 func TestContainerFilesUseDedicatedFullScreen(t *testing.T) {
-	for _, tab := range []containerDetailTab{containerDetailTabCompose, containerDetailTabFile, containerDetailTabStats} {
+	for _, tab := range []containerDetailTab{containerDetailTabCompose, containerDetailTabFile} {
 		project := core.Project{Path: "/projects/app", Name: "app"}
 		a := &App{
 			width:                  100,
@@ -418,6 +438,49 @@ func TestContainerFilesUseDedicatedFullScreen(t *testing.T) {
 		if !strings.Contains(got, "web") || !strings.Contains(got, tab.shortLabel()) || !strings.Contains(got, "services:") {
 			t.Fatalf("%s screen is missing its title or content", tab.shortLabel())
 		}
+	}
+}
+
+func TestContainerStatsDashboard(t *testing.T) {
+	project := core.Project{Path: "/projects/app", Name: "app"}
+	a := &App{
+		width: 120, height: 36,
+		view: ViewProject, tab: TabContainers,
+		containerSubview:   containerSubviewDetail,
+		containerDetailTab: containerDetailTabStats,
+		containerDetailName: "laradock-workspace-1",
+		containerDetailID:   "abc123",
+		containerDetailStats: dockerStatsSample{
+			CPU: 12.5, MemPct: 4.8, MemLabel: "959MiB / 19GiB (4.8%)",
+			NetRX: 1000, NetTX: 500, NetLabel: "1MB / 500KB",
+			BlkR: 2000, BlkW: 1000, BlkLabel: "2MB / 1MB", PIDs: 39,
+			Raw: "CPU (%): 12.5%\nMemory: 959MiB / 19GiB (4.8%)",
+		},
+		containerDetailCPUHist: []float64{4, 8, 12, 10, 14, 12.5},
+		containerDetailMemHist: []float64{3, 4, 5, 4.5, 4.8},
+		containerDetailNetHist: []float64{800, 900, 1000, 1500},
+		containerDetailBlkHist: []float64{1000, 2000, 2500, 3000},
+		containerDetailPIDHist: []float64{30, 35, 39},
+		containerDetailStatsLive: true,
+		selectedProject:          &project,
+		snapshot:                 core.Snapshot{Projects: []core.Project{project}},
+	}
+	got := stripANSI(a.renderProject())
+	for _, want := range []string{"laradock-workspace-1", "CPU", "MEMÓRIA", "REDE", "BLOCK", "I/O", "SAÚDE", "live", "12.50%"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("stats dashboard missing %q in:\n%s", want, got)
+		}
+	}
+	// must not fall back to the old plain-text stats body
+	if strings.Contains(got, "CPU (%):") && !strings.Contains(got, "MEMÓRIA") {
+		t.Fatal("renderProject still using old text stats screen")
+	}
+}
+
+func TestParseDockerStatsFull(t *testing.T) {
+	s := parseDockerStatsFull("CPU (%): 0.41%\nMemory: 959.7MiB / 19.25GiB (4.87%)\nNet I/O: 10.9MB / 5.21MB\nBlock I/O: 469MB / 538MB\nPIDs: 39")
+	if s.CPU < 0.4 || s.MemPct < 4.8 || s.PIDs != 39 || s.NetRX < 10000 {
+		t.Fatalf("%+v", s)
 	}
 }
 

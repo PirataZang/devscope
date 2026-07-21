@@ -225,12 +225,14 @@ func TestOpenGitBranchHistoryDoesNotOpenCommit(t *testing.T) {
 	if a.gitSubview == gitSubviewCommit {
 		t.Fatal("enter on branch must not open commit detail")
 	}
-	got := a.renderGitTab(&project)
-	if strings.Contains(stripANSI(got), "SCOPE") {
+	got := stripANSI(a.renderGitTab(&project))
+	if strings.Contains(got, "SCOPE") {
 		t.Fatal("branch history must be a dedicated full-width screen")
 	}
-	if !strings.Contains(got, "Commits  feature") && !strings.Contains(got, "latest") {
-		t.Fatalf("branch history missing content: %q", got)
+	for _, want := range []string{"feature", "latest", "COMMITS", "DETALHES", "AUTHORS"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("branch history missing %q in:\n%s", want, got)
+		}
 	}
 }
 

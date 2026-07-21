@@ -75,40 +75,19 @@ func (t containerDetailTab) shortLabel() string {
 }
 
 func (a *App) renderContainerDetail(p *core.Project) string {
-	// Detail always uses the dedicated fullscreen renderer.
+	if a.containerDetailTab == containerDetailTabStats {
+		return a.renderContainerStatsScreen()
+	}
 	return a.renderContainerTextScreen()
 }
 
 func (a *App) renderContainerTextScreen() string {
 	height := maxInt(12, a.height-2)
-	panelW := maxInt(20, a.width)
-	innerW := maxInt(16, panelW-2)  // account for border
-	viewport := maxInt(1, height-6) // title + tabs + footer + borders
-
-	nameW := maxInt(8, innerW/2)
-	title := StyleSection.Render(truncate(a.containerDetailName, nameW))
-	status := a.containerDetailStatusBadge()
-	header := title + "  " + status
-	if lipgloss.Width(header) > innerW {
-		header = title + "  " + StyleMuted.Render(fmt.Sprintf("[%d/%d]", int(a.containerDetailTab)+1, containerDetailTabTotal))
-	}
-	tabs := a.renderContainerDetailTabBar(innerW)
-
-	bodyLines := a.renderContainerDetailBodyLines(viewport, innerW)
-	position := a.containerDetailPosition(viewport)
-	footer := StyleMuted.Render(truncate(a.containerDetailFooter(position), innerW))
-
-	content := []string{header, tabs, strings.Join(bodyLines, "\n"), footer}
-	panel := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorBorder).
-		Width(panelW).
-		MaxWidth(panelW).
-		Render(strings.Join(content, "\n"))
-	panel = clampRenderedHeight(panel, height)
-	statusBar := truncate(a.renderStatusBar("container · "+a.containerDetailTab.shortLabel()), panelW)
-
-	return lipgloss.JoinVertical(lipgloss.Left, panel, statusBar)
+	panelW := maxInt(40, a.width)
+	innerW := maxInt(36, panelW-2)
+	bodyH := maxInt(8, height-6)
+	body := a.renderContainerDetailRichBody(innerW, bodyH)
+	return a.renderContainerDetailChrome(body, bodyH)
 }
 
 func (a *App) containerDetailStatusBadge() string {
@@ -212,13 +191,33 @@ func (a *App) containerDetailPosition(viewport int) string {
 	if a.containerDetailLoading {
 		return ""
 	}
-	all := a.containerDetailLines()
-	if len(all) == 0 {
+	n := a.containerDetailContentLen()
+	if n == 0 {
 		return "0/0"
 	}
 	start := a.containerDetailScroll
-	end := minInt(start+viewport, len(all))
-	return fmt.Sprintf("%d-%d/%d", start+1, end, len(all))
+	end := minInt(start+viewport, n)
+	return fmt.Sprintf("%d-%d/%d", start+1, end, n)
+}
+
+func (a *App) containerDetailContentLen() int {
+	switch a.containerDetailTab {
+	case containerDetailTabEnv:
+		return len(flattenEnvGroups(groupEnvPairs(parseEnvPairs(a.containerDetailContent))))
+	case containerDetailTabConfig:
+		return maxInt(1, len(parseContainerConfig(a.containerDetailContent).labels))
+	case containerDetailTabCompose, containerDetailTabFile:
+		raw := a.containerDetailContent
+		if strings.HasPrefix(strings.TrimSpace(raw), "#") {
+			parts := strings.SplitN(raw, "\n", 2)
+			if len(parts) == 2 {
+				raw = parts[1]
+			}
+		}
+		return len(strings.Split(raw, "\n"))
+	default:
+		return len(a.containerDetailLines())
+	}
 }
 
 func (a *App) renderContainerDetailTabBar(width int) string {
@@ -351,12 +350,16 @@ func (a *App) containerDetailMaxLineWidth() int {
 }
 
 func (a *App) containerDetailViewport() int {
-	v := maxInt(1, maxInt(12, a.height-2)-6)
-	return v
+	// Match rich views: bodyH = height-6, cards ~3, box chrome ~2
+	h := maxInt(12, a.height-2)
+	bodyH := maxInt(8, h-6)
+	restH := maxInt(6, bodyH-3)
+	return maxInt(1, restH-2)
 }
 
 func (a *App) containerDetailSwitchTab(delta int) tea.Cmd {
 	a.stopContainerDetailFollow()
+	a.stopContainerDetailStatsLive()
 	a.containerDetailSearchQuery = ""
 	a.containerDetailSearchIdx = 0
 	a.containerDetailHScroll = 0
@@ -370,9 +373,8 @@ func (a *App) containerDetailSwitchTab(delta int) tea.Cmd {
 }
 
 func (a *App) containerDetailScrollBy(delta int) {
-	lines := a.containerDetailLines()
 	viewport := a.containerDetailViewport()
-	a.containerDetailScroll = clampScroll(a.containerDetailScroll+delta, viewport, len(lines))
+	a.containerDetailScroll = clampScroll(a.containerDetailScroll+delta, viewport, a.containerDetailContentLen())
 }
 
 func (a *App) containerDetailHScrollBy(delta int) {
@@ -388,9 +390,8 @@ func (a *App) containerDetailHScrollBy(delta int) {
 }
 
 func (a *App) isContainerDetailAtEnd() bool {
-	lines := a.containerDetailLines()
 	viewport := a.containerDetailViewport()
-	maxScroll := maxInt(0, len(lines)-viewport)
+	maxScroll := maxInt(0, a.containerDetailContentLen()-viewport)
 	return a.containerDetailScroll >= maxScroll
 }
 
@@ -592,6 +593,7 @@ func (a *App) handleContainerDetailKeys(msg tea.KeyMsg, p *core.Project) (tea.Mo
 			return a, nil
 		}
 		a.stopContainerDetailFollow()
+		a.stopContainerDetailStatsLive()
 		a.containerSubview = containerSubviewList
 		a.containerDetailCache = nil
 		a.containerDetailSearchOn = false
@@ -643,6 +645,9 @@ func (a *App) handleContainerDetailKeys(msg tea.KeyMsg, p *core.Project) (tea.Mo
 	case "r":
 		if a.containerDetailTab == containerDetailTabLogs {
 			return a, a.reloadContainerDetailLogs()
+		}
+		if a.containerDetailTab == containerDetailTabStats {
+			return a, a.fetchContainerDetailStatsOnce()
 		}
 	}
 	return a, nil

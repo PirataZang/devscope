@@ -20,7 +20,6 @@ type wsSubTab int
 const (
 	wsTabOverview wsSubTab = iota
 	wsTabMessages
-	wsTabSend
 	wsTabHistory
 	wsTabSettings
 )
@@ -105,18 +104,24 @@ func (a *App) enterWsTab(_ *core.Project) {
 	a.wsOpen = false
 	a.wsEditing = false
 	a.wsSearchOn = false
+	a.wsShowAll = false
 }
 
 func (a *App) openWsClient(p *core.Project) tea.Cmd {
 	a.wsOpen = true
 	a.wsEditing = false
 	a.wsSearchOn = false
+	a.wsShowAll = false
+	a.wsEditSourceIdx = -1
 	a.wsSubTab = wsTabOverview
-	a.wsFocus = wsFocusMessages
+	a.wsFocus = wsFocusConnections
 	a.wsEdit = editorState{Anchor: -1}
 	a.wsErr = ""
 	a.wsStatus = "ready"
 	a.wsMsgScroll = 0
+	a.wsMsgHScroll = 0
+	a.wsSendVScroll = 0
+	a.wsSendHScroll = 0
 	a.wsFilter = wsFilterAll
 	a.wsPayloadMode = wsPayloadPretty
 	a.wsSendMode = wsSendJSON
@@ -126,8 +131,13 @@ func (a *App) openWsClient(p *core.Project) tea.Cmd {
 	if a.wsSend == "" {
 		a.wsSend = "{\n  \"type\": \"ping\"\n}"
 	}
+	a.loadWsProjectConns(p)
 	if strings.TrimSpace(a.wsURL) == "" {
-		a.wsURL = a.defaultWsURL(p)
+		if len(a.wsRecent) > 0 {
+			a.wsURL = a.wsRecent[0]
+		} else {
+			a.wsURL = a.defaultWsURL(p)
+		}
 	}
 	a.rememberWsURL(a.wsURL)
 	return nil
@@ -138,6 +148,7 @@ func (a *App) leaveWsTab() tea.Cmd {
 	a.wsOpen = false
 	a.wsEditing = false
 	a.wsSearchOn = false
+	a.wsShowAll = false
 	a.tab = TabWebSocket
 	a.tabCursor = 0
 	return nil
@@ -164,12 +175,29 @@ func (a *App) rememberWsURL(u string) {
 			continue
 		}
 		out = append(out, r)
-		if len(out) >= 8 {
+		if len(out) >= 24 {
 			break
 		}
 	}
 	a.wsRecent = out
 	a.wsRecentCursor = 0
+	a.persistWsProjectConns()
+}
+
+func (a *App) loadWsProjectConns(p *core.Project) {
+	if p == nil {
+		return
+	}
+	a.wsRecent = wsutil.LoadProject(p.Path).URLs
+	a.wsRecentCursor = 0
+}
+
+func (a *App) persistWsProjectConns() {
+	p := a.currentProject()
+	if p == nil {
+		return
+	}
+	_ = wsutil.SaveProject(p.Path, wsutil.ProjectConfig{URLs: a.wsRecent})
 }
 
 // --- landing ---
@@ -184,14 +212,14 @@ func (a *App) renderWsLanding(_ *core.Project) string {
 		StyleNormal.Render("  pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para o Overview"),
 		"",
 		StyleSection.Render("OVERVIEW"),
-		StyleMuted.Render("  esquerda  connections · filters"),
+		StyleMuted.Render("  esquerda  connections (por projeto) · filters"),
 		StyleMuted.Render("  centro    messages + send"),
 		StyleMuted.Render("  direita   inspector (details / payload / handshake)"),
 		"",
 		StyleSection.Render("ATALHOS"),
-		StyleMuted.Render("  c connect   d disconnect   r reconnect"),
-		StyleMuted.Render("  0-4 abas   tab painéis   / search   f filter"),
-		StyleMuted.Render("  enter send · ctrl+enter na edição"),
+		StyleMuted.Render("  n nova  e edit  x del  c/enter on  d off"),
+		StyleMuted.Render("  A todas   m Text/JSON/Binary   r reconnect"),
+		StyleMuted.Render("  0-3 abas   tab lista↔send   ←→ scroll   / f"),
 	}
 	return StylePanel.Render(strings.Join(lines, "\n"))
 }
@@ -210,8 +238,6 @@ func (a *App) renderWsTab(p *core.Project) string {
 	switch a.wsSubTab {
 	case wsTabMessages:
 		body = a.renderWsMessagesFull(w, bodyH)
-	case wsTabSend:
-		body = a.renderWsSendFull(w, bodyH)
 	case wsTabHistory:
 		body = a.renderWsHistory(w, bodyH)
 	case wsTabSettings:
@@ -221,17 +247,37 @@ func (a *App) renderWsTab(p *core.Project) string {
 	}
 
 	hints := a.wsHints()
-	return lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, a.renderStatusBar(hints))
+	view := lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, a.renderStatusBar(hints))
+	if a.wsShowAll {
+		return overlayCentered(view, a.renderWsAllPopup(w, h), w, h)
+	}
+	return view
 }
 
 func (a *App) wsHints() string {
+	if a.wsShowAll {
+		return "A todas  ↑↓ navega  enter conectar  esc fecha"
+	}
 	if a.wsEditing {
+		if a.wsFocus == wsFocusConnections {
+			return "editando url  enter salva  esc cancelar"
+		}
 		return "editando  ctrl+enter send  esc sair"
 	}
 	if a.wsSearchOn {
 		return "search  enter aplicar  esc limpar"
 	}
-	base := "c connect  d disconnect  r reconnect  tab painel  / search  f filter  0-4 aba  esc"
+	base := "c on  d off  r reconnect  n nova  e edit  x del  A todas  m modo  tab  ←→  /  f  0-3  esc"
+	switch a.wsFocus {
+	case wsFocusConnections:
+		base = "n nova  e edit  x del  enter/c on  d off  A todas  tab  esc"
+	case wsFocusMessages:
+		base = "↑↓ frames  ←→ scroll  tab send  enter detalhe  /  f  esc"
+	case wsFocusSend:
+		base = "m Text/JSON/Binary  e editar  enter enviar  ←→↑↓ scroll  tab msgs  esc"
+	case wsFocusInspector:
+		base = "m/[ ] Pretty/Raw/Hex  ↑↓ frame  tab  esc"
+	}
 	if a.wsStatus != "" {
 		return a.wsStatus + "  ·  " + base
 	}
@@ -240,8 +286,17 @@ func (a *App) wsHints() string {
 
 func (a *App) renderWsHeader(width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabWebSocket)).Bold(true)
-	url := truncate(strings.TrimSpace(a.wsURL), maxInt(24, width/3))
-	left := accent.Render("devscope") + StyleMuted.Render(" › ") + StyleNormal.Render(url)
+	proj := "ws"
+	if p := a.currentProject(); p != nil && p.Name != "" {
+		proj = p.Name
+	}
+	showURL := strings.TrimSpace(a.wsURL)
+	if live := a.liveWsURL(); live != "" {
+		showURL = live
+	}
+	url := truncate(showURL, maxInt(20, width/3))
+	left := accent.Render("devscope") + StyleMuted.Render(" › ") +
+		StyleNormal.Render(proj) + StyleMuted.Render(" › ") + StyleNormal.Render(url)
 
 	badge := StyleMuted.Render("○ Disconnected")
 	switch {
@@ -290,7 +345,7 @@ func (a *App) renderWsHeader(width int) string {
 }
 
 func (a *App) renderWsSubTabs(width int) string {
-	names := []string{"Overview", "Messages", "Send", "History", "Settings"}
+	names := []string{"Overview", "Messages", "History", "Settings"}
 	var parts []string
 	for i, n := range names {
 		label := fmt.Sprintf("%d:%s", i, n)
@@ -322,8 +377,14 @@ func (a *App) renderWsOverview(width, height int) string {
 	}
 	centerW := maxInt(30, width-leftW-rightW-2)
 
-	sendH := maxInt(6, height*28/100)
-	msgH := maxInt(6, height-sendH)
+	sendH := height * 30 / 100
+	if sendH < 7 {
+		sendH = 7
+	}
+	if sendH > height-6 {
+		sendH = maxInt(5, height-6)
+	}
+	msgH := maxInt(4, height-sendH)
 
 	left := a.renderWsLeftColumn(leftW, height)
 	center := lipgloss.JoinVertical(lipgloss.Left,
@@ -335,8 +396,8 @@ func (a *App) renderWsOverview(width, height int) string {
 }
 
 func (a *App) renderWsLeftColumn(width, height int) string {
-	connH := maxInt(6, height*35/100)
-	statsH := maxInt(7, height*30/100)
+	connH := maxInt(8, height*38/100)
+	statsH := maxInt(6, height*28/100)
 	filtH := maxInt(5, height-connH-statsH)
 	return lipgloss.JoinVertical(lipgloss.Left,
 		a.renderWsConnections(width, connH),
@@ -347,25 +408,52 @@ func (a *App) renderWsLeftColumn(width, height int) string {
 
 func (a *App) renderWsConnections(width, height int) string {
 	focus := a.wsFocus == wsFocusConnections
-	lines := make([]string, 0, height)
-	if len(a.wsRecent) == 0 {
-		lines = append(lines, StyleMuted.Render("  (nenhuma ainda)"))
+	proj := "—"
+	if p := a.currentProject(); p != nil && p.Name != "" {
+		proj = p.Name
 	}
+	innerW := maxInt(8, width-4)
+	lines := make([]string, 0, height)
+	lines = append(lines, StyleMuted.Render("proj ")+StyleNormal.Render(truncate(proj, innerW-5)))
+
+	if a.wsEditing && focus {
+		ed := a.wsEdit
+		editLines := renderEditorLines(a.wsURL, &ed, innerW, 1, true, false)
+		a.wsEdit = ed
+		for _, ln := range editLines {
+			lines = append(lines, StyleWarning.Render("✎ ")+ln)
+		}
+	}
+
+	if len(a.wsRecent) == 0 && !(a.wsEditing && focus) {
+		lines = append(lines, StyleMuted.Render("  (vazia — n nova)"))
+	}
+	live := a.liveWsURL()
 	for i, u := range a.wsRecent {
-		host := shortWsHost(u)
+		on := live != "" && live == u
 		dot := StyleMuted.Render("○")
-		if a.wsConnected && strings.TrimSpace(a.wsURL) == u {
+		st := StyleMuted.Render("off")
+		label := StyleNormal.Render(truncate(shortWsLabel(u), innerW-8))
+		if on {
 			dot = StyleHealthy.Render("●")
-		} else if i == 0 {
-			dot = lipgloss.NewStyle().Foreground(ColorPrimary).Render("●")
+			st = StyleHealthy.Render("on")
+			label = StyleHealthy.Render(truncate(shortWsLabel(u), innerW-8))
+		} else if strings.TrimSpace(a.wsURL) == u {
+			dot = StyleWarning.Render("○")
+			label = StyleWarning.Render(truncate(shortWsLabel(u), innerW-8))
 		}
 		mark := "  "
-		if i == a.wsRecentCursor && focus {
+		if i == a.wsRecentCursor && focus && !(a.wsEditing) {
 			mark = StyleSelected.Render("▸ ")
 		}
-		lines = append(lines, mark+dot+" "+StyleNormal.Render(truncate(host, width-6)))
+		lines = append(lines, mark+dot+" "+label+" "+st)
 	}
-	lines = append(lines, StyleMuted.Render("  + n nova url (settings)"))
+	if focus {
+		lines = append(lines, StyleMuted.Render("n/e/x  c on  d off"))
+		lines = append(lines, StyleMuted.Render("A todas as conexões"))
+	} else {
+		lines = append(lines, StyleMuted.Render("tab · n nova · A"))
+	}
 	title := "CONNECTIONS"
 	if focus {
 		title = "> CONNECTIONS"
@@ -435,19 +523,15 @@ func (a *App) renderWsMessagesTable(width, height int) string {
 	vis := a.filteredWsFrames()
 	a.syncWsFrameCursor(len(vis))
 
-	lines := []string{StyleMuted.Render(fmt.Sprintf("%-8s %-2s %-6s %5s  %s", "TIME", "DIR", "TYPE", "SIZE", "PAYLOAD"))}
+	hdr := fmt.Sprintf("%-8s %-2s %-6s %5s  %s", "TIME", "DIR", "TYPE", "SIZE", "PAYLOAD")
+	if a.wsMsgHScroll > 0 {
+		hdr = sliceColumns(hdr, a.wsMsgHScroll, maxInt(8, width-4))
+	}
+	lines := []string{StyleMuted.Render(hdr)}
 	if len(vis) == 0 {
 		lines = append(lines, StyleMuted.Render("  sem frames — c conecta, enter envia"))
 	} else {
-		if a.wsFrameCursor < a.wsMsgScroll {
-			a.wsMsgScroll = a.wsFrameCursor
-		}
-		if a.wsFrameCursor >= a.wsMsgScroll+viewport-1 {
-			a.wsMsgScroll = a.wsFrameCursor - (viewport - 2)
-		}
-		if a.wsMsgScroll < 0 {
-			a.wsMsgScroll = 0
-		}
+		a.wsMsgScroll = ensureVisible(a.wsFrameCursor, a.wsMsgScroll, maxInt(1, viewport-1), len(vis))
 		end := minInt(a.wsMsgScroll+viewport-1, len(vis))
 		for i := a.wsMsgScroll; i < end; i++ {
 			f := vis[i]
@@ -463,6 +547,9 @@ func (a *App) renderWsMessagesTable(width, height int) string {
 	title := fmt.Sprintf("MESSAGES (%d)", len(vis))
 	if focus {
 		title = "> " + title
+		if a.wsMsgHScroll > 0 {
+			title += fmt.Sprintf("  ←%d", a.wsMsgHScroll)
+		}
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, focus)
 }
@@ -490,49 +577,65 @@ func (a *App) formatWsFrameRow(f wsFrame, width int) string {
 		kindSt = StyleNormal
 	}
 	payload := strings.ReplaceAll(f.Payload, "\n", " ")
-	payload = truncate(payload, maxInt(8, width-28))
+	payloadW := maxInt(8, width-28)
+	payload = sliceColumns(payload, a.wsMsgHScroll, payloadW)
 	return StyleMuted.Render(tm+" ") + dirSt.Render(dir+" ") + kindSt.Render(fmt.Sprintf("%-6s", f.Kind)) +
 		StyleMuted.Render(fmt.Sprintf(" %4s  ", humanBytes(f.Size))) + StyleNormal.Render(payload)
 }
 
 func (a *App) renderWsSendBox(width, height int) string {
 	focus := a.wsFocus == wsFocusSend
+	if height < 5 {
+		height = 5
+	}
 	modes := []string{"Text", "JSON", "Binary"}
 	var modeParts []string
 	for i, m := range modes {
 		if wsSendMode(i) == a.wsSendMode {
-			modeParts = append(modeParts, StyleSelected.Render(m))
+			modeParts = append(modeParts, StyleSelected.Render(" "+m+" "))
 		} else {
-			modeParts = append(modeParts, StyleMuted.Render(m))
+			modeParts = append(modeParts, StyleMuted.Render(" "+m+" "))
 		}
 	}
-	head := strings.Join(modeParts, StyleMuted.Render(" │ "))
-	innerH := maxInt(1, height-3)
+	head := StyleKey.Render("m") + StyleMuted.Render(" ") + strings.Join(modeParts, StyleMuted.Render("│"))
+	if width >= 44 {
+		head += StyleMuted.Render("  e edita  enter envia")
+	}
+	msgH := maxInt(2, height-3)
+	innerW := maxInt(4, width-2)
 	var body []string
 	body = append(body, head)
 	if a.wsEditing && focus {
 		ed := a.wsEdit
-		lines := renderEditorLines(a.wsSend, &ed, width-2, innerH, true, a.wsSendMode == wsSendJSON)
+		lines := renderEditorLines(a.wsSend, &ed, innerW, msgH, true, a.wsSendMode == wsSendJSON)
 		a.wsEdit = ed
 		body = append(body, lines...)
+	} else if strings.TrimSpace(a.wsSend) == "" {
+		body = append(body, StyleMuted.Render("(vazio — e para escrever a mensagem)"))
 	} else {
 		raw := strings.Split(strings.ReplaceAll(a.wsSend, "\r\n", "\n"), "\n")
+		if a.wsSendVScroll > maxInt(0, len(raw)-1) {
+			a.wsSendVScroll = maxInt(0, len(raw)-1)
+		}
 		st := StyleMuted
 		if focus {
 			st = StyleNormal
 		}
-		for i := 0; i < innerH && i < len(raw); i++ {
+		for i := a.wsSendVScroll; i < a.wsSendVScroll+msgH && i < len(raw); i++ {
 			line := sanitizeTerminalLine(raw[i])
-			if a.wsSendMode == wsSendJSON && strings.HasPrefix(strings.TrimSpace(line), "{") {
-				body = append(body, renderJSONColumns(line, 0, width-2))
+			if a.wsSendMode == wsSendJSON {
+				body = append(body, renderJSONColumns(line, a.wsSendHScroll, innerW))
 			} else {
-				body = append(body, st.Render(truncate(line, width-2)))
+				body = append(body, st.Render(sliceColumns(line, a.wsSendHScroll, innerW)))
 			}
 		}
 	}
-	title := "SEND  enter"
+	title := "SEND MESSAGE"
 	if focus {
-		title = "> SEND"
+		title = "> SEND MESSAGE  m·e·enter"
+		if a.wsSendHScroll > 0 || a.wsSendVScroll > 0 {
+			title += fmt.Sprintf("  ←%d ↑%d", a.wsSendHScroll, a.wsSendVScroll)
+		}
 	}
 	return renderApiTitledBox(title, fitExactLines(body, height-2), width, height, focus)
 }
@@ -619,16 +722,21 @@ func (a *App) renderWsPayloadLines(f *wsFrame, width, height int) []string {
 // --- other subtabs ---
 
 func (a *App) renderWsMessagesFull(width, height int) string {
-	a.wsFocus = wsFocusMessages
-	return a.renderWsMessagesTable(width, height)
-}
-
-func (a *App) renderWsSendFull(width, height int) string {
-	a.wsFocus = wsFocusSend
-	top := 3
-	box := a.renderWsSendBox(width, height-top)
-	hint := StyleMuted.Render("m cicla Text/JSON/Binary   e editar   ctrl+enter enviar")
-	return lipgloss.JoinVertical(lipgloss.Left, hint, box)
+	sendH := height * 35 / 100
+	if sendH < 8 {
+		sendH = 8
+	}
+	if sendH > height-8 {
+		sendH = maxInt(6, height-8)
+	}
+	msgH := maxInt(6, height-sendH)
+	if a.wsFocus != wsFocusMessages && a.wsFocus != wsFocusSend {
+		a.wsFocus = wsFocusMessages
+	}
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderWsMessagesTable(width, msgH),
+		a.renderWsSendBox(width, sendH),
+	)
 }
 
 func (a *App) renderWsHistory(width, height int) string {
@@ -643,14 +751,12 @@ func (a *App) renderWsHistory(width, height int) string {
 }
 
 func (a *App) renderWsSettings(width, height int) string {
-	focusURL := a.wsEditing && a.wsFocus == wsFocusSend // reuse send focus flag loosely — use messages=url
-	_ = focusURL
 	urlH := 4
 	hdrH := maxInt(6, (height-urlH)*45/100)
 	optH := maxInt(4, height-urlH-hdrH)
 
 	urlLines := []string{StyleNormal.Render(truncate(a.wsURL, width-4))}
-	if a.wsEditing && a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections {
+	if a.wsEditing && a.wsFocus == wsFocusConnections {
 		ed := a.wsEdit
 		urlLines = renderEditorLines(a.wsURL, &ed, width-2, 1, true, false)
 		a.wsEdit = ed
@@ -668,7 +774,8 @@ func (a *App) renderWsSettings(width, height int) string {
 	opts := []string{
 		StyleMuted.Render("a  Auto reconnect: ") + StyleNormal.Render(auto),
 		StyleMuted.Render("u  Ciclar porta do projeto"),
-		StyleMuted.Render("e  Editar URL (focus connections) / Headers (filters)"),
+		StyleMuted.Render("A  Todas as connections (todos os projetos)"),
+		StyleMuted.Render("e  Editar URL (connections) / Headers (filters)"),
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("URL", fitExactLines(urlLines, urlH-2), width, urlH, a.wsFocus == wsFocusConnections),
@@ -677,9 +784,79 @@ func (a *App) renderWsSettings(width, height int) string {
 	)
 }
 
+type wsAllEntry struct {
+	Project string
+	URL     string
+}
+
+func (a *App) wsAllConnEntries() []wsAllEntry {
+	out := make([]wsAllEntry, 0)
+	curPath := ""
+	if p := a.currentProject(); p != nil {
+		curPath = p.Path
+	}
+	for _, p := range a.snapshot.Projects {
+		urls := wsutil.LoadProject(p.Path).URLs
+		if curPath != "" && pathsMatch(p.Path, curPath) {
+			urls = a.wsRecent
+		}
+		for _, u := range urls {
+			out = append(out, wsAllEntry{Project: p.Name, URL: u})
+		}
+	}
+	return out
+}
+
+func (a *App) renderWsAllPopup(width, height int) string {
+	entries := a.wsAllConnEntries()
+	if a.wsAllCursor >= len(entries) {
+		a.wsAllCursor = maxInt(0, len(entries)-1)
+	}
+	boxW := minInt(64, maxInt(40, width-8))
+	boxH := minInt(22, maxInt(10, height-4))
+	lines := []string{
+		StyleSection.Render("TODAS AS CONNECTIONS"),
+		StyleMuted.Render("agrupadas por projeto · enter conecta · esc fecha"),
+		"",
+	}
+	if len(entries) == 0 {
+		lines = append(lines, StyleMuted.Render("  (nenhuma salva ainda)"))
+	}
+	lastProj := ""
+	active := strings.TrimSpace(a.wsURL)
+	for i, e := range entries {
+		if e.Project != lastProj {
+			lastProj = e.Project
+			lines = append(lines, StyleAccent.Render("▸ "+truncate(e.Project, boxW-6)))
+		}
+		on := a.wsConnected && active == e.URL
+		dot := StyleMuted.Render("○")
+		label := StyleNormal.Render(truncate(e.URL, boxW-8))
+		if on {
+			dot = StyleHealthy.Render("●")
+			label = StyleHealthy.Render(truncate(e.URL, boxW-8))
+		}
+		mark := "  "
+		if i == a.wsAllCursor {
+			mark = StyleSelected.Render("▸ ")
+		}
+		lines = append(lines, mark+dot+" "+label)
+	}
+	body := fitExactLines(lines, boxH-2)
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(ColorAccent).
+		Padding(0, 1).
+		Width(boxW).
+		Render(strings.Join(body, "\n"))
+}
+
 // --- keys ---
 
 func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {
+	if a.wsShowAll {
+		return a.handleWsAllKeys(msg)
+	}
 	if a.wsEditing {
 		return a.updateWsEdit(msg, p)
 	}
@@ -690,28 +867,46 @@ func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 		a.wsSubTab = wsTabOverview
 	case "1":
 		a.wsSubTab = wsTabMessages
+		if a.wsFocus != wsFocusSend {
+			a.wsFocus = wsFocusMessages
+		}
 	case "2":
-		a.wsSubTab = wsTabSend
-	case "3":
 		a.wsSubTab = wsTabHistory
-	case "4":
+	case "3":
 		a.wsSubTab = wsTabSettings
 		a.wsFocus = wsFocusConnections
 	case "c":
+		if a.wsFocus == wsFocusConnections {
+			return a, a.connectSelectedWsURL()
+		}
 		if !a.wsConnected {
 			return a, a.toggleWsConnect()
 		}
-	case "d", "x":
-		if msg.String() == "x" && a.wsFocus == wsFocusSend {
-			a.wsSend = ""
+	case "d":
+		a.disconnectSelectedWsURL()
+		return a, nil
+	case "x", "delete", "backspace":
+		if a.wsFocus == wsFocusConnections {
+			a.deleteSelectedWsURL()
 			return a, nil
 		}
-		if a.wsConnected {
+		if msg.String() == "x" && a.wsFocus == wsFocusSend {
+			a.wsSend = ""
+			a.wsSendVScroll = 0
+			a.wsSendHScroll = 0
+			return a, nil
+		}
+		if msg.String() == "x" && a.wsConnected {
 			a.wsCloseSession()
 			a.pushWsMeta("disconnected")
 			a.wsStatus = "disconnected"
 		}
 	case "r":
+		if a.wsFocus == wsFocusConnections {
+			if u, ok := a.selectedWsURL(); ok {
+				a.wsURL = u
+			}
+		}
 		a.wsCloseSession()
 		return a, a.toggleWsConnect()
 	case "f":
@@ -724,14 +919,25 @@ func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 		a.wsSearchInput = a.wsSearch
 		return a, nil
 	case "tab":
+		if a.wsSubTab == wsTabMessages {
+			a.toggleWsMsgSendFocus()
+			return a, nil
+		}
 		a.cycleWsFocus(1)
 	case "shift+tab":
+		if a.wsSubTab == wsTabMessages {
+			a.toggleWsMsgSendFocus()
+			return a, nil
+		}
 		a.cycleWsFocus(-1)
 	case "m":
-		if a.wsFocus == wsFocusSend || a.wsSubTab == wsTabSend {
-			a.wsSendMode = wsSendMode((int(a.wsSendMode) + 1) % 3)
-		} else if a.wsFocus == wsFocusInspector {
+		if a.wsFocus == wsFocusInspector {
 			a.wsPayloadMode = wsPayloadMode((int(a.wsPayloadMode) + 1) % 3)
+			modes := []string{"Pretty", "Raw", "Hex"}
+			a.wsStatus = "payload → " + modes[a.wsPayloadMode]
+		} else {
+			a.wsSendMode = wsSendMode((int(a.wsSendMode) + 1) % 3)
+			a.wsStatus = "send → " + []string{"Text", "JSON", "Binary"}[a.wsSendMode]
 		}
 	case "[", "]":
 		if a.wsFocus == wsFocusInspector {
@@ -745,16 +951,43 @@ func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 		if a.wsSubTab == wsTabSettings {
 			a.wsAutoReconnect = !a.wsAutoReconnect
 		}
+	case "A":
+		a.openWsAllPopup()
+		return a, nil
 	case "u":
 		a.cycleWsPort(p)
+	case "n", "N":
+		a.startNewWsURL(p)
+		return a, nil
 	case "e":
+		if a.wsFocus == wsFocusConnections {
+			a.startEditSelectedWsURL()
+			return a, nil
+		}
+		if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusFilters {
+			a.beginWsEdit()
+			return a, nil
+		}
+		a.wsFocus = wsFocusSend
 		a.beginWsEdit()
 	case "enter":
 		return a, a.wsEnterAction(p)
+	case "left", "h":
+		a.wsPan(-4, 0)
+	case "right", "l":
+		a.wsPan(4, 0)
 	case "up", "k":
-		a.wsNav(-1)
+		if a.wsFocus == wsFocusSend {
+			a.wsPan(0, -1)
+		} else {
+			a.wsNav(-1)
+		}
 	case "down", "j":
-		a.wsNav(1)
+		if a.wsFocus == wsFocusSend {
+			a.wsPan(0, 1)
+		} else {
+			a.wsNav(1)
+		}
 	case "pgup":
 		a.wsFrameCursor = maxInt(0, a.wsFrameCursor-10)
 	case "pgdown":
@@ -763,9 +996,77 @@ func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 		a.wsFrames = nil
 		a.wsFrameCursor = 0
 		a.wsMsgScroll = 0
+		a.wsMsgHScroll = 0
 		a.wsStatus = "log limpo"
 	}
 	return a, nil
+}
+
+func (a *App) toggleWsMsgSendFocus() {
+	if a.wsFocus == wsFocusSend {
+		a.wsFocus = wsFocusMessages
+		a.wsStatus = "messages"
+		return
+	}
+	a.wsFocus = wsFocusSend
+	a.wsStatus = "send"
+}
+
+func (a *App) wsPan(dx, dy int) {
+	switch a.wsFocus {
+	case wsFocusMessages:
+		a.wsMsgHScroll = maxInt(0, a.wsMsgHScroll+dx)
+		if dy != 0 {
+			a.wsNav(dy)
+		}
+	case wsFocusSend:
+		a.wsSendHScroll = maxInt(0, a.wsSendHScroll+dx)
+		a.wsSendVScroll = maxInt(0, a.wsSendVScroll+dy)
+	case wsFocusInspector:
+		if dy != 0 {
+			a.wsNav(dy)
+		}
+	}
+}
+
+func (a *App) openWsAllPopup() {
+	a.wsShowAll = true
+	a.wsAllCursor = 0
+	a.wsStatus = "todas as connections"
+}
+
+func (a *App) handleWsAllKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "esc", "A", "q":
+		a.wsShowAll = false
+		a.wsStatus = "ready"
+		return a, nil
+	case "up", "k":
+		a.wsAllCursor = maxInt(0, a.wsAllCursor-1)
+	case "down", "j":
+		n := len(a.wsAllConnEntries())
+		if n > 0 {
+			a.wsAllCursor = minInt(n-1, a.wsAllCursor+1)
+		}
+	case "enter", "c":
+		return a, a.pickWsAllEntry()
+	}
+	return a, nil
+}
+
+func (a *App) pickWsAllEntry() tea.Cmd {
+	entries := a.wsAllConnEntries()
+	if a.wsAllCursor < 0 || a.wsAllCursor >= len(entries) {
+		a.wsStatus = "nenhuma connection"
+		return nil
+	}
+	e := entries[a.wsAllCursor]
+	a.wsShowAll = false
+	a.rememberWsURL(e.URL)
+	a.wsFocus = wsFocusConnections
+	a.wsSubTab = wsTabOverview
+	a.wsStatus = e.Project + " · " + shortWsHost(e.URL)
+	return a.connectSelectedWsURL()
 }
 
 func (a *App) cycleWsFocus(delta int) {
@@ -794,19 +1095,14 @@ func (a *App) wsNav(delta int) {
 	case wsFocusMessages, wsFocusInspector:
 		a.wsFrameCursor = clampCursor(a.wsFrameCursor+delta, len(a.filteredWsFrames()))
 	case wsFocusSend:
-		// no-op
+		a.wsSendVScroll = maxInt(0, a.wsSendVScroll+delta)
 	}
 }
 
 func (a *App) wsEnterAction(p *core.Project) tea.Cmd {
 	switch a.wsFocus {
 	case wsFocusConnections:
-		if a.wsRecentCursor >= 0 && a.wsRecentCursor < len(a.wsRecent) {
-			a.wsURL = a.wsRecent[a.wsRecentCursor]
-			if !a.wsConnected {
-				return a.toggleWsConnect()
-			}
-		}
+		return a.connectSelectedWsURL()
 	case wsFocusFilters:
 		a.wsFrameCursor = 0
 	case wsFocusSend:
@@ -820,7 +1116,8 @@ func (a *App) wsEnterAction(p *core.Project) tea.Cmd {
 	if a.wsSubTab == wsTabHistory && len(a.wsHistory) > 0 {
 		idx := clampCursor(a.wsFrameCursor, len(a.wsHistory))
 		a.wsSend = a.wsHistory[idx]
-		a.wsSubTab = wsTabSend
+		a.wsSubTab = wsTabMessages
+		a.wsFocus = wsFocusSend
 		return a.wsSendFrame()
 	}
 	if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections && !a.wsConnected {
@@ -832,36 +1129,207 @@ func (a *App) wsEnterAction(p *core.Project) tea.Cmd {
 
 func (a *App) beginWsEdit() {
 	switch {
-	case a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections:
+	case a.wsFocus == wsFocusConnections:
 		a.wsEditing = true
 		a.wsEdit = editorState{Cursor: len([]rune(a.wsURL)), Anchor: -1}
 	case a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusFilters:
 		a.wsEditing = true
 		a.wsEdit = editorState{Cursor: len([]rune(a.wsHeaders)), Anchor: -1}
-	case a.wsFocus == wsFocusSend || a.wsSubTab == wsTabSend:
+	case a.wsFocus == wsFocusSend || a.wsSubTab == wsTabMessages:
 		a.wsFocus = wsFocusSend
 		a.wsEditing = true
 		a.wsEdit = editorState{Cursor: len([]rune(a.wsSend)), Anchor: -1}
 	}
 }
 
+func (a *App) startNewWsURL(p *core.Project) {
+	a.wsEditSourceIdx = -1
+	a.wsSubTab = wsTabOverview
+	a.wsFocus = wsFocusConnections
+	a.wsURL = a.defaultWsURL(p)
+	a.wsEditing = true
+	a.wsEdit = editorState{Cursor: len([]rune(a.wsURL)), Anchor: -1}
+	a.wsStatus = "nova url — enter salva"
+}
+
+func (a *App) startEditSelectedWsURL() {
+	u, ok := a.selectedWsURL()
+	if !ok {
+		a.wsStatus = "nenhuma connection"
+		return
+	}
+	a.wsEditSourceIdx = a.wsRecentCursor
+	a.wsURL = u
+	a.wsSubTab = wsTabOverview
+	a.wsFocus = wsFocusConnections
+	a.wsEditing = true
+	a.wsEdit = editorState{Cursor: len([]rune(a.wsURL)), Anchor: -1}
+	a.wsStatus = "editando url — enter salva"
+}
+
+func (a *App) selectedWsURL() (string, bool) {
+	if a.wsRecentCursor < 0 || a.wsRecentCursor >= len(a.wsRecent) {
+		return "", false
+	}
+	return a.wsRecent[a.wsRecentCursor], true
+}
+
+// liveWsURL is the URL of the open socket — not the list cursor / editor draft.
+func (a *App) liveWsURL() string {
+	if !a.wsConnected {
+		return ""
+	}
+	if u := strings.TrimSpace(a.wsInfo.URL); u != "" {
+		return u
+	}
+	return strings.TrimSpace(a.wsURL)
+}
+
+func (a *App) connectSelectedWsURL() tea.Cmd {
+	u, ok := a.selectedWsURL()
+	if !ok {
+		u = strings.TrimSpace(a.wsURL)
+	}
+	u = strings.TrimSpace(u)
+	if u == "" {
+		a.wsStatus = "nenhuma url"
+		return nil
+	}
+	if live := a.liveWsURL(); live != "" && live == u {
+		a.wsURL = u
+		a.wsStatus = "já conectado"
+		return nil
+	}
+	if a.wsConnected {
+		a.wsCloseSession()
+		a.pushWsMeta("switched")
+	}
+	a.wsURL = u
+	a.rememberWsURL(u)
+	return a.toggleWsConnect()
+}
+
+func (a *App) disconnectSelectedWsURL() {
+	if a.wsFocus == wsFocusConnections {
+		u, ok := a.selectedWsURL()
+		if !ok {
+			a.wsStatus = "nenhuma connection"
+			return
+		}
+		if a.liveWsURL() != u {
+			a.wsStatus = "não está conectada"
+			return
+		}
+	}
+	if !a.wsConnected {
+		a.wsStatus = "já desconectado"
+		return
+	}
+	a.wsCloseSession()
+	a.pushWsMeta("disconnected")
+	a.wsStatus = "disconnected"
+}
+
+func (a *App) deleteSelectedWsURL() {
+	idx := a.wsRecentCursor
+	if idx < 0 || idx >= len(a.wsRecent) {
+		a.wsStatus = "nenhuma connection"
+		return
+	}
+	u := a.wsRecent[idx]
+	if a.wsConnected && strings.TrimSpace(a.wsURL) == u {
+		a.wsCloseSession()
+		a.pushWsMeta("disconnected")
+	}
+	a.wsRecent = append(a.wsRecent[:idx], a.wsRecent[idx+1:]...)
+	a.persistWsProjectConns()
+	if len(a.wsRecent) == 0 {
+		a.wsRecentCursor = 0
+		a.wsStatus = "connection removida"
+		return
+	}
+	a.wsRecentCursor = clampCursor(idx, len(a.wsRecent))
+	if strings.TrimSpace(a.wsURL) == u {
+		a.wsURL = a.wsRecent[a.wsRecentCursor]
+	}
+	a.wsStatus = "connection removida"
+}
+
+func (a *App) saveWsURLFromEditor() {
+	u := strings.TrimSpace(a.wsURL)
+	if u == "" {
+		a.wsStatus = "url vazia"
+		return
+	}
+	a.wsURL = u
+	if a.wsEditSourceIdx >= 0 && a.wsEditSourceIdx < len(a.wsRecent) {
+		old := a.wsRecent[a.wsEditSourceIdx]
+		a.wsRecent[a.wsEditSourceIdx] = u
+		out := make([]string, 0, len(a.wsRecent))
+		seen := map[string]bool{}
+		for _, r := range a.wsRecent {
+			if r == "" || seen[r] {
+				continue
+			}
+			seen[r] = true
+			out = append(out, r)
+		}
+		a.wsRecent = out
+		for i, r := range a.wsRecent {
+			if r == u {
+				a.wsRecentCursor = i
+				break
+			}
+		}
+		a.persistWsProjectConns()
+		if a.wsConnected && old != u && strings.TrimSpace(a.wsInfo.URL) == old {
+			a.wsStatus = "url atualizada — reconecte com c"
+		} else {
+			a.wsStatus = "url atualizada"
+		}
+	} else {
+		a.rememberWsURL(u)
+		a.wsStatus = "url salva"
+	}
+	a.wsEditSourceIdx = -1
+	a.wsSubTab = wsTabOverview
+	a.wsFocus = wsFocusConnections
+}
+
 func (a *App) updateWsEdit(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
+		wasURL := a.wsFocus == wsFocusConnections
 		a.wsEditing = false
 		a.wsEdit.clearSel()
+		a.wsEditSourceIdx = -1
+		if wasURL {
+			if live := a.liveWsURL(); live != "" {
+				a.wsURL = live
+			}
+		}
 		return a, nil
+	case "enter":
+		if a.wsFocus == wsFocusConnections {
+			a.wsEditing = false
+			a.wsEdit.clearSel()
+			a.saveWsURLFromEditor()
+			return a, nil
+		}
 	case "ctrl+enter":
 		a.wsEditing = false
 		a.wsEdit.clearSel()
-		if a.wsFocus == wsFocusSend || a.wsSubTab == wsTabSend {
+		if a.wsFocus == wsFocusSend {
 			return a, a.wsSendFrame()
+		}
+		if a.wsFocus == wsFocusConnections {
+			a.saveWsURLFromEditor()
 		}
 		return a, nil
 	}
-	multiline := !(a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections)
+	multiline := a.wsFocus != wsFocusConnections
 	text := a.wsSend
-	if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections {
+	if a.wsFocus == wsFocusConnections {
 		text = a.wsURL
 	} else if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusFilters {
 		text = a.wsHeaders
@@ -870,7 +1338,7 @@ func (a *App) updateWsEdit(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 	if !handled {
 		return a, nil
 	}
-	if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusConnections {
+	if a.wsFocus == wsFocusConnections {
 		a.wsURL = newText
 	} else if a.wsSubTab == wsTabSettings && a.wsFocus == wsFocusFilters {
 		a.wsHeaders = newText
@@ -959,6 +1427,11 @@ func (a *App) wsSendFrame() tea.Cmd {
 		a.wsStatus = ""
 		return nil
 	}
+	live := a.liveWsURL()
+	// Keep draft URL aligned with the live socket so the UI can't lie.
+	if live != "" {
+		a.wsURL = live
+	}
 	text := a.wsSend
 	if a.wsSendMode == wsSendJSON {
 		var v any
@@ -974,6 +1447,7 @@ func (a *App) wsSendFrame() tea.Cmd {
 	mode := a.wsSendMode
 	a.wsLastSendAt = time.Now()
 	a.pushWsHistory(a.wsSend)
+	a.wsStatus = "→ " + shortWsHost(live)
 	return func() tea.Msg {
 		var err error
 		if mode == wsSendBinary {
@@ -1229,6 +1703,12 @@ func shortWsHost(u string) string {
 	if i := strings.IndexByte(u, '/'); i >= 0 {
 		return u[:i]
 	}
+	return u
+}
+
+func shortWsLabel(u string) string {
+	u = strings.TrimPrefix(strings.TrimSpace(u), "ws://")
+	u = strings.TrimPrefix(u, "wss://")
 	return u
 }
 

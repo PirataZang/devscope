@@ -130,17 +130,26 @@ func parseOpenAPI(data []byte) ([]Route, error) {
 				continue
 			}
 			summary := ""
+			auth := false
 			if op, ok := opRaw.(map[string]any); ok {
 				if s, ok := op["summary"].(string); ok {
 					summary = s
 				} else if s, ok := op["operationId"].(string); ok {
 					summary = s
 				}
+				if sec, ok := op["security"].([]any); ok && len(sec) > 0 {
+					auth = true
+					if summary == "" {
+						summary = "secured"
+					}
+				}
 			}
 			routes = append(routes, Route{
 				Method:  m,
 				Path:    path,
+				Source:  "openapi",
 				Summary: summary,
+				Auth:    auth,
 			})
 		}
 	}

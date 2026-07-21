@@ -110,8 +110,8 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 	}{
 		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes}},
 		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok}},
-		{"UTILS", []Tab{TabJSON, TabJWT, TabRoutes}},
+		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabJenkins}},
+		{"UTILS", []Tab{TabRoutes}},
 	}
 	var rows []string
 	for gi, g := range groups {
@@ -211,6 +211,8 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorAccent
 	case TabNgrok:
 		return ColorSuccess
+	case TabJenkins:
+		return ColorK8s
 	default:
 		return ColorHighlight
 	}
@@ -246,42 +248,16 @@ func tabGlyph(t Tab) string {
 		return "⚡"
 	case TabNgrok:
 		return "⇪"
+	case TabJenkins:
+		return "⚙"
 	default:
 		return "·"
 	}
 }
 
-func tabActiveBg(t Tab) lipgloss.Color {
-	switch t {
-	case TabGit:
-		return lipgloss.Color("#3F3A14")
-	case TabContainers:
-		return lipgloss.Color("#0F2A3D")
-	case TabKubernetes:
-		return lipgloss.Color("#0F1F3D")
-	case TabHealth:
-		return lipgloss.Color("#143324")
-	case TabLogs:
-		return lipgloss.Color("#1A2A3F")
-	case TabMetrics:
-		return lipgloss.Color("#3A3414")
-	case TabAPI:
-		return lipgloss.Color("#2A1A3F")
-	case TabDatabase:
-		return lipgloss.Color("#0F2A3D")
-	case TabJSON:
-		return lipgloss.Color("#3F3A14")
-	case TabJWT:
-		return lipgloss.Color("#143324")
-	case TabRoutes:
-		return lipgloss.Color("#2A1A3F")
-	case TabWebSocket:
-		return lipgloss.Color("#1A2A3F")
-	case TabNgrok:
-		return lipgloss.Color("#143324")
-	default:
-		return lipgloss.Color("#2A2440")
-	}
+func tabActiveBg(_ Tab) lipgloss.Color {
+	// Theme-driven so light/dracula don't keep dark-only tints.
+	return ColorSelBg
 }
 
 func (a *App) renderProjectSidebarRow(t Tab, width int, _ *core.Project) string {

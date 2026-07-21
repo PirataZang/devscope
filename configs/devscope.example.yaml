@@ -24,7 +24,8 @@ refresh:
   git_interval: 30s
 
 ui:
-  theme: auto
+  # dark | dracula | nord | monokai | catppuccin | gruvbox | solarized | light | auto
+  theme: dark
 
 health:
   timeout: 5s

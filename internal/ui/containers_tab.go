@@ -25,6 +25,8 @@ type containerPreviewMsg struct {
 	stats   string
 	volumes []string
 	cpu     float64
+	mem     float64
+	net     float64
 }
 
 func (a *App) initContainersTab() {
@@ -45,6 +47,8 @@ func (a *App) initContainersTab() {
 	a.containerPreviewStats = ""
 	a.containerPreviewVolumes = nil
 	a.containerCPUHistory = nil
+	a.containerMemHistory = nil
+	a.containerNetHistory = nil
 }
 
 func (a *App) renderContainersTab(p *core.Project) string {
@@ -110,7 +114,7 @@ func (a *App) renderContainerList(p *core.Project) string {
 	tableH := maxInt(6, bodyH-bottomH)
 
 	table := a.renderContainersTable(containers, w, tableH)
-	actions := StyleMuted.Render("enter detalhe  s stop  r restart  p pause  d remove  e shell  l logs  / buscar")
+	actions := StyleMuted.Render("enter detalhe  s stop  r restart  p pause  d remove  e shell  l logs  g stats  / buscar")
 	bottom := a.renderContainersBottom(w, bottomH)
 
 	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, actions, bottom)
@@ -228,9 +232,22 @@ func (a *App) renderContainersBottom(width, height int) string {
 	}
 	return lipgloss.JoinHorizontal(lipgloss.Top,
 		renderApiTitledBox(title, fitExactLines(logs, inner), w1, height, false),
-		renderApiTitledBox("STATS (60s)", fitExactLines(stats, inner), w2, height, false),
+		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
 		renderApiTitledBox("VOLUMES", fitExactLines(vols, inner), w3, height, false),
 	)
+}
+
+func (a *App) containerStatsTitle() string {
+	switch a.containerStatsMode {
+	case 1:
+		return "STATS · CPU  g"
+	case 2:
+		return "STATS · MEM  g"
+	case 3:
+		return "STATS · NET  g"
+	default:
+		return "STATS · ALL  g"
+	}
 }
 
 func (a *App) containerPreviewLogLines(maxLines, width int) []string {
@@ -259,39 +276,75 @@ func (a *App) containerPreviewLogLines(maxLines, width int) []string {
 }
 
 func (a *App) containerPreviewStatLines(maxLines, width int) []string {
-	spark := a.renderCPUSparkline(width - 2)
-	lines := []string{StyleAccent.Render(spark)}
-	if a.containerPreviewStats != "" {
-		for _, line := range strings.Split(a.containerPreviewStats, "\n") {
-			if len(lines) >= maxLines {
-				break
-			}
-			lines = append(lines, StyleMuted.Render(truncate(line, width)))
-		}
-	} else {
-		lines = append(lines, StyleMuted.Render("cpu/mem do selecionado"))
+	sparkW := maxInt(8, width-5)
+	showCPU := a.containerStatsMode == 0 || a.containerStatsMode == 1
+	showMem := a.containerStatsMode == 0 || a.containerStatsMode == 2
+	showNet := a.containerStatsMode == 0 || a.containerStatsMode == 3
+
+	lines := make([]string, 0, maxLines)
+	if showCPU {
+		lines = append(lines, StyleMuted.Render("CPU ")+StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, sparkW, 100)))
 	}
+	if showMem {
+		lines = append(lines, StyleMuted.Render("MEM ")+StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, sparkW, 100)))
+	}
+	if showNet {
+		lines = append(lines, StyleMuted.Render("NET ")+StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, sparkW, 0)))
+	}
+
 	if c, ok := a.selectedContainer(a.currentProject()); ok {
+		cpu := c.CPU
+		if n := len(a.containerCPUHistory); n > 0 {
+			cpu = a.containerCPUHistory[n-1]
+		}
+		mem := formatContainerMem(c.Memory)
+		memPct := ""
+		if n := len(a.containerMemHistory); n > 0 {
+			memPct = fmt.Sprintf(" (%.1f%%)", a.containerMemHistory[n-1])
+		}
+		net := "—"
+		if n := len(a.containerNetHistory); n > 0 {
+			net = formatNetKB(a.containerNetHistory[n-1])
+		}
 		lines = append(lines,
-			StyleNormal.Render(fmt.Sprintf("CPU %.1f%%  MEM %s", c.CPU, formatContainerMem(c.Memory))),
+			StyleNormal.Render(fmt.Sprintf("CPU %.1f%%", cpu)),
+			StyleNormal.Render("MEM "+mem+memPct),
+			StyleNormal.Render("NET "+net),
 		)
+	} else if len(lines) == 0 {
+		lines = append(lines, StyleMuted.Render("selecione um container"))
+	}
+	lines = append(lines, StyleMuted.Render("g cicla métrica"))
+	if len(lines) > maxLines {
+		lines = lines[:maxLines]
 	}
 	return lines
 }
 
-func (a *App) renderCPUSparkline(width int) string {
-	hist := a.containerCPUHistory
-	if len(hist) == 0 {
-		return StyleMuted.Render(strings.Repeat("·", maxInt(8, width)))
-	}
-	bars := []rune("▁▂▃▄▅▆▇█")
+// renderMetricSparkline: maxHint>0 scales against that ceiling; 0 = relative to window max.
+func renderMetricSparkline(hist []float64, width int, maxHint float64) string {
 	n := maxInt(8, width)
+	if len(hist) == 0 {
+		return strings.Repeat("·", n)
+	}
 	if len(hist) > n {
 		hist = hist[len(hist)-n:]
 	}
+	maxV := maxHint
+	if maxV <= 0 {
+		for _, v := range hist {
+			if v > maxV {
+				maxV = v
+			}
+		}
+		if maxV <= 0 {
+			maxV = 1
+		}
+	}
+	bars := []rune("▁▂▃▄▅▆▇█")
 	var b strings.Builder
 	for _, v := range hist {
-		idx := int(v / 12.5)
+		idx := int(v / maxV * float64(len(bars)-1))
 		if idx < 0 {
 			idx = 0
 		}
@@ -304,6 +357,75 @@ func (a *App) renderCPUSparkline(width int) string {
 		b.WriteRune('·')
 	}
 	return b.String()
+}
+
+func formatNetKB(kb float64) string {
+	if kb < 1024 {
+		return fmt.Sprintf("%.0f KB", kb)
+	}
+	return fmt.Sprintf("%.2f MB", kb/1024)
+}
+
+func parseDockerStatsSample(stats string) (cpu, mem, net float64) {
+	for _, line := range strings.Split(stats, "\n") {
+		switch {
+		case strings.Contains(line, "CPU"):
+			cpu = firstFloatIn(line)
+		case strings.Contains(line, "Memory") || strings.Contains(line, "MEM"):
+			// prefer MemPerc inside (...)
+			if i := strings.LastIndex(line, "("); i >= 0 {
+				mem = firstFloatIn(line[i:])
+			} else {
+				mem = firstFloatIn(line)
+			}
+		case strings.Contains(line, "Net"):
+			rest := line
+			if i := strings.Index(line, ":"); i >= 0 {
+				rest = line[i+1:]
+			}
+			for _, p := range strings.Split(rest, "/") {
+				net += parseDockerBytesToKB(p)
+			}
+		}
+	}
+	return
+}
+
+func firstFloatIn(s string) float64 {
+	fields := strings.Fields(strings.ReplaceAll(s, "%", " "))
+	for _, f := range fields {
+		f = strings.Trim(f, "():,")
+		var v float64
+		if _, err := fmt.Sscanf(f, "%f", &v); err == nil {
+			return v
+		}
+	}
+	return 0
+}
+
+func parseDockerBytesToKB(s string) float64 {
+	s = strings.TrimSpace(strings.ToLower(s))
+	s = strings.TrimPrefix(s, "net i/o:")
+	s = strings.TrimSpace(s)
+	var v float64
+	var unit string
+	if _, err := fmt.Sscanf(s, "%f%s", &v, &unit); err != nil {
+		if _, err2 := fmt.Sscanf(s, "%f", &v); err2 != nil {
+			return 0
+		}
+	}
+	switch {
+	case strings.HasPrefix(unit, "b") && !strings.HasPrefix(unit, "bi"):
+		return v / 1024
+	case strings.HasPrefix(unit, "kb") || strings.HasPrefix(unit, "kib"):
+		return v
+	case strings.HasPrefix(unit, "mb") || strings.HasPrefix(unit, "mib"):
+		return v * 1024
+	case strings.HasPrefix(unit, "gb") || strings.HasPrefix(unit, "gib"):
+		return v * 1024 * 1024
+	default:
+		return v
+	}
 }
 
 func (a *App) containerPreviewVolumeLines(maxLines, width int) []string {
@@ -561,6 +683,11 @@ func (a *App) requestContainerPreview() tea.Cmd {
 		a.containerPreviewVolumes = nil
 		return nil
 	}
+	if a.containerPreviewID != "" && a.containerPreviewID != c.ID {
+		a.containerCPUHistory = nil
+		a.containerMemHistory = nil
+		a.containerNetHistory = nil
+	}
 	a.containerPreviewGen++
 	gen := a.containerPreviewGen
 	a.containerPreviewID = c.ID
@@ -570,21 +697,8 @@ func (a *App) requestContainerPreview() tea.Cmd {
 		logs, _ := collectors.DockerLogs(id, 30)
 		stats, _ := collectors.DockerContainerStats(target)
 		vols := collectors.DockerContainerVolumes(target)
-		cpu := 0.0
-		for _, line := range strings.Split(stats, "\n") {
-			if strings.Contains(line, "CPU") {
-				fields := strings.Fields(line)
-				for _, f := range fields {
-					f = strings.TrimSuffix(f, "%")
-					var v float64
-					if _, err := fmt.Sscanf(f, "%f", &v); err == nil {
-						cpu = v
-						break
-					}
-				}
-			}
-		}
-		return containerPreviewMsg{id: id, gen: gen, logs: logs, stats: stats, volumes: vols, cpu: cpu}
+		cpu, mem, net := parseDockerStatsSample(stats)
+		return containerPreviewMsg{id: id, gen: gen, logs: logs, stats: stats, volumes: vols, cpu: cpu, mem: mem, net: net}
 	}
 }
 
@@ -595,12 +709,17 @@ func (a *App) handleContainerPreview(msg containerPreviewMsg) {
 	a.containerPreviewLogs = msg.logs
 	a.containerPreviewStats = msg.stats
 	a.containerPreviewVolumes = msg.volumes
-	if msg.cpu > 0 || len(a.containerCPUHistory) > 0 {
-		a.containerCPUHistory = append(a.containerCPUHistory, msg.cpu)
-		if len(a.containerCPUHistory) > 40 {
-			a.containerCPUHistory = a.containerCPUHistory[len(a.containerCPUHistory)-40:]
-		}
+	a.containerCPUHistory = appendMetricHistory(a.containerCPUHistory, msg.cpu)
+	a.containerMemHistory = appendMetricHistory(a.containerMemHistory, msg.mem)
+	a.containerNetHistory = appendMetricHistory(a.containerNetHistory, msg.net)
+}
+
+func appendMetricHistory(hist []float64, v float64) []float64 {
+	hist = append(hist, v)
+	if len(hist) > 40 {
+		hist = hist[len(hist)-40:]
 	}
+	return hist
 }
 
 func (a *App) updateContainerFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {

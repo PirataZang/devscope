@@ -46,6 +46,7 @@ type ngrokLoadedMsg struct {
 	requests []ngrokutil.Request
 	agent    ngrokutil.AgentInfo
 	cfg      ngrokutil.ProjectConfig
+	foreign  int
 	err      string
 }
 
@@ -100,6 +101,7 @@ func (a *App) refreshNgrok(p *core.Project) tea.Cmd {
 	if p != nil {
 		path, name = p.Path, p.Name
 	}
+	showAll := a.ngrokShowAll
 	return func() tea.Msg {
 		cfg := ngrokutil.LoadProject(path, name)
 		agent := ngrokutil.PingAgent()
@@ -107,9 +109,16 @@ func (a *App) refreshNgrok(p *core.Project) tea.Cmd {
 		if err != nil && agent.Connected {
 			return ngrokLoadedMsg{cfg: cfg, agent: agent, err: err.Error()}
 		}
+		foreign := ngrokutil.CountForeignLive(cfg, live)
 		tunnels := ngrokutil.MergeTunnels(cfg, live)
+		if showAll {
+			tunnels = ngrokutil.MergeTunnelsAll(cfg, live)
+		}
 		reqs, _ := ngrokutil.ListHTTPRequests(50)
-		return ngrokLoadedMsg{tunnels: tunnels, requests: reqs, agent: agent, cfg: cfg}
+		return ngrokLoadedMsg{
+			tunnels: tunnels, requests: reqs, agent: agent, cfg: cfg,
+			foreign: foreign,
+		}
 	}
 }
 
@@ -121,6 +130,7 @@ func (a *App) handleNgrokMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.ngrokAgent = m.agent
 		a.ngrokTunnels = m.tunnels
 		a.ngrokRequests = m.requests
+		a.ngrokForeign = m.foreign
 		if m.err != "" {
 			a.ngrokErr = m.err
 		} else {
@@ -234,7 +244,11 @@ func (a *App) ngrokHints() string {
 	if a.ngrokWizard {
 		return "tab campo  ←→ cursor  space proto  backspace/del  enter salvar+start  esc"
 	}
-	base := "0-5 aba  tab painel  n new  s start  x stop  r restart  c copy  o open  d delete  esc"
+	scope := "A todos"
+	if a.ngrokShowAll {
+		scope = "A projeto"
+	}
+	base := "0-5 aba  tab painel  n new  s start  x stop  r restart  c copy  o open  d delete  " + scope + "  esc"
 	if a.ngrokLoading {
 		base = "carregando…  " + base
 	}
@@ -276,7 +290,14 @@ func (a *App) renderNgrokHeader(p *core.Project, width int) string {
 	if region == "" {
 		region = "us"
 	}
-	right := badge + StyleMuted.Render(fmt.Sprintf("  Plan:Free  Region:%s  v%s  Tunnels:%d", region, ver, online))
+	scope := StyleMuted.Render("projeto")
+	if a.ngrokShowAll {
+		scope = StyleAccent.Render("TODOS")
+	}
+	right := badge + StyleMuted.Render(fmt.Sprintf("  Region:%s  v%s  Tunnels:%d  ", region, ver, online)) + scope
+	if !a.ngrokShowAll && a.ngrokForeign > 0 {
+		right += StyleMuted.Render(fmt.Sprintf("  (+%d outros · A)", a.ngrokForeign))
+	}
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {
 		pad = 1
@@ -623,6 +644,7 @@ func (a *App) renderNgrokInspector(p *core.Project, width, height int) string {
 		StyleKey.Render("e") + StyleMuted.Render(" edit"),
 		StyleKey.Render("d") + StyleMuted.Render(" delete"),
 		StyleKey.Render("y") + StyleMuted.Render(" dup"),
+		StyleKey.Render("A") + StyleMuted.Render(" todos/proj"),
 	}
 	// Border (2) + all action rows; never taller than half the column.
 	actH := len(actions) + 2
@@ -838,6 +860,15 @@ func (a *App) ngrokSelected() (ngrokutil.Tunnel, bool) {
 	return a.ngrokTunnels[a.ngrokCursor], true
 }
 
+func ngrokTunnelInConfig(cfg ngrokutil.ProjectConfig, t ngrokutil.Tunnel) bool {
+	for _, c := range cfg.Tunnels {
+		if c.Name == t.Name || (c.Port > 0 && c.Port == t.Port) {
+			return true
+		}
+	}
+	return false
+}
+
 func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {
 	if a.ngrokConfirmDelete {
 		switch msg.String() {
@@ -904,8 +935,20 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		return a, a.ngrokCopyURL(true)
 	case "o", "O":
 		return a, a.ngrokOpenBrowser()
+	case "A":
+		a.ngrokShowAll = !a.ngrokShowAll
+		if a.ngrokShowAll {
+			a.ngrokStatus = "mostrando todos os túneis do agent"
+		} else {
+			a.ngrokStatus = "filtrando túneis do projeto"
+		}
+		return a, a.refreshNgrok(p)
 	case "d":
-		if _, ok := a.ngrokSelected(); ok {
+		if t, ok := a.ngrokSelected(); ok {
+			if a.ngrokShowAll && !ngrokTunnelInConfig(a.ngrokCfg, t) {
+				a.ngrokStatus = "túnel de outro projeto — só stop (x)"
+				return a, nil
+			}
 			a.ngrokConfirmDelete = true
 			a.ngrokStatus = "delete túnel da config?"
 		}

@@ -13,9 +13,15 @@ var (
 	ColorText      = lipgloss.Color("#F9FAFB")
 	ColorSubtext   = lipgloss.Color("#9CA3AF")
 	ColorBorder    = lipgloss.Color("#374151")
-	ColorBg        = lipgloss.Color("#111827")
-	ColorBgPanel   = lipgloss.Color("#1F2937")
+	ColorBg        = lipgloss.Color("#0D1117")
+	ColorBgPanel   = lipgloss.Color("#161B22")
 	ColorHighlight = lipgloss.Color("#A78BFA")
+	ColorSelBg     = lipgloss.Color("#21262D")
+
+	ColorJSONKey     = lipgloss.Color("#9CDCFE")
+	ColorJSONString  = lipgloss.Color("#CE9178")
+	ColorJSONNumber  = lipgloss.Color("#B5CEA8")
+	ColorJSONKeyword = lipgloss.Color("#C586C0")
 
 	ColorGo      = lipgloss.Color("#00ADD8")
 	ColorDocker  = lipgloss.Color("#2496ED")
@@ -81,15 +87,14 @@ var (
 			Foreground(ColorBg).
 			Background(ColorAccent)
 
-	// Body JSON syntax (VS Code-ish dark).
 	StyleJSONKey = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#9CDCFE"))
+			Foreground(ColorJSONKey)
 	StyleJSONString = lipgloss.NewStyle().
-			Foreground(ColorText)
+			Foreground(ColorJSONString)
 	StyleJSONNumber = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#B5CEA8"))
+			Foreground(ColorJSONNumber)
 	StyleJSONKeyword = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#C586C0"))
+				Foreground(ColorJSONKeyword)
 	StyleJSONPunct = lipgloss.NewStyle().
 			Foreground(ColorWarning).
 			Bold(true)

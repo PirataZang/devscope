@@ -12,6 +12,7 @@ import (
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/routeutil"
 	"github.com/devscope/devscope/internal/wsutil"
@@ -32,6 +33,10 @@ type App struct {
 
 	helpOn     bool
 	helpScroll int
+
+	themeOn       bool
+	themeCursor   int
+	themePrevious string // restore on esc
 
 	selectedProject             *core.Project
 	tab                         Tab
@@ -113,6 +118,9 @@ type App struct {
 	containerPreviewStats       string
 	containerPreviewVolumes     []string
 	containerCPUHistory         []float64
+	containerMemHistory         []float64
+	containerNetHistory         []float64
+	containerStatsMode          int // 0=all 1=cpu 2=mem 3=net
 	containerPreviewGen         int
 	containerDetailTab          containerDetailTab
 	containerDetailID           string
@@ -126,6 +134,14 @@ type App struct {
 	containerDetailFollow       bool
 	containerDetailFollowPaused bool
 	containerDetailFollowGen    int
+	containerDetailStatsLive    bool
+	containerDetailStatsGen     int
+	containerDetailStats        dockerStatsSample
+	containerDetailCPUHist      []float64
+	containerDetailMemHist      []float64
+	containerDetailNetHist      []float64
+	containerDetailBlkHist      []float64
+	containerDetailPIDHist      []float64
 	containerDetailSearchOn     bool
 	containerDetailSearchInput  string
 	containerDetailSearchQuery  string
@@ -166,6 +182,7 @@ type App struct {
 	dbOpen                      bool
 	dbEditing                   bool
 	dbLoading                   bool
+	dbSchemaLoading             bool
 	dbPane                      dbPane
 	dbTargets                   []collectors.DBTarget
 	dbTargetIdx                 int
@@ -177,7 +194,13 @@ type App struct {
 	dbResult                    string
 	dbResultScroll              int
 	dbResultHScroll             int
+	dbResultRows                int
 	dbErr                       string
+	dbFilterOn                  bool
+	dbFilter                    string
+	dbFilterInput               string
+	dbSchema                    collectors.DBTableInfo
+	dbSchemaErr                 string
 	k8sOpen                     bool
 	k8sEditing                  bool
 	k8sLoading                  bool
@@ -260,6 +283,9 @@ type App struct {
 	wsFrameSeq                  int
 	wsFrameCursor               int
 	wsMsgScroll                 int
+	wsMsgHScroll                int
+	wsSendVScroll               int
+	wsSendHScroll               int
 	wsFilter                    wsFilterKind
 	wsSearchOn                  bool
 	wsSearchInput               string
@@ -269,6 +295,9 @@ type App struct {
 	wsHistory                   []string
 	wsRecent                    []string
 	wsRecentCursor              int
+	wsEditSourceIdx             int
+	wsShowAll                   bool
+	wsAllCursor                 int
 	wsStats                     wsStats
 	wsInfo                      wsutil.Info
 	wsConnectedAt               time.Time
@@ -297,10 +326,42 @@ type App struct {
 	ngrokWizardCursor           int
 	ngrokStatus                 string
 	ngrokErr                    string
+	ngrokForeign                int  // live tunnels on agent that belong to other projects
+	ngrokShowAll                bool // true = list every live tunnel on the agent
 	ngrokTunnels                []ngrokutil.Tunnel
 	ngrokRequests               []ngrokutil.Request
 	ngrokCfg                    ngrokutil.ProjectConfig
 	ngrokAgent                  ngrokutil.AgentInfo
+	jenkinsOpen                 bool
+	jenkinsLoading              bool
+	jenkinsEditing              bool
+	jenkinsBuildDetail          bool
+	jenkinsSubTab               jenkinsSubTab
+	jenkinsFocus                jenkinsFocus
+	jenkinsCursor               int
+	jenkinsScroll               int
+	jenkinsBuildCursor          int
+	jenkinsBuildScroll          int
+	jenkinsLogScroll            int
+	jenkinsLogHScroll           int
+	jenkinsSetField             int
+	jenkinsSetCursor            int
+	jenkinsEditURL              string
+	jenkinsEditUser             string
+	jenkinsEditToken            string
+	jenkinsEditFolder           string
+	jenkinsEditRefresh          string
+	jenkinsJobFocus             string
+	jenkinsBuildFocus           int
+	jenkinsStatus               string
+	jenkinsErr                  string
+	jenkinsConsole              string
+	jenkinsQueue                int
+	jenkinsGen                  int
+	jenkinsJobs                 []jenkinsutil.Job
+	jenkinsBuilds               []jenkinsutil.Build
+	jenkinsCfg                  jenkinsutil.ProjectConfig
+	jenkinsInfo                 jenkinsutil.ServerInfo
 	fuzzyOn                     bool
 	fuzzyInput                  string
 	deployConfirm               bool
@@ -348,6 +409,7 @@ func (a *App) Init() tea.Cmd {
 }
 
 func (a *App) Run() error {
+	defer RestoreTerminalTheme()
 	p := tea.NewProgram(a, tea.WithAltScreen())
 	_, err := p.Run()
 	return err
@@ -356,6 +418,9 @@ func (a *App) Run() error {
 func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if a.themeOn {
+			return a.updateThemePicker(msg)
+		}
 		if a.helpOn {
 			return a.updateHelp(msg)
 		}
@@ -381,6 +446,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if a.routesFilterOn {
 			return a.updateRoutesFilter(msg)
+		}
+		if a.dbFilterOn {
+			return a.updateDbFilter(msg, a.currentProject())
 		}
 		if a.wsSearchOn {
 			return a.updateWsSearch(msg)
@@ -483,13 +551,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case containerDetailFollowMsg:
 		return a, a.handleContainerDetailFollow(msg)
 
+	case containerDetailStatsMsg:
+		return a, a.handleContainerDetailStats(msg)
+
 	case apiResponseMsg:
 		a.handleApiResponse(msg)
 		return a, nil
 
-	case dbTablesMsg:
-		return a.handleDbMsg(msg)
-	case dbQueryMsg:
+	case dbTablesMsg, dbQueryMsg, dbSchemaMsg:
 		return a.handleDbMsg(msg)
 
 	case k8sLoadedMsg, k8sActionMsg, k8sDetailMsg, k8sNsMsg, k8sEditReadyMsg, k8sInspectMsg, k8sMetaMsg:
@@ -503,6 +572,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a.handleWsMsg(msg)
 	case ngrokLoadedMsg, ngrokActionMsg:
 		return a.handleNgrokMsg(msg)
+
+	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
+		return a.handleJenkinsMsg(msg)
 
 	case projectLogFollowMsg:
 		if a.projectLogContainerID == msg.id && a.projectLogsFollow && !a.projectLogsPaused {
@@ -645,7 +717,7 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.view == ViewProject && a.tab == TabAPI && a.apiOpen && a.apiEditing {
 		return a.updateProject(msg)
 	}
-	if a.view == ViewProject && a.tab == TabDatabase && a.dbOpen && a.dbEditing {
+	if a.view == ViewProject && a.tab == TabDatabase && a.dbOpen && (a.dbEditing || a.dbFilterOn) {
 		return a.updateProject(msg)
 	}
 	if a.view == ViewProject && a.tab == TabKubernetes && a.k8sOpen && a.k8sEditing {
@@ -669,6 +741,10 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case msg.String() == "?":
 		a.helpOn = true
 		a.helpScroll = 0
+		return a, nil
+
+	case msg.String() == "T":
+		a.openThemePicker()
 		return a, nil
 
 	case msg.String() == "/":
@@ -790,9 +866,14 @@ func (a *App) closeToolClients() {
 	}
 	a.wsOpen = false
 	a.wsEditing = false
+	a.wsShowAll = false
 	a.ngrokOpen = false
 	a.ngrokWizard = false
 	a.ngrokConfirmDelete = false
+	a.jenkinsOpen = false
+	a.jenkinsEditing = false
+	a.jenkinsBuildDetail = false
+	a.jenkinsGen++
 }
 
 func tabIndex(t Tab) int {
@@ -843,6 +924,8 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterWsTab(p)
 	case TabNgrok:
 		a.enterNgrokTab(p)
+	case TabJenkins:
+		a.enterJenkinsTab(p)
 	}
 	return nil
 }
@@ -891,6 +974,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	}
 	if tab == TabNgrok {
 		a.ngrokOpen = false
+	}
+	if tab == TabJenkins {
+		a.jenkinsOpen = false
 	}
 	var cmds []tea.Cmd
 	cmds = append(cmds, a.startProjectLoad(cp.Path))
@@ -953,6 +1039,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.handleNgrokKeys(msg, p)
+	}
+	if a.tab == TabJenkins && a.jenkinsOpen {
+		return a.handleJenkinsKeys(msg, p)
 	}
 
 	switch msg.String() {
@@ -1113,6 +1202,11 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.gitTabReady(p) {
 			return a, a.gitPush(p)
 		}
+	case "g":
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			a.containerStatsMode = (a.containerStatsMode + 1) % 4
+			return a, nil
+		}
 	case "s":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
@@ -1236,6 +1330,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabNgrok && !a.ngrokOpen {
 			return a, a.openNgrokClient(p)
 		}
+		if a.tab == TabJenkins && !a.jenkinsOpen {
+			return a, a.openJenkinsClient(p)
+		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
 				return a, a.openContainerDetail(c, p.Path)
@@ -1324,47 +1421,34 @@ func (a *App) View() string {
 		return ""
 	}
 
-	if a.helpOn {
-		return a.renderHelpPopup(a.renderCurrentView())
+	var content string
+	switch {
+	case a.themeOn:
+		content = a.renderThemePopup(a.renderCurrentView())
+	case a.helpOn:
+		content = a.renderHelpPopup(a.renderCurrentView())
+	case a.fuzzyOn:
+		content = a.renderFuzzyPrompt()
+	case a.filterOn:
+		content = a.renderFilterPrompt()
+	case a.gitBranchFilterOn:
+		content = a.renderGitBranchFilterPrompt()
+	case a.gitDiffSearchOn:
+		content = a.renderGitDiffSearchPrompt()
+	case a.containerDetailSearchOn:
+		content = a.renderContainerDetailSearchPrompt()
+	case a.apiSearchOn:
+		content = a.renderApiSearchPrompt()
+	case a.gitPromptOn:
+		content = a.renderGitPrompt()
+	case a.dashboardSubview == dashboardSubviewShellReturn && a.view == ViewDashboard:
+		content = a.renderFullShellReturn(a.projectShellExitErr)
+	case a.containerSubview == containerSubviewShellReturn:
+		content = a.renderFullShellReturn(a.containerShellExitErr)
+	default:
+		content = a.renderCurrentView()
 	}
-
-	if a.fuzzyOn {
-		return a.renderFuzzyPrompt()
-	}
-
-	if a.filterOn {
-		return a.renderFilterPrompt()
-	}
-
-	if a.gitBranchFilterOn {
-		return a.renderGitBranchFilterPrompt()
-	}
-
-	if a.gitDiffSearchOn {
-		return a.renderGitDiffSearchPrompt()
-	}
-
-	if a.containerDetailSearchOn {
-		return a.renderContainerDetailSearchPrompt()
-	}
-
-	if a.apiSearchOn {
-		return a.renderApiSearchPrompt()
-	}
-
-	if a.gitPromptOn {
-		return a.renderGitPrompt()
-	}
-
-	if a.dashboardSubview == dashboardSubviewShellReturn && a.view == ViewDashboard {
-		return a.renderFullShellReturn(a.projectShellExitErr)
-	}
-
-	if a.containerSubview == containerSubviewShellReturn {
-		return a.renderFullShellReturn(a.containerShellExitErr)
-	}
-
-	return a.renderCurrentView()
+	return paintAppFrame(content, a.width, a.height)
 }
 
 func (a *App) renderCurrentView() string {
@@ -1421,7 +1505,7 @@ func (a *App) renderProject() string {
 		a.projectContentScroll = 0
 	}
 	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
-		return a.renderContainerTextScreen()
+		return a.renderContainerDetail(p)
 	}
 	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit || a.gitSubview == gitSubviewFileDiff) {
 		return a.renderGitTab(p)
@@ -1450,6 +1534,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.renderNgrokTab(p)
 	}
+	if a.tab == TabJenkins && a.jenkinsOpen {
+		return a.renderJenkinsTab(p)
+	}
 
 	sidebar := a.renderProjectSidebar()
 	contentWidth := maxInt(50, a.width-lipgloss.Width(sidebar)-3)
@@ -1470,7 +1557,8 @@ func (a *App) renderProject() string {
 		(a.tab == TabContainers && a.containerSubview == containerSubviewList) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
-		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen)
+		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen) ||
+		(a.tab == TabJenkins && !a.jenkinsOpen)
 	switch {
 	case moduleDash:
 		content = lipgloss.Place(contentWidth, panelH, lipgloss.Left, lipgloss.Top, content)
@@ -1521,6 +1609,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabNgrok && !a.ngrokOpen {
 		hints = "enter abrir Ngrok  " + hints
 	}
+	if a.tab == TabJenkins && !a.jenkinsOpen {
+		hints = "enter abrir Jenkins  " + hints
+	}
 	compact := a.projectCompact()
 	if compact {
 		hints = "tab switch  ↑↓/pg scroll  esc back  ? help"
@@ -1547,6 +1638,9 @@ func (a *App) renderProject() string {
 		}
 		if a.tab == TabNgrok && !a.ngrokOpen {
 			hints = "enter abrir Ngrok  " + hints
+		}
+		if a.tab == TabJenkins && !a.jenkinsOpen {
+			hints = "enter abrir Jenkins  " + hints
 		}
 	}
 
@@ -1682,6 +1776,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderWsLanding(p)
 	case TabNgrok:
 		return a.renderNgrokLanding(p)
+	case TabJenkins:
+		return a.renderJenkinsLanding(p)
 	default:
 		return a.renderOverviewTab(p)
 	}
@@ -1692,6 +1788,70 @@ func (a *App) helpViewport() int {
 		return 12
 	}
 	return maxInt(8, a.height-10)
+}
+
+func (a *App) openThemePicker() {
+	a.themeOn = true
+	a.themePrevious = CurrentTheme()
+	a.themeCursor = ThemeIndex(a.themePrevious)
+	ApplyTheme(Themes[a.themeCursor].ID)
+}
+
+func (a *App) updateThemePicker(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "esc", "T", "q":
+		ApplyTheme(a.themePrevious)
+		a.themeOn = false
+		a.statusMsg = "theme cancelado"
+	case "up", "k":
+		if a.themeCursor > 0 {
+			a.themeCursor--
+			ApplyTheme(Themes[a.themeCursor].ID)
+		}
+	case "down", "j":
+		if a.themeCursor < len(Themes)-1 {
+			a.themeCursor++
+			ApplyTheme(Themes[a.themeCursor].ID)
+		}
+	case "enter", " ":
+		name := Themes[a.themeCursor].ID
+		ApplyTheme(name)
+		if a.cfg != nil {
+			a.cfg.UI.Theme = name
+		}
+		if err := config.SaveTheme(name); err != nil {
+			a.statusMsg = "theme save falhou: " + err.Error()
+		} else {
+			a.statusMsg = "theme salvo → " + name
+		}
+		a.themeOn = false
+		a.themePrevious = name
+	}
+	return a, nil
+}
+
+func (a *App) renderThemePopup(background string) string {
+	lines := []string{
+		StyleSection.Render("Themes"),
+		StyleMuted.Render("↑↓ preview  ·  enter salva  ·  esc cancela"),
+		"",
+	}
+	for i, t := range Themes {
+		mark := "  "
+		label := StyleNormal.Render(fmt.Sprintf("%-12s", t.Label)) + StyleMuted.Render("  "+t.Desc)
+		if i == a.themeCursor {
+			mark = StyleSelected.Render("▸ ")
+			label = StyleSelected.Render(fmt.Sprintf("%-12s", t.Label)) + "  " + StyleMuted.Render(t.Desc)
+		} else if t.ID == a.themePrevious {
+			mark = StyleHealthy.Render("● ")
+		}
+		sw := swatch(t.pal.Bg) + swatch(t.pal.Primary) + swatch(t.pal.Accent) + swatch(t.pal.Success)
+		lines = append(lines, mark+sw+"  "+label)
+	}
+	lines = append(lines, "", StyleMuted.Render("salvo em ~/.config/devscope/config.yaml"))
+	boxWidth := minInt(64, maxInt(40, a.width-8))
+	box := StylePanel.Width(boxWidth).Background(ColorBgPanel).Render(strings.Join(lines, "\n"))
+	return overlayCentered(background, box, a.width, a.height)
 }
 
 func (a *App) renderHelpPopup(background string) string {
@@ -1795,6 +1955,7 @@ func getHelpText() string {
   /            Filtrar projetos
   ctrl+p       Filtro fuzzy de projetos
   ?            Alternar exibição de ajuda
+  T            Escolher theme (modal)
   q            Sair do DevScope
 
 Dashboard:
@@ -1816,43 +1977,6 @@ Abas de Projeto:
   R            Docker compose restart
   o            Abrir URL do projeto no navegador
 
-Aba JSON (UTILS):
-  enter        Abrir editor input/output
-  p            Pretty
-  m            Minify
-  v            Validate (linha/coluna do erro)
-  s            Sort Keys
-  w            JSON ⇄ YAML
-  t            JSON ⇄ TOML
-  x            JSON ⇄ XML
-  d            Diff input ↔ output
-  n            Remover campos nulos
-  /            Buscar por chave
-  c            Copiar resultado
-  e            Editar input
-  shift+←→↑↓   Selecionar (na edição)
-  ctrl+←→      Pular palavra
-  ctrl+shift+←→ Selecionar palavra
-  ctrl+a/c/x/v Selecionar tudo / copiar / recortar / colar
-  esc          Voltar para a landing / sair edição
-
-Aba JWT (UTILS):
-  enter        Abrir cliente (secret + token/claims + result)
-  d            Decode
-  v            Verify (HMAC + secret)
-  g            Generate claims template
-  s            Sign claims → JWT
-  c            Copy Claims
-  x            Export JSON (header+payload)
-  y            Copy token (clipboard; sign já copia)
-  Y            Copy result (decode/export)
-  ctrl+y       Copy token (mesmo em modo edição)
-  []           Alg HS256 / HS384 / HS512
-  ←→ / h l     Scroll horizontal no painel focado
-  e / enter    Editar secret ou token/claims (VS Code keys)
-  tab          secret │ token │ result
-  esc          Voltar para a landing
-
 Aba Rotas (UTILS):
   enter        Detectar stack + escanear rotas (OpenAPI/parsers)
   ↑↓ / j k     Navegar rotas
@@ -1863,22 +1987,28 @@ Aba Rotas (UTILS):
 
 Aba WebSocket (TOOLS):
   enter        Abrir Overview (3 colunas)
-  0-4          Overview / Messages / Send / History / Settings
-  c            Connect
-  d / x        Disconnect (x no Send limpa editor)
+  0-3          Overview / Messages / History / Settings
+  1            Messages (lista + send embaixo)
+  n            Nova connection (painel Connections)
+  e            Editar connection / Send / URL
+  x            Deletar connection (focus Connections)
+  c / enter    Conectar selecionada
+  d            Desconectar selecionada
+  A            Ver todas as connections (todos os projetos)
   r            Reconnect
-  tab          Connections → Filters → Messages → Send → Inspector
+  tab          Overview: painéis · Messages: lista ↔ send
+  ←→ / h l     Scroll horizontal (messages e send)
+  ↑↓ / j k     Scroll vertical / navegar frames
   f            Ciclar filtro (All/Text/JSON/Binary/Errors/In/Out)
   /            Buscar no payload
-  m            Ciclar modo Send ou Payload view
+  m            Send: Text → JSON → Binary (no Inspector: Pretty/Raw/Hex)
   []           Pretty / Raw / Hex no inspector
-  e            Editar Send (ou URL/Headers em Settings)
   enter        Enviar / conectar / reenviar history
   ctrl+enter   Enviar na edição
   ctrl+l       Limpar frames
   a            Auto reconnect (Settings)
   u            Porta do projeto
-  esc          Voltar (desconecta)
+  esc          Voltar (desconecta) / fechar lista A
 
 Aba Kubernetes:
   enter        Abrir cliente (pods/deploy/svc/manifests)

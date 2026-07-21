@@ -77,6 +77,10 @@ func (a *App) loadContainerDetailTab() tea.Cmd {
 	if a.containerDetailCache == nil {
 		a.containerDetailCache = make(map[containerDetailTab]string)
 	}
+	if a.containerDetailTab == containerDetailTabStats {
+		a.containerDetailLoading = len(a.containerDetailCPUHist) == 0
+		return a.startContainerDetailStatsLive()
+	}
 	if content, ok := a.containerDetailCache[a.containerDetailTab]; ok {
 		a.containerDetailContent = content
 		a.containerDetailLoading = false
@@ -105,6 +109,10 @@ func (a *App) handleContainerDetailLoaded(msg containerDetailLoadedMsg) tea.Cmd 
 		a.containerDetailCache = make(map[containerDetailTab]string)
 	}
 	a.containerDetailCache[msg.tab] = msg.content
+	if msg.tab == containerDetailTabStats {
+		a.applyContainerDetailStats(parseDockerStatsFull(msg.content))
+		return a.startContainerDetailStatsLive()
+	}
 	if msg.tab == containerDetailTabLogs && a.containerDetailFollow && !a.containerDetailFollowPaused {
 		return a.scheduleContainerDetailFollow()
 	}
@@ -380,6 +388,13 @@ func (a *App) openContainerDetail(c core.Container, projectPath string) tea.Cmd 
 	a.containerDetailFollow = false
 	a.containerDetailFollowPaused = false
 	a.containerDetailFollowGen++
+	a.stopContainerDetailStatsLive()
+	a.containerDetailStats = dockerStatsSample{}
+	a.containerDetailCPUHist = nil
+	a.containerDetailMemHist = nil
+	a.containerDetailNetHist = nil
+	a.containerDetailBlkHist = nil
+	a.containerDetailPIDHist = nil
 	a.containerDetailSearchOn = false
 	a.containerDetailSearchInput = ""
 	a.containerDetailSearchQuery = ""

@@ -8,6 +8,7 @@ type Route struct {
 	File    string // relative path (optional)
 	Line    int
 	Summary string
+	Auth    bool // protected / requires auth (best-effort from middleware/guards)
 }
 
 // Scanner extracts routes from a project tree for a given stack.

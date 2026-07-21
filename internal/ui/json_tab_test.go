@@ -8,22 +8,14 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
-func TestAllTabsIncludesJSON(t *testing.T) {
-	found := false
+func TestJSONNotInNav(t *testing.T) {
 	for _, tab := range AllTabs {
 		if tab == TabJSON {
-			found = true
-			break
+			t.Fatal("TabJSON should be removed from AllTabs")
 		}
-	}
-	if !found {
-		t.Fatal("TabJSON missing from AllTabs")
 	}
 	if TabJSON.String() != "JSON" {
 		t.Fatalf("String=%q", TabJSON.String())
-	}
-	if int(TabJSON) != 9 {
-		t.Fatalf("TabJSON index=%d want 9", TabJSON)
 	}
 }
 
@@ -91,13 +83,28 @@ func TestJsonShiftSelectAndCtrlWord(t *testing.T) {
 	}
 }
 
-func TestSidebarShowsUtilsJSON(t *testing.T) {
-	a := &App{width: 120, height: 40, tab: TabJSON}
+func TestSidebarHidesJSON(t *testing.T) {
+	a := &App{width: 120, height: 40, tab: TabRoutes}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "UTILS") || !strings.Contains(got, "JSON") {
-		t.Fatalf("sidebar missing UTILS/JSON: %q", got)
+	if !strings.Contains(got, "UTILS") || !strings.Contains(got, "Rotas") {
+		t.Fatalf("sidebar missing UTILS/Rotas: %q", got)
 	}
-	if !strings.Contains(got, "tab · shift+tab") {
-		t.Fatalf("footer should mention tab · shift+tab: %q", got)
+	if strings.Contains(got, "JSON") || strings.Contains(got, "JWT") {
+		t.Fatalf("sidebar should not list JSON/JWT: %q", got)
+	}
+}
+
+func TestJsonClientDashboard(t *testing.T) {
+	a := &App{
+		width: 120, height: 36, jsonOpen: true, tab: TabJSON,
+		jsonInput:  "{\n  \"hello\": \"devscope\",\n  \"n\": 1\n}\n",
+		jsonOutput: "{\n  \"hello\": \"devscope\",\n  \"n\": 1\n}\n",
+		jsonStatus: "pretty",
+	}
+	got := stripANSI(a.renderJsonTab(nil))
+	for _, want := range []string{"devscope", "json", "INPUT", "OUTPUT", "AÇÕES", "STATUS", "pretty"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("json client missing %q in:\n%s", want, got)
+		}
 	}
 }

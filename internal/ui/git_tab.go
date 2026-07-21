@@ -440,49 +440,129 @@ func gitScrollDownLine(n int) string {
 }
 
 func (a *App) renderGitBranchHistory(p *core.Project) string {
-	height := maxInt(12, a.height-2)
-	viewport := maxInt(1, height-7)
+	w := maxInt(72, a.width)
+	h := maxInt(18, a.height-2)
 	branch := a.gitViewBranch
-	if branch == "" && p.Git != nil {
+	if branch == "" && p != nil && p.Git != nil {
 		branch = p.Git.Branch
 	}
+	commits := a.gitDisplayedCommits()
+	if !a.gitBranchLoading && len(commits) > 0 {
+		a.gitCommitCursor = clampCursor(a.gitCommitCursor, len(commits))
+	}
 
-	title := StyleSection.Render(truncate("Commits  "+branch, maxInt(10, a.width-6)))
-	var body []string
-	position := ""
+	header := a.renderGitBranchHistoryHeader(p, branch, w)
+	cards := a.renderGitBranchHistoryCards(p, branch, commits, w)
+	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + 2
+	bodyH := maxInt(8, h-chromeH-2)
 
+	rightW := maxInt(24, w*28/100)
+	if rightW > 38 {
+		rightW = 38
+	}
+	leftW := maxInt(36, w-rightW-1)
+	list := a.renderGitBranchHistoryTable(commits, leftW, bodyH)
+	detail := a.renderGitBranchHistoryInspector(p, branch, commits, rightW, bodyH)
+	body := lipgloss.JoinHorizontal(lipgloss.Top, list, detail)
+
+	pos := ""
+	if n := len(commits); n > 0 {
+		pos = fmt.Sprintf("%d/%d", a.gitCommitCursor+1, n)
+	}
+	footer := StyleMuted.Render(truncate(
+		"↑↓ navegar  enter abrir commit  pgup/pgdn  "+pos+"  esc voltar",
+		maxInt(10, w-2),
+	))
+	return lipgloss.JoinVertical(lipgloss.Left,
+		header, cards, body, footer,
+		a.renderStatusBar("histórico · "+truncate(branch, 24)),
+	)
+}
+
+func (a *App) renderGitBranchHistoryHeader(p *core.Project, branch string, width int) string {
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabGit)).Bold(true)
+	left := accent.Render("devscope") + StyleMuted.Render(" › git › branch") +
+		StyleMuted.Render("  ") + StyleWarning.Render(truncate(branch, 28))
+	badge := StyleMuted.Render("○")
+	if p != nil && p.Git != nil && p.Git.Branch == branch {
+		badge = StyleHealthy.Render("● HEAD")
+	}
+	n := len(a.gitDisplayedCommits())
+	right := badge + StyleMuted.Render(fmt.Sprintf("  commits:%d", n))
 	if a.gitBranchLoading {
-		body = append(body, StyleMuted.Render("  Carregando commits..."))
-	} else {
-		commits := a.gitDisplayedCommits()
-		if len(commits) == 0 {
-			body = append(body, StyleMuted.Render("  (sem commits)"))
-		} else {
-			a.gitCommitCursor = clampCursor(a.gitCommitCursor, len(commits))
-			a.gitCommitScroll = ensureVisible(a.gitCommitCursor, a.gitCommitScroll, viewport, len(commits))
-			start := a.gitCommitScroll
-			end := minInt(start+viewport, len(commits))
-			for i := start; i < end; i++ {
-				body = append(body, a.renderGitBranchCommitLine(commits[i], i, maxInt(10, a.width-8)))
-			}
-			position = fmt.Sprintf("%d/%d", a.gitCommitCursor+1, len(commits))
+		right += StyleMuted.Render("  · atualizando…")
+	}
+	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
+	if pad < 1 {
+		pad = 1
+	}
+	return left + strings.Repeat(" ", pad) + right
+}
+
+func (a *App) renderGitBranchHistoryCards(p *core.Project, branch string, commits []core.GitCommit, width int) string {
+	authors := gitUniqueAuthors(commits)
+	tip := "—"
+	if len(commits) > 0 {
+		tip = commits[0].Date
+		if tip == "" {
+			tip = "—"
 		}
 	}
-	for len(body) < viewport {
-		body = append(body, "")
+	head := "outra"
+	aheadBehind := "—"
+	if p != nil && p.Git != nil {
+		if p.Git.Branch == branch {
+			head = "sim"
+			aheadBehind = fmt.Sprintf("↑%d ↓%d", p.Git.Ahead, p.Git.Behind)
+		}
 	}
+	boxW := maxInt(12, width/5)
+	cards := []struct{ title, value string }{
+		{"BRANCH", branch},
+		{"COMMITS", fmt.Sprintf("%d", len(commits))},
+		{"AUTHORS", fmt.Sprintf("%d", len(authors))},
+		{"TIP", tip},
+		{"HEAD", head + "  " + aheadBehind},
+	}
+	parts := make([]string, 0, len(cards))
+	for _, c := range cards {
+		val := StyleNormal.Render(truncate(c.value, boxW-4))
+		switch c.title {
+		case "BRANCH":
+			val = StyleWarning.Render(truncate(c.value, boxW-4))
+		case "HEAD":
+			if head == "sim" {
+				val = StyleHealthy.Render(truncate(c.value, boxW-4))
+			}
+		}
+		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
 
-	footer := StyleMuted.Render(truncate(
-		"↑↓ navegar  enter abrir commit  "+position+"  esc voltar",
-		maxInt(10, a.width-6),
-	))
-	panel := StylePanel.
-		Width(maxInt(10, a.width-6)).
-		Render(strings.Join([]string{title, strings.Join(body, "\n"), footer}, "\n"))
-	return lipgloss.JoinVertical(lipgloss.Left,
-		fitProjectPanel(panel, a.width, height),
-		a.renderStatusBar("histórico da branch"),
-	)
+func (a *App) renderGitBranchHistoryTable(commits []core.GitCommit, width, height int) string {
+	viewport := maxInt(1, height-2)
+	lines := make([]string, 0, viewport)
+	if len(commits) == 0 {
+		if a.gitBranchLoading {
+			lines = append(lines, StyleMuted.Render("  Carregando commits…"))
+		} else {
+			lines = append(lines, StyleMuted.Render("  (sem commits nesta branch)"))
+		}
+	} else {
+		a.gitCommitScroll = ensureVisible(a.gitCommitCursor, a.gitCommitScroll, viewport-1, len(commits))
+		header := StyleMuted.Render(truncate(
+			fmt.Sprintf("  %-8s %-12s %-14s %s", "HASH", "WHEN", "AUTHOR", "MESSAGE"),
+			width-2,
+		))
+		lines = append(lines, header)
+		start := a.gitCommitScroll
+		end := minInt(start+viewport-1, len(commits))
+		for i := start; i < end; i++ {
+			lines = append(lines, a.renderGitBranchCommitLine(commits[i], i, width-2))
+		}
+	}
+	return renderApiTitledBox("COMMITS", fitExactLines(lines, viewport), width, height, true)
 }
 
 func (a *App) renderGitBranchCommitLine(c core.GitCommit, idx, width int) string {
@@ -490,19 +570,151 @@ func (a *App) renderGitBranchCommitLine(c core.GitCommit, idx, width int) string
 	if a.gitCommitCursor == idx {
 		marker = "▶ "
 	}
-	msgW := maxInt(8, width-28)
-	line := fmt.Sprintf("%s%-9s  %-*s  %s",
+	msgW := maxInt(8, width-40)
+	when := c.Date
+	if when == "" {
+		when = "—"
+	}
+	line := fmt.Sprintf("%s%-8s %-12s %-14s %s",
 		marker,
-		truncate(c.Hash, 9),
-		msgW,
-		truncate(c.Message, msgW),
+		truncate(c.Hash, 8),
+		truncate(when, 12),
 		truncate(c.Author, 14),
+		truncate(c.Message, msgW),
 	)
 	line = truncate(line, width)
 	if a.gitCommitCursor == idx {
 		return StyleSelected.Render(line)
 	}
-	return StyleNormal.Render(line)
+	hash := StyleAccent.Render(truncate(c.Hash, 8))
+	rest := StyleMuted.Render(fmt.Sprintf(" %-12s %-14s ", truncate(when, 12), truncate(c.Author, 14))) +
+		StyleNormal.Render(truncate(c.Message, msgW))
+	return marker + hash + rest
+}
+
+func (a *App) renderGitBranchHistoryInspector(p *core.Project, branch string, commits []core.GitCommit, width, height int) string {
+	detH := maxInt(8, height*55/100)
+	actH := maxInt(5, height*22/100)
+	authH := maxInt(4, height-detH-actH)
+
+	details := []string{StyleMuted.Render("(nenhum commit)")}
+	if len(commits) == 0 && a.gitBranchLoading {
+		details = []string{StyleMuted.Render("carregando…")}
+	} else if len(commits) > 0 && a.gitCommitCursor < len(commits) {
+		c := commits[a.gitCommitCursor]
+		details = []string{
+			StyleMuted.Render("Hash    ") + StyleAccent.Render(c.Hash),
+			StyleMuted.Render("Author  ") + StyleNormal.Render(truncate(c.Author, width-12)),
+			StyleMuted.Render("When    ") + StyleMuted.Render(firstNonEmpty(c.Date, "—")),
+			StyleMuted.Render("Branch  ") + StyleWarning.Render(truncate(branch, width-12)),
+			"",
+			StyleMuted.Render("Message"),
+		}
+		for _, part := range wrapGitMessage(c.Message, width-4) {
+			details = append(details, StyleNormal.Render(part))
+		}
+		if p != nil && p.Git != nil && p.Git.Branch == branch && a.gitCommitCursor == 0 {
+			details = append(details, "", StyleHealthy.Render("● tip da HEAD"))
+		}
+	}
+
+	actions := moduleActionLines(
+		[2]string{"enter", "abrir commit"},
+		[2]string{"esc", "voltar"},
+		[2]string{"↑↓", "navegar"},
+		[2]string{"pg", "página"},
+	)
+
+	authors := gitAuthorCounts(commits)
+	authLines := []string{StyleMuted.Render("(sem autores)")}
+	if len(authors) > 0 {
+		authLines = authLines[:0]
+		maxN := authors[0].n
+		show := minInt(6, len(authors))
+		barW := maxInt(6, width-16)
+		for i := 0; i < show; i++ {
+			au := authors[i]
+			pct := 100.0 * float64(au.n) / float64(maxN)
+			authLines = append(authLines,
+				StyleMuted.Render(fmt.Sprintf("%-10s ", truncate(au.name, 10)))+
+					meterBar(pct, barW)+
+					StyleMuted.Render(fmt.Sprintf(" %d", au.n)),
+			)
+		}
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
+		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		renderApiTitledBox("AUTHORS", fitExactLines(authLines, authH-2), width, authH, false),
+	)
+}
+
+func wrapGitMessage(msg string, width int) []string {
+	msg = strings.TrimSpace(msg)
+	if msg == "" {
+		return []string{StyleMuted.Render("(sem mensagem)")}
+	}
+	if width < 8 {
+		width = 8
+	}
+	var out []string
+	for len(msg) > 0 {
+		if len(msg) <= width {
+			out = append(out, msg)
+			break
+		}
+		out = append(out, msg[:width])
+		msg = msg[width:]
+		if len(out) >= 6 {
+			if msg != "" {
+				out[len(out)-1] = truncate(out[len(out)-1]+"…", width)
+			}
+			break
+		}
+	}
+	return out
+}
+
+type gitAuthorCount struct {
+	name string
+	n    int
+}
+
+func gitUniqueAuthors(commits []core.GitCommit) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, c := range commits {
+		if c.Author == "" || seen[c.Author] {
+			continue
+		}
+		seen[c.Author] = true
+		out = append(out, c.Author)
+	}
+	return out
+}
+
+func gitAuthorCounts(commits []core.GitCommit) []gitAuthorCount {
+	m := map[string]int{}
+	for _, c := range commits {
+		if c.Author == "" {
+			continue
+		}
+		m[c.Author]++
+	}
+	out := make([]gitAuthorCount, 0, len(m))
+	for name, n := range m {
+		out = append(out, gitAuthorCount{name: name, n: n})
+	}
+	// simple desc sort
+	for i := 0; i < len(out); i++ {
+		for j := i + 1; j < len(out); j++ {
+			if out[j].n > out[i].n {
+				out[i], out[j] = out[j], out[i]
+			}
+		}
+	}
+	return out
 }
 
 func (a *App) renderGitCommitDetail(p *core.Project) string {
@@ -1136,7 +1348,9 @@ func (a *App) gitShowWorkingTree() bool {
 }
 
 func (a *App) gitBranchHistoryViewport() int {
-	return maxInt(1, maxInt(12, a.height-2)-7)
+	h := maxInt(18, a.height-2)
+	// header(~1) + cards(~3) + footer/status(~3) + box chrome(~2)
+	return maxInt(5, h-10)
 }
 
 func (a *App) gitCommitDiffViewport() int {

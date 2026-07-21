@@ -1,8 +1,10 @@
 package ui
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -75,9 +77,16 @@ func (a *App) renderJwtLanding(p *core.Project) string {
 	rightW := a.moduleRightWidth(w)
 	centerW := maxInt(36, w-rightW-1)
 
-	openH := maxInt(5, bodyH*30/100)
-	keysH := maxInt(6, bodyH-openH)
-	openLines := append([]string{StyleMuted.Render("decode, verify, generate e sign — estilo jwt.io")}, moduleOpenHint()...)
+	openH := maxInt(5, bodyH*28/100)
+	featH := maxInt(5, bodyH*28/100)
+	keysH := maxInt(6, bodyH-openH-featH)
+	openLines := append([]string{StyleMuted.Render("decode · verify · generate · sign — estilo jwt.io")}, moduleOpenHint()...)
+	featLines := []string{
+		StyleMuted.Render("token colorido (header · payload · sig)"),
+		StyleMuted.Render("claims com times (iat/nbf/exp)"),
+		StyleMuted.Render("HS* / RS* / ES* / EdDSA  ·  [] troca alg"),
+		StyleMuted.Render("export JSON  ·  copy token/result"),
+	}
 	keyLines := []string{
 		StyleMuted.Render("d Decode   v Verify   g Generate   s Sign"),
 		StyleMuted.Render("y Copy token   Y Copy result   c Claims"),
@@ -86,16 +95,17 @@ func (a *App) renderJwtLanding(p *core.Project) string {
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("JWT", fitExactLines(openLines, openH-2), centerW, openH, true),
+		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 		renderApiTitledBox("ATALHOS", fitExactLines(keyLines, keysH-2), centerW, keysH, false),
 	)
 	details := []string{
-		StyleMuted.Render("Algs   HS* / RS* / ES* / EdDSA"),
-		StyleMuted.Render("Modos  decode · verify · sign"),
-		StyleMuted.Render("Extra  claims · export"),
+		StyleMuted.Render("Alg   ") + StyleNormal.Render(firstNonEmpty(a.jwtAlg, "HS256")),
+		StyleMuted.Render("Modos ") + StyleMuted.Render("decode·verify·sign"),
+		StyleMuted.Render("Extra ") + StyleMuted.Render("claims · export"),
 	}
 	actions := moduleActionLines(
 		[2]string{"enter", "abrir cliente"},
-		[2]string{"0", "abrir JSON"},
+		[2]string{"tab", "módulo"},
 		[2]string{"esc", "voltar"},
 	)
 	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
@@ -103,17 +113,27 @@ func (a *App) renderJwtLanding(p *core.Project) string {
 }
 
 func (a *App) renderJwtTab(_ *core.Project) string {
-	w := maxInt(60, a.width)
+	w := maxInt(72, a.width)
 	h := maxInt(18, a.height-2)
-	leftW := maxInt(28, (w-1)/2)
-	rightW := maxInt(28, w-leftW-1)
-	bodyH := h - 5
+	header := a.renderJwtHeader(w)
+	algs := a.renderJwtAlgBar(w)
+	cards := a.renderJwtStatsCards(w)
+	secret := a.renderJwtSecretBox(w)
+	chromeH := lipgloss.Height(header) + lipgloss.Height(algs) + lipgloss.Height(cards) + lipgloss.Height(secret) + 2
+	bodyH := maxInt(8, h-chromeH)
 
-	header := a.renderJwtHeader()
-	secretLine := a.renderJwtSecretLine(w)
+	rightW := maxInt(22, w*24/100)
+	if rightW > 34 {
+		rightW = 34
+	}
+	panesW := w - rightW - 1
+	leftW := maxInt(28, (panesW-1)/2)
+	midW := maxInt(28, panesW-leftW-1)
+
 	left := a.renderJwtInputPane(leftW, bodyH)
-	right := a.renderJwtOutputPane(rightW, bodyH)
-	body := lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
+	mid := a.renderJwtOutputPane(midW, bodyH)
+	rail := a.renderJwtActionRail(rightW, bodyH)
+	body := lipgloss.JoinHorizontal(lipgloss.Top, left, mid, rail)
 
 	hints := "d/v/g/s  y token  Y result  c claims  x export  [] alg  ←→  e  tab  esc"
 	if a.jwtEditing {
@@ -122,62 +142,208 @@ func (a *App) renderJwtTab(_ *core.Project) string {
 	if a.jwtStatus != "" {
 		hints = a.jwtStatus + "  ·  " + hints
 	}
-	return lipgloss.JoinVertical(lipgloss.Left, header, secretLine, body, a.renderStatusBar(hints))
+	return lipgloss.JoinVertical(lipgloss.Left, header, algs, cards, secret, body, a.renderStatusBar(hints))
 }
 
-func (a *App) renderJwtHeader() string {
+func (a *App) renderJwtHeader(width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabJWT)).Bold(true)
+	left := accent.Render("devscope") + StyleMuted.Render(" › jwt") +
+		StyleMuted.Render("  ") + StyleNormal.Render(firstNonEmpty(a.jwtAlg, "HS256"))
+	right := StyleMuted.Render("jwt.io-style")
+	if a.jwtErr != "" {
+		right = StyleUnhealthy.Render(truncate(a.jwtErr, 40))
+	} else if a.jwtStatus != "" {
+		right = StyleHealthy.Render(truncate(a.jwtStatus, 32))
+	} else if a.jwtEditing {
+		right = StyleWarning.Render("EDIT")
+	}
+	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
+	if pad < 1 {
+		pad = 1
+	}
+	return left + strings.Repeat(" ", pad) + right
+}
+
+func (a *App) renderJwtAlgBar(width int) string {
 	algs := jwtutil.Algs()
 	var parts []string
 	for _, alg := range algs {
 		if alg == a.jwtAlg {
-			parts = append(parts, StyleSelected.Render(">"+alg+"<"))
+			parts = append(parts, StyleSelected.Render(" "+alg+" "))
 		} else {
-			parts = append(parts, StyleMuted.Render(alg))
+			parts = append(parts, StyleMuted.Render(" "+alg+" "))
 		}
 	}
-	line := accent.Render("⚿ JWT") + "  " + strings.Join(parts, " ")
-	if a.jwtErr != "" {
-		line += "  " + StyleUnhealthy.Render(truncate(a.jwtErr, 40))
-	} else if a.jwtStatus != "" {
-		line += "  " + StyleHealthy.Render(truncate(a.jwtStatus, 32))
-	}
-	return line
+	line := StyleMuted.Render("ALG ") + strings.Join(parts, StyleMuted.Render("│")) + StyleMuted.Render("  [ ]")
+	return truncate(line, width)
 }
 
-func (a *App) renderJwtSecretLine(width int) string {
+func (a *App) renderJwtStatsCards(width int) string {
+	info := a.jwtTokenInfo()
+	boxW := maxInt(12, width/5)
+	expStyle := StyleHealthy
+	if info.expired {
+		expStyle = StyleUnhealthy
+	} else if info.expLabel == "—" {
+		expStyle = StyleMuted
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top,
+		renderStatsCard("ALG", firstNonEmpty(info.alg, a.jwtAlg), StyleMuted.Render("[] troca"), StyleAccent, boxW, 3),
+		" ",
+		renderStatsCard("PARTS", fmt.Sprintf("%d", info.parts), StyleMuted.Render("header.payload.sig"), StyleNormal, boxW, 3),
+		" ",
+		renderStatsCard("CLAIMS", fmt.Sprintf("%d", info.claims), StyleMuted.Render("payload keys"), StyleWarning, boxW, 3),
+		" ",
+		renderStatsCard("EXP", info.expLabel, StyleMuted.Render("validade"), expStyle, boxW, 3),
+		" ",
+		renderStatsCard("STATUS", info.status, StyleMuted.Render(a.jwtStatus), StyleHealthy, boxW, 3),
+	)
+}
+
+type jwtTokenInfo struct {
+	alg, expLabel, status string
+	parts, claims         int
+	expired               bool
+}
+
+func (a *App) jwtTokenInfo() jwtTokenInfo {
+	info := jwtTokenInfo{alg: a.jwtAlg, expLabel: "—", status: "idle", parts: 0}
+	tok := strings.TrimSpace(a.jwtSourceToken())
+	if tok == "" {
+		tok = strings.TrimSpace(a.jwtInput)
+	}
+	if lookLikeJWT(tok) {
+		info.parts = strings.Count(tok, ".") + 1
+		if header, payload, err := jwtutil.Decode(tok); err == nil {
+			if alg, _ := header["alg"].(string); alg != "" {
+				info.alg = alg
+			}
+			info.claims = len(payload)
+			info.status = "decoded"
+			if sec, ok := jwtExpSeconds(payload["exp"]); ok {
+				t := time.Unix(sec, 0)
+				if time.Now().After(t) {
+					info.expired = true
+					info.expLabel = "expired"
+					info.status = "expired"
+				} else {
+					info.expLabel = time.Until(t).Round(time.Minute).String()
+				}
+			}
+		} else {
+			info.status = "bad token"
+		}
+	} else if strings.HasPrefix(strings.TrimSpace(a.jwtInput), "{") {
+		info.status = "claims"
+		info.parts = 0
+	}
+	if a.jwtErr != "" {
+		info.status = "error"
+	} else if strings.Contains(strings.ToUpper(a.jwtOutput), "VALID") {
+		info.status = "valid"
+	}
+	return info
+}
+
+func jwtExpSeconds(v any) (int64, bool) {
+	switch t := v.(type) {
+	case float64:
+		return int64(t), true
+	case int64:
+		return t, true
+	case int:
+		return int64(t), true
+	default:
+		return 0, false
+	}
+}
+
+func (a *App) renderJwtSecretBox(width int) string {
 	focus := a.jwtPane == jwtPaneSecret
-	label := StyleMuted.Render("secret ")
-	innerW := maxInt(12, width-10)
+	innerW := maxInt(12, width-4)
 	val := a.jwtSecret
 	h := a.jwtHScrollSecret
+	var show string
 	if a.jwtEditing && focus {
 		ed := a.jwtEdit
 		ed.HScroll = h
 		lines := renderEditorLines(val, &ed, innerW, 1, true, false)
 		a.jwtEdit.HScroll = ed.HScroll
 		a.jwtHScrollSecret = ed.HScroll
-		show := ""
 		if len(lines) > 0 {
 			show = lines[0]
 		}
-		return label + StyleSelected.Render(show)
+	} else {
+		runes := []rune(val)
+		if h > len(runes) {
+			h = len(runes)
+		}
+		a.jwtHScrollSecret = h
+		show = truncate(string(runes[h:]), innerW)
+		if !focus {
+			// mask most of secret when not focused
+			show = jwtMaskSecret(val, innerW)
+		}
 	}
-	runes := []rune(val)
-	if h > len(runes) {
-		h = len(runes)
-	}
-	a.jwtHScrollSecret = h
-	show := string(runes[h:])
-	show = truncate(show, innerW)
-	titleExtra := ""
-	if h > 0 {
-		titleExtra = StyleMuted.Render(" ←" + strconv.Itoa(h) + " ")
-	}
+	title := "SECRET"
 	if focus {
-		return label + titleExtra + StyleSelected.Render(show)
+		title = "> SECRET"
 	}
-	return label + titleExtra + StyleNormal.Render(show)
+	if a.jwtHScrollSecret > 0 {
+		title += " ←" + strconv.Itoa(a.jwtHScrollSecret)
+	}
+	line := StyleNormal.Render(show)
+	if focus {
+		line = StyleSelected.Render(stripANSI(show))
+		if a.jwtEditing {
+			line = show // already styled by editor
+		}
+	}
+	return renderApiTitledBox(title, fitExactLines([]string{line}, 1), width, 3, focus)
+}
+
+func jwtMaskSecret(s string, width int) string {
+	if s == "" {
+		return "(vazio)"
+	}
+	if len(s) <= 4 {
+		return strings.Repeat("*", len(s))
+	}
+	masked := strings.Repeat("*", len(s)-4) + s[len(s)-4:]
+	return truncate(masked, width)
+}
+
+func (a *App) renderJwtActionRail(width, height int) string {
+	info := a.jwtTokenInfo()
+	sumH := maxInt(6, height*40/100)
+	actH := maxInt(6, height-sumH)
+	summary := []string{
+		StyleMuted.Render("Alg    ") + StyleAccent.Render(info.alg),
+		StyleMuted.Render("Parts  ") + StyleNormal.Render(fmt.Sprintf("%d", info.parts)),
+		StyleMuted.Render("Claims ") + StyleNormal.Render(fmt.Sprintf("%d", info.claims)),
+		StyleMuted.Render("Exp    ") + StyleNormal.Render(info.expLabel),
+		StyleMuted.Render("Status ") + StyleHealthy.Render(info.status),
+	}
+	if info.expired {
+		summary[3] = StyleMuted.Render("Exp    ") + StyleUnhealthy.Render("expired")
+	}
+	if a.jwtErr != "" {
+		summary = append(summary, StyleUnhealthy.Render(truncate(a.jwtErr, width-4)))
+	}
+	actions := moduleActionLines(
+		[2]string{"d", "decode"},
+		[2]string{"v", "verify"},
+		[2]string{"g", "generate"},
+		[2]string{"s", "sign"},
+		[2]string{"c", "claims"},
+		[2]string{"x", "export"},
+		[2]string{"y/Y", "copy"},
+		[2]string{"e", "editar"},
+	)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("TOKEN", fitExactLines(summary, sumH-2), width, sumH, false),
+		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+	)
 }
 
 func (a *App) renderJwtInputPane(width, height int) string {
@@ -185,7 +351,10 @@ func (a *App) renderJwtInputPane(width, height int) string {
 	viewport := maxInt(1, height-2)
 	innerW := maxInt(8, width-2)
 	editing := a.jwtEditing && focus
-	title := paneTitleWithHScroll("token / claims", a.jwtHScrollIn)
+	title := paneTitleWithHScroll("TOKEN / CLAIMS", a.jwtHScrollIn)
+	if focus {
+		title = "> " + title
+	}
 
 	ed := a.jwtEdit
 	ed.VScroll = a.jwtScrollIn
@@ -208,8 +377,15 @@ func (a *App) renderJwtOutputPane(width, height int) string {
 	focus := a.jwtPane == jwtPaneOutput
 	viewport := maxInt(1, height-2)
 	innerW := maxInt(8, width-2)
-	title := paneTitleWithHScroll("result", a.jwtHScrollOut)
-	lines := a.renderJwtStaticLines(a.jwtOutput, a.jwtScrollOut, a.jwtHScrollOut, innerW, viewport, focus, false)
+	title := paneTitleWithHScroll("RESULT", a.jwtHScrollOut)
+	if focus {
+		title = "> " + title
+	}
+	content := a.jwtOutput
+	if strings.TrimSpace(content) == "" {
+		content = "(decode / verify / sign para ver resultado)"
+	}
+	lines := a.renderJwtStaticLines(content, a.jwtScrollOut, a.jwtHScrollOut, innerW, viewport, focus, false)
 	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, focus)
 }
 
@@ -229,12 +405,20 @@ func (a *App) renderJwtStaticLines(content string, vScroll, hScroll, width, heig
 	lines := make([]string, 0, height)
 	for _, line := range raw[start:end] {
 		plain := sanitizeTerminalLine(line)
+		trim := strings.TrimSpace(plain)
 		display := sliceColumns(plain, hScroll, width)
-		if colorJWT && strings.Count(plain, ".") >= 2 && !strings.HasPrefix(strings.TrimSpace(plain), "{") {
+		switch {
+		case colorJWT && strings.Count(plain, ".") >= 2 && !strings.HasPrefix(trim, "{"):
 			display = colorJWTTokenLine(plain, hScroll, width)
-		} else if focus && strings.HasPrefix(strings.TrimSpace(plain), "{") {
+		case trim == "HEADER" || trim == "PAYLOAD" || trim == "TIMES" || strings.HasPrefix(trim, "ALG"):
+			display = StyleAccent.Bold(true).Render(display)
+		case strings.Contains(trim, "VALID"):
+			display = StyleHealthy.Render(display)
+		case strings.Contains(trim, "INVALID") || strings.Contains(trim, "expirado"):
+			display = StyleUnhealthy.Render(display)
+		case strings.HasPrefix(trim, "{") || strings.HasPrefix(trim, "\"") || strings.HasPrefix(trim, "}"):
 			display = renderJSONColumns(plain, hScroll, width)
-		} else {
+		default:
 			style := StyleMuted
 			if focus {
 				style = StyleNormal

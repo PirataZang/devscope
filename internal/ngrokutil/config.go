@@ -93,16 +93,27 @@ func (c *ProjectConfig) RemoveTunnel(name string) {
 	c.Tunnels = out
 }
 
+// MergeTunnels keeps only tunnels from this project's config.
+// Live agent tunnels from other projects are ignored (agent is global).
 func MergeTunnels(cfg ProjectConfig, live []Tunnel) []Tunnel {
 	byName := map[string]Tunnel{}
+	byPort := map[int][]Tunnel{}
 	for _, t := range live {
-		t.Project = cfg.Project
 		byName[t.Name] = t
+		if t.Port > 0 {
+			byPort[t.Port] = append(byPort[t.Port], t)
+		}
 	}
 	var out []Tunnel
-	seen := map[string]bool{}
 	for _, c := range cfg.Tunnels {
-		if liveT, ok := byName[c.Name]; ok {
+		liveT, ok := byName[c.Name]
+		if !ok && c.Port > 0 {
+			if matches := byPort[c.Port]; len(matches) == 1 {
+				liveT, ok = matches[0], true
+			}
+		}
+		if ok {
+			liveT.Name = c.Name
 			liveT.Project = cfg.Project
 			if liveT.Port == 0 {
 				liveT.Port = c.Port
@@ -110,8 +121,10 @@ func MergeTunnels(cfg ProjectConfig, live []Tunnel) []Tunnel {
 			if liveT.Proto == "" {
 				liveT.Proto = c.Proto
 			}
+			if liveT.Domain == "" {
+				liveT.Domain = c.Domain
+			}
 			out = append(out, liveT)
-			seen[c.Name] = true
 			continue
 		}
 		out = append(out, Tunnel{
@@ -123,13 +136,51 @@ func MergeTunnels(cfg ProjectConfig, live []Tunnel) []Tunnel {
 			Region:  c.Region,
 			Status:  "offline",
 		})
-		seen[c.Name] = true
 	}
+	return out
+}
+
+// CountForeignLive returns how many live tunnels are not in this project config.
+func CountForeignLive(cfg ProjectConfig, live []Tunnel) int {
+	owned := map[string]bool{}
+	ports := map[int]bool{}
+	for _, c := range cfg.Tunnels {
+		owned[c.Name] = true
+		if c.Port > 0 {
+			ports[c.Port] = true
+		}
+	}
+	n := 0
 	for _, t := range live {
-		if seen[t.Name] {
+		if owned[t.Name] || (t.Port > 0 && ports[t.Port]) {
 			continue
 		}
-		t.Project = cfg.Project
+		n++
+	}
+	return n
+}
+
+// MergeTunnelsAll lists this project's tunnels first, then other live agent tunnels.
+func MergeTunnelsAll(cfg ProjectConfig, live []Tunnel) []Tunnel {
+	out := MergeTunnels(cfg, live)
+	ownedName := map[string]bool{}
+	ownedPort := map[int]bool{}
+	for _, t := range out {
+		ownedName[t.Name] = true
+		if t.Port > 0 {
+			ownedPort[t.Port] = true
+		}
+	}
+	for _, t := range live {
+		if ownedName[t.Name] || (t.Port > 0 && ownedPort[t.Port]) {
+			continue
+		}
+		if t.Project == "" || t.Project == cfg.Project {
+			t.Project = "(outro)"
+		}
+		if t.Status == "" {
+			t.Status = "online"
+		}
 		out = append(out, t)
 	}
 	return out

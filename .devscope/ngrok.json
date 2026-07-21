@@ -1,0 +1,14 @@
+{
+  "project": "devscope-main",
+  "region": "us",
+  "tunnels": [
+    {
+      "name": "so",
+      "port": 8080,
+      "proto": "http",
+      "region": "us",
+      "created_at": "2026-07-21T08:25:13.999755915-03:00"
+    }
+  ],
+  "updated_at": "2026-07-21T08:25:13.999756868-03:00"
+}

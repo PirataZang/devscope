@@ -50,12 +50,27 @@ func mergeRoutes(in []Route) []Route {
 			continue
 		}
 		if prev.Source != "openapi" && r.Source == "openapi" {
+			r.Auth = r.Auth || prev.Auth
+			if r.File == "" {
+				r.File = prev.File
+				r.Line = prev.Line
+			}
+			if r.Summary == "" {
+				r.Summary = prev.Summary
+			}
 			best[k] = r
 			continue
 		}
-		if prev.Summary == "" && r.Summary != "" {
-			best[k] = r
+		merged := prev
+		if merged.Summary == "" && r.Summary != "" {
+			merged.Summary = r.Summary
 		}
+		if merged.File == "" && r.File != "" {
+			merged.File = r.File
+			merged.Line = r.Line
+		}
+		merged.Auth = merged.Auth || r.Auth
+		best[k] = merged
 	}
 	out := make([]Route, 0, len(best))
 	for _, r := range best {

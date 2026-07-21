@@ -100,11 +100,20 @@ func (a *App) handleRoutesLoaded(msg routesLoadedMsg) {
 func (a *App) routesCountLabel() string {
 	all := len(a.routes)
 	vis := a.filteredRoutes()
+	auth := 0
+	for _, r := range a.routes {
+		if r.Auth {
+			auth++
+		}
+	}
 	if q := strings.TrimSpace(a.routesFilter); q != "" {
 		return fmt.Sprintf("%d/%d rotas · \"%s\"", len(vis), all, q)
 	}
 	if all == 0 {
 		return "nenhuma rota encontrada"
+	}
+	if auth > 0 {
+		return fmt.Sprintf("%d rotas · %d auth", all, auth)
 	}
 	return fmt.Sprintf("%d rotas", all)
 }
@@ -116,14 +125,27 @@ func (a *App) filteredRoutes() []routeutil.Route {
 	}
 	out := make([]routeutil.Route, 0, len(a.routes))
 	for _, r := range a.routes {
-		if strings.Contains(strings.ToLower(r.Path), q) ||
-			strings.Contains(strings.ToLower(r.Method), q) ||
-			strings.Contains(strings.ToLower(r.Summary), q) ||
-			strings.Contains(strings.ToLower(r.Source), q) {
+		if routeMatchesFilter(r, q) {
 			out = append(out, r)
 		}
 	}
 	return out
+}
+
+func routeMatchesFilter(r routeutil.Route, q string) bool {
+	if q == "auth" || q == "private" || q == "protegida" || q == "secured" {
+		return r.Auth
+	}
+	if q == "public" || q == "aberta" {
+		return !r.Auth
+	}
+	hay := strings.ToLower(strings.Join([]string{
+		r.Path, r.Method, r.Summary, r.Source, r.File,
+	}, " "))
+	if r.Auth {
+		hay += " auth private"
+	}
+	return strings.Contains(hay, q)
 }
 
 func (a *App) syncRoutesCursor() {
@@ -162,7 +184,6 @@ func (a *App) updateRoutesFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			r := []rune(a.routesFilterInput)
 			a.routesFilterInput = string(r[:len(r)-1])
 		}
-		// Live preview while typing.
 		a.routesFilter = strings.TrimSpace(a.routesFilterInput)
 		a.routesCursor = 0
 		a.syncRoutesCursor()
@@ -178,11 +199,9 @@ func (a *App) updateRoutesFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) refreshRoutesStatusFilter() {
-	// Keep stack prefix if present (before first · count).
 	base := a.routesStatus
 	if i := strings.Index(base, " · "); i >= 0 {
 		prefix := base[:i+3]
-		// Only keep if it looks like stacks (no "rotas" before).
 		if !strings.Contains(prefix, "rotas") {
 			a.routesStatus = prefix + a.routesCountLabel()
 			return
@@ -201,20 +220,18 @@ func (a *App) renderRoutesLanding(p *core.Project) string {
 	openH := maxInt(5, bodyH*26/100)
 	srcH := maxInt(6, bodyH*40/100)
 	keysH := maxInt(5, bodyH-openH-srcH)
-	openLines := append([]string{StyleMuted.Render("descobre endpoints e abre na aba API")}, moduleOpenHint()...)
-	// override enter hint wording for routes
+	openLines := append([]string{StyleMuted.Render("descobre endpoints públicos e privados")}, moduleOpenHint()...)
 	openLines[1] = StyleNormal.Render("pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para escanear")
 	srcLines := []string{
 		StyleMuted.Render("OpenAPI/Swagger (arquivo ou localhost)"),
-		StyleMuted.Render("Nest · Express · Fastify · Hono"),
-		StyleMuted.Render("Next · Nuxt · Laravel · Django"),
-		StyleMuted.Render("Flask · FastAPI · Rails"),
-		StyleMuted.Render("Go (Gin/Echo/Fiber/Chi)"),
-		StyleMuted.Render("Spring · Axum/Actix"),
+		StyleMuted.Render("Laravel · Nest · Express · Fastify"),
+		StyleMuted.Render("Next · Nuxt · Django · Flask · FastAPI"),
+		StyleMuted.Render("Rails · Go · Spring · Axum/Actix"),
+		StyleMuted.Render("auth/sanctum/guards detectados no código"),
 	}
 	keyLines := []string{
 		StyleMuted.Render("↑↓ / j k   navegar"),
-		StyleMuted.Render("b          filtrar path"),
+		StyleMuted.Render("b          filtrar (path/auth/source)"),
 		StyleMuted.Render("enter      abrir na API"),
 		StyleMuted.Render("r          reescanear"),
 		StyleMuted.Render("esc        voltar"),
@@ -231,6 +248,7 @@ func (a *App) renderRoutesLanding(p *core.Project) string {
 	details := []string{
 		StyleMuted.Render("Stack   ") + StyleNormal.Render(truncate(stack, rightW-10)),
 		StyleMuted.Render("Modo    ") + StyleMuted.Render("scan + OpenAPI"),
+		StyleMuted.Render("Inclui  ") + StyleMuted.Render("rotas auth/privadas"),
 		StyleMuted.Render("Destino ") + StyleMuted.Render("aba API"),
 	}
 	actions := moduleActionLines(
@@ -243,106 +261,298 @@ func (a *App) renderRoutesLanding(p *core.Project) string {
 }
 
 func (a *App) renderRoutesTab(p *core.Project) string {
-	w := maxInt(60, a.width)
+	w := maxInt(72, a.width)
 	h := maxInt(18, a.height-2)
-	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabRoutes)).Bold(true)
-
-	header := accent.Render("⇄ Rotas")
-	if p != nil {
-		header += StyleMuted.Render("  "+truncate(p.Name, 24))
-	}
-	if a.routesErr != "" {
-		header += "  " + StyleUnhealthy.Render(truncate(a.routesErr, 40))
-	} else if a.routesStatus != "" {
-		header += "  " + StyleHealthy.Render(a.routesStatus)
+	visible := a.filteredRoutes()
+	if !a.routesLoading && len(visible) > 0 {
+		a.routesCursor = clampCursor(a.routesCursor, len(visible))
 	}
 
-	bodyH := maxInt(4, h-3)
-	if a.routesFilterOn {
-		bodyH = maxInt(3, bodyH-1)
-	}
-	innerW := maxInt(20, w-4)
-	lines := a.renderRoutesList(innerW, bodyH)
-	body := StylePanel.Width(w - 2).Render(strings.Join(lines, "\n"))
+	header := a.renderRoutesHeader(p, w)
+	cards := a.renderRoutesCards(w)
+	filterLine := a.renderRoutesFilterLine(w)
 
-	var parts []string
-	parts = append(parts, header)
-	if a.routesFilterOn {
-		prompt := StyleKey.Render("filter ") + StyleSelected.Render(a.routesFilterInput+"▌")
-		parts = append(parts, prompt)
-	} else if q := strings.TrimSpace(a.routesFilter); q != "" {
-		parts = append(parts, StyleMuted.Render("filter: ")+StyleNormal.Render(q)+StyleMuted.Render("  (b editar · esc limpar)"))
+	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + lipgloss.Height(filterLine) + 2
+	bodyH := maxInt(8, h-chromeH-2)
+
+	rightW := maxInt(24, w*28/100)
+	if rightW > 40 {
+		rightW = 40
 	}
-	parts = append(parts, body)
+	leftW := maxInt(36, w-rightW-1)
+	list := a.renderRoutesTable(visible, leftW, bodyH)
+	detail := a.renderRoutesInspector(visible, rightW, bodyH)
+	body := lipgloss.JoinHorizontal(lipgloss.Top, list, detail)
 
 	hints := "↑↓ navegar  b filtrar  enter → API  r rescan  esc"
 	if a.routesLoading {
 		hints = "scanning…  esc"
 	} else if a.routesFilterOn {
-		hints = "digite o filtro  enter aplicar  esc limpar"
+		hints = "filtro: path · auth · source · file  enter aplicar  esc limpar"
 	}
-	parts = append(parts, a.renderStatusBar(hints))
-	return lipgloss.JoinVertical(lipgloss.Left, parts...)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		header, cards, filterLine, body,
+		a.renderStatusBar(hints),
+	)
 }
 
-func (a *App) renderRoutesList(width, height int) []string {
-	if a.routesLoading && len(a.routes) == 0 {
-		return fitExactLines([]string{StyleMuted.Render("escaneando OpenAPI e código…")}, height)
+func (a *App) renderRoutesHeader(p *core.Project, width int) string {
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabRoutes)).Bold(true)
+	left := accent.Render("devscope") + StyleMuted.Render(" › rotas")
+	if p != nil {
+		left += StyleMuted.Render("  ") + StyleNormal.Render(truncate(p.Name, 28))
 	}
-	visible := a.filteredRoutes()
-	if len(a.routes) == 0 {
+	right := StyleMuted.Render(a.routesStatus)
+	if a.routesErr != "" {
+		right = StyleUnhealthy.Render(truncate(a.routesErr, 36))
+	} else if a.routesLoading {
+		right = StyleMuted.Render("escaneando…")
+	}
+	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
+	if pad < 1 {
+		pad = 1
+	}
+	return left + strings.Repeat(" ", pad) + right
+}
+
+func (a *App) renderRoutesCards(width int) string {
+	byMethod := map[string]int{}
+	sources := map[string]int{}
+	authN := 0
+	for _, r := range a.routes {
+		byMethod[r.Method]++
+		sources[r.Source]++
+		if r.Auth {
+			authN++
+		}
+	}
+	topSrc := "—"
+	topN := 0
+	for s, n := range sources {
+		if s == "" {
+			s = "?"
+		}
+		if n > topN {
+			topN = n
+			topSrc = s
+		}
+	}
+	meth := fmt.Sprintf("G%d P%d U%d D%d",
+		byMethod["GET"], byMethod["POST"], byMethod["PUT"]+byMethod["PATCH"], byMethod["DELETE"])
+	vis := len(a.filteredRoutes())
+	boxW := maxInt(12, width/5)
+	cards := []struct{ title, value string; warn bool }{
+		{"TOTAL", fmt.Sprintf("%d", len(a.routes)), false},
+		{"VISÍVEIS", fmt.Sprintf("%d", vis), false},
+		{"AUTH", fmt.Sprintf("%d", authN), authN > 0},
+		{"MÉTODOS", meth, false},
+		{"FONTE", topSrc, false},
+	}
+	parts := make([]string, 0, len(cards))
+	for _, c := range cards {
+		val := StyleNormal.Render(truncate(c.value, boxW-4))
+		if c.title == "AUTH" && c.warn {
+			val = StyleWarning.Render(truncate(c.value, boxW-4))
+		}
+		if c.title == "TOTAL" {
+			val = StyleHealthy.Render(truncate(c.value, boxW-4))
+		}
+		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+func (a *App) renderRoutesFilterLine(width int) string {
+	if a.routesFilterOn {
+		return StyleKey.Render("filter ") + StyleSelected.Render(a.routesFilterInput+"▌") +
+			StyleMuted.Render("  (auth · public · path · source)")
+	}
+	if q := strings.TrimSpace(a.routesFilter); q != "" {
+		return StyleMuted.Render("filter: ") + StyleNormal.Render(q) +
+			StyleMuted.Render("  (b editar · esc limpar)")
+	}
+	return StyleMuted.Render(truncate("b filtrar · tip: \"auth\" mostra só privadas", maxInt(20, width-2)))
+}
+
+func (a *App) renderRoutesTable(visible []routeutil.Route, width, height int) string {
+	viewport := maxInt(1, height-2)
+	lines := make([]string, 0, viewport)
+
+	if a.routesLoading && len(a.routes) == 0 {
+		lines = append(lines, StyleMuted.Render("  escaneando OpenAPI e código…"))
+	} else if len(a.routes) == 0 {
 		msg := "nenhuma rota encontrada"
 		if a.routesErr != "" {
 			msg = a.routesErr
 		}
-		return fitExactLines([]string{
-			StyleMuted.Render(msg),
-			"",
-			StyleMuted.Render("dica: openapi.json ou rotas no código da stack detectada"),
-			StyleMuted.Render("pressione r para tentar de novo"),
-		}, height)
+		lines = append(lines,
+			StyleMuted.Render("  "+msg),
+			StyleMuted.Render("  dica: openapi.json ou rotas no código"),
+			StyleMuted.Render("  r para tentar de novo"),
+		)
+	} else if len(visible) == 0 {
+		lines = append(lines,
+			StyleMuted.Render(fmt.Sprintf("  nenhuma rota com \"%s\"", strings.TrimSpace(a.routesFilter))),
+			StyleMuted.Render("  b mudar · esc limpar"),
+		)
+	} else {
+		a.routesScroll = ensureVisible(a.routesCursor, a.routesScroll, viewport-1, len(visible))
+		header := StyleMuted.Render(truncate(
+			fmt.Sprintf("  %-6s %-28s %-5s %-10s %s", "METHOD", "PATH", "AUTH", "SOURCE", "FILE"),
+			width-2,
+		))
+		lines = append(lines, header)
+		start := a.routesScroll
+		end := minInt(start+viewport-1, len(visible))
+		for i := start; i < end; i++ {
+			lines = append(lines, a.renderRoutesTableLine(visible[i], i, width-2))
+		}
 	}
-	if len(visible) == 0 {
-		q := strings.TrimSpace(a.routesFilter)
-		return fitExactLines([]string{
-			StyleMuted.Render(fmt.Sprintf("nenhuma rota com \"%s\"", q)),
-			"",
-			StyleMuted.Render("b para mudar o filtro · esc no filtro limpa"),
-		}, height)
-	}
+	title := fmt.Sprintf("ROTAS (%d)", len(visible))
+	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, true)
+}
 
-	if a.routesCursor < a.routesScroll {
-		a.routesScroll = a.routesCursor
+func (a *App) renderRoutesTableLine(r routeutil.Route, idx, width int) string {
+	marker := "  "
+	if a.routesCursor == idx {
+		marker = "▶ "
 	}
-	if a.routesCursor >= a.routesScroll+height {
-		a.routesScroll = a.routesCursor - height + 1
+	auth := "·"
+	if r.Auth {
+		auth = "auth"
 	}
-	if a.routesScroll < 0 {
-		a.routesScroll = 0
+	src := r.Source
+	if src == "" {
+		src = "?"
 	}
+	file := r.File
+	if r.Line > 0 {
+		file = fmt.Sprintf("%s:%d", r.File, r.Line)
+	}
+	if file == "" || file == ":0" {
+		file = "—"
+	}
+	pathW := maxInt(10, width-48)
+	plain := fmt.Sprintf("%s%-6s %-28s %-5s %-10s %s",
+		marker,
+		truncate(r.Method, 6),
+		truncate(r.Path, 28),
+		auth,
+		truncate(src, 10),
+		truncate(file, pathW),
+	)
+	plain = truncate(plain, width)
+	if a.routesCursor == idx {
+		return StyleSelected.Render(plain)
+	}
+	methodSt := routeMethodStyle(r.Method)
+	authSt := StyleMuted
+	if r.Auth {
+		authSt = StyleWarning
+	}
+	return marker +
+		methodSt.Render(fmt.Sprintf("%-6s", truncate(r.Method, 6))) + " " +
+		StyleNormal.Render(fmt.Sprintf("%-28s", truncate(r.Path, 28))) + " " +
+		authSt.Render(fmt.Sprintf("%-5s", auth)) + " " +
+		StyleMuted.Render(fmt.Sprintf("%-10s", truncate(src, 10))) + " " +
+		StyleMuted.Render(truncate(file, pathW))
+}
 
-	out := make([]string, 0, height)
-	end := minInt(a.routesScroll+height, len(visible))
-	for i := a.routesScroll; i < end; i++ {
-		r := visible[i]
-		method := fmt.Sprintf("%-6s", r.Method)
-		methodSt := routeMethodStyle(r.Method)
-		path := truncate(r.Path, maxInt(8, width-18))
-		src := StyleMuted.Render(r.Source)
-		line := methodSt.Render(method) + " " + StyleNormal.Render(path)
+func (a *App) renderRoutesInspector(visible []routeutil.Route, width, height int) string {
+	detH := maxInt(8, height*55/100)
+	actH := maxInt(5, height*22/100)
+	statH := maxInt(4, height-detH-actH)
+
+	details := []string{StyleMuted.Render("(nenhuma rota)")}
+	if a.routesLoading && len(a.routes) == 0 {
+		details = []string{StyleMuted.Render("carregando…")}
+	} else if len(visible) > 0 && a.routesCursor < len(visible) {
+		r := visible[a.routesCursor]
+		access := StyleHealthy.Render("pública")
+		if r.Auth {
+			access = StyleWarning.Render("privada / auth")
+		}
+		file := r.File
+		if r.Line > 0 {
+			file = fmt.Sprintf("%s:%d", r.File, r.Line)
+		}
+		if file == "" {
+			file = "—"
+		}
+		details = []string{
+			StyleMuted.Render("Method  ") + routeMethodStyle(r.Method).Render(r.Method),
+			StyleMuted.Render("Path    ") + StyleNormal.Render(truncate(r.Path, width-12)),
+			StyleMuted.Render("Access  ") + access,
+			StyleMuted.Render("Source  ") + StyleMuted.Render(firstNonEmpty(r.Source, "—")),
+			StyleMuted.Render("File    ") + StyleMuted.Render(truncate(file, width-12)),
+		}
 		if r.Summary != "" {
-			line += "  " + StyleMuted.Render(truncate(r.Summary, 24))
-		} else {
-			line += "  " + src
+			details = append(details, "",
+				StyleMuted.Render("Summary"),
+				StyleNormal.Render(truncate(r.Summary, width-4)),
+			)
 		}
-		if i == a.routesCursor {
-			line = StyleSelected.Render("▸ ") + line
-		} else {
-			line = "  " + line
-		}
-		out = append(out, line)
 	}
-	return fitExactLines(out, height)
+
+	actions := moduleActionLines(
+		[2]string{"enter", "abrir na API"},
+		[2]string{"b", "filtrar"},
+		[2]string{"r", "reescanear"},
+		[2]string{"esc", "voltar"},
+	)
+
+	statLines := a.routesSourceStats(width)
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
+		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		renderApiTitledBox("FONTES", fitExactLines(statLines, statH-2), width, statH, false),
+	)
+}
+
+func (a *App) routesSourceStats(width int) []string {
+	type pair struct {
+		name string
+		n    int
+	}
+	counts := map[string]int{}
+	for _, r := range a.routes {
+		s := r.Source
+		if s == "" {
+			s = "?"
+		}
+		counts[s]++
+	}
+	if len(counts) == 0 {
+		return []string{StyleMuted.Render("(sem fontes)")}
+	}
+	list := make([]pair, 0, len(counts))
+	maxN := 0
+	for name, n := range counts {
+		list = append(list, pair{name, n})
+		if n > maxN {
+			maxN = n
+		}
+	}
+	for i := 0; i < len(list); i++ {
+		for j := i + 1; j < len(list); j++ {
+			if list[j].n > list[i].n {
+				list[i], list[j] = list[j], list[i]
+			}
+		}
+	}
+	barW := maxInt(6, width-16)
+	out := make([]string, 0, minInt(6, len(list)))
+	for i := 0; i < len(list) && i < 6; i++ {
+		p := list[i]
+		pct := 100.0 * float64(p.n) / float64(maxN)
+		out = append(out,
+			StyleMuted.Render(fmt.Sprintf("%-10s ", truncate(p.name, 10)))+
+				meterBar(pct, barW)+
+				StyleMuted.Render(fmt.Sprintf(" %d", p.n)),
+		)
+	}
+	return out
 }
 
 func routeMethodStyle(m string) lipgloss.Style {

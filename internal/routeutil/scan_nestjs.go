@@ -21,6 +21,7 @@ func (nestjsScanner) Match(root string, frameworks []string) bool {
 var (
 	reNestController = regexp.MustCompile(`@Controller\s*\(\s*(?:['"]([^'"]*)['"])?\s*\)`)
 	reNestMethod     = regexp.MustCompile(`@(Get|Post|Put|Patch|Delete)\s*\(\s*(?:['"]([^'"]*)['"])?\s*\)`)
+	reNestGuards     = regexp.MustCompile(`@UseGuards\s*\(`)
 )
 
 func (nestjsScanner) Scan(root string) ([]Route, error) {
@@ -56,17 +57,33 @@ func (nestjsScanner) Scan(root string) ([]Route, error) {
 				subpath = sub[2]
 			}
 			line := 1 + strings.Count(content[:loc[0]], "\n")
+			auth := nestMethodGuarded(content, loc[0])
+			summary := ""
+			if auth {
+				summary = "guard"
+			}
 			routes = append(routes, Route{
-				Method: method,
-				Path:   joinRoute(prefix, nestPath(subpath)),
-				Source: "nestjs",
-				File:   rel,
-				Line:   line,
+				Method:  method,
+				Path:    joinRoute(prefix, nestPath(subpath)),
+				Source:  "nestjs",
+				File:    rel,
+				Line:    line,
+				Summary: summary,
+				Auth:    auth,
 			})
 		}
 		return nil
 	})
 	return routes, nil
+}
+
+// ponytail: look back for @UseGuards on handler or controller class
+func nestMethodGuarded(content string, methodIdx int) bool {
+	start := methodIdx - 800
+	if start < 0 {
+		start = 0
+	}
+	return reNestGuards.MatchString(content[start:methodIdx])
 }
 
 func nestPath(p string) string {

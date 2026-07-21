@@ -8,22 +8,14 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
-func TestAllTabsIncludesJWT(t *testing.T) {
-	found := false
+func TestJWTNotInNav(t *testing.T) {
 	for _, tab := range AllTabs {
 		if tab == TabJWT {
-			found = true
-			break
+			t.Fatal("TabJWT should be removed from AllTabs")
 		}
-	}
-	if !found {
-		t.Fatal("TabJWT missing from AllTabs")
 	}
 	if TabJWT.String() != "JWT" {
 		t.Fatalf("String=%q", TabJWT.String())
-	}
-	if int(TabJWT) != 10 {
-		t.Fatalf("TabJWT index=%d want 10", TabJWT)
 	}
 }
 
@@ -109,13 +101,25 @@ func TestJwtHScrollAndEditorSelect(t *testing.T) {
 	}
 }
 
-func TestSidebarShowsUtilsJWT(t *testing.T) {
-	a := &App{width: 120, height: 40, tab: TabJWT}
+func TestSidebarHidesJWT(t *testing.T) {
+	a := &App{width: 120, height: 40, tab: TabRoutes}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "UTILS") || !strings.Contains(got, "JWT") {
-		t.Fatalf("sidebar missing UTILS/JWT: %q", got)
+	if strings.Contains(got, "JWT") {
+		t.Fatalf("sidebar should not list JWT: %q", got)
 	}
-	if !strings.Contains(got, "tab · shift+tab") {
-		t.Fatalf("footer should mention tab · shift+tab: %q", got)
+}
+
+func TestJwtClientDashboard(t *testing.T) {
+	a := &App{
+		width: 120, height: 40, jwtOpen: true, tab: TabJWT,
+		jwtAlg: "HS256", jwtSecret: "your-256-bit-secret",
+		jwtEdit: editorState{Anchor: -1},
+	}
+	a.openJwtClient(nil)
+	got := stripANSI(a.renderJwtTab(nil))
+	for _, want := range []string{"devscope", "jwt", "TOKEN", "RESULT", "AÇÕES", "SECRET", "HS256", "ALG"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("jwt client missing %q in:\n%s", want, got)
+		}
 	}
 }

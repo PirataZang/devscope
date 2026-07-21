@@ -26,6 +26,22 @@ type DBTarget struct {
 	Engine    DBEngine
 	User      string
 	Database  string
+	Ports     string // host port mapping hint from docker, optional
+}
+
+// DBColumn is one column from DESCRIBE / information_schema.
+type DBColumn struct {
+	Name     string
+	Type     string
+	Nullable string // YES / NO
+	Key      string // PK / MUL / UNI / empty
+}
+
+// DBTableInfo is schema + approximate row count for a table.
+type DBTableInfo struct {
+	Table   string
+	Columns []DBColumn
+	Rows    int64 // -1 unknown
 }
 
 var (
@@ -83,6 +99,7 @@ func DetectProjectDatabases(p *core.Project) []DBTarget {
 			Engine:    eng,
 			User:      user,
 			Database:  db,
+			Ports:     c.Ports,
 		})
 	}
 	return out
@@ -91,9 +108,12 @@ func DetectProjectDatabases(p *core.Project) []DBTarget {
 func detectContainerDBEngine(c core.Container) DBEngine {
 	s := strings.ToLower(c.Image + " " + c.Name)
 	switch {
-	case strings.Contains(s, "postgres"), strings.Contains(s, "postgis"):
+	case strings.Contains(s, "postgres"), strings.Contains(s, "postgis"),
+		strings.Contains(s, "timescale"), strings.Contains(s, "pgvector"),
+		strings.Contains(s, "supabase/postgres"):
 		return DBEnginePostgres
-	case strings.Contains(s, "mysql"), strings.Contains(s, "mariadb"), strings.Contains(s, "percona"):
+	case strings.Contains(s, "mysql"), strings.Contains(s, "mariadb"),
+		strings.Contains(s, "percona"), strings.Contains(s, "bitnami/mysql"):
 		return DBEngineMySQL
 	default:
 		return ""
@@ -252,6 +272,125 @@ func DBListTables(t DBTarget, projectPath string) ([]string, error) {
 		}
 	}
 	return tables, nil
+}
+
+// DBDescribeTable returns columns and an approximate row count.
+func DBDescribeTable(t DBTarget, projectPath, table string) (DBTableInfo, error) {
+	table = strings.TrimSpace(table)
+	if table == "" {
+		return DBTableInfo{}, fmt.Errorf("tabela vazia")
+	}
+	info := DBTableInfo{Table: table, Rows: -1}
+	pass := containerPass(t.Container, t.Engine, projectPath)
+	ident := quoteDBIdent(table, t.Engine)
+
+	var colsSQL, countSQL string
+	switch t.Engine {
+	case DBEnginePostgres:
+		colsSQL = fmt.Sprintf(
+			`SELECT c.column_name, c.data_type, c.is_nullable,
+COALESCE((SELECT 'PK' FROM information_schema.table_constraints tc
+  JOIN information_schema.key_column_usage k ON tc.constraint_name=k.constraint_name AND tc.table_schema=k.table_schema
+  WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema=c.table_schema AND tc.table_name=c.table_name AND k.column_name=c.column_name),'')
+FROM information_schema.columns c
+WHERE c.table_schema='public' AND c.table_name='%s'
+ORDER BY c.ordinal_position`, escapeSQLLiteral(table))
+		countSQL = fmt.Sprintf(`SELECT COALESCE(reltuples::bigint,-1) FROM pg_class WHERE relkind='r' AND relname='%s' LIMIT 1`, escapeSQLLiteral(table))
+	case DBEngineMySQL:
+		colsSQL = fmt.Sprintf(
+			`SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='%s'
+ORDER BY ORDINAL_POSITION`, escapeSQLLiteral(table))
+		countSQL = fmt.Sprintf(
+			`SELECT TABLE_ROWS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='%s' LIMIT 1`,
+			escapeSQLLiteral(table))
+	default:
+		return info, fmt.Errorf("engine não suportado")
+	}
+	_ = ident
+
+	colsOut, err := runDBCmd(dbExecSQL(t, pass, colsSQL, true))
+	if err != nil {
+		return info, err
+	}
+	for _, line := range strings.Split(colsOut, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		parts := strings.Split(line, "\t")
+		if len(parts) < 2 {
+			parts = strings.Fields(line)
+		}
+		col := DBColumn{}
+		if len(parts) > 0 {
+			col.Name = parts[0]
+		}
+		if len(parts) > 1 {
+			col.Type = parts[1]
+		}
+		if len(parts) > 2 {
+			col.Nullable = parts[2]
+		}
+		if len(parts) > 3 {
+			col.Key = parts[3]
+		}
+		if col.Name != "" {
+			info.Columns = append(info.Columns, col)
+		}
+	}
+
+	countOut, err := runDBCmd(dbExecSQL(t, pass, countSQL, true))
+	if err == nil {
+		n := strings.TrimSpace(countOut)
+		if n != "" {
+			var v int64
+			if _, e := fmt.Sscanf(n, "%d", &v); e == nil {
+				info.Rows = v
+			}
+		}
+	}
+	return info, nil
+}
+
+func escapeSQLLiteral(s string) string {
+	return strings.ReplaceAll(s, "'", "''")
+}
+
+func quoteDBIdent(name string, eng DBEngine) string {
+	if eng == DBEngineMySQL {
+		return "`" + strings.ReplaceAll(name, "`", "``") + "`"
+	}
+	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
+}
+
+func dbExecSQL(t DBTarget, pass, sql string, tuplesOnly bool) *exec.Cmd {
+	args := []string{"exec"}
+	switch t.Engine {
+	case DBEnginePostgres:
+		if pass != "" {
+			args = append(args, "-e", "PGPASSWORD="+pass)
+		}
+		args = append(args, t.Container, "psql", "-U", t.User, "-d", t.Database)
+		if tuplesOnly {
+			args = append(args, "-Atc", sql)
+		} else {
+			args = append(args, "-c", sql)
+		}
+	case DBEngineMySQL:
+		if pass != "" {
+			args = append(args, "-e", "MYSQL_PWD="+pass)
+		}
+		args = append(args, t.Container, "mysql", "-u"+t.User)
+		if tuplesOnly {
+			args = append(args, "-N", "-B")
+		} else {
+			args = append(args, "-t")
+		}
+		args = append(args, "-e", sql, t.Database)
+	}
+	return exec.Command("docker", args...)
 }
 
 // DBQuery runs SQL and returns tabular text (truncated).

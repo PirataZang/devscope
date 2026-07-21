@@ -37,3 +37,18 @@ func TestDetectProjectDatabases(t *testing.T) {
 		t.Fatalf("got %+v", got)
 	}
 }
+
+func TestDetectContainerDBEngineExtras(t *testing.T) {
+	if detectContainerDBEngine(core.Container{Image: "timescale/timescaledb:latest"}) != DBEnginePostgres {
+		t.Fatal("timescale")
+	}
+	if detectContainerDBEngine(core.Container{Image: "mariadb:11"}) != DBEngineMySQL {
+		t.Fatal("mariadb")
+	}
+}
+
+func TestEscapeSQLLiteral(t *testing.T) {
+	if escapeSQLLiteral("a'b") != "a''b" {
+		t.Fatal(escapeSQLLiteral("a'b"))
+	}
+}

@@ -61,28 +61,35 @@ func (a *App) renderJsonLanding(p *core.Project) string {
 	rightW := a.moduleRightWidth(w)
 	centerW := maxInt(36, w-rightW-1)
 
-	openH := maxInt(5, bodyH*30/100)
-	keysH := maxInt(6, bodyH-openH)
-	openLines := append([]string{StyleMuted.Render("pretty, minify, validate, convert e diff")}, moduleOpenHint()...)
+	openH := maxInt(5, bodyH*28/100)
+	featH := maxInt(5, bodyH*28/100)
+	keysH := maxInt(6, bodyH-openH-featH)
+	openLines := append([]string{StyleMuted.Render("workspace de JSON — format, convert, validate, diff")}, moduleOpenHint()...)
+	featLines := []string{
+		StyleMuted.Render("pretty / minify / validate / sort keys"),
+		StyleMuted.Render("YAML · TOML · XML  ·  strip nulls"),
+		StyleMuted.Render("diff lado a lado  ·  busca por chave"),
+		StyleMuted.Render("syntax highlight no editor e no output"),
+	}
 	keyLines := []string{
 		StyleMuted.Render("p Pretty   m Minify   v Validate   s Sort"),
 		StyleMuted.Render("w YAML     t TOML     x XML        d Diff"),
 		StyleMuted.Render("n strip nulls   / buscar   c copiar"),
 		StyleMuted.Render("e editar   tab painel   esc sair"),
-		StyleMuted.Render("edição: seleção · ctrl+a/c/x/v"),
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("JSON", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("ATALHOS NO CLIENTE", fitExactLines(keyLines, keysH-2), centerW, keysH, false),
+		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
+		renderApiTitledBox("ATALHOS", fitExactLines(keyLines, keysH-2), centerW, keysH, false),
 	)
 	details := []string{
-		StyleMuted.Render("Formato  JSON / YAML / TOML / XML"),
-		StyleMuted.Render("Diff     lado a lado"),
-		StyleMuted.Render("Busca    por chave"),
+		StyleMuted.Render("In   ") + StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonInput))),
+		StyleMuted.Render("Out  ") + StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonOutput))),
+		StyleMuted.Render("Fmt  ") + StyleMuted.Render("JSON/YAML/TOML/XML"),
 	}
 	actions := moduleActionLines(
 		[2]string{"enter", "abrir cliente"},
-		[2]string{"-", "abrir JWT"},
+		[2]string{"tab", "módulo"},
 		[2]string{"esc", "voltar"},
 	)
 	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
@@ -90,18 +97,27 @@ func (a *App) renderJsonLanding(p *core.Project) string {
 }
 
 func (a *App) renderJsonTab(_ *core.Project) string {
-	w := maxInt(60, a.width)
+	w := maxInt(72, a.width)
 	h := maxInt(18, a.height-2)
-	leftW := maxInt(28, (w-1)/2)
-	rightW := maxInt(28, w-leftW-1)
-	bodyH := h - 4
+	header := a.renderJsonHeader(w)
+	cards := a.renderJsonStatsCards(w)
+	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + 2
+	bodyH := maxInt(8, h-chromeH)
 
-	header := a.renderJsonHeader()
-	left := a.renderJsonPane("input", a.jsonInput, leftW, bodyH, a.jsonPane == jsonPaneInput, a.jsonScrollIn, a.jsonEditing && a.jsonPane == jsonPaneInput)
-	right := a.renderJsonPane("output", a.jsonOutput, rightW, bodyH, a.jsonPane == jsonPaneOutput, a.jsonScrollOut, false)
-	body := lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
+	rightW := maxInt(22, w*24/100)
+	if rightW > 32 {
+		rightW = 32
+	}
+	panesW := w - rightW - 1
+	leftW := maxInt(28, (panesW-1)/2)
+	midW := maxInt(28, panesW-leftW-1)
 
-	hints := "p/m/v/s/w/t/x/d ações  e edit  tab painéis  n nulls  / busca  c copia  esc"
+	left := a.renderJsonPane("INPUT", a.jsonInput, leftW, bodyH, a.jsonPane == jsonPaneInput, a.jsonScrollIn, a.jsonEditing && a.jsonPane == jsonPaneInput)
+	mid := a.renderJsonPane("OUTPUT", a.jsonOutput, midW, bodyH, a.jsonPane == jsonPaneOutput, a.jsonScrollOut, false)
+	rail := a.renderJsonActionRail(rightW, bodyH)
+	body := lipgloss.JoinHorizontal(lipgloss.Top, left, mid, rail)
+
+	hints := "p/m/v/s/w/t/x/d  e edit  tab painéis  n nulls  / busca  c copia  esc"
 	if a.jsonSearchOn {
 		hints = "buscar chave: " + a.jsonSearchInput + "█  enter  esc"
 	} else if a.jsonEditing {
@@ -110,33 +126,138 @@ func (a *App) renderJsonTab(_ *core.Project) string {
 	if a.jsonStatus != "" {
 		hints = a.jsonStatus + "  ·  " + hints
 	}
-	return lipgloss.JoinVertical(lipgloss.Left, header, body, a.renderStatusBar(hints))
+	return lipgloss.JoinVertical(lipgloss.Left, header, cards, body, a.renderStatusBar(hints))
 }
 
-func (a *App) renderJsonHeader() string {
+func (a *App) renderJsonHeader(width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabJSON)).Bold(true)
-	line := accent.Render("{ } JSON") + StyleMuted.Render("  p pretty · m minify · v validate · s sort · w yaml · t toml · x xml · d diff")
+	left := accent.Render("devscope") + StyleMuted.Render(" › json") +
+		StyleMuted.Render("  workspace")
+	right := StyleMuted.Render("p m v s · w t x d")
 	if a.jsonErr != "" {
-		line += "  " + StyleUnhealthy.Render(truncate(a.jsonErr, 48))
+		right = StyleUnhealthy.Render(truncate(a.jsonErr, 40))
 	} else if a.jsonStatus != "" {
-		line += "  " + StyleHealthy.Render(truncate(a.jsonStatus, 36))
+		right = StyleHealthy.Render(truncate(a.jsonStatus, 32))
+	} else if a.jsonEditing {
+		right = StyleWarning.Render("EDIT")
 	}
-	return line
+	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
+	if pad < 1 {
+		pad = 1
+	}
+	return left + strings.Repeat(" ", pad) + right
+}
+
+func (a *App) renderJsonStatsCards(width int) string {
+	inB, inL, inK, inOK := jsonDocStats(a.jsonInput)
+	outB, outL, outK, outOK := jsonDocStats(a.jsonOutput)
+	status := "idle"
+	stStyle := StyleMuted
+	switch {
+	case a.jsonErr != "":
+		status = "error"
+		stStyle = StyleUnhealthy
+	case a.jsonStatus != "":
+		status = a.jsonStatus
+		stStyle = StyleHealthy
+	case inOK:
+		status = "valid"
+		stStyle = StyleHealthy
+	case strings.TrimSpace(a.jsonInput) != "":
+		status = "invalid"
+		stStyle = StyleWarning
+	}
+	boxW := maxInt(12, width/5)
+	return lipgloss.JoinHorizontal(lipgloss.Top,
+		renderStatsCard("INPUT", fmt.Sprintf("%d B", inB), StyleMuted.Render(fmt.Sprintf("%d ln · ~%d keys", inL, inK)), StyleAccent, boxW, 3),
+		" ",
+		renderStatsCard("OUTPUT", fmt.Sprintf("%d B", outB), StyleMuted.Render(fmt.Sprintf("%d ln · ~%d keys", outL, outK)), StyleHealthy, boxW, 3),
+		" ",
+		renderStatsCard("STATUS", status, stStyle.Render(boolLabel(inOK || outOK)), stStyle, boxW, 3),
+		" ",
+		renderStatsCard("PANE", jsonPaneName(a.jsonPane), StyleMuted.Render("tab cicla"), StyleWarning, boxW, 3),
+		" ",
+		renderStatsCard("MODE", jsonEditMode(a), StyleMuted.Render("e toggle"), StyleNormal, boxW, 3),
+	)
+}
+
+func jsonPaneName(p jsonPane) string {
+	if p == jsonPaneOutput {
+		return "output"
+	}
+	return "input"
+}
+
+func jsonEditMode(a *App) string {
+	if a.jsonEditing {
+		return "edit"
+	}
+	if a.jsonSearchOn {
+		return "search"
+	}
+	return "view"
+}
+
+func jsonDocStats(s string) (bytes, lines, keys int, valid bool) {
+	bytes = len(s)
+	if s == "" {
+		return 0, 0, 0, false
+	}
+	lines = strings.Count(s, "\n") + 1
+	keys = strings.Count(s, `":`) + strings.Count(s, `": `)
+	valid = jsonutil.Validate(s) == nil
+	return
+}
+
+func (a *App) renderJsonActionRail(width, height int) string {
+	actH := maxInt(8, height*55/100)
+	tipH := maxInt(5, height-actH)
+	actions := moduleActionLines(
+		[2]string{"p", "pretty"},
+		[2]string{"m", "minify"},
+		[2]string{"v", "validate"},
+		[2]string{"s", "sort keys"},
+		[2]string{"w/t/x", "yaml/toml/xml"},
+		[2]string{"d", "diff"},
+		[2]string{"n", "strip null"},
+		[2]string{"c", "copiar out"},
+		[2]string{"/", "buscar"},
+		[2]string{"e", "editar"},
+	)
+	tips := []string{
+		StyleMuted.Render("input → ação → output"),
+		StyleMuted.Render("syntax color no painel"),
+		StyleMuted.Render("diff compara in/out"),
+	}
+	if a.jsonErr != "" {
+		tips = append([]string{StyleUnhealthy.Render(truncate(a.jsonErr, width-4))}, tips...)
+	}
+	return lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		renderApiTitledBox("DICAS", fitExactLines(tips, tipH-2), width, tipH, false),
+	)
 }
 
 func (a *App) renderJsonPane(title, content string, width, height int, focus bool, scroll int, editing bool) string {
 	viewport := maxInt(1, height-2)
-	innerW := maxInt(8, width-2)
+	innerW := maxInt(8, width-4)
+	label := title
+	if focus {
+		label = "> " + title
+	}
 	if editing {
 		lines := a.renderJsonMultilineEdit(content, innerW, viewport)
-		return renderApiTitledBox("["+title+"]", lines, width, height, focus)
+		return renderApiTitledBox(label, lines, width, height, focus)
 	}
 	raw := strings.Split(strings.ReplaceAll(content, "\r\n", "\n"), "\n")
+	if len(raw) == 1 && raw[0] == "" {
+		raw = []string{"(vazio — e para editar · p pretty)"}
+	}
 	maxScroll := maxInt(0, len(raw)-viewport)
 	if scroll > maxScroll {
 		scroll = maxScroll
 	}
-	if title == "input" {
+	if title == "INPUT" {
 		a.jsonScrollIn = scroll
 	} else {
 		a.jsonScrollOut = scroll
@@ -144,14 +265,17 @@ func (a *App) renderJsonPane(title, content string, width, height int, focus boo
 	start := scroll
 	end := minInt(start+viewport, len(raw))
 	lines := make([]string, 0, viewport)
-	for _, line := range raw[start:end] {
-		style := StyleMuted
-		if focus {
-			style = StyleNormal
+	for i := start; i < end; i++ {
+		plain := sanitizeTerminalLine(raw[i])
+		num := StyleMuted.Render(fmt.Sprintf("%3d ", i+1))
+		colored := renderJSONColumns(plain, 0, innerW)
+		if !focus && strings.TrimSpace(plain) != "" && !strings.HasPrefix(strings.TrimSpace(plain), "(") {
+			// dim non-focused pane slightly by using muted for empty-looking lines only
 		}
-		lines = append(lines, style.Render(truncate(sanitizeTerminalLine(line), innerW)))
+		_ = focus
+		lines = append(lines, num+colored)
 	}
-	return renderApiTitledBox("["+title+"]", fitExactLines(lines, viewport), width, height, focus)
+	return renderApiTitledBox(label, fitExactLines(lines, viewport), width, height, focus)
 }
 
 func (a *App) renderJsonMultilineEdit(content string, width, height int) []string {

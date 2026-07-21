@@ -143,6 +143,32 @@ func TestRoutesFilterByPath(t *testing.T) {
 	}
 }
 
+func TestRoutesFilterAuthAndRender(t *testing.T) {
+	a := &App{
+		width:      120,
+		height:     40,
+		routesOpen: true,
+		tab:        TabRoutes,
+		routes: []routeutil.Route{
+			{Method: "GET", Path: "/public", Source: "laravel"},
+			{Method: "GET", Path: "/me", Source: "laravel", Auth: true, Summary: "auth", File: "routes/api.php", Line: 12},
+			{Method: "POST", Path: "/private", Source: "laravel", Auth: true},
+		},
+		routesStatus: "laravel · 3 rotas · 2 auth",
+	}
+	a.routesFilter = "auth"
+	vis := a.filteredRoutes()
+	if len(vis) != 2 {
+		t.Fatalf("auth filter: got %d", len(vis))
+	}
+	view := stripANSI(a.renderRoutesTab(&core.Project{Name: "demo"}))
+	for _, want := range []string{"ROTAS", "DETALHES", "AUTH", "/me", "auth", "privada"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in %q", want, view)
+		}
+	}
+}
+
 func TestSidebarShowsUtilsRoutes(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabRoutes}
 	got := stripANSI(a.renderProjectSidebar())

@@ -14,16 +14,34 @@ func TestMergeTunnels(t *testing.T) {
 			{Name: "admin", Port: 8081, Proto: "http"},
 		},
 	}
-	live := []Tunnel{{Name: "api", Port: 3000, Proto: "http", PublicURL: "https://x.ngrok-free.app", Status: "online"}}
+	live := []Tunnel{
+		{Name: "api", Port: 3000, Proto: "http", PublicURL: "https://x.ngrok-free.app", Status: "online"},
+		{Name: "other-app", Port: 9000, Proto: "http", PublicURL: "https://y.ngrok-free.app", Status: "online"},
+	}
 	got := MergeTunnels(cfg, live)
 	if len(got) != 2 {
-		t.Fatalf("len=%d", len(got))
+		t.Fatalf("len=%d want 2 (project only)", len(got))
 	}
 	if got[0].Status != "online" || got[0].PublicURL == "" {
 		t.Fatalf("api should be online: %+v", got[0])
 	}
 	if got[1].Status != "offline" || got[1].Name != "admin" {
 		t.Fatalf("admin should be offline: %+v", got[1])
+	}
+	for _, tnl := range got {
+		if tnl.Name == "other-app" {
+			t.Fatal("foreign live tunnel must not appear in project list")
+		}
+	}
+	if n := CountForeignLive(cfg, live); n != 1 {
+		t.Fatalf("foreign=%d want 1", n)
+	}
+	all := MergeTunnelsAll(cfg, live)
+	if len(all) != 3 {
+		t.Fatalf("all len=%d want 3", len(all))
+	}
+	if all[2].Name != "other-app" || all[2].Project != "(outro)" {
+		t.Fatalf("foreign in all: %+v", all[2])
 	}
 }
 
