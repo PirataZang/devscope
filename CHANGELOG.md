@@ -8,6 +8,40 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Configuração de projeto para WebSocket URLs**
+  - Gerenciamento de URLs de WebSocket por projeto (salvar/carregar de JSON)
+  - Limpeza e deduplicação de URLs
+- **Aba Jenkins (CI/CD)**
+  - Cliente Jenkins completo com listagem de jobs, builds, console output
+  - Gerenciamento de nós, plugins e fila de builds
+- **Container Detail Views**
+  - Visualização detalhada de containers com abas de info, env, ports, mounts, logs, stats
+  - Monitoramento em tempo real com ContainerStats
+- **Docker Compose Edit**
+  - Editor de docker-compose.yml embutido
+  - Adicionar/remover serviços, portas, volumes, env vars
+- **Docker Hub Integration**
+  - Busca e pull de imagens do Docker Hub
+- **Git tab aprimorada**
+  - Integração com docker-compose (up/down/restart via git tab)
+  - Mensagens de commit e prompt aprimorados
+- **Add Container Dialog**
+  - Wizard para adicionar containers ao projeto (search + config)
+- **Aprimoramentos cross-platform**
+  - ProjectShell unificado para Windows e Unix
+  - Execução de comandos shell adaptada ao SO
+- **Melhorias em abas existentes**
+  - Database tab: descoberta de schemas aprimorada, queries nomeadas
+  - JSON tab: validação e busca aprimoradas
+  - JWT tab: geração e verificação de tokens
+  - Routes tab: suporte a Laravel e NestJS aprimorado
+  - WebSocket tab: gerenciamento de conexões, filtros e mensagens
+  - Tema: sistema de temas completo com tema escuro/claro
+- Testes unitários para WebSocket config, Jenkins, Container stats, Docker compose, temas
+
+## [1.2.0] - 2026-07-23
+
+### Added
 - **Aba Database (TOOLS)**
   - Descoberta automática de Postgres/MySQL nos containers do projeto
   - Listagem de tabelas/colunas e execução de SQL
@@ -112,7 +146,8 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - GoReleaser + GitHub Releases
 - CLI: `devscope`, `scan --json`, `watch`, `version`
 
-[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/PirataZang/devscope/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/PirataZang/devscope/compare/v0.1.2...v1.0.0
 [0.1.2]: https://github.com/PirataZang/devscope/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/PirataZang/devscope/compare/v0.1.0...v0.1.1
