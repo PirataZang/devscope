@@ -50,13 +50,54 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 	}
 	got := stripANSI(a.renderGitTab(&project))
 	for _, want := range []string{
-		"BRANCHES", "COMMITS", "MODIFIED FILES", "DIFF",
+		"BRANCHES", "COMMITS", "MODIFIED FILES",
 		"RECENT ACTIVITY", "STASHES", "REMOTES",
 		"DES-2834", "stash@{0}", "origin",
 	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("git main missing %q in:\n%s", want, got)
 		}
+	}
+	if strings.Contains(got, "DIFF ·") || strings.Contains(got, "\nDIFF\n") {
+		t.Fatal("main git view should not show inline DIFF panel")
+	}
+}
+
+func TestGitFileLinesShowsStagedBadge(t *testing.T) {
+	g := &core.GitInfo{
+		IsRepo: true, Branch: "main", Staged: 1,
+		Files: []core.GitFileStatus{
+			{Path: "dirty.go", Staging: " ", Worktree: "M"},
+			{Path: "ready.go", Staging: "A", Worktree: " "},
+		},
+	}
+	a := &App{gitFocus: gitFocusFiles, gitFileCursor: 1, gitViewBranch: "main"}
+	got := stripANSI(strings.Join(a.gitFileLines(g, "main", 10), "\n"))
+	if !strings.Contains(got, "ready.go") || !strings.Contains(got, "● staged") {
+		t.Fatalf("expected staged badge, got %q", got)
+	}
+	if strings.Count(got, "● staged") != 1 {
+		t.Fatalf("only staged file should show badge: %q", got)
+	}
+	if !gitFileStaged(g.Files[1]) || gitFileStaged(g.Files[0]) {
+		t.Fatal("worktree-only M must not count as staged")
+	}
+}
+
+func TestGitAddFileTogglesUnstage(t *testing.T) {
+	p := core.Project{
+		Path: "/tmp/repo", Name: "repo",
+		Git: &core.GitInfo{
+			IsRepo: true, Branch: "main",
+			Files: []core.GitFileStatus{{Path: "a.go", Staging: "A", Worktree: " "}},
+		},
+	}
+	a := &App{gitFocus: gitFocusFiles, selectedProject: &p}
+	if cmd := a.gitAddFile(&p); cmd == nil {
+		t.Fatal("expected unstage cmd")
+	}
+	if a.gitStatusMsg != "unstage a.go…" {
+		t.Fatalf("status=%q", a.gitStatusMsg)
 	}
 }
 
@@ -397,5 +438,75 @@ func TestGitCommitDiffScrollReachesEnd(t *testing.T) {
 	got := a.renderGitCommitDiffBody(a.gitCommitDiffViewport())
 	if !strings.Contains(got, "line 40") {
 		t.Fatal("diff scroll must reach the last line")
+	}
+}
+
+func TestGitComposeModalMultiline(t *testing.T) {
+	p := core.Project{
+		Path: "/tmp/repo",
+		Name: "repo",
+		Git: &core.GitInfo{
+			IsRepo: true, Branch: "main", Staged: 2, Modified: 1,
+			Branches: []core.GitBranch{{Name: "main", Current: true}},
+		},
+	}
+	a := &App{
+		width: 100, height: 30,
+		view: ViewProject, tab: TabGit, gitSubview: gitSubviewMain,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+	}
+	a.startGitCompose(&p)
+	if !a.gitComposeOn {
+		t.Fatal("compose not open")
+	}
+	_, _ = a.updateGitCompose(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("fix")})
+	_, _ = a.updateGitCompose(tea.KeyMsg{Type: tea.KeyEnter})
+	_, _ = a.updateGitCompose(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("body")})
+	if !strings.Contains(a.gitComposeMsg, "fix\nbody") {
+		t.Fatalf("multiline msg=%q", a.gitComposeMsg)
+	}
+	got := stripANSI(a.renderGitCompose())
+	for _, want := range []string{"Novo commit", "main", "Commitar", "Cancelar"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in %q", want, truncate(got, 300))
+		}
+	}
+	// enter in editor must NOT commit
+	if !a.gitComposeOn {
+		t.Fatal("enter should stay in editor")
+	}
+	_, _ = a.updateGitCompose(tea.KeyMsg{Type: tea.KeyTab})
+	if a.gitComposeFocus != gitComposeFocusCommit {
+		t.Fatalf("tab should focus commit button, got %v", a.gitComposeFocus)
+	}
+	_, cmd := a.updateGitCompose(tea.KeyMsg{Type: tea.KeyEnter})
+	if a.gitComposeOn {
+		t.Fatal("enter on Commitar should submit")
+	}
+	if cmd == nil {
+		t.Fatal("expected commit cmd")
+	}
+}
+
+func TestGitNewBranchPromptIsModal(t *testing.T) {
+	p := core.Project{
+		Path: "/tmp/repo",
+		Name: "repo",
+		Git:  &core.GitInfo{IsRepo: true, Branch: "main", Branches: []core.GitBranch{{Name: "main", Current: true}}},
+	}
+	a := &App{
+		width: 100, height: 30,
+		view: ViewProject, tab: TabGit, gitSubview: gitSubviewMain,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+	}
+	a.startGitNewBranch(&p)
+	if !a.gitPromptOn || a.gitPromptKind != gitPromptNewBranch {
+		t.Fatal("prompt not started")
+	}
+	got := stripANSI(a.renderGitPrompt())
+	for _, want := range []string{"Nova branch", "a partir de", "main", "enter cria"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in %q", want, truncate(got, 250))
+		}
 	}
 }

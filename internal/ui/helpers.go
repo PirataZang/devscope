@@ -200,6 +200,16 @@ func gitStatusLabel(staging, worktree string) string {
 	return staging
 }
 
+func gitFileStaged(f core.GitFileStatus) bool {
+	// Index column from `git status --porcelain` (not worktree-only changes).
+	switch f.Staging {
+	case "M", "A", "D", "R", "C", "U", "T":
+		return true
+	default:
+		return false
+	}
+}
+
 func gitStatusStyle(code string) string {
 	switch code {
 	case "M":

@@ -46,6 +46,62 @@ type gitWTDiffMsg struct {
 	diff string
 }
 
+type gitWTRefreshedMsg struct {
+	path string
+	gen  int
+}
+
+func (a *App) maybeRefreshGitWorkingTree() tea.Cmd {
+	if a.view != ViewProject || a.tab != TabGit || a.gitSubview != gitSubviewMain {
+		return nil
+	}
+	if a.gitActionLoading || a.gitComposeOn || a.gitPromptOn || a.gitConfirmOn || a.gitWTRefreshing {
+		return nil
+	}
+	if time.Since(a.gitLastWTRefresh) < time.Second {
+		return nil
+	}
+	p := a.currentProject()
+	if p == nil || p.Git == nil || !p.Git.IsRepo {
+		return nil
+	}
+	a.gitLastWTRefresh = time.Now()
+	a.gitWTRefreshing = true
+	a.gitWTRefreshGen++
+	gen := a.gitWTRefreshGen
+	path := p.Path
+	store := a.store
+	return func() tea.Msg {
+		collectors.RefreshProjectGitFiles(store, path)
+		return gitWTRefreshedMsg{path: path, gen: gen}
+	}
+}
+
+func (a *App) handleGitWTRefreshed(msg gitWTRefreshedMsg) {
+	a.gitWTRefreshing = false
+	if msg.gen != a.gitWTRefreshGen {
+		return
+	}
+	if a.selectedProject == nil || !pathsMatch(a.selectedProject.Path, msg.path) {
+		return
+	}
+	a.snapshot = a.store.Get()
+	p := a.currentProject()
+	if p == nil || p.Git == nil {
+		return
+	}
+	a.syncGitBranchesFrom(p)
+	if len(p.Git.Files) == 0 {
+		a.gitFileCursor = 0
+		a.gitFileScroll = 0
+		return
+	}
+	if a.gitFileCursor >= len(p.Git.Files) {
+		a.gitFileCursor = len(p.Git.Files) - 1
+	}
+	a.gitFileScroll = ensureVisible(a.gitFileCursor, a.gitFileScroll, a.gitFilesViewport(), len(p.Git.Files))
+}
+
 func (a *App) requestGitWorkingTreeDiff(path, file string) tea.Cmd {
 	if path == "" || file == "" {
 		return nil
@@ -110,6 +166,71 @@ func loadGitCommitFileDiff(path, hash, file string, gen int) tea.Cmd {
 			diff = "(sem diff para este arquivo)"
 		}
 		return gitCommitDiffLoadedMsg{path: path, hash: hash, file: file, diff: diff, gen: gen}
+	}
+}
+
+func (a *App) gitAddFile(p *core.Project) tea.Cmd {
+	if p == nil || p.Git == nil {
+		return nil
+	}
+	if a.gitViewBranch != "" && a.gitViewBranch != p.Git.Branch {
+		a.gitStatusMsg = "checkout da branch para stage"
+		return nil
+	}
+	if len(p.Git.Files) == 0 || a.gitFileCursor >= len(p.Git.Files) {
+		a.gitStatusMsg = "nenhum arquivo para stage"
+		return nil
+	}
+	f := p.Git.Files[a.gitFileCursor]
+	file := f.Path
+	path := p.Path
+	a.gitActionLoading = true
+	if gitFileStaged(f) {
+		a.gitStatusMsg = "unstage " + file + "…"
+		return func() tea.Msg {
+			err := collectors.GitUnstage(path, file)
+			return gitActionDoneMsg{path: path, action: "unstage", branch: file, err: err}
+		}
+	}
+	a.gitStatusMsg = "git add " + file + "…"
+	return func() tea.Msg {
+		err := collectors.GitAdd(path, file)
+		return gitActionDoneMsg{path: path, action: "add", branch: file, err: err}
+	}
+}
+
+func (a *App) gitAddAll(p *core.Project) tea.Cmd {
+	if p == nil || p.Git == nil {
+		return nil
+	}
+	if a.gitViewBranch != "" && a.gitViewBranch != p.Git.Branch {
+		a.gitStatusMsg = "checkout da branch para stage"
+		return nil
+	}
+	if len(p.Git.Files) == 0 {
+		a.gitStatusMsg = "nada para stage"
+		return nil
+	}
+	path := p.Path
+	allStaged := true
+	for _, f := range p.Git.Files {
+		if !gitFileStaged(f) {
+			allStaged = false
+			break
+		}
+	}
+	a.gitActionLoading = true
+	if allStaged {
+		a.gitStatusMsg = "unstage all…"
+		return func() tea.Msg {
+			err := collectors.GitUnstage(path)
+			return gitActionDoneMsg{path: path, action: "unstage-all", err: err}
+		}
+	}
+	a.gitStatusMsg = "git add -A…"
+	return func() tea.Msg {
+		err := collectors.GitAdd(path)
+		return gitActionDoneMsg{path: path, action: "add-all", err: err}
 	}
 }
 
@@ -302,7 +423,7 @@ func (a *App) handleGitCommitDiffLoaded(msg gitCommitDiffLoadedMsg) {
 
 func needsGitBranchCommitsReload(action string) bool {
 	switch action {
-	case "checkout", "cherry-pick", "create-branch", "rename-branch":
+	case "checkout", "cherry-pick", "create-branch", "rename-branch", "commit":
 		return true
 	default:
 		return false
@@ -351,6 +472,15 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 		a.gitBranchLoading = false
 		a.syncGitBranchCursor(p.Git.Branches)
 		a.gitStatusMsg = fmt.Sprintf("cherry-pick em %s ✓ (%d commits)", msg.branch, msg.count)
+	case "commit":
+		a.gitViewBranch = p.Git.Branch
+		a.gitBranchLoading = true
+		a.gitBranchCommits = nil
+		a.gitCommitCursor = 0
+		a.gitCommitScroll = 0
+		a.clearGitCommitSelection()
+		a.syncGitBranchCursor(p.Git.Branches)
+		a.gitStatusMsg = "commit ✓"
 	case "create-branch":
 		a.allowGitBranchName(msg.branch)
 		a.gitViewBranch = msg.branch
@@ -399,6 +529,14 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 	case "push":
 		a.gitBranchLoading = false
 		a.gitStatusMsg = "push ✓"
+	case "add":
+		a.gitStatusMsg = "staged " + msg.branch + " ✓"
+	case "add-all":
+		a.gitStatusMsg = "todos os arquivos em stage ✓"
+	case "unstage":
+		a.gitStatusMsg = "unstage " + msg.branch + " ✓"
+	case "unstage-all":
+		a.gitStatusMsg = "todos removidos do stage ✓"
 	}
 }
 

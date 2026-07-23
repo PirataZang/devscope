@@ -197,6 +197,13 @@ func (a *App) updateContainerStatusSummary() {
 	a.containerStatusMsg = strings.Join(parts, "  ·  ")
 }
 
+func (a *App) containerActionProjectPath(c core.Container) string {
+	if c.ProjectPath != "" {
+		return c.ProjectPath
+	}
+	return a.currentProjectPath()
+}
+
 func (a *App) containerPause(c core.Container) tea.Cmd {
 	action := "pause"
 	run := collectors.DockerPause
@@ -207,7 +214,7 @@ func (a *App) containerPause(c core.Container) tea.Cmd {
 	if !a.beginContainerAction(action, c) {
 		return nil
 	}
-	path := a.currentProjectPath()
+	path := a.containerActionProjectPath(c)
 	store := a.store
 	healthCfg := a.cfg.Health
 	return func() tea.Msg {
@@ -221,7 +228,7 @@ func (a *App) containerStart(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("start", c) {
 		return nil
 	}
-	path := a.currentProjectPath()
+	path := a.containerActionProjectPath(c)
 	store := a.store
 	healthCfg := a.cfg.Health
 	return func() tea.Msg {
@@ -235,7 +242,7 @@ func (a *App) containerStop(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("stop", c) {
 		return nil
 	}
-	path := a.currentProjectPath()
+	path := a.containerActionProjectPath(c)
 	store := a.store
 	healthCfg := a.cfg.Health
 	return func() tea.Msg {
@@ -249,7 +256,7 @@ func (a *App) containerRestart(c core.Container) tea.Cmd {
 	if !a.beginContainerAction("restart", c) {
 		return nil
 	}
-	path := a.currentProjectPath()
+	path := a.containerActionProjectPath(c)
 	store := a.store
 	healthCfg := a.cfg.Health
 	return func() tea.Msg {
@@ -267,7 +274,7 @@ func (a *App) containerStartOrRestart(c core.Container) tea.Cmd {
 }
 
 func (a *App) containerRemove(c core.Container) tea.Cmd {
-	path := a.currentProjectPath()
+	path := a.containerActionProjectPath(c)
 	store := a.store
 	healthCfg := a.cfg.Health
 	return func() tea.Msg {
@@ -327,14 +334,7 @@ func (a *App) handleContainerActionDone(msg containerActionDoneMsg) {
 			a.containerStatusMsg = msg.action + " " + msg.name + " ✓"
 		}
 	}
-	containers := a.currentProjectContainers()
-	if len(containers) == 0 {
-		a.tabCursor = 0
-		a.containerScroll = 0
-		return
-	}
-	a.tabCursor = clampCursor(a.tabCursor, len(containers))
-	a.syncContainerScroll(len(containers))
+	a.restoreContainerCursor(a.containerPreviewID)
 }
 
 func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {
@@ -347,11 +347,7 @@ func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {
 	// Sucesso: volta direto para a lista
 	a.containerSubview = containerSubviewList
 	a.containerShellExitErr = ""
-	containers := a.currentProjectContainers()
-	if len(containers) > 0 {
-		a.tabCursor = clampCursor(a.tabCursor, len(containers))
-		a.syncContainerScroll(len(containers))
-	}
+	a.restoreContainerCursor(a.containerPreviewID)
 	return tea.Batch(
 		tea.ClearScreen,
 		a.refreshDocker(),
@@ -408,6 +404,28 @@ func (a *App) currentProjectContainers() []core.Container {
 		return nil
 	}
 	return p.Containers
+}
+
+// restoreContainerCursor keeps the selected container across docker refreshes / actions.
+// Uses the visible list (including show-all), not only the current project.
+func (a *App) restoreContainerCursor(preferID string) {
+	containers := a.filteredContainers(a.currentProject())
+	if len(containers) == 0 {
+		a.tabCursor = 0
+		a.containerScroll = 0
+		return
+	}
+	if preferID != "" {
+		for i, c := range containers {
+			if c.ID == preferID {
+				a.tabCursor = i
+				a.syncContainerScroll(len(containers))
+				return
+			}
+		}
+	}
+	a.tabCursor = clampCursor(a.tabCursor, len(containers))
+	a.syncContainerScroll(len(containers))
 }
 
 var errContainerNotRunning = errString("container não está running")

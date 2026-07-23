@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -281,24 +280,43 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) renderGitPrompt() string {
-	content := a.renderProject()
-	label := "Nova branch"
-	if a.gitPromptKind == gitPromptRenameBranch {
-		label = "Renomear branch"
-		if a.gitPromptBranch != "" {
-			label += " (" + a.gitPromptBranch + ")"
-		}
-	} else if a.gitPromptBranch != "" {
-		label += " (de " + a.gitPromptBranch + ")"
-	}
+	background := a.renderProject()
 	runes := []rune(a.gitPromptInput)
 	a.gitPromptCursor = minInt(a.gitPromptCursor, len(runes))
 	input := string(runes[:a.gitPromptCursor]) + "█" + string(runes[a.gitPromptCursor:])
-	prompt := StylePanel.Render(label + ": " + input)
-	return lipgloss.JoinVertical(lipgloss.Left,
-		content,
+
+	title := "Nova branch"
+	context := ""
+	footer := "enter cria  ·  esc cancela"
+	if a.gitPromptKind == gitPromptRenameBranch {
+		title = "Renomear branch"
+		if a.gitPromptBranch != "" {
+			context = StyleMuted.Render("atual  ") + StyleWarning.Render(a.gitPromptBranch)
+		}
+		footer = "enter renomeia  ·  esc cancela"
+	} else if a.gitPromptBranch != "" {
+		context = StyleMuted.Render("a partir de  ") + StyleWarning.Render(a.gitPromptBranch)
+	}
+
+	lines := []string{
+		StyleSection.Render(title),
+		StyleMuted.Render("digite o nome da branch"),
 		"",
-		prompt,
-		a.renderStatusBar("←/→ mover  home/end  backspace/delete editar  enter confirmar  esc cancelar"),
+	}
+	if context != "" {
+		lines = append(lines, context, "")
+	}
+	lines = append(lines,
+		StyleMuted.Render("nome"),
+		StyleSelected.Render("▸ "+input),
+		"",
+		StyleMuted.Render(footer),
 	)
+
+	boxW := minInt(56, maxInt(36, a.width-10))
+	box := StylePanel.
+		Width(boxW).
+		Background(ColorBgPanel).
+		Render(strings.Join(lines, "\n"))
+	return overlayCentered(background, box, a.width, a.height)
 }

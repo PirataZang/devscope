@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -42,6 +43,7 @@ func (a *App) initContainersTab() {
 	a.containerFilterOn = false
 	a.containerFilterInput = ""
 	a.containerFilter = ""
+	a.containerShowAll = false
 	a.containerPreviewID = ""
 	a.containerPreviewLogs = ""
 	a.containerPreviewStats = ""
@@ -68,11 +70,7 @@ func (a *App) dismissContainerShellReturn() tea.Cmd {
 		a.containerStatusMsg = a.containerShellExitErr
 	}
 	a.containerShellExitErr = ""
-	containers := a.filteredContainers(a.currentProject())
-	if len(containers) > 0 {
-		a.tabCursor = clampCursor(a.tabCursor, len(containers))
-		a.syncContainerScroll(len(containers))
-	}
+	a.restoreContainerCursor(a.containerPreviewID)
 	return tea.Batch(
 		tea.ClearScreen,
 		a.refreshDocker(),
@@ -84,19 +82,24 @@ func (a *App) renderContainerList(p *core.Project) string {
 	w := maxInt(60, a.width)
 	h := maxInt(18, a.projectPanelHeight())
 
-	if a.projectDockerLoading && len(p.Containers) == 0 {
+	containers := a.filteredContainers(p)
+	if a.projectDockerLoading && len(containers) == 0 {
 		return renderApiTitledBox("CONTAINERS", fitExactLines([]string{StyleMuted.Render("Carregando containers...")}, h-2), w, h, true)
 	}
-	if len(p.Containers) == 0 {
-		return renderApiTitledBox("CONTAINERS", fitExactLines([]string{
+	if len(containers) == 0 {
+		msg := []string{
 			StyleMuted.Render("Nenhum container vinculado a este projeto."),
 			StyleMuted.Render("Vinculamos por docker-compose working_dir, config e volumes."),
-		}, h-2), w, h, true)
+			StyleMuted.Render("A · ver containers de todos os projetos"),
+		}
+		if a.containerShowAll {
+			msg = []string{StyleMuted.Render("Nenhum container nos projetos escaneados."), StyleMuted.Render("A · voltar ao projeto atual")}
+		}
+		return renderApiTitledBox("CONTAINERS", fitExactLines(msg, h-2), w, h, true)
 	}
 
-	containers := a.filteredContainers(p)
 	running, stopped := 0, 0
-	for _, c := range p.Containers {
+	for _, c := range containers {
 		if strings.EqualFold(c.Status, "running") {
 			running++
 		} else {
@@ -114,14 +117,22 @@ func (a *App) renderContainerList(p *core.Project) string {
 	tableH := maxInt(6, bodyH-bottomH)
 
 	table := a.renderContainersTable(containers, w, tableH)
-	actions := StyleMuted.Render("enter detalhe  s stop  r restart  p pause  d remove  e shell  l logs  g stats  / buscar")
+	scope := "A todos"
+	if a.containerShowAll {
+		scope = "A projeto"
+	}
+	actions := StyleMuted.Render("n novo serviço  " + scope + "  enter detalhe  s stop  r restart  p pause  d remove  e shell  l logs  g stats  / buscar")
 	bottom := a.renderContainersBottom(w, bottomH)
 
 	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, actions, bottom)
 }
 
 func (a *App) renderContainersHeader(p *core.Project, running, stopped, width int) string {
-	left := StyleSection.Render("CONTAINERS") + StyleMuted.Render("  "+shortenPath(p.Path))
+	scope := StyleMuted.Render("  " + shortenPath(p.Path))
+	if a.containerShowAll {
+		scope = StyleAccent.Render("  TODOS OS PROJETOS")
+	}
+	left := StyleSection.Render("CONTAINERS") + scope
 	right := StyleHealthy.Render(fmt.Sprintf("%d running", running)) + StyleMuted.Render("  ") + StyleStopped.Render(fmt.Sprintf("%d stopped", stopped))
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {
@@ -211,7 +222,11 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 	if rem := len(containers) - end; rem > 0 {
 		lines = append(lines, StyleMuted.Render(fmt.Sprintf("↓ %d abaixo", rem)))
 	}
-	return renderApiTitledBox(fmt.Sprintf("LISTA (%d)", len(containers)), fitExactLines(lines, inner), width, height, true)
+	title := fmt.Sprintf("LISTA (%d)", len(containers))
+	if a.containerShowAll {
+		title = fmt.Sprintf("LISTA · TODOS (%d)", len(containers))
+	}
+	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) renderContainersBottom(width, height int) string {
@@ -453,22 +468,71 @@ func formatContainerMem(b int64) string {
 }
 
 func (a *App) filteredContainers(p *core.Project) []core.Container {
-	if p == nil {
-		return nil
+	var base []core.Container
+	if a.containerShowAll {
+		base = a.allProjectContainers()
+	} else if p != nil {
+		base = p.Containers
 	}
 	if a.containerFilter == "" {
-		return p.Containers
+		return base
 	}
 	f := strings.ToLower(a.containerFilter)
 	var out []core.Container
-	for _, c := range p.Containers {
+	for _, c := range base {
+		proj := strings.ToLower(a.containerProjectLabel(c))
 		if strings.Contains(strings.ToLower(c.Name), f) ||
 			strings.Contains(strings.ToLower(c.Image), f) ||
-			strings.Contains(strings.ToLower(c.Ports), f) {
+			strings.Contains(strings.ToLower(c.Ports), f) ||
+			strings.Contains(proj, f) {
 			out = append(out, c)
 		}
 	}
 	return out
+}
+
+func (a *App) allProjectContainers() []core.Container {
+	type row struct {
+		proj string
+		c    core.Container
+	}
+	rows := make([]row, 0)
+	for _, p := range a.snapshot.Projects {
+		for _, c := range p.Containers {
+			cc := c
+			// Always the project root — compose cwd may differ from p.Path.
+			cc.ProjectPath = p.Path
+			rows = append(rows, row{proj: p.Name, c: cc})
+		}
+	}
+	sort.SliceStable(rows, func(i, j int) bool {
+		if rows[i].proj != rows[j].proj {
+			return rows[i].proj < rows[j].proj
+		}
+		return rows[i].c.Name < rows[j].c.Name
+	})
+	out := make([]core.Container, len(rows))
+	for i, r := range rows {
+		out[i] = r.c
+	}
+	return out
+}
+
+func (a *App) containerProjectLabel(c core.Container) string {
+	for _, p := range a.snapshot.Projects {
+		for _, pc := range p.Containers {
+			if pc.ID != "" && pc.ID == c.ID {
+				return p.Name
+			}
+		}
+		if c.ProjectPath != "" && pathsMatch(p.Path, c.ProjectPath) {
+			return p.Name
+		}
+	}
+	if c.ProjectPath != "" {
+		return shortenPath(c.ProjectPath)
+	}
+	return "—"
 }
 
 func (a *App) renderContainerRow(c core.Container, selected bool) string {
@@ -486,10 +550,23 @@ func (a *App) renderContainerRow(c core.Container, selected bool) string {
 		lipgloss.NewStyle().Width(1).Render(""),
 		state,
 		gap,
+	}
+	if cols.project > 0 {
+		projStyle := style
+		if !selected {
+			if p := a.currentProject(); p != nil && c.ProjectPath != "" && pathsMatch(p.Path, c.ProjectPath) {
+				projStyle = StyleAccent
+			} else {
+				projStyle = StyleWarning
+			}
+		}
+		parts = append(parts, projStyle.Width(cols.project).MaxWidth(cols.project).Render(truncate(a.containerProjectLabel(c), cols.project)), gap)
+	}
+	parts = append(parts,
 		cell(cols.name, c.Name),
 		gap,
 		cell(cols.image, c.Image),
-	}
+	)
 	if cols.ports > 0 {
 		parts = append(parts, gap, cell(cols.ports, c.Ports))
 	}
@@ -506,19 +583,22 @@ func (a *App) renderContainerRow(c core.Container, selected bool) string {
 }
 
 type containerCols struct {
-	state, name, image, ports, cpu, mem, uptime int
+	state, project, name, image, ports, cpu, mem, uptime int
 }
 
 func (a *App) containerColumns() containerCols {
 	tableWidth := maxInt(38, a.width-8)
 	cols := containerCols{state: 9}
 	flexible := tableWidth - 1 - cols.state - 2
+	if a.containerShowAll {
+		cols.project = maxInt(10, flexible*18/100)
+		flexible -= cols.project + 1
+	}
 	if a.width < 90 {
 		cols.name = flexible * 40 / 100
 		cols.image = flexible - cols.name
 		return cols
 	}
-	// wide: name image ports cpu mem uptime
 	cols.cpu = 6
 	cols.mem = 6
 	cols.uptime = 8
@@ -542,10 +622,15 @@ func (a *App) renderContainerHeader() string {
 		lipgloss.NewStyle().Width(1).Render(""),
 		style.Width(cols.state).Render("STATE"),
 		gap,
+	}
+	if cols.project > 0 {
+		parts = append(parts, style.Width(cols.project).Render("PROJECT"), gap)
+	}
+	parts = append(parts,
 		style.Width(cols.name).Render("NAME"),
 		gap,
 		style.Width(cols.image).Render("IMAGE"),
-	}
+	)
 	if cols.ports > 0 {
 		parts = append(parts, gap, style.Width(cols.ports).Render("PORTS"))
 	}
@@ -656,6 +741,10 @@ func (a *App) updateContainerCursor(delta int, p *core.Project) tea.Cmd {
 	a.tabCursor = clampCursor(a.tabCursor+delta, len(containers))
 	a.syncContainerScroll(len(containers))
 	if a.tabCursor != prev {
+		// Pin selection immediately so async docker refresh can't yank the cursor back.
+		if c, ok := a.selectedContainer(p); ok {
+			a.containerPreviewID = c.ID
+		}
 		return a.requestContainerPreview()
 	}
 	return nil

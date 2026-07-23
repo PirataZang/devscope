@@ -79,10 +79,27 @@ type App struct {
 	gitPromptInput              string
 	gitPromptCursor             int
 	gitPromptBranch             string
+	gitComposeOn                bool
+	gitComposeMsg               string
+	gitComposeEdit              editorState
+	gitComposeFocus             gitComposeFocus
+	dockerAddOn                 bool
+	dockerAddStep               dockerAddStep
+	dockerAddQuery              string
+	dockerAddCursor             int
+	dockerAddResults            []collectors.DockerHubRepo
+	dockerAddEdit               string
+	dockerAddEditState          editorState
+	dockerAddFocus              dockerAddFocus
+	dockerAddSearchFocus        dockerAddSearchFocus
+	dockerAddLoading            bool
 	gitConfirmOn                bool
 	gitConfirmAction            string
 	gitConfirmBranch            string
 	gitBranchLoadGen            int
+	gitWTRefreshGen             int
+	gitWTRefreshing             bool
+	gitLastWTRefresh            time.Time
 	gitRenderCache              *core.GitInfo
 	gitMarkedBranch             string
 	gitBranches                 []core.GitBranch
@@ -113,6 +130,7 @@ type App struct {
 	containerFilterOn           bool
 	containerFilterInput        string
 	containerFilter             string
+	containerShowAll            bool // A = todos os projetos / só o atual
 	containerPreviewID          string
 	containerPreviewLogs        string
 	containerPreviewStats       string
@@ -435,6 +453,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return a, nil
 		}
+		if a.gitComposeOn {
+			return a.updateGitCompose(msg)
+		}
+		if a.dockerAddOn {
+			return a.updateDockerAdd(msg)
+		}
 		if a.gitPromptOn {
 			return a.updateGitPrompt(msg)
 		}
@@ -491,6 +515,8 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		a.snapshot = a.store.Get()
 		a.now = time.Now()
+		var cmds []tea.Cmd
+		cmds = append(cmds, tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }))
 		if a.view == ViewProject {
 			if p := a.currentProject(); p != nil {
 				if a.projectGitLoading && p.Git != nil {
@@ -501,10 +527,20 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				if a.tab == TabGit && p.Git != nil && p.Git.IsRepo {
 					a.syncGitBranchesFrom(p)
+					if cmd := a.maybeRefreshGitWorkingTree(); cmd != nil {
+						cmds = append(cmds, cmd)
+					}
+				}
+				if a.tab == TabContainers && a.containerSubview == containerSubviewList && a.containerPreviewID != "" {
+					a.restoreContainerCursor(a.containerPreviewID)
 				}
 			}
 		}
-		return a, tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} })
+		return a, tea.Batch(cmds...)
+
+	case gitWTRefreshedMsg:
+		a.handleGitWTRefreshed(msg)
+		return a, nil
 
 	case gitCommitsLoadedMsg:
 		a.handleGitCommitsLoaded(msg)
@@ -621,11 +657,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case dockerRefreshedMsg:
 		a.snapshot = a.store.Get()
-		containers := a.filteredContainers(a.currentProject())
-		if len(containers) > 0 {
-			a.tabCursor = clampCursor(a.tabCursor, len(containers))
-			a.syncContainerScroll(len(containers))
-		}
+		a.restoreContainerCursor(a.containerPreviewID)
 		return a, a.requestContainerPreview()
 
 	case projectGitLoadedMsg:
@@ -642,6 +674,13 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case composeDoneMsg:
 		a.handleComposeDone(msg)
 		return a, nil
+
+	case dockerHubSearchDoneMsg:
+		a.handleDockerHubSearchDone(msg)
+		return a, nil
+
+	case dockerAddSavedMsg:
+		return a, a.handleDockerAddSaved(msg)
 
 	case projectLogsLoadedMsg:
 		a.handleProjectLogsLoaded(msg)
@@ -1064,8 +1103,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, a.cycleProjectTab(-1, p)
 	case "pgup":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitFocus == gitFocusFiles {
-			a.gitWTDiffScroll = maxInt(0, a.gitWTDiffScroll-5)
-			return a, nil
+			return a, a.updateGitCursor(-5, p, false)
 		}
 		a.projectContentScroll -= maxInt(1, a.projectPanelHeight()-4)
 		if a.projectContentScroll < 0 {
@@ -1074,8 +1112,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, nil
 	case "pgdown":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitFocus == gitFocusFiles {
-			a.gitWTDiffScroll += 5
-			return a, nil
+			return a, a.updateGitCursor(5, p, false)
 		}
 		a.projectContentScroll += maxInt(1, a.projectPanelHeight()-4)
 		return a, nil
@@ -1183,9 +1220,37 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				return a, a.openContainerDetail(c, p.Path)
 			}
 		}
+	case "c":
+		if a.gitTabReady(p) {
+			a.startGitCompose(p)
+			return a, nil
+		}
+	case "a":
+		if a.gitTabReady(p) && a.gitFocus == gitFocusFiles {
+			return a, a.gitAddFile(p)
+		}
+	case "A", "shift+a", "shift+A":
+		if a.gitTabReady(p) && a.gitFocus == gitFocusFiles {
+			return a, a.gitAddAll(p)
+		}
+		if a.containersTabReady(p) {
+			a.containerShowAll = !a.containerShowAll
+			a.tabCursor = 0
+			a.containerScroll = 0
+			if a.containerShowAll {
+				a.containerStatusMsg = "mostrando containers de todos os projetos"
+			} else {
+				a.containerStatusMsg = "filtrando containers do projeto"
+			}
+			return a, a.requestContainerPreview()
+		}
 	case "n", "N":
 		if a.gitTabReady(p) {
 			a.startGitNewBranch(p)
+			return a, nil
+		}
+		if a.containersTabReady(p) {
+			a.startDockerAdd(p)
 			return a, nil
 		}
 	case "shift+r", "shift+R":
@@ -1439,6 +1504,10 @@ func (a *App) View() string {
 		content = a.renderContainerDetailSearchPrompt()
 	case a.apiSearchOn:
 		content = a.renderApiSearchPrompt()
+	case a.gitComposeOn:
+		content = a.renderGitCompose()
+	case a.dockerAddOn:
+		content = a.renderDockerAdd()
 	case a.gitPromptOn:
 		content = a.renderGitPrompt()
 	case a.dashboardSubview == dashboardSubviewShellReturn && a.view == ViewDashboard:
@@ -2048,13 +2117,16 @@ Aba Database:
   r            Recarregar tabelas
 
 Aba Git:
+  c            Novo commit (editor · tab → Commitar)
+  a            Toggle stage do arquivo (add / unstage)
+  A            Toggle stage de todos (add -A / unstage all)
   space        Checkout de branch (ou toggle commit)
   shift+↑/↓    Selecionar range de commits
   x            Toggle de seleção de commit individual
   shift+c      Copiar commits selecionados (cherry-pick)
   shift+v      Colar commits (cherry-pick) na branch destino
   b            Filtrar lista de branches
-  enter        Ver detalhes do commit
+  enter        Detalhe (branch/commit) ou diff do arquivo (tela cheia)
   n            Criar nova branch
   d            Apagar branch (confirmação y/esc)
   D            Marcar branch de origem
@@ -2066,6 +2138,8 @@ Aba Git:
   ←/→ or h/l   Alternar foco entre colunas (Branches / Commits)
 
 Aba Containers:
+  n            Novo serviço (Docker Hub ou YAML manual → compose)
+  A            Alternar todos os containers / só do projeto
   enter / m    Monitoramento de detalhes do container
   shift+e      Abrir shell interativo dentro do container
   s            Parar container (stop)

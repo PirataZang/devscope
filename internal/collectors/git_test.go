@@ -302,6 +302,40 @@ func TestGitCheckoutAndCherryPick(t *testing.T) {
 	}
 }
 
+func TestCollectGitFilesStagingColumns(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	writeFile(t, filepath.Join(dir, "a.txt"), "one\n")
+	runGit(t, dir, "add", "a.txt")
+	runGit(t, dir, "commit", "-m", "base")
+
+	writeFile(t, filepath.Join(dir, "a.txt"), "two\n")
+	files := collectGitFiles(dir)
+	if len(files) != 1 || files[0].Staging != " " || files[0].Worktree != "M" {
+		t.Fatalf("unstaged modify want ' M', got %+v", files)
+	}
+
+	runGit(t, dir, "add", "a.txt")
+	files = collectGitFiles(dir)
+	if len(files) != 1 || files[0].Staging != "M" || files[0].Worktree != " " {
+		t.Fatalf("staged modify want 'M ', got %+v", files)
+	}
+
+	store := core.NewStateStore([]string{dir})
+	store.SetProjects([]core.Project{{
+		Path: dir, Name: "t",
+		Git: &core.GitInfo{IsRepo: true, Branch: "main", LastCommit: "x", Branches: []core.GitBranch{{Name: "main"}}},
+	}})
+	runGit(t, dir, "restore", "--staged", "a.txt")
+	RefreshProjectGitFiles(store, dir)
+	got := store.Get().Projects[0].Git
+	if got.Staged != 0 || got.Modified != 1 || len(got.Files) != 1 || got.Files[0].Staging != " " {
+		t.Fatalf("refresh files after unstage: staged=%d mod=%d files=%+v", got.Staged, got.Modified, got.Files)
+	}
+}
+
 func TestCollectWorkingTreeDiffModifiedAndUntracked(t *testing.T) {
 	dir := t.TempDir()
 	runGit(t, dir, "init")

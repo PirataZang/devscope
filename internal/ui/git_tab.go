@@ -128,7 +128,7 @@ func (a *App) renderGitTab(p *core.Project) string {
 	top := a.renderGitMainColumnsSized(g, viewBranch, w, topH)
 	mid := a.renderGitWorkingRow(g, viewBranch, w, midH)
 	bottom := a.renderGitBottomBoxes(g, w, bottomH)
-	actions := StyleMuted.Render("space checkout  enter detail/diff  x cherry  p/P pull/push  ←→ painel  n/d/R/M branch")
+	actions := StyleMuted.Render("c commit  a/A stage toggle  space checkout  enter detail/diff  x cherry  p/P pull/push  n/d/R/M branch")
 
 	return lipgloss.JoinVertical(lipgloss.Left, header, stats, notif, top, mid, bottom, actions)
 }
@@ -284,27 +284,16 @@ func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, widt
 }
 
 func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, height int) string {
-	filesW := maxInt(22, width*38/100)
-	diffW := maxInt(28, width-filesW)
 	filesFocus := a.gitFocus == gitFocusFiles
-	diffFocus := a.gitFocus == gitFocusFiles // same focus scrolls either with keys later
-
 	fileLines := a.gitFileLines(g, viewBranch, height-2)
-	diffLines := a.gitWorkingDiffLines(height-2, diffW-2)
-
 	filesTitle := "MODIFIED FILES"
+	if g.Staged > 0 {
+		filesTitle += fmt.Sprintf(" · %d staged", g.Staged)
+	}
 	if filesFocus {
-		filesTitle = "> MODIFIED FILES"
+		filesTitle = "> " + filesTitle
 	}
-	diffTitle := "DIFF"
-	if a.gitWTDiffFile != "" {
-		diffTitle = "DIFF · " + truncate(a.gitWTDiffFile, 20)
-	}
-	_ = diffFocus
-	return lipgloss.JoinHorizontal(lipgloss.Top,
-		renderApiTitledBox(filesTitle, fitExactLines(fileLines, height-2), filesW, height, filesFocus),
-		renderApiTitledBox(diffTitle, fitExactLines(diffLines, height-2), diffW, height, filesFocus),
-	)
+	return renderApiTitledBox(filesTitle, fitExactLines(fileLines, height-2), width, height, filesFocus)
 }
 
 func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []string {
@@ -328,32 +317,11 @@ func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []s
 			mark = "▸ "
 			style = StyleSelected
 		}
-		lines = append(lines, style.Render(mark+gitStatusStyle(code)+" "+f.Path))
-	}
-	return lines
-}
-
-func (a *App) gitWorkingDiffLines(maxLines, width int) []string {
-	body := a.gitWTDiff
-	if strings.TrimSpace(body) == "" {
-		return []string{StyleMuted.Render("selecione um arquivo (←→ files)")}
-	}
-	raw := strings.Split(body, "\n")
-	a.gitWTDiffScroll = clampScroll(a.gitWTDiffScroll, maxLines, len(raw))
-	start := a.gitWTDiffScroll
-	end := minInt(start+maxLines, len(raw))
-	lines := make([]string, 0, maxLines)
-	for _, line := range raw[start:end] {
-		style := StyleMuted
-		switch {
-		case strings.HasPrefix(line, "+") && !strings.HasPrefix(line, "+++"):
-			style = StyleDiffAdd
-		case strings.HasPrefix(line, "-") && !strings.HasPrefix(line, "---"):
-			style = StyleDiffRemove
-		case strings.HasPrefix(line, "@@"):
-			style = StyleDiffHunk
+		line := style.Render(mark + gitStatusStyle(code) + " " + f.Path)
+		if gitFileStaged(f) {
+			line += "  " + StyleHealthy.Render("● staged")
 		}
-		lines = append(lines, style.Render(truncate(line, width)))
+		lines = append(lines, line)
 	}
 	return lines
 }
@@ -1340,6 +1308,7 @@ func (a *App) gitCommitsViewport() int {
 }
 
 func (a *App) gitFilesViewport() int {
+	// Mid row ≈ half of the main body after branches/commits.
 	return maxInt(3, a.gitListViewport()/2)
 }
 
@@ -1484,24 +1453,13 @@ func (a *App) gitFocusNext() tea.Cmd {
 	case gitFocusCommits:
 		if a.gitShowWorkingTree() {
 			a.gitFocus = gitFocusFiles
-			return a.gitEnsureWTDiff(a.currentProject())
+		} else {
+			a.gitFocus = gitFocusBranches
 		}
-		a.gitFocus = gitFocusBranches
 	default:
 		a.gitFocus = gitFocusBranches
 	}
 	return nil
-}
-
-func (a *App) gitEnsureWTDiff(p *core.Project) tea.Cmd {
-	if p == nil || p.Git == nil || len(p.Git.Files) == 0 {
-		return nil
-	}
-	if a.gitFileCursor >= len(p.Git.Files) {
-		a.gitFileCursor = 0
-	}
-	f := p.Git.Files[a.gitFileCursor]
-	return a.requestGitWorkingTreeDiff(p.Path, f.Path)
 }
 
 func (a *App) gitFocusPrev() tea.Cmd {
@@ -1516,9 +1474,9 @@ func (a *App) gitFocusPrev() tea.Cmd {
 	default:
 		if a.gitShowWorkingTree() {
 			a.gitFocus = gitFocusFiles
-			return a.gitEnsureWTDiff(a.currentProject())
+		} else {
+			a.gitFocus = gitFocusCommits
 		}
-		a.gitFocus = gitFocusCommits
 	}
 	return nil
 }
@@ -1596,14 +1554,9 @@ func (a *App) updateGitCursor(delta int, p *core.Project, shift bool) tea.Cmd {
 		if len(p.Git.Files) == 0 {
 			return nil
 		}
-		prev := a.gitFileCursor
 		viewport := a.gitFilesViewport()
 		a.gitFileCursor = clampCursor(a.gitFileCursor+delta, len(p.Git.Files))
 		a.gitFileScroll = ensureVisible(a.gitFileCursor, a.gitFileScroll, viewport, len(p.Git.Files))
-		if a.gitFileCursor != prev || a.gitWTDiff == "" {
-			f := p.Git.Files[a.gitFileCursor]
-			return a.requestGitWorkingTreeDiff(p.Path, f.Path)
-		}
 	}
 	return nil
 }

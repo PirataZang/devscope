@@ -223,7 +223,9 @@ func collectGitFiles(path string) []core.GitFileStatus {
 		return nil
 	}
 	var files []core.GitFileStatus
-	for _, line := range strings.Split(strings.TrimSpace(status), "\n") {
+	// Don't TrimSpace the whole blob — a leading space is the unstaged index column (e.g. " M file").
+	for _, line := range strings.Split(status, "\n") {
+		line = strings.TrimRight(line, "\r")
 		if len(line) < 3 {
 			continue
 		}
@@ -461,6 +463,24 @@ func GitCheckout(path, branch string) error {
 	return gitRun(path, "checkout", branch)
 }
 
+// GitAdd stages paths (git add -- <files...>). Empty files stages everything (git add -A).
+func GitAdd(path string, files ...string) error {
+	if len(files) == 0 {
+		return gitRun(path, "add", "-A")
+	}
+	args := append([]string{"add", "--"}, files...)
+	return gitRun(path, args...)
+}
+
+// GitUnstage removes paths from the index. Empty files unstages everything.
+func GitUnstage(path string, files ...string) error {
+	if len(files) == 0 {
+		return gitRun(path, "restore", "--staged", ".")
+	}
+	args := append([]string{"restore", "--staged", "--"}, files...)
+	return gitRun(path, args...)
+}
+
 func GitCherryPick(path string, hashes []string) error {
 	if len(hashes) == 0 {
 		return fmt.Errorf("nenhum commit para cherry-pick")
@@ -491,6 +511,35 @@ func GitBranchCreate(path, name, from string) error {
 		args = append(args, from)
 	}
 	return gitRun(path, args...)
+}
+
+// GitCommit creates a commit with a multi-line message.
+// Uses the index; if nothing is staged, stages tracked changes (git add -u) first.
+func GitCommit(path, message string) error {
+	message = strings.TrimSpace(message)
+	if message == "" {
+		return fmt.Errorf("mensagem vazia")
+	}
+	if gitRun(path, "diff", "--cached", "--quiet") == nil {
+		if err := gitRun(path, "add", "-u"); err != nil {
+			return err
+		}
+		if gitRun(path, "diff", "--cached", "--quiet") == nil {
+			return fmt.Errorf("nada para commitar")
+		}
+	}
+	cmd := exec.Command("git", "commit", "-F", "-")
+	cmd.Dir = path
+	cmd.Stdin = strings.NewReader(message + "\n")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		msg := strings.TrimSpace(string(out))
+		if msg == "" {
+			return err
+		}
+		return fmt.Errorf("%s", msg)
+	}
+	return nil
 }
 
 func GitBranchDelete(path, branch string) error {
@@ -686,6 +735,46 @@ func RefreshProjectGit(store *core.StateStore, projectPath string) {
 	if info != nil {
 		store.UpdateProjectGit(projectPath, *info)
 	}
+}
+
+// RefreshProjectGitFiles updates only working-tree file status (cheap poll while on Git tab).
+func RefreshProjectGitFiles(store *core.StateStore, projectPath string) {
+	projectPath = filepath.Clean(projectPath)
+	root := gitRepoRoot(projectPath)
+	if root == "" {
+		return
+	}
+	files := collectGitFiles(root)
+	staged, modified, untracked := 0, 0, 0
+	for _, f := range files {
+		if f.Staging == "?" || f.Worktree == "?" {
+			untracked++
+			continue
+		}
+		if f.Staging != " " && f.Staging != "" {
+			staged++
+		}
+		if f.Worktree != " " && f.Worktree != "" {
+			modified++
+		}
+	}
+	store.Update(func(snap *core.Snapshot) {
+		for i := range snap.Projects {
+			if filepath.Clean(snap.Projects[i].Path) != projectPath {
+				continue
+			}
+			if snap.Projects[i].Git == nil || !snap.Projects[i].Git.IsRepo {
+				return
+			}
+			g := *snap.Projects[i].Git
+			g.Files = files
+			g.Staged = staged
+			g.Modified = modified
+			g.Untracked = untracked
+			snap.Projects[i].Git = &g
+			return
+		}
+	})
 }
 
 func preserveGitForProjects(store *core.StateStore, projects []core.Project) []core.Project {
