@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -18,11 +17,17 @@ func (a *App) renderProjectSidebar() string {
 func (a *App) renderProjectSidebarH(height int) string {
 	width := 26
 	if a.projectCompact() {
-		width = 22
+		width = 20
 	}
-	inner := maxInt(16, width-2)
+	if a.projectTiny() {
+		width = 16
+	}
+	inner := maxInt(12, width-2)
 	p := a.currentProject()
 	accent := tabAccentColor(a.tab)
+	// lipgloss Height is content rows; border adds ±2 to the measured box.
+	// Keep outer lipgloss.Height(sidebar) == height so it fits the panel.
+	contentH := maxInt(1, height-2)
 
 	top := make([]string, 0, 24)
 	top = append(top, a.sidebarBrandBlock(p, inner)...)
@@ -30,17 +35,44 @@ func (a *App) renderProjectSidebarH(height int) string {
 	top = append(top, a.sidebarNavBlock(p, inner)...)
 
 	foot := a.sidebarFooterLines(p, accent)
-	topH := len(top)
-	footH := len(foot)
-	blank := maxInt(0, height-2-topH-1-footH) // borders + divider before footer
+	// Prefer nav over meters when vertical space is scarce (VS Code terminal).
+	if len(top)+1+len(foot) > contentH {
+		foot = []string{StyleMuted.Render("tab · esc")}
+	}
+	if len(top)+1+len(foot) > contentH {
+		foot = nil
+	}
+	// Still too tall: drop blank group separators, then trim brand.
+	if len(top)+len(foot) > contentH {
+		top = a.sidebarBrandBlock(p, inner)
+		if !a.projectTiny() {
+			top = append(top, sidebarRule(inner, accent))
+		}
+		top = append(top, a.sidebarNavBlockDense(p, inner)...)
+	}
+	if len(top)+len(foot) > contentH && len(foot) > 0 {
+		foot = nil
+	}
 
-	rows := make([]string, 0, topH+blank+1+footH)
+	blank := 0
+	if foot != nil {
+		blank = maxInt(0, contentH-len(top)-1-len(foot))
+	} else {
+		blank = maxInt(0, contentH-len(top))
+	}
+
+	rows := make([]string, 0, contentH)
 	rows = append(rows, top...)
 	for i := 0; i < blank; i++ {
 		rows = append(rows, "")
 	}
-	rows = append(rows, sidebarRule(inner, ColorBorder))
-	rows = append(rows, foot...)
+	if foot != nil {
+		rows = append(rows, sidebarRule(inner, ColorBorder))
+		rows = append(rows, foot...)
+	}
+	if len(rows) > contentH {
+		rows = rows[:contentH]
+	}
 
 	body := strings.Join(rows, "\n")
 	return lipgloss.NewStyle().
@@ -48,7 +80,7 @@ func (a *App) renderProjectSidebarH(height int) string {
 		BorderForeground(accent).
 		Padding(0, 1).
 		Width(width).
-		Height(maxInt(height, lipgloss.Height(body)+2)).
+		Height(contentH).
 		Align(lipgloss.Left, lipgloss.Top).
 		Render(body)
 }
@@ -57,6 +89,15 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	accent := tabAccentColor(a.tab)
 	mark := lipgloss.NewStyle().Foreground(accent).Bold(true).Render("◆")
 	title := lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render("devscope")
+	if a.projectTiny() {
+		name := "project"
+		if p != nil {
+			name = p.Name
+		}
+		return []string{
+			mark + " " + StyleNormal.Render(truncate(name, maxInt(6, width-2))),
+		}
+	}
 	ver := StyleMuted.Render("v" + version.Version)
 	rows := []string{mark + " " + title + " " + ver}
 	if p == nil {
@@ -68,8 +109,10 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 			StyleMuted.Render("  ")+
 			healthDot(p.Health)+" "+healthShort(p.Health),
 	)
-	if branch := sidebarBranchLine(p, width); branch != "" {
-		rows = append(rows, branch)
+	if !a.projectCompact() {
+		if branch := sidebarBranchLine(p, width); branch != "" {
+			rows = append(rows, branch)
+		}
 	}
 	return rows
 }
@@ -104,18 +147,10 @@ func sidebarBranchLine(p *core.Project, width int) string {
 }
 
 func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
-	groups := []struct {
-		title string
-		tabs  []Tab
-	}{
-		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes}},
-		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabJenkins}},
-		{"UTILS", []Tab{TabRoutes}},
-	}
+	groups := sidebarGroups()
 	var rows []string
 	for gi, g := range groups {
-		if gi > 0 {
+		if gi > 0 && !a.projectTiny() {
 			rows = append(rows, "")
 		}
 		rows = append(rows, sidebarGroupLabel(g.title, width, tabAccentColor(g.tabs[0])))
@@ -126,23 +161,41 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 	return rows
 }
 
+// sidebarNavBlockDense drops blank separators between groups (short terminals).
+func (a *App) sidebarNavBlockDense(p *core.Project, width int) []string {
+	groups := sidebarGroups()
+	var rows []string
+	for _, g := range groups {
+		rows = append(rows, sidebarGroupLabel(g.title, width, tabAccentColor(g.tabs[0])))
+		for _, t := range g.tabs {
+			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
+		}
+	}
+	return rows
+}
+
+func sidebarGroups() []struct {
+	title string
+	tabs  []Tab
+} {
+	return []struct {
+		title string
+		tabs  []Tab
+	}{
+		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes}},
+		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
+		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabJenkins}},
+		{"UTILS", []Tab{TabRoutes}},
+	}
+}
+
 func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []string {
-	m := a.snapshot.HostMetrics
-	cpu := m.CPUPercent
-	ramPct := m.MemoryPercent
-	disk := m.DiskPercent
-	ramLabel := fmt.Sprintf("%.0f%%", ramPct)
-	if m.MemoryTotalMB > 0 {
-		ramLabel = fmt.Sprintf("%.1fG/%.0fG", float64(m.MemoryUsedMB)/1024, float64(m.MemoryTotalMB)/1024)
-	}
 	_ = p
-	return []string{
-		lipgloss.NewStyle().Foreground(accent).Bold(true).Render("RESUMO RÁPIDO"),
-		StyleMuted.Render("CPU  ") + meterBar(cpu, 8) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", cpu)),
-		StyleMuted.Render("RAM  ") + meterBar(ramPct, 8) + StyleMuted.Render(" "+ramLabel),
-		StyleMuted.Render("DISK ") + meterBar(disk, 8) + StyleMuted.Render(fmt.Sprintf(" %.0f%%", disk)),
-		StyleMuted.Render("tab · shift+tab · esc"),
+	_ = accent
+	if a.projectTiny() {
+		return []string{StyleMuted.Render("tab · esc")}
 	}
+	return []string{StyleMuted.Render("tab · shift+tab · esc")}
 }
 
 func meterBar(pct float64, width int) string {
@@ -211,6 +264,8 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorAccent
 	case TabNgrok:
 		return ColorSuccess
+	case TabCFTunnel:
+		return ColorWarning
 	case TabJenkins:
 		return ColorK8s
 	default:
@@ -248,6 +303,8 @@ func tabGlyph(t Tab) string {
 		return "⚡"
 	case TabNgrok:
 		return "⇪"
+	case TabCFTunnel:
+		return "☁"
 	case TabJenkins:
 		return "⚙"
 	default:
@@ -264,6 +321,9 @@ func (a *App) renderProjectSidebarRow(t Tab, width int, _ *core.Project) string 
 	accentCol := tabAccentColor(t)
 	accent := lipgloss.NewStyle().Foreground(accentCol).Bold(true)
 	name := t.String()
+	if a.projectTiny() {
+		name = truncate(name, maxInt(6, width-4))
+	}
 
 	if t == a.tab {
 		left := "▌" + tabGlyph(t) + " " + name
@@ -271,18 +331,16 @@ func (a *App) renderProjectSidebarRow(t Tab, width int, _ *core.Project) string 
 		if pad < 0 {
 			pad = 0
 		}
-		line := accent.Render("▌"+tabGlyph(t)) + " " +
-			lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render(name) +
-			strings.Repeat(" ", pad)
-		return lipgloss.NewStyle().Width(width).Background(tabActiveBg(t)).Render(line)
+		return lipgloss.NewStyle().
+			Foreground(ColorText).
+			Background(tabActiveBg(t)).
+			Bold(true).
+			Render(left + strings.Repeat(" ", pad))
 	}
-
 	left := " " + tabGlyph(t) + " " + name
 	pad := width - lipgloss.Width(left)
 	if pad < 0 {
 		pad = 0
 	}
-	line := " " + accent.Render(tabGlyph(t)) + " " + StyleMuted.Render(name) +
-		strings.Repeat(" ", pad)
-	return lipgloss.NewStyle().Width(width).Render(line)
+	return " " + accent.Render(tabGlyph(t)) + " " + StyleMuted.Render(name) + strings.Repeat(" ", pad)
 }

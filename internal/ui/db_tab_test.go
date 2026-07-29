@@ -76,12 +76,12 @@ func TestSidebarShowsDatabaseTool(t *testing.T) {
 func TestDbClientRenderAndFilter(t *testing.T) {
 	p := &core.Project{Name: "demo", Path: "/p"}
 	a := &App{
-		width:      120,
-		height:     40,
-		dbOpen:     true,
-		tab:        TabDatabase,
-		dbTargets:  []collectors.DBTarget{{Label: "db", Engine: collectors.DBEnginePostgres, User: "u", Database: "app"}},
-		dbTables:   []string{"users", "posts", "sessions"},
+		width:     120,
+		height:    40,
+		dbOpen:    true,
+		tab:       TabDatabase,
+		dbTargets: []collectors.DBTarget{{Label: "db", Engine: collectors.DBEnginePostgres, User: "u", Database: "app"}},
+		dbTables:  []string{"users", "posts", "sessions"},
 		dbSchema: collectors.DBTableInfo{
 			Table: "users",
 			Rows:  120,

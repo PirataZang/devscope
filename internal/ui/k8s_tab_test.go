@@ -43,7 +43,7 @@ func TestK8sLandingEnterAndEsc(t *testing.T) {
 		t.Fatalf("4 should open landing, tab=%v open=%v", a.tab, a.k8sOpen)
 	}
 	landing := stripANSI(a.renderK8sLanding(&p))
-	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "Kubernetes") {
+	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "KUBERNETES") || !strings.Contains(landing, "AÇÕES") {
 		t.Fatalf("landing missing prompt: %q", landing)
 	}
 

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/ngrokutil"
 )
@@ -42,10 +41,13 @@ func TestNgrokLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderNgrokTab(&p))
-	for _, want := range []string{"devscope", "ngrok", "TUNNELS", "DETAILS", "AÇÕES"} {
+	for _, want := range []string{"devscope", "ngrok", "TUNNELS", "QUICK STATS", "LOGS", "AÇÕES"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}
+	}
+	if strings.Contains(view, "NAV") || strings.Contains(view, "DETAILS") {
+		t.Fatalf("side panels should be gone:\n%s", view)
 	}
 }
 
@@ -120,40 +122,21 @@ func TestNgrokTunnelsRender(t *testing.T) {
 	}
 }
 
-func TestNgrokTunnelsViewColumnsAlign(t *testing.T) {
+func TestNgrokTunnelsViewLayout(t *testing.T) {
 	a := &App{
 		width: 100, height: 28, ngrokOpen: true, ngrokSubTab: ngrokTabTunnels,
 		ngrokTunnels: []ngrokutil.Tunnel{
-			{Name: "api", Project: "demo", Port: 3000, Proto: "http", Status: "offline"},
+			{Name: "api", Project: "digiliza-site", Port: 3000, Proto: "http", Domain: "x.ngrok-free.app", Status: "offline"},
 		},
 		ngrokCfg: ngrokutil.ProjectConfig{Project: "demo", Region: "us"},
 	}
-	h := 18
-	w := 90
-	leftW, rightW := 18, 26
-	centerW := w - leftW - rightW
-	left := a.renderNgrokSideNav(leftW, h)
-	right := a.renderNgrokInspector(&core.Project{Name: "demo"}, rightW, h)
-	bottomH := h * 32 / 100
-	if bottomH < 5 {
-		bottomH = 5
-	}
-	tableH := h - bottomH
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderNgrokTunnelTable(centerW, tableH),
-		lipgloss.JoinHorizontal(lipgloss.Top,
-			a.renderNgrokRequestsPane(centerW/2, bottomH),
-			a.renderNgrokLogsPane(centerW-centerW/2, bottomH),
-		),
-	)
-	if lipgloss.Height(left) != h || lipgloss.Height(right) != h || lipgloss.Height(center) != h {
-		t.Fatalf("column heights left=%d center=%d right=%d want %d",
-			lipgloss.Height(left), lipgloss.Height(center), lipgloss.Height(right), h)
-	}
-	got := stripANSI(a.renderNgrokTunnelsView(&core.Project{Name: "demo"}, w, h))
-	for _, want := range []string{"LIVE REQUESTS", "LOGS", "AÇÕES", "edit"} {
+	got := stripANSI(a.renderNgrokTunnelsView(&core.Project{Name: "demo"}, 100, 18))
+	for _, want := range []string{"QUICK STATS", "LOGS", "AÇÕES", "TUNNELS", "digiliza-site", "DOMAIN", "x.ngrok-free.app"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
+	}
+	if strings.Contains(got, "NAV") {
+		t.Fatalf("NAV should be removed:\n%s", got)
 	}
 }

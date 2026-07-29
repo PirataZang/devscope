@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/mattn/go-runewidth"
 )
@@ -279,21 +280,23 @@ func frameworkIcon(name string) string {
 }
 
 func renderMetricPills(m core.HostMetrics) string {
-	cpuStyle := StyleMetricCPU
-	if m.CPUPercent > 80 {
-		cpuStyle = StyleUnhealthy
-	} else if m.CPUPercent > 50 {
-		cpuStyle = StyleMetricRAM
-	}
-	ramStyle := StyleMetricRAM
-	if m.MemoryPercent > 90 {
-		ramStyle = StyleUnhealthy
-	}
 	return strings.Join([]string{
-		cpuStyle.Render(fmt.Sprintf("CPU %.0f%%", m.CPUPercent)),
-		ramStyle.Render(fmt.Sprintf("RAM %.0f%%", m.MemoryPercent)),
-		StyleMetricDisk.Render(fmt.Sprintf("DISK %.0f%%", m.DiskPercent)),
+		metricUsageStyle(m.CPUPercent).Render(fmt.Sprintf("CPU %.0f%%", m.CPUPercent)),
+		metricUsageStyle(m.MemoryPercent).Render(fmt.Sprintf("RAM %.0f%%", m.MemoryPercent)),
+		metricUsageStyle(m.DiskPercent).Render(fmt.Sprintf("DISK %.0f%%", m.DiskPercent)),
 	}, "  ")
+}
+
+// metricUsageStyle: verde ≤30%, laranja 31–70%, vermelho >70%.
+func metricUsageStyle(pct float64) lipgloss.Style {
+	switch {
+	case pct > 70:
+		return lipgloss.NewStyle().Foreground(ColorDanger).Bold(true)
+	case pct >= 31:
+		return lipgloss.NewStyle().Foreground(ColorWarning).Bold(true)
+	default:
+		return lipgloss.NewStyle().Foreground(ColorSuccess).Bold(true)
+	}
 }
 
 func renderKeybind(keys, desc string) string {
@@ -321,4 +324,39 @@ func frameworkIconPlain(name string) string {
 	default:
 		return "•"
 	}
+}
+
+// tunnelCmdWidth keeps the tunnel-table call sites; same as actionsCmdWidth.
+func tunnelCmdWidth(total int) int { return actionsCmdWidth(total) }
+
+// tunnelTableCols spreads tunnel columns across the available table width.
+type tunnelCols struct {
+	name, project, port, mode, host, uptime, pid int
+}
+
+func tunnelTableCols(width int) tunnelCols {
+	inner := maxInt(40, width-6) // borders + status prefix
+	// Host/URL gets most of the stretch — trycloudflare hostnames are long.
+	c := tunnelCols{name: 14, project: 14, port: 5, mode: 6, host: 36, uptime: 8, pid: 6}
+	used := 3 + c.name + c.project + c.port + c.mode + c.host + c.uptime + c.pid + 7 // spaces
+	extra := inner - used
+	if extra > 0 {
+		hostExtra := extra * 70 / 100
+		projExtra := extra * 15 / 100
+		nameExtra := extra - hostExtra - projExtra
+		c.host += hostExtra
+		c.project += projExtra
+		c.name += nameExtra
+	} else if extra < 0 {
+		need := -extra
+		take := minInt(need, maxInt(0, c.host-24))
+		c.host -= take
+		need -= take
+		take = minInt(need, maxInt(0, c.project-10))
+		c.project -= take
+		need -= take
+		take = minInt(need, maxInt(0, c.name-10))
+		c.name -= take
+	}
+	return c
 }

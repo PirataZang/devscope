@@ -22,9 +22,9 @@ func TestRestoreContainerCursorKeepsShowAllSelection(t *testing.T) {
 		},
 	}
 	a := &App{
-		containerShowAll: true,
-		selectedProject:  &p1,
-		snapshot:         core.Snapshot{Projects: []core.Project{p1, p2}},
+		containerShowAll:   true,
+		selectedProject:    &p1,
+		snapshot:           core.Snapshot{Projects: []core.Project{p1, p2}},
 		containerPreviewID: "b1",
 		tabCursor:          0, // wrong index after a bad clamp
 	}

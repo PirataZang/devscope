@@ -36,7 +36,7 @@ func TestWsLandingEnterEsc(t *testing.T) {
 	}
 	a.enterWsTab(&p)
 	landing := stripANSI(a.renderWsLanding(&p))
-	if !strings.Contains(landing, "WebSocket") || !strings.Contains(landing, "enter") {
+	if !strings.Contains(landing, "WEBSOCKET") || !strings.Contains(landing, "enter") || !strings.Contains(landing, "AÇÕES") {
 		t.Fatalf("landing=%q", landing)
 	}
 	_ = a.openWsClient(&p)
@@ -44,7 +44,7 @@ func TestWsLandingEnterEsc(t *testing.T) {
 		t.Fatalf("open url=%q open=%v", a.wsURL, a.wsOpen)
 	}
 	view := stripANSI(a.renderWsTab(&p))
-	for _, want := range []string{"Overview", "MESSAGES", "SEND MESSAGE", "CONNECTIONS", "STATS", "FILTERS"} {
+	for _, want := range []string{"Overview", "MESSAGES", "SEND MESSAGE", "CONNECTIONS", "STATS", "FILTERS", "AÇÕES"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("overview missing %q in %q", want, truncate(view, 200))
 		}
@@ -148,11 +148,11 @@ func TestWsOverviewKeepsSendBody(t *testing.T) {
 	a := &App{
 		width: 120, height: 28,
 		wsOpen: true, wsSubTab: wsTabOverview,
-		wsSend: "{\n  \"type\": \"ping\"\n}",
-		wsSendMode: wsSendJSON,
-		wsURL: "ws://localhost:3000/ws",
+		wsSend:          "{\n  \"type\": \"ping\"\n}",
+		wsSendMode:      wsSendJSON,
+		wsURL:           "ws://localhost:3000/ws",
 		selectedProject: &p,
-		snapshot: core.Snapshot{Projects: []core.Project{p}},
+		snapshot:        core.Snapshot{Projects: []core.Project{p}},
 	}
 	view := stripANSI(a.renderWsTab(&p))
 	if !strings.Contains(view, "SEND MESSAGE") || !strings.Contains(view, "ping") {
@@ -166,7 +166,7 @@ func TestWsMessagesHasSendAndTabToggle(t *testing.T) {
 		width: 100, height: 30,
 		wsOpen: true, wsSubTab: wsTabMessages, wsFocus: wsFocusMessages,
 		wsSend: `{"type":"ping"}`, wsSendMode: wsSendJSON,
-		wsFrames: []wsFrame{{ID: 1, Dir: "in", Kind: "text", Payload: "hello-from-server", Size: 17}},
+		wsFrames:        []wsFrame{{ID: 1, Dir: "in", Kind: "text", Payload: "hello-from-server", Size: 17}},
 		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
 	}
 	view := stripANSI(a.renderWsTab(&p))
@@ -246,12 +246,12 @@ func TestWsAllConnectionsPopup(t *testing.T) {
 
 func TestWsConnectionManage(t *testing.T) {
 	a := &App{
-		wsOpen:         true,
-		wsFocus:        wsFocusConnections,
-		wsURL:          "wss://ws.ifelse.io",
-		wsConnected:    true,
-		wsRecent:       []string{"wss://ws.ifelse.io", "wss://echo.websocket.events/", "ws://localhost:5"},
-		wsRecentCursor: 1,
+		wsOpen:          true,
+		wsFocus:         wsFocusConnections,
+		wsURL:           "wss://ws.ifelse.io",
+		wsConnected:     true,
+		wsRecent:        []string{"wss://ws.ifelse.io", "wss://echo.websocket.events/", "ws://localhost:5"},
+		wsRecentCursor:  1,
 		wsEditSourceIdx: -1,
 	}
 
@@ -355,4 +355,3 @@ func TestWsSwitchIgnoresStaleURLDraft(t *testing.T) {
 		t.Fatal("expected dial cmd")
 	}
 }
-

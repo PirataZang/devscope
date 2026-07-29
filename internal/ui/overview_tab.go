@@ -12,15 +12,26 @@ import (
 )
 
 func (a *App) renderOverviewTab(p *core.Project) string {
-	w := maxInt(60, a.width)
-	h := maxInt(16, a.projectPanelHeight())
+	w := a.width
+	if w < 40 {
+		w = 40
+	}
+	h := a.projectPanelHeight()
+	if h < 6 {
+		h = 6
+	}
 	return a.renderOverviewDashboard(p, w, h)
 }
 
 func (a *App) renderOverviewDashboard(p *core.Project, width, height int) string {
 	ctx := a.renderOverviewContext(p, width)
 	ctxH := lipgloss.Height(ctx)
-	bodyH := maxInt(12, height-ctxH)
+	bodyH := maxInt(4, height-ctxH)
+
+	// Short / narrow: single column, no right rail (VS Code terminal).
+	if a.projectTiny() || width < 70 || bodyH < 18 {
+		return lipgloss.JoinVertical(lipgloss.Left, ctx, a.renderOverviewCompact(p, width, bodyH))
+	}
 
 	rightW := maxInt(24, width*28/100)
 	if rightW > 38 {
@@ -32,6 +43,24 @@ func (a *App) renderOverviewDashboard(p *core.Project, width, height int) string
 	right := a.renderOverviewRight(p, rightW, bodyH)
 	body := lipgloss.JoinHorizontal(lipgloss.Top, center, right)
 	return lipgloss.JoinVertical(lipgloss.Left, ctx, body)
+}
+
+func (a *App) renderOverviewCompact(p *core.Project, width, height int) string {
+	if height < 4 {
+		height = 4
+	}
+	// Proportional rows that always sum to height (no hard floors).
+	r1 := maxInt(3, height*30/100)
+	r2 := maxInt(3, height*28/100)
+	r3 := maxInt(3, height-r1-r2)
+	if r1+r2+r3 > height {
+		r3 = maxInt(2, height-r1-r2)
+	}
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderOverviewProjectBox(p, width, r1),
+		a.renderOverviewRuntimeBox(p, width, r2),
+		a.renderOverviewGitBox(p, width, r3),
+	)
 }
 
 func (a *App) renderOverviewContext(p *core.Project, width int) string {
@@ -83,13 +112,42 @@ func projectEnvLabel(p *core.Project) string {
 }
 
 func (a *App) renderOverviewCenter(p *core.Project, width, height int) string {
-	row1H := maxInt(5, height*18/100)
-	row2H := maxInt(7, height*28/100)
-	row3H := maxInt(4, height*14/100)
-	row4H := maxInt(5, height*16/100)
-	row5H := maxInt(5, height-row1H-row2H-row3H-row4H)
+	// Soft mins — never let floors sum past available height.
+	row1H := height * 18 / 100
+	row2H := height * 28 / 100
+	row3H := height * 14 / 100
+	row4H := height * 16 / 100
+	if row1H < 3 {
+		row1H = 3
+	}
+	if row2H < 3 {
+		row2H = 3
+	}
+	if row3H < 3 {
+		row3H = 3
+	}
+	if row4H < 3 {
+		row4H = 3
+	}
+	row5H := height - row1H - row2H - row3H - row4H
+	if row5H < 3 {
+		// Collapse activity/health into leftover; shrink upper rows.
+		need := 3 - row5H
+		for need > 0 && row2H > 3 {
+			row2H--
+			need--
+		}
+		for need > 0 && row1H > 3 {
+			row1H--
+			need--
+		}
+		row5H = height - row1H - row2H - row3H - row4H
+		if row5H < 2 {
+			row5H = 2
+		}
+	}
 
-	projAlertW := maxInt(14, width*28/100)
+	projAlertW := maxInt(12, width*28/100)
 	projMainW := width - projAlertW
 	stackW := width / 2
 	runtimeW := width - stackW
@@ -376,21 +434,16 @@ func (a *App) renderOverviewDetailsBox(p *core.Project, width, height int) strin
 }
 
 func (a *App) renderOverviewActionsBox(width, height int) string {
-	actions := []struct{ key, desc string }{
-		{"a", "analisar projeto"},
-		{"2", "ver git"},
-		{"5", "health check"},
-		{"6", "ver logs"},
-		{"o", "abrir no browser"},
-		{"E", "shell no projeto"},
-		{"3", "containers"},
-		{"7", "métricas"},
-	}
-	lines := make([]string, 0, height-2)
-	for _, ac := range actions {
-		lines = append(lines, StyleKey.Render(fmt.Sprintf("%-3s", ac.key))+StyleMuted.Render(ac.desc))
-	}
-	return renderApiTitledBox("AÇÕES RÁPIDAS", fitExactLines(lines, height-2), width, height, false)
+	return renderActionsBox(width, height,
+		[2]string{"a", "analisar"},
+		[2]string{"2", "git"},
+		[2]string{"5", "health"},
+		[2]string{"6", "logs"},
+		[2]string{"o", "browser"},
+		[2]string{"E", "shell"},
+		[2]string{"3", "containers"},
+		[2]string{"7", "métricas"},
+	)
 }
 
 func (a *App) renderOverviewNotesBox(width, height int) string {

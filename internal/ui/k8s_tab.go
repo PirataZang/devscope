@@ -140,55 +140,56 @@ func (a *App) leaveK8sTab() tea.Cmd {
 }
 
 func (a *App) renderK8sLanding(p *core.Project) string {
-	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabKubernetes)).Bold(true)
+	w, h := a.moduleSize()
 	available := collectors.K8sAvailable()
-	ctx := collectors.K8sCurrentContext()
+	kctx := collectors.K8sCurrentContext()
 	manifests := collectors.DiscoverProjectManifests(p.Path)
-
-	lines := []string{
-		accent.Render("⎈  Kubernetes"),
+	status := "offline"
+	if available {
+		status = "ready"
+	}
+	ctx := a.renderModuleContext(p, w, "KUBERNETES", status)
+	bodyH := maxInt(12, h-lipgloss.Height(ctx))
+	rightW := a.moduleRightWidth(w)
+	centerW := maxInt(36, w-rightW-1)
+	openH := maxInt(7, bodyH*40/100)
+	featH := maxInt(6, bodyH-openH)
+	openLines := []string{
 		StyleMuted.Render("explorer · workloads · logs · yaml · events"),
-		"",
-		StyleSection.Render("ABRIR"),
-		StyleNormal.Render("  pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para entrar"),
-		StyleMuted.Render("  esc no cliente volta para esta aba"),
-		"",
-		StyleSection.Render("ATALHOS"),
-		StyleMuted.Render("  b filter  n/p namespace  l logs  y yaml  e edit"),
-		StyleMuted.Render("  c create  ctrl+s apply  d delete  r refresh"),
-		"",
-		StyleSection.Render("CLUSTER"),
 	}
+	openLines = append(openLines, moduleOpenHint()...)
 	if !available {
-		lines = append(lines,
-			StyleUnhealthy.Render("  kubectl não encontrado no PATH"),
-			StyleMuted.Render("  instale kubectl e configure o kubeconfig"),
-		)
+		openLines = append(openLines, "", StyleUnhealthy.Render("kubectl não encontrado no PATH"))
 	} else {
-		if ctx == "" {
-			ctx = "(sem context)"
+		if kctx == "" {
+			kctx = "(sem context)"
 		}
-		lines = append(lines, StyleNormal.Render("  context  ")+StyleWarning.Render(ctx))
+		openLines = append(openLines, "", StyleMuted.Render("context  ")+StyleWarning.Render(kctx))
 	}
-	lines = append(lines, "", StyleSection.Render("MANIFESTS DO PROJETO"))
-	if len(manifests) == 0 {
-		lines = append(lines, StyleMuted.Render("  nenhum yaml em k8s/ kubernetes/ deploy/"))
-	} else {
-		n := minInt(6, len(manifests))
-		for i := 0; i < n; i++ {
-			rel := manifests[i]
-			if p != nil {
-				if r, err := filepath.Rel(p.Path, manifests[i]); err == nil {
-					rel = r
-				}
-			}
-			lines = append(lines, StyleMuted.Render("  · "+truncate(rel, 42)))
-		}
-		if len(manifests) > n {
-			lines = append(lines, StyleMuted.Render(fmt.Sprintf("  … +%d", len(manifests)-n)))
-		}
+	featLines := []string{
+		StyleMuted.Render("pods · deployments · services"),
+		StyleMuted.Render("logs live · yaml · apply/edit"),
+		StyleMuted.Render("manifests do projeto (k8s/)"),
 	}
-	return StylePanel.Render(strings.Join(lines, "\n"))
+	if len(manifests) > 0 {
+		featLines = append(featLines, StyleMuted.Render(fmt.Sprintf("%d manifests detectados", len(manifests))))
+	}
+	center := lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("KUBERNETES", fitExactLines(openLines, openH-2), centerW, openH, true),
+		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
+	)
+	details := []string{
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(available)),
+		StyleMuted.Render("Context ") + StyleMuted.Render(truncate(kctx, 18)),
+		StyleMuted.Render("YAML    ") + StyleNormal.Render(fmt.Sprintf("%d", len(manifests))),
+	}
+	actions := moduleActionLines(
+		[2]string{"enter", "abrir console"},
+		[2]string{"r", "refresh"},
+		[2]string{"esc", "voltar"},
+	)
+	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
+	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
 }
 
 func (a *App) loadK8sMeta() tea.Cmd {
@@ -377,8 +378,8 @@ func (a *App) k8sSelectedManifest() (string, bool) {
 }
 
 func (a *App) renderK8sTab(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	header := a.renderK8sHeader(w)
 	tabs := a.renderK8sSubTabs(w)
 	headerH := lipgloss.Height(header) + lipgloss.Height(tabs)
@@ -464,15 +465,17 @@ func (a *App) renderK8sSubTabs(width int) string {
 }
 
 func (a *App) renderK8sOverview(width, height int) string {
-	leftW := maxInt(22, width*20/100)
+	cmdW := actionsCmdWidth(width)
+	inner := width - cmdW
+	leftW := maxInt(22, inner*20/100)
 	if leftW > 32 {
 		leftW = 32
 	}
-	rightW := maxInt(24, width*26/100)
+	rightW := maxInt(24, inner*26/100)
 	if rightW > 40 {
 		rightW = 40
 	}
-	centerW := maxInt(30, width-leftW-rightW-2)
+	centerW := maxInt(30, inner-leftW-rightW-2)
 
 	bottomH := maxInt(6, height*32/100)
 	tableH := maxInt(6, height-bottomH)
@@ -488,7 +491,20 @@ func (a *App) renderK8sOverview(width, height int) string {
 		),
 	)
 	right := a.renderK8sDetailPane(rightW, height)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
+	main := lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
+	actions := renderActionsBox(cmdW, height,
+		[2]string{"enter", "detail"},
+		[2]string{"l", "logs"},
+		[2]string{"y", "yaml"},
+		[2]string{"e", "edit"},
+		[2]string{"c", "create"},
+		[2]string{"d", "delete"},
+		[2]string{"n/p", "namespace"},
+		[2]string{"b", "filter"},
+		[2]string{"r", "refresh"},
+		[2]string{"tab", "painel"},
+	)
+	return lipgloss.JoinHorizontal(lipgloss.Top, main, actions)
 }
 
 func (a *App) renderK8sExplorer(width, height int) string {

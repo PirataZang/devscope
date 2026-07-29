@@ -86,7 +86,20 @@ func (a *App) renderContainerTextScreen() string {
 	panelW := maxInt(40, a.width)
 	innerW := maxInt(36, panelW-2)
 	bodyH := maxInt(8, height-6)
-	body := a.renderContainerDetailRichBody(innerW, bodyH)
+	cmdW := actionsCmdWidth(innerW)
+	mainW := maxInt(28, innerW-cmdW)
+	body := lipgloss.JoinHorizontal(lipgloss.Top,
+		a.renderContainerDetailRichBody(mainW, bodyH),
+		renderActionsBox(cmdW, bodyH,
+			[2]string{"←→", "abas"},
+			[2]string{"↑↓", "scroll"},
+			[2]string{"/", "buscar"},
+			[2]string{"f", "follow"},
+			[2]string{"p", "pause"},
+			[2]string{"r", "reload"},
+			[2]string{"esc", "voltar"},
+		),
+	)
 	return a.renderContainerDetailChrome(body, bodyH)
 }
 

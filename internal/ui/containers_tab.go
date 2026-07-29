@@ -79,8 +79,8 @@ func (a *App) dismissContainerShellReturn() tea.Cmd {
 }
 
 func (a *App) renderContainerList(p *core.Project) string {
-	w := maxInt(60, a.width)
-	h := maxInt(18, a.projectPanelHeight())
+	w := maxInt(40, a.width)
+	h := maxInt(8, a.projectPanelHeight())
 
 	containers := a.filteredContainers(p)
 	if a.projectDockerLoading && len(containers) == 0 {
@@ -117,14 +117,9 @@ func (a *App) renderContainerList(p *core.Project) string {
 	tableH := maxInt(6, bodyH-bottomH)
 
 	table := a.renderContainersTable(containers, w, tableH)
-	scope := "A todos"
-	if a.containerShowAll {
-		scope = "A projeto"
-	}
-	actions := StyleMuted.Render("n novo serviço  " + scope + "  enter detalhe  s stop  r restart  p pause  d remove  e shell  l logs  g stats  / buscar")
 	bottom := a.renderContainersBottom(w, bottomH)
 
-	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, actions, bottom)
+	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, bottom)
 }
 
 func (a *App) renderContainersHeader(p *core.Project, running, stopped, width int) string {
@@ -230,9 +225,11 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 }
 
 func (a *App) renderContainersBottom(width, height int) string {
-	w1 := width * 42 / 100
-	w2 := width * 30 / 100
-	w3 := width - w1 - w2
+	cmdW := actionsCmdWidth(width)
+	rest := width - cmdW
+	w1 := rest * 42 / 100
+	w2 := rest * 30 / 100
+	w3 := rest - w1 - w2
 	inner := maxInt(2, height-2)
 
 	logs := a.containerPreviewLogLines(inner, w1-4)
@@ -245,10 +242,25 @@ func (a *App) renderContainersBottom(width, height int) string {
 			title = "LOGS · " + truncate(c.Name, 18)
 		}
 	}
+	scope := "todos"
+	if a.containerShowAll {
+		scope = "projeto"
+	}
 	return lipgloss.JoinHorizontal(lipgloss.Top,
 		renderApiTitledBox(title, fitExactLines(logs, inner), w1, height, false),
 		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
 		renderApiTitledBox("VOLUMES", fitExactLines(vols, inner), w3, height, false),
+		renderActionsBox(cmdW, height,
+			[2]string{"enter", "detalhe"},
+			[2]string{"n", "novo svc"},
+			[2]string{"s", "stop"},
+			[2]string{"r", "restart"},
+			[2]string{"p", "pause"},
+			[2]string{"d", "remove"},
+			[2]string{"e", "shell"},
+			[2]string{"A", scope},
+			[2]string{"/", "buscar"},
+		),
 	)
 }
 

@@ -18,12 +18,41 @@ func (a *App) renderDashboard() string {
 	m := a.snapshot.HostMetrics
 	tableW := safeTableWidth(a.width)
 
+	var projectsBlock string
+	if a.width >= 100 && !a.dashboardCompact() {
+		cmdW := actionsCmdWidth(tableW)
+		mainW := maxInt(40, tableW-cmdW-1)
+		projectsBlock = lipgloss.JoinHorizontal(lipgloss.Top,
+			a.renderProjectsList(projects, mainW),
+			renderActionsBox(cmdW, maxInt(8, a.dashboardProjectsViewport()+4),
+				[2]string{"↑↓", "navegar"},
+				[2]string{"enter", "abrir"},
+				[2]string{"g", "git"},
+				[2]string{"c", "containers"},
+				[2]string{"/", "filtrar"},
+				[2]string{"S-E", "terminal"},
+				[2]string{"S-O", "opencode"},
+				[2]string{"^p", "fuzzy"},
+				[2]string{"r", "refresh"},
+				[2]string{"?", "help"},
+				[2]string{"q", "sair"},
+			),
+		)
+	} else {
+		projectsBlock = a.renderProjectsList(projects, tableW)
+	}
+
 	var sections []string
 	sections = append(sections, a.renderDashboardHeader(m)...)
-	sections = append(sections, "", a.renderProjectsList(projects, tableW))
+	sections = append(sections, "", projectsBlock)
 	sections = append(sections, "", a.renderDashboardFooter(projects))
-
-	return StyleDashboard.Render(strings.Join(sections, "\n"))
+	out := StyleDashboard.Render(strings.Join(sections, "\n"))
+	// Garante que nada empurre as métricas para fora da viewport.
+	if a.height > 0 && lipgloss.Height(out) > a.height {
+		lines := strings.Split(out, "\n")
+		out = strings.Join(lines[:a.height], "\n")
+	}
+	return out
 }
 
 func (a *App) renderDashboardHeader(m core.HostMetrics) []string {
@@ -32,17 +61,13 @@ func (a *App) renderDashboardHeader(m core.HostMetrics) []string {
 		StyleSubtitle.Render(" • Developer Command Center")
 	metrics := renderMetricPills(m)
 	clock := StyleClock.Render(a.now.Format("15:04:05"))
+	innerW := maxInt(a.width-layoutOverhead, 40)
 
-	var lines []string
-	if compact || a.width < 100 {
-		lines = append(lines, brand)
-		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Top, metrics, "  ", clock))
-	} else {
-		lines = append(lines, joinWithSpacer(
-			lipgloss.JoinHorizontal(lipgloss.Top, brand, "  ", metrics),
-			clock,
-			maxInt(a.width-layoutOverhead, 60),
-		))
+	// Métricas sempre na 1ª linha — em tela cheia o overflow da lista
+	// empurrava brand+metrics para fora da viewport.
+	lines := []string{
+		joinWithSpacer(metrics, clock, innerW),
+		brand,
 	}
 
 	sysLine := fmt.Sprintf(
@@ -161,9 +186,13 @@ func (a *App) dashboardProjectsViewport() int {
 	if h <= 0 {
 		return 6
 	}
-	reserved := 13
+	// Chrome fixo: borda/padding do dashboard (~4) + metrics + brand (~2) +
+	// system overview (~1 compact / ~4 wide) + gaps (~2) + footer (~3) +
+	// chrome da lista PROJECTS (~6). Precisa caber na altura do terminal
+	// senão o topo (CPU/RAM/DISK) é empurrado para fora da tela.
+	reserved := 22
 	if a.dashboardCompact() {
-		reserved = 11
+		reserved = 16
 	}
 	v := h - reserved
 	if v < 3 {

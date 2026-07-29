@@ -97,8 +97,8 @@ func (a *App) renderJsonLanding(p *core.Project) string {
 }
 
 func (a *App) renderJsonTab(_ *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	header := a.renderJsonHeader(w)
 	cards := a.renderJsonStatsCards(w)
 	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + 2

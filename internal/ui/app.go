@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/devscope/devscope/internal/cfutil"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
@@ -350,6 +351,31 @@ type App struct {
 	ngrokRequests               []ngrokutil.Request
 	ngrokCfg                    ngrokutil.ProjectConfig
 	ngrokAgent                  ngrokutil.AgentInfo
+	cfOpen                      bool
+	cfLoading                   bool
+	cfWizard                    bool
+	cfConfirmDelete             bool
+	cfSubTab                    cfSubTab
+	cfFocus                     cfFocus
+	cfCursor                    int
+	cfScroll                    int
+	cfAcctCursor                int
+	cfAcctScroll                int
+	cfLogScroll                 int
+	cfNewURL                    string
+	cfNewName                   string
+	cfNewHostname               string
+	cfNewMode                   string
+	cfWizardField               int // 0 name, 1 url, 2 hostname, 3 mode
+	cfWizardCursor              int
+	cfStatus                    string
+	cfErr                       string
+	cfForeign                   int  // live tunnels not in this project config
+	cfShowAll                   bool // true = list every live cloudflared on the host
+	cfTunnels                   []cfutil.Tunnel
+	cfAccount                   []cfutil.AccountTunnel
+	cfCfg                       cfutil.ProjectConfig
+	cfAuth                      cfutil.AuthInfo
 	jenkinsOpen                 bool
 	jenkinsLoading              bool
 	jenkinsEditing              bool
@@ -608,6 +634,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a.handleWsMsg(msg)
 	case ngrokLoadedMsg, ngrokActionMsg:
 		return a.handleNgrokMsg(msg)
+
+	case cfLoadedMsg, cfActionMsg:
+		return a.handleCFMsg(msg)
 
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
@@ -909,6 +938,9 @@ func (a *App) closeToolClients() {
 	a.ngrokOpen = false
 	a.ngrokWizard = false
 	a.ngrokConfirmDelete = false
+	a.cfOpen = false
+	a.cfWizard = false
+	a.cfConfirmDelete = false
 	a.jenkinsOpen = false
 	a.jenkinsEditing = false
 	a.jenkinsBuildDetail = false
@@ -963,6 +995,8 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterWsTab(p)
 	case TabNgrok:
 		a.enterNgrokTab(p)
+	case TabCFTunnel:
+		a.enterCFTab(p)
 	case TabJenkins:
 		a.enterJenkinsTab(p)
 	}
@@ -1013,6 +1047,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	}
 	if tab == TabNgrok {
 		a.ngrokOpen = false
+	}
+	if tab == TabCFTunnel {
+		a.cfOpen = false
 	}
 	if tab == TabJenkins {
 		a.jenkinsOpen = false
@@ -1078,6 +1115,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.handleNgrokKeys(msg, p)
+	}
+	if a.tab == TabCFTunnel && a.cfOpen {
+		return a.handleCFKeys(msg, p)
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.handleJenkinsKeys(msg, p)
@@ -1395,6 +1435,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabNgrok && !a.ngrokOpen {
 			return a, a.openNgrokClient(p)
 		}
+		if a.tab == TabCFTunnel && !a.cfOpen {
+			return a, a.openCFClient(p)
+		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			return a, a.openJenkinsClient(p)
 		}
@@ -1603,12 +1646,19 @@ func (a *App) renderProject() string {
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.renderNgrokTab(p)
 	}
+	if a.tab == TabCFTunnel && a.cfOpen {
+		return a.renderCFTab(p)
+	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.renderJenkinsTab(p)
 	}
 
 	sidebar := a.renderProjectSidebar()
-	contentWidth := maxInt(50, a.width-lipgloss.Width(sidebar)-3)
+	minContent := 36
+	if a.projectTiny() {
+		minContent = 24
+	}
+	contentWidth := maxInt(minContent, a.width-lipgloss.Width(sidebar)-3)
 	panelH := a.projectPanelHeight()
 	accent := tabAccentColor(a.tab)
 
@@ -1627,6 +1677,7 @@ func (a *App) renderProject() string {
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
 		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen) ||
+		(a.tab == TabCFTunnel && !a.cfOpen) ||
 		(a.tab == TabJenkins && !a.jenkinsOpen)
 	switch {
 	case moduleDash:
@@ -1678,6 +1729,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabNgrok && !a.ngrokOpen {
 		hints = "enter abrir Ngrok  " + hints
 	}
+	if a.tab == TabCFTunnel && !a.cfOpen {
+		hints = "enter abrir CF Tunnel  " + hints
+	}
 	if a.tab == TabJenkins && !a.jenkinsOpen {
 		hints = "enter abrir Jenkins  " + hints
 	}
@@ -1708,13 +1762,16 @@ func (a *App) renderProject() string {
 		if a.tab == TabNgrok && !a.ngrokOpen {
 			hints = "enter abrir Ngrok  " + hints
 		}
+		if a.tab == TabCFTunnel && !a.cfOpen {
+			hints = "enter abrir CF Tunnel  " + hints
+		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			hints = "enter abrir Jenkins  " + hints
 		}
 	}
 
-	// Dual-pane shell: brand lives in the rail — keep top chrome light.
-	chrome := a.renderHeader()
+	// Dual-pane shell: brand e métricas ficam no rail e no dashboard — sem
+	// barra de topo aqui.
 	layout := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, " ", content)
 	if compact {
 		return lipgloss.JoinVertical(lipgloss.Left,
@@ -1723,8 +1780,6 @@ func (a *App) renderProject() string {
 		)
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		chrome,
-		"",
 		layout,
 		"",
 		a.renderStatusBar(hints),
@@ -1735,15 +1790,24 @@ func (a *App) projectPanelHeight() int {
 	if a.height <= 0 {
 		return 20
 	}
-	if a.projectCompact() {
-		return maxInt(12, a.height-2)
+	// VS Code / split terminals: use almost all rows (status bar = 1).
+	if a.projectTiny() {
+		return maxInt(6, a.height-1)
 	}
-	// Header + status bar only (project brand moved into the rail).
-	return maxInt(14, a.height-6)
+	if a.projectCompact() {
+		return maxInt(8, a.height-2)
+	}
+	// Sem barra de topo: sobra só o espaçador e a status bar.
+	return maxInt(10, a.height-3)
 }
 
 func (a *App) projectCompact() bool {
 	return (a.height > 0 && a.height < 34) || (a.width > 0 && a.width < 110)
+}
+
+// projectTiny is VS Code / short split-terminal mode (very little vertical room).
+func (a *App) projectTiny() bool {
+	return a.height > 0 && a.height < 22
 }
 
 func (a *App) renderProjectPanel(content string, width, height int) string {
@@ -1845,6 +1909,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderWsLanding(p)
 	case TabNgrok:
 		return a.renderNgrokLanding(p)
+	case TabCFTunnel:
+		return a.renderCFLanding(p)
 	case TabJenkins:
 		return a.renderJenkinsLanding(p)
 	default:

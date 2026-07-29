@@ -250,21 +250,37 @@ func (a *App) renderApiTab(p *core.Project) string {
 	height := maxInt(14, a.height-2)
 	panelW := maxInt(20, a.width)
 	innerW := maxInt(16, panelW-2)
-	chrome := a.renderApiChrome(innerW)
+	cmdW := actionsCmdWidth(innerW)
+	workW := maxInt(40, innerW-cmdW)
+	chrome := a.renderApiChrome(workW)
 	chromeH := lipgloss.Height(chrome)
 	bodyHeight := maxInt(8, height-chromeH-2) // chrome + footer
 	sideW := a.apiSidebarWidth()
-	if sideW+28 > innerW {
-		sideW = maxInt(20, innerW/3)
+	if sideW+28 > workW {
+		sideW = maxInt(20, workW/3)
 	}
-	mainW := maxInt(24, innerW-sideW)
+	mainW := maxInt(24, workW-sideW)
 
 	left := a.renderApiLeftColumn(p, sideW, bodyHeight)
 	right := a.renderApiRightColumn(mainW, bodyHeight)
 	body := lipgloss.JoinHorizontal(lipgloss.Top, left, right)
-	footer := a.renderApiFooterLine(innerW)
+	footer := a.renderApiFooterLine(workW)
+	actions := renderActionsBox(cmdW, bodyHeight+lipgloss.Height(footer),
+		[2]string{"enter", "send"},
+		[2]string{"m", "method"},
+		[2]string{"u", "url"},
+		[2]string{"H", "headers"},
+		[2]string{"e", "body"},
+		[2]string{"[]", "abas"},
+		[2]string{"tab", "painel"},
+		[2]string{"N/P", "history"},
+		[2]string{"esc", "sair"},
+	)
 
-	content := chrome + "\n" + body + "\n" + footer
+	content := chrome + "\n" + lipgloss.JoinHorizontal(lipgloss.Top,
+		lipgloss.JoinVertical(lipgloss.Left, body, footer),
+		actions,
+	)
 	panel := clampRenderedHeight(content, height)
 
 	method := a.apiMethod

@@ -73,16 +73,16 @@ type wsFrame struct {
 }
 
 type wsStats struct {
-	RecvFrames int
-	SentFrames int
-	RecvBytes  int
-	SentBytes  int
-	Errors     int
+	RecvFrames  int
+	SentFrames  int
+	RecvBytes   int
+	SentBytes   int
+	Errors      int
 	Disconnects int
-	LatencyMin time.Duration
-	LatencyMax time.Duration
-	LatencySum time.Duration
-	LatencyN   int
+	LatencyMin  time.Duration
+	LatencyMax  time.Duration
+	LatencySum  time.Duration
+	LatencyN    int
 }
 
 type wsEventMsg struct {
@@ -202,33 +202,46 @@ func (a *App) persistWsProjectConns() {
 
 // --- landing ---
 
-func (a *App) renderWsLanding(_ *core.Project) string {
-	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabWebSocket)).Bold(true)
-	lines := []string{
-		accent.Render("⚡  WebSocket Inspector"),
-		StyleMuted.Render("observabilidade WS — estilo DevTools + LazyGit"),
-		"",
-		StyleSection.Render("ABRIR"),
-		StyleNormal.Render("  pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para o Overview"),
-		"",
-		StyleSection.Render("OVERVIEW"),
-		StyleMuted.Render("  esquerda  connections (por projeto) · filters"),
-		StyleMuted.Render("  centro    messages + send"),
-		StyleMuted.Render("  direita   inspector (details / payload / handshake)"),
-		"",
-		StyleSection.Render("ATALHOS"),
-		StyleMuted.Render("  n nova  e edit  x del  c/enter on  d off"),
-		StyleMuted.Render("  A todas   m Text/JSON/Binary   r reconnect"),
-		StyleMuted.Render("  0-3 abas   tab lista↔send   ←→ scroll   / f"),
+func (a *App) renderWsLanding(p *core.Project) string {
+	w, h := a.moduleSize()
+	ctx := a.renderModuleContext(p, w, "WEBSOCKET", "ready")
+	bodyH := maxInt(12, h-lipgloss.Height(ctx))
+	rightW := a.moduleRightWidth(w)
+	centerW := maxInt(36, w-rightW-1)
+	openH := maxInt(7, bodyH*40/100)
+	featH := maxInt(6, bodyH-openH)
+	openLines := []string{
+		StyleMuted.Render("observabilidade WS — connections · frames · send"),
 	}
-	return StylePanel.Render(strings.Join(lines, "\n"))
+	openLines = append(openLines, moduleOpenHint()...)
+	featLines := []string{
+		StyleMuted.Render("esquerda  connections + filters"),
+		StyleMuted.Render("centro    messages + send"),
+		StyleMuted.Render("direita   inspector payload/handshake"),
+	}
+	center := lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("WEBSOCKET", fitExactLines(openLines, openH-2), centerW, openH, true),
+		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
+	)
+	details := []string{
+		StyleMuted.Render("Modo   ") + StyleNormal.Render("inspector"),
+		StyleMuted.Render("Proto  ") + StyleMuted.Render("RFC6455"),
+	}
+	actions := moduleActionLines(
+		[2]string{"enter", "abrir console"},
+		[2]string{"n", "nova conexão"},
+		[2]string{"c", "connect"},
+		[2]string{"esc", "voltar"},
+	)
+	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
+	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
 }
 
 // --- main render ---
 
 func (a *App) renderWsTab(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	header := a.renderWsHeader(w)
 	tabs := a.renderWsSubTabs(w)
 	headerH := lipgloss.Height(header) + lipgloss.Height(tabs)
@@ -367,15 +380,17 @@ func (a *App) renderWsSubTabs(width int) string {
 // --- overview 3-column ---
 
 func (a *App) renderWsOverview(width, height int) string {
-	leftW := maxInt(22, width*22/100)
+	cmdW := actionsCmdWidth(width)
+	inner := width - cmdW
+	leftW := maxInt(22, inner*22/100)
 	if leftW > 34 {
 		leftW = 34
 	}
-	rightW := maxInt(26, width*28/100)
+	rightW := maxInt(26, inner*28/100)
 	if rightW > 42 {
 		rightW = 42
 	}
-	centerW := maxInt(30, width-leftW-rightW-2)
+	centerW := maxInt(30, inner-leftW-rightW-2)
 
 	sendH := height * 30 / 100
 	if sendH < 7 {
@@ -392,7 +407,20 @@ func (a *App) renderWsOverview(width, height int) string {
 		a.renderWsSendBox(centerW, sendH),
 	)
 	right := a.renderWsInspector(rightW, height)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
+	main := lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
+	actions := renderActionsBox(cmdW, height,
+		[2]string{"c", "connect"},
+		[2]string{"d", "disconnect"},
+		[2]string{"r", "reconnect"},
+		[2]string{"n", "nova"},
+		[2]string{"e", "edit"},
+		[2]string{"x", "delete"},
+		[2]string{"m", "modo"},
+		[2]string{"A", "todas"},
+		[2]string{"tab", "foco"},
+		[2]string{"/", "search"},
+	)
+	return lipgloss.JoinHorizontal(lipgloss.Top, main, actions)
 }
 
 func (a *App) renderWsLeftColumn(width, height int) string {
@@ -479,7 +507,7 @@ func (a *App) renderWsStatsBox(width, height int) string {
 		lat = fmt.Sprintf("%dms / %dms / %dms", avg.Milliseconds(), st.LatencyMin.Milliseconds(), st.LatencyMax.Milliseconds())
 	}
 	kv := []string{
-		stStyle.Render("Status  "+status),
+		stStyle.Render("Status  " + status),
 		StyleMuted.Render("Uptime  ") + StyleNormal.Render(up),
 		StyleMuted.Render("Frames  ") + StyleNormal.Render(fmt.Sprintf("↓%d  ↑%d", st.RecvFrames, st.SentFrames)),
 		StyleMuted.Render("Bytes   ") + StyleNormal.Render(fmt.Sprintf("↓%s  ↑%s", humanBytes(st.RecvBytes), humanBytes(st.SentBytes))),

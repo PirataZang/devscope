@@ -130,10 +130,10 @@ func (a *App) renderDbLanding(p *core.Project) string {
 	if len(targets) > 0 {
 		t := targets[0]
 		details = append(details,
-			StyleMuted.Render("Engine  ") + StyleNormal.Render(string(t.Engine)),
-			StyleMuted.Render("DB      ") + StyleNormal.Render(truncate(t.Database, rightW-10)),
-			StyleMuted.Render("User    ") + StyleMuted.Render(truncate(t.User, rightW-10)),
-			StyleMuted.Render("Label   ") + StyleMuted.Render(truncate(t.Label, rightW-10)),
+			StyleMuted.Render("Engine  ")+StyleNormal.Render(string(t.Engine)),
+			StyleMuted.Render("DB      ")+StyleNormal.Render(truncate(t.Database, rightW-10)),
+			StyleMuted.Render("User    ")+StyleMuted.Render(truncate(t.User, rightW-10)),
+			StyleMuted.Render("Label   ")+StyleMuted.Render(truncate(t.Label, rightW-10)),
 		)
 	}
 	actions := moduleActionLines(
@@ -330,8 +330,8 @@ func parseDBResultRows(out string) int {
 }
 
 func (a *App) renderDbTab(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	a.syncDbTableCursor()
 
 	header := a.renderDbHeader(p, w)
@@ -344,16 +344,30 @@ func (a *App) renderDbTab(p *core.Project) string {
 	sqlH := maxInt(4, bodyH*22/100)
 	resultH := maxInt(5, bodyH-topH-sqlH)
 
-	leftW := maxInt(22, w*28/100)
+	cmdW := actionsCmdWidth(w)
+	mainW := maxInt(40, w-cmdW)
+	leftW := maxInt(22, mainW*28/100)
 	if leftW > 36 {
 		leftW = 36
 	}
-	schemaW := maxInt(24, w-leftW-1)
+	schemaW := maxInt(24, mainW-leftW-1)
 	tables := a.renderDbTablesPane(leftW, topH)
 	schema := a.renderDbSchemaPane(schemaW, topH)
 	top := lipgloss.JoinHorizontal(lipgloss.Top, tables, schema)
-	query := a.renderDbQueryPane(w, sqlH)
-	result := a.renderDbResultPane(w, resultH)
+	query := a.renderDbQueryPane(mainW, sqlH)
+	result := a.renderDbResultPane(mainW, resultH)
+	main := lipgloss.JoinVertical(lipgloss.Left, top, query, result)
+	actions := renderActionsBox(cmdW, lipgloss.Height(main),
+		[2]string{"enter", "preview"},
+		[2]string{"d", "schema"},
+		[2]string{"e", "SQL"},
+		[2]string{"^↵", "run"},
+		[2]string{"b", "filtro"},
+		[2]string{"[]", "banco"},
+		[2]string{"tab", "painel"},
+		[2]string{"↑↓", "navegar"},
+		[2]string{"esc", "sair"},
+	)
 
 	hints := "↑↓ tabelas  enter preview  d schema  e SQL  ctrl+enter run  b filtro  [] banco  esc"
 	if a.dbPane == dbPaneResult && !a.dbEditing {
@@ -369,7 +383,8 @@ func (a *App) renderDbTab(p *core.Project) string {
 		hints = "carregando…  " + hints
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		header, cards, filterLine, top, query, result,
+		header, cards, filterLine,
+		lipgloss.JoinHorizontal(lipgloss.Top, main, actions),
 		a.renderStatusBar(hints),
 	)
 }

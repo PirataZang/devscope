@@ -34,11 +34,9 @@ const (
 type ngrokFocus int
 
 const (
-	ngrokFocusNav ngrokFocus = iota
-	ngrokFocusTable
-	ngrokFocusRequests
+	ngrokFocusTable ngrokFocus = iota
 	ngrokFocusLogs
-	ngrokFocusDetail
+	ngrokFocusRequests
 )
 
 type ngrokLoadedMsg struct {
@@ -208,12 +206,12 @@ func (a *App) renderNgrokLanding(p *core.Project) string {
 }
 
 func (a *App) renderNgrokTab(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	header := a.renderNgrokHeader(p, w)
 	nav := a.renderNgrokNav(w)
 	headerH := lipgloss.Height(header) + lipgloss.Height(nav)
-	bodyH := maxInt(10, h-headerH-2)
+	bodyH := maxInt(4, h-headerH-2)
 
 	var body string
 	if a.ngrokWizard {
@@ -388,59 +386,36 @@ func ngrokStatusLabel(ok bool) string {
 }
 
 func (a *App) renderNgrokTunnelsView(p *core.Project, width, height int) string {
-	if height < 10 {
-		height = 10
+	_ = p
+	if height < 6 {
+		height = 6
 	}
-	leftW := maxInt(16, width*14/100)
-	if leftW > 22 {
-		leftW = 22
-	}
-	rightW := maxInt(22, width*24/100)
-	if rightW > 34 {
-		rightW = 34
-	}
-	centerW := width - leftW - rightW
-	if centerW < 28 {
-		shrink := 28 - centerW
-		take := shrink / 2
-		leftW = maxInt(14, leftW-take)
-		rightW = maxInt(18, rightW-(shrink-take))
-		centerW = width - leftW - rightW
-	}
-	// Keep vertical splits exact so JoinHorizontal doesn't spill taller columns.
 	bottomH := height * 32 / 100
-	if bottomH < 5 {
-		bottomH = 5
+	if bottomH < 4 {
+		bottomH = 4
 	}
-	if bottomH > height-6 {
-		bottomH = height - 6
+	if bottomH > height-4 {
+		bottomH = height - 4
 	}
 	tableH := height - bottomH
-	reqW := centerW / 2
-	logW := centerW - reqW
-
-	left := a.renderNgrokSideNav(leftW, height)
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderNgrokTunnelTable(centerW, tableH),
-		lipgloss.JoinHorizontal(lipgloss.Top,
-			a.renderNgrokRequestsPane(reqW, bottomH),
-			a.renderNgrokLogsPane(logW, bottomH),
-		),
+	cmdW := tunnelCmdWidth(width)
+	rest := width - cmdW
+	statsW := rest / 2
+	logsW := rest - statsW
+	bottom := lipgloss.JoinHorizontal(lipgloss.Top,
+		a.renderNgrokQuickStats(statsW, bottomH),
+		a.renderNgrokLogsPane(logsW, bottomH),
 	)
-	right := a.renderNgrokInspector(p, rightW, height)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
+	if cmdW >= 12 {
+		bottom = lipgloss.JoinHorizontal(lipgloss.Top, bottom, a.renderNgrokCommands(cmdW, bottomH))
+	}
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderNgrokTunnelTable(width, tableH),
+		bottom,
+	)
 }
 
-func (a *App) renderNgrokSideNav(width, height int) string {
-	focus := a.ngrokFocus == ngrokFocusNav
-	statsH := height * 36 / 100
-	if statsH < 5 {
-		statsH = 5
-	}
-	if statsH > height-6 {
-		statsH = height - 6
-	}
-	navH := height - statsH
+func (a *App) renderNgrokQuickStats(width, height int) string {
 	online, offline := 0, 0
 	for _, t := range a.ngrokTunnels {
 		if t.Status == "online" {
@@ -449,41 +424,37 @@ func (a *App) renderNgrokSideNav(width, height int) string {
 			offline++
 		}
 	}
-	items := []string{"Overview", "Tunnels", "Requests", "History", "Domains", "Settings"}
-	lines := make([]string, 0, navH-2)
-	for i, name := range items {
-		mark := "  "
-		style := StyleMuted
-		if ngrokSubTab(i) == a.ngrokSubTab {
-			mark = "▸ "
-			if focus {
-				style = StyleSelected
-			} else {
-				style = StyleNormal
-			}
-		}
-		badge := ""
-		switch ngrokSubTab(i) {
-		case ngrokTabTunnels:
-			badge = fmt.Sprintf(" %d", len(a.ngrokTunnels))
-		case ngrokTabRequests:
-			badge = fmt.Sprintf(" %d", len(a.ngrokRequests))
-		}
-		lines = append(lines, style.Render(truncate(mark+name+badge, width-2)))
+	scope := "projeto"
+	if a.ngrokShowAll {
+		scope = "TODOS"
 	}
-	stats := []string{
-		StyleHealthy.Render(truncate(fmt.Sprintf("On  %d", online), width-2)),
-		StyleUnhealthy.Render(truncate(fmt.Sprintf("Off %d", offline), width-2)),
-		StyleMuted.Render(truncate(fmt.Sprintf("Req %d", len(a.ngrokRequests)), width-2)),
-		StyleMuted.Render(truncate("Band —", width-2)),
+	region := a.ngrokCfg.Region
+	if region == "" {
+		region = "us"
 	}
-	title := "NAV"
-	if focus {
-		title = "> NAV"
+	lines := []string{
+		StyleHealthy.Render(fmt.Sprintf("Online     %d", online)),
+		StyleUnhealthy.Render(fmt.Sprintf("Offline    %d", offline)),
+		StyleMuted.Render(fmt.Sprintf("Requests   %d", len(a.ngrokRequests))),
+		StyleMuted.Render(fmt.Sprintf("Foreign    %d  (A)", a.ngrokForeign)),
+		StyleMuted.Render("Scope      ") + StyleNormal.Render(scope),
+		StyleMuted.Render("Region     ") + StyleNormal.Render(region),
 	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox(title, fitExactLines(lines, navH-2), width, navH, focus),
-		renderApiTitledBox("QUICK STATS", fitExactLines(stats, statsH-2), width, statsH, false),
+	return renderApiTitledBox("QUICK STATS", fitExactLines(lines, height-2), width, height, false)
+}
+
+func (a *App) renderNgrokCommands(width, height int) string {
+	return renderActionsBox(width, height,
+		[2]string{"s", "start"},
+		[2]string{"x", "stop"},
+		[2]string{"r", "restart"},
+		[2]string{"n", "new"},
+		[2]string{"e", "edit"},
+		[2]string{"c", "copy"},
+		[2]string{"o", "open"},
+		[2]string{"A", "todos"},
+		[2]string{"y", "dup"},
+		[2]string{"d", "delete"},
 	)
 }
 
@@ -491,8 +462,17 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 	focus := a.ngrokFocus == ngrokFocusTable
 	n := len(a.ngrokTunnels)
 	a.ngrokScroll = ensureVisible(a.ngrokCursor, a.ngrokScroll, height-3, n)
-	header := fmt.Sprintf("%-3s %-12s %-10s %-5s %-5s %-22s %-8s %s",
-		"ST", "NAME", "PROJECT", "PORT", "PROTO", "DOMAIN", "UPTIME", "REQ")
+	cols := tunnelTableCols(width)
+	header := fmt.Sprintf("%-3s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
+		"ST",
+		cols.name, "NAME",
+		cols.project, "PROJECT",
+		cols.port, "PORT",
+		cols.mode, "PROTO",
+		cols.host, "DOMAIN",
+		cols.uptime, "UPTIME",
+		cols.pid, "REQ",
+	)
 	lines := []string{StyleMuted.Render(truncate(header, width-2))}
 	if n == 0 {
 		lines = append(lines, StyleMuted.Render("  (nenhum túnel — n para criar)"))
@@ -510,15 +490,15 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 			default:
 				dot = StyleUnhealthy.Render("●")
 			}
-			row := fmt.Sprintf("%s %-12s %-10s %-5d %-5s %-22s %-8s %d",
+			row := fmt.Sprintf("%s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
 				" ",
-				truncate(t.Name, 12),
-				truncate(t.Project, 10),
-				t.Port,
-				truncate(t.Proto, 5),
-				truncate(t.Domain, 22),
-				truncate(t.Uptime, 8),
-				t.Requests,
+				cols.name, truncate(t.Name, cols.name),
+				cols.project, truncate(t.Project, cols.project),
+				cols.port, truncate(fmt.Sprintf("%d", t.Port), cols.port),
+				cols.mode, truncate(t.Proto, cols.mode),
+				cols.host, truncate(t.Domain, cols.host),
+				cols.uptime, truncate(t.Uptime, cols.uptime),
+				cols.pid, truncate(fmt.Sprintf("%d", t.Requests), cols.pid),
 			)
 			prefix := "  "
 			style := StyleMuted
@@ -630,61 +610,6 @@ func (a *App) renderNgrokLogsPane(width, height int) string {
 		title = "> LOGS"
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
-}
-
-func (a *App) renderNgrokInspector(p *core.Project, width, height int) string {
-	focus := a.ngrokFocus == ngrokFocusDetail
-	actions := []string{
-		StyleKey.Render("s") + StyleMuted.Render(" start"),
-		StyleKey.Render("x") + StyleMuted.Render(" stop"),
-		StyleKey.Render("r") + StyleMuted.Render(" restart"),
-		StyleKey.Render("o") + StyleMuted.Render(" open"),
-		StyleKey.Render("c") + StyleMuted.Render(" copy"),
-		StyleKey.Render("n") + StyleMuted.Render(" new"),
-		StyleKey.Render("e") + StyleMuted.Render(" edit"),
-		StyleKey.Render("d") + StyleMuted.Render(" delete"),
-		StyleKey.Render("y") + StyleMuted.Render(" dup"),
-		StyleKey.Render("A") + StyleMuted.Render(" todos/proj"),
-	}
-	// Border (2) + all action rows; never taller than half the column.
-	actH := len(actions) + 2
-	if actH > height/2 {
-		actH = height / 2
-	}
-	if actH < 5 {
-		actH = 5
-	}
-	if actH > height-5 {
-		actH = height - 5
-	}
-	detH := height - actH
-	innerW := maxInt(8, width-2)
-	var details []string
-	if t, ok := a.ngrokSelected(); ok {
-		details = []string{
-			StyleMuted.Render("Name   ") + StyleNormal.Render(truncate(t.Name, innerW-7)),
-			StyleMuted.Render("Proj   ") + StyleNormal.Render(truncate(t.Project, innerW-7)),
-			StyleMuted.Render("Status ") + StyleNormal.Render(truncate(t.Status, innerW-7)),
-			StyleMuted.Render("Public ") + StyleAccent.Render(truncate(t.PublicURL, innerW-7)),
-			StyleMuted.Render("Local  ") + StyleMuted.Render(truncate(t.LocalURL, innerW-7)),
-			StyleMuted.Render("Proto  ") + StyleNormal.Render(truncate(t.Proto, innerW-7)),
-			StyleMuted.Render("Domain ") + StyleMuted.Render(truncate(t.Domain, innerW-7)),
-			StyleMuted.Render("Port   ") + StyleNormal.Render(fmt.Sprintf("%d", t.Port)),
-			StyleMuted.Render("Region ") + StyleMuted.Render(truncate(a.ngrokCfg.Region, innerW-7)),
-			StyleMuted.Render("Reqs   ") + StyleNormal.Render(fmt.Sprintf("%d", t.Requests)),
-		}
-	} else {
-		details = []string{StyleMuted.Render("selecione um túnel")}
-	}
-	_ = p
-	title := "DETAILS"
-	if focus {
-		title = "> DETAILS"
-	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox(title, fitExactLines(details, detH-2), width, detH, focus),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
-	)
 }
 
 func (a *App) renderNgrokRequestsFull(width, height int) string {
@@ -888,7 +813,11 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 	case "esc":
 		return a, a.leaveNgrokTab()
 	case "tab":
-		a.ngrokFocus = (a.ngrokFocus + 1) % 5
+		if a.ngrokSubTab == ngrokTabRequests {
+			a.ngrokFocus = ngrokFocusRequests
+		} else {
+			a.ngrokFocus = (a.ngrokFocus + 1) % 2
+		}
 	case "0":
 		a.ngrokSubTab = ngrokTabOverview
 	case "1":
@@ -896,6 +825,7 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		a.ngrokFocus = ngrokFocusTable
 	case "2":
 		a.ngrokSubTab = ngrokTabRequests
+		a.ngrokFocus = ngrokFocusRequests
 	case "3":
 		a.ngrokSubTab = ngrokTabHistory
 	case "4":
@@ -956,25 +886,12 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		return a, a.ngrokDuplicateSelected(p)
 	case "ctrl+r":
 		return a, a.refreshNgrok(p)
-	case "left", "h":
-		a.ngrokFocus = ngrokFocusNav
-	case "right":
-		a.ngrokFocus = ngrokFocusTable
 	}
 	return a, nil
 }
 
 func (a *App) ngrokMove(delta int) tea.Cmd {
 	switch a.ngrokFocus {
-	case ngrokFocusNav:
-		next := int(a.ngrokSubTab) + delta
-		if next < 0 {
-			next = 0
-		}
-		if next > 5 {
-			next = 5
-		}
-		a.ngrokSubTab = ngrokSubTab(next)
 	case ngrokFocusRequests:
 		a.ngrokReqCursor += delta
 		if a.ngrokReqCursor < 0 {

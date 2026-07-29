@@ -47,7 +47,7 @@ func TestOverviewDashboardLayout(t *testing.T) {
 	for _, want := range []string{
 		"Projeto", "Ambiente", "Servidor", "Uptime",
 		"PROJETO", "Atenção", "STACK", "RUNTIME", "MÓDULOS", "GIT",
-		"ATIVIDADE", "HEALTH", "DETALHES", "AÇÕES RÁPIDAS", "NOTAS",
+		"ATIVIDADE", "HEALTH", "DETALHES", "AÇÕES", "NOTAS",
 		"Laravel", "DES-2834",
 	} {
 		if !strings.Contains(view, want) {

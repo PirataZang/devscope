@@ -314,8 +314,8 @@ func (a *App) renderJenkinsLanding(p *core.Project) string {
 }
 
 func (a *App) renderJenkinsTab(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	if a.jenkinsBuildDetail {
 		return lipgloss.JoinVertical(lipgloss.Left,
 			a.renderJenkinsHeader(p, w),

@@ -48,12 +48,19 @@ func (a *App) renderContainerStatsScreen() string {
 	tabs := a.renderContainerDetailTabBar(innerW)
 
 	bodyH := maxInt(8, height-6)
+	cmdW := actionsCmdWidth(innerW)
+	mainW := maxInt(28, innerW-cmdW)
 	var body string
 	if a.containerDetailLoading && len(a.containerDetailCPUHist) == 0 {
-		body = renderApiTitledBox("STATS", fitExactLines([]string{StyleMuted.Render("Coletando métricas do Docker…")}, bodyH-2), innerW, bodyH, true)
+		body = renderApiTitledBox("STATS", fitExactLines([]string{StyleMuted.Render("Coletando métricas do Docker…")}, bodyH-2), mainW, bodyH, true)
 	} else {
-		body = a.renderContainerStatsDashboard(innerW, bodyH)
+		body = a.renderContainerStatsDashboard(mainW, bodyH)
 	}
+	body = lipgloss.JoinHorizontal(lipgloss.Top, body, renderActionsBox(cmdW, bodyH,
+		[2]string{"r", "refresh"},
+		[2]string{"←→", "abas"},
+		[2]string{"esc", "lista"},
+	))
 
 	footer := StyleMuted.Render(truncate("r refresh  ↔ abas  esc lista  ·  poll 2s", innerW))
 	content := lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, footer)

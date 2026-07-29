@@ -101,8 +101,8 @@ func (a *App) renderGitTab(p *core.Project) string {
 		current = p
 	}
 	g := current.Git
-	w := maxInt(60, a.width)
-	h := maxInt(18, a.projectPanelHeight())
+	w := maxInt(40, a.width)
+	h := maxInt(8, a.projectPanelHeight())
 
 	if a.projectGitLoading && (g == nil || !g.IsRepo || len(g.Branches) == 0) {
 		return renderApiTitledBox("GIT", fitExactLines([]string{StyleMuted.Render("Carregando informações do Git...")}, h-2), w, h, true)
@@ -125,12 +125,26 @@ func (a *App) renderGitTab(p *core.Project) string {
 	midH := maxInt(5, (bodyH-bottomH)/2)
 	topH := maxInt(5, bodyH-bottomH-midH)
 
-	top := a.renderGitMainColumnsSized(g, viewBranch, w, topH)
-	mid := a.renderGitWorkingRow(g, viewBranch, w, midH)
-	bottom := a.renderGitBottomBoxes(g, w, bottomH)
-	actions := StyleMuted.Render("c commit  a/A stage toggle  space checkout  enter detail/diff  x cherry  p/P pull/push  n/d/R/M branch")
-
-	return lipgloss.JoinVertical(lipgloss.Left, header, stats, notif, top, mid, bottom, actions)
+	cmdW := actionsCmdWidth(w)
+	mainW := maxInt(40, w-cmdW)
+	top := a.renderGitMainColumnsSized(g, viewBranch, mainW, topH)
+	mid := a.renderGitWorkingRow(g, viewBranch, mainW, midH)
+	bottom := a.renderGitBottomBoxes(g, mainW, bottomH)
+	main := lipgloss.JoinVertical(lipgloss.Left, top, mid, bottom)
+	actions := renderActionsBox(cmdW, lipgloss.Height(main),
+		[2]string{"c", "commit"},
+		[2]string{"a/A", "stage"},
+		[2]string{"space", "checkout"},
+		[2]string{"enter", "detail"},
+		[2]string{"x", "cherry"},
+		[2]string{"p/P", "pull/push"},
+		[2]string{"n", "branch"},
+		[2]string{"d", "delete"},
+		[2]string{"b", "filter"},
+		[2]string{"←→", "painéis"},
+	)
+	body := lipgloss.JoinHorizontal(lipgloss.Top, main, actions)
+	return lipgloss.JoinVertical(lipgloss.Left, header, stats, notif, body)
 }
 
 func (a *App) renderGitHeader(p *core.Project, g *core.GitInfo, width int) string {
@@ -145,7 +159,7 @@ func (a *App) renderGitHeader(p *core.Project, g *core.GitInfo, width int) strin
 		left += StyleMuted.Render(fmt.Sprintf("  stash:%d", g.StashCount))
 	}
 	if remote != "" {
-		left += StyleMuted.Render("  ↗ "+truncate(remote, 36))
+		left += StyleMuted.Render("  ↗ " + truncate(remote, 36))
 	}
 	right := StyleMuted.Render("HEAD ") + StyleWarning.Render(g.Branch)
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
@@ -408,8 +422,8 @@ func gitScrollDownLine(n int) string {
 }
 
 func (a *App) renderGitBranchHistory(p *core.Project) string {
-	w := maxInt(72, a.width)
-	h := maxInt(18, a.height-2)
+	w := a.screenWidth()
+	h := a.screenHeight()
 	branch := a.gitViewBranch
 	if branch == "" && p != nil && p.Git != nil {
 		branch = p.Git.Branch
@@ -1317,7 +1331,7 @@ func (a *App) gitShowWorkingTree() bool {
 }
 
 func (a *App) gitBranchHistoryViewport() int {
-	h := maxInt(18, a.height-2)
+	h := a.screenHeight()
 	// header(~1) + cards(~3) + footer/status(~3) + box chrome(~2)
 	return maxInt(5, h-10)
 }

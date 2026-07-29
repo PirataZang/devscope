@@ -32,6 +32,7 @@ const (
 	TabRoutes
 	TabWebSocket
 	TabNgrok
+	TabCFTunnel
 	TabJenkins
 )
 
@@ -65,6 +66,8 @@ func (t Tab) String() string {
 		return "WS"
 	case TabNgrok:
 		return "Ngrok"
+	case TabCFTunnel:
+		return "CF Tunnel"
 	case TabJenkins:
 		return "Jenkins"
 	default:
@@ -76,6 +79,6 @@ func (t Tab) String() string {
 var AllTabs = []Tab{
 	TabOverview, TabGit, TabContainers, TabKubernetes,
 	TabHealth, TabLogs, TabMetrics,
-	TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabJenkins,
+	TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabJenkins,
 	TabRoutes,
 }

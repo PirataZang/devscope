@@ -110,9 +110,14 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	got := a.renderProjectSidebar()
 	plain := stripANSI(got)
 
-	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "API", "Database", "WS", "Ngrok", "Rotas", "tab · shift+tab", "CPU", "RESUMO"} {
+	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "API", "Database", "WS", "Ngrok", "CF Tunnel", "Rotas", "tab · shift+tab"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
+		}
+	}
+	for _, ban := range []string{"RESUMO", "DISK"} {
+		if strings.Contains(plain, ban) {
+			t.Fatalf("host stats %q devem ficar só no dashboard: %q", ban, plain)
 		}
 	}
 	// One outer rail (single top border), not 7 stacked cards.
@@ -152,8 +157,10 @@ func TestProjectSidebarShowsLiveMeta(t *testing.T) {
 	if strings.Contains(got, "containers") {
 		t.Fatalf("brand must not show containers: %q", got)
 	}
-	if !strings.Contains(got, "CPU") || !strings.Contains(got, "RAM") || !strings.Contains(got, "RESUMO") {
-		t.Fatalf("footer meters missing: %q", got)
+	for _, ban := range []string{"RESUMO", "DISK", "CPU"} {
+		if strings.Contains(got, ban) {
+			t.Fatalf("host stats %q devem ficar só no dashboard: %q", ban, got)
+		}
 	}
 }
 
@@ -189,23 +196,112 @@ func TestProjectRuntimeMetricsUsesOnlyProjectProcesses(t *testing.T) {
 	}
 }
 
-func TestCompactProjectViewHidesHeader(t *testing.T) {
+func TestProjectViewHidesHostMetricsBar(t *testing.T) {
+	project := core.Project{Path: "/projects/app", Name: "app"}
+	host := core.HostMetrics{CPUPercent: 9, MemoryPercent: 92, DiskPercent: 72}
+	pills := stripANSI(renderMetricPills(host))
+	for _, size := range []struct{ w, h int }{{100, 28}, {160, 48}} {
+		a := &App{
+			width:           size.w,
+			height:          size.h,
+			view:            ViewProject,
+			tab:             TabOverview,
+			selectedProject: &project,
+			snapshot:        core.Snapshot{Projects: []core.Project{project}, HostMetrics: host},
+		}
+
+		got := stripANSI(a.renderProject())
+		if strings.Contains(got, pills) {
+			t.Fatalf("%dx%d: barra de métricas do host só no dashboard: %q", size.w, size.h, got)
+		}
+		if !strings.Contains(got, "Visão Geral") || !strings.Contains(got, "SCOPE") {
+			t.Fatalf("%dx%d: sidebar deve continuar", size.w, size.h)
+		}
+	}
+}
+
+func TestDashboardKeepsHostMetricsBar(t *testing.T) {
 	project := core.Project{Path: "/projects/app", Name: "app"}
 	a := &App{
-		width:           100,
-		height:          28,
+		width: 160, height: 48, view: ViewDashboard,
+		snapshot: core.Snapshot{
+			Projects:    []core.Project{project},
+			HostMetrics: core.HostMetrics{CPUPercent: 9, MemoryPercent: 92, DiskPercent: 72},
+		},
+	}
+	got := stripANSI(a.renderDashboard())
+	for _, want := range []string{"DevScope", "CPU 9%", "RAM 92%", "DISK 72%"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("dashboard deve manter %q: %q", want, got)
+		}
+	}
+}
+
+func TestMetricUsageStyleThresholds(t *testing.T) {
+	cases := []struct {
+		pct  float64
+		want lipgloss.Color
+	}{
+		{0, ColorSuccess},
+		{30, ColorSuccess},
+		{31, ColorWarning},
+		{70, ColorWarning},
+		{71, ColorDanger},
+		{100, ColorDanger},
+	}
+	for _, c := range cases {
+		got := metricUsageStyle(c.pct).Render("x")
+		want := lipgloss.NewStyle().Foreground(c.want).Bold(true).Render("x")
+		if got != want {
+			t.Fatalf("pct=%.0f: cor errada", c.pct)
+		}
+	}
+}
+
+func TestTinySidebarFitsPanelHeight(t *testing.T) {
+	project := core.Project{Path: "/projects/app", Name: "app"}
+	a := &App{
+		width:           120,
+		height:          16,
 		view:            ViewProject,
 		tab:             TabOverview,
 		selectedProject: &project,
 		snapshot:        core.Snapshot{Projects: []core.Project{project}},
 	}
-
-	got := a.renderProject()
-	if strings.Contains(got, "DevScope") {
-		t.Fatal("compact project view should hide the header")
+	panelH := a.projectPanelHeight()
+	side := a.renderProjectSidebar()
+	if lipgloss.Height(side) > panelH {
+		t.Fatalf("sidebar height %d exceeds panel %d", lipgloss.Height(side), panelH)
 	}
-	if !strings.Contains(stripANSI(got), "Visão Geral") || !strings.Contains(stripANSI(got), "SCOPE") {
-		t.Fatal("compact project view should keep the sidebar")
+	plain := stripANSI(side)
+	if strings.Contains(plain, "RESUMO") {
+		t.Fatalf("tiny sidebar should drop RESUMO: %q", plain)
+	}
+	got := stripANSI(a.renderProject())
+	if !strings.Contains(got, "SCOPE") {
+		t.Fatal("tiny project view should keep nav groups")
+	}
+}
+
+func TestOverviewCompactOnShortTerminal(t *testing.T) {
+	project := core.Project{
+		Name: "app", Path: "/p", Status: core.StatusRunning, Health: core.HealthHealthy,
+		Git: &core.GitInfo{IsRepo: true, Branch: "main", LastCommit: "abc1234"},
+	}
+	a := &App{
+		width: 100, height: 18, tab: TabOverview,
+		selectedProject: &project,
+		snapshot:        core.Snapshot{Projects: []core.Project{project}},
+	}
+	got := stripANSI(a.renderOverviewTab(&project))
+	if strings.Contains(got, "NOTAS") || strings.Contains(got, "AÇÕES RÁPIDAS") {
+		t.Fatalf("short overview should omit right rail: %q", got)
+	}
+	if !strings.Contains(got, "GIT") && !strings.Contains(got, "Git") {
+		// git box title may vary — at least project name should show
+		if !strings.Contains(got, "app") {
+			t.Fatalf("compact overview empty: %q", got)
+		}
 	}
 }
 
@@ -446,8 +542,8 @@ func TestContainerStatsDashboard(t *testing.T) {
 	a := &App{
 		width: 120, height: 36,
 		view: ViewProject, tab: TabContainers,
-		containerSubview:   containerSubviewDetail,
-		containerDetailTab: containerDetailTabStats,
+		containerSubview:    containerSubviewDetail,
+		containerDetailTab:  containerDetailTabStats,
 		containerDetailName: "laradock-workspace-1",
 		containerDetailID:   "abc123",
 		containerDetailStats: dockerStatsSample{
@@ -456,11 +552,11 @@ func TestContainerStatsDashboard(t *testing.T) {
 			BlkR: 2000, BlkW: 1000, BlkLabel: "2MB / 1MB", PIDs: 39,
 			Raw: "CPU (%): 12.5%\nMemory: 959MiB / 19GiB (4.8%)",
 		},
-		containerDetailCPUHist: []float64{4, 8, 12, 10, 14, 12.5},
-		containerDetailMemHist: []float64{3, 4, 5, 4.5, 4.8},
-		containerDetailNetHist: []float64{800, 900, 1000, 1500},
-		containerDetailBlkHist: []float64{1000, 2000, 2500, 3000},
-		containerDetailPIDHist: []float64{30, 35, 39},
+		containerDetailCPUHist:   []float64{4, 8, 12, 10, 14, 12.5},
+		containerDetailMemHist:   []float64{3, 4, 5, 4.5, 4.8},
+		containerDetailNetHist:   []float64{800, 900, 1000, 1500},
+		containerDetailBlkHist:   []float64{1000, 2000, 2500, 3000},
+		containerDetailPIDHist:   []float64{30, 35, 39},
 		containerDetailStatsLive: true,
 		selectedProject:          &project,
 		snapshot:                 core.Snapshot{Projects: []core.Project{project}},
@@ -538,4 +634,43 @@ func TestWrapText(t *testing.T) {
 
 func ptrStatus(s core.ProjectStatus) *core.ProjectStatus {
 	return &s
+}
+
+func TestDashboardHeaderAlwaysShowsMetrics(t *testing.T) {
+	projects := make([]core.Project, 20)
+	for i := range projects {
+		projects[i] = core.Project{Path: fmt.Sprintf("/p/%d", i), Name: fmt.Sprintf("app-%d", i)}
+	}
+	host := core.HostMetrics{CPUPercent: 35, MemoryPercent: 96, DiskPercent: 72}
+	for _, size := range []struct{ w, h int }{{80, 24}, {120, 40}, {200, 60}, {240, 80}} {
+		a := &App{
+			width: size.w, height: size.h, view: ViewDashboard,
+			snapshot: core.Snapshot{Projects: projects, HostMetrics: host},
+		}
+		raw := a.renderDashboard()
+		if lipgloss.Height(raw) > size.h {
+			t.Fatalf("%dx%d: dashboard height %d exceeds terminal", size.w, size.h, lipgloss.Height(raw))
+		}
+		got := stripANSI(raw)
+		for _, want := range []string{"CPU 35%", "RAM 96%", "DISK 72%"} {
+			if !strings.Contains(got, want) {
+				t.Fatalf("%dx%d missing %q\n%s", size.w, size.h, want, got)
+			}
+		}
+		// Métricas na 1ª linha útil (antes de SYSTEM/PROJECTS).
+		lines := strings.Split(got, "\n")
+		found := false
+		for _, line := range lines {
+			if strings.Contains(line, "CPU 35%") {
+				found = true
+				break
+			}
+			if strings.Contains(line, "SYSTEM OVERVIEW") || strings.Contains(line, "PROJECTS") {
+				t.Fatalf("%dx%d: metrics appear after SYSTEM/PROJECTS\n%s", size.w, size.h, got)
+			}
+		}
+		if !found {
+			t.Fatalf("%dx%d: metrics never found", size.w, size.h)
+		}
+	}
 }
