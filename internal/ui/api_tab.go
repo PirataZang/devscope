@@ -415,9 +415,9 @@ func renderApiTitledBox(title string, lines []string, width, height int, focused
 		if i < len(lines) {
 			line = lines[i]
 		}
-		// Strip styles for width fit of content that already has ANSI.
+		// ANSI-aware truncate — plain truncate() breaks escapes and widens cells.
 		if lipgloss.Width(line) > innerW {
-			line = truncate(line, innerW)
+			line = ansi.Truncate(line, innerW, "…")
 		}
 		body[i] = padRightVisible(line, innerW)
 	}

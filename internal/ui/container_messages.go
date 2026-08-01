@@ -163,6 +163,10 @@ func containerActionPrefix(kind string) string {
 		return "▶ iniciando"
 	case "restart":
 		return "⟳ reiniciando"
+	case "always":
+		return "∞ always"
+	case "no-always":
+		return "○ no-restart"
 	case "pause":
 		return "⏸ pausando"
 	case "unpause":
@@ -176,7 +180,7 @@ func (a *App) updateContainerStatusSummary() {
 	if len(a.containerActions) == 0 {
 		return
 	}
-	order := []string{"stop", "start", "restart", "pause", "unpause"}
+	order := []string{"stop", "start", "restart", "always", "no-always", "pause", "unpause"}
 	byKind := make(map[string][]string)
 	for name, kind := range a.containerActions {
 		byKind[kind] = append(byKind[kind], name)
@@ -266,6 +270,26 @@ func (a *App) containerRestart(c core.Container) tea.Cmd {
 	}
 }
 
+func (a *App) containerToggleRestartAlways(c core.Container) tea.Cmd {
+	policy := "always"
+	action := "always"
+	if containerRestartAlways(c) {
+		policy = "no"
+		action = "no-always"
+	}
+	if !a.beginContainerAction(action, c) {
+		return nil
+	}
+	path := a.containerActionProjectPath(c)
+	store := a.store
+	healthCfg := a.cfg.Health
+	return func() tea.Msg {
+		err := collectors.DockerSetRestartPolicy(collectors.DockerExecTarget(c), policy)
+		collectors.RefreshProjectDocker(store, path, healthCfg)
+		return containerActionDoneMsg{action: action, name: c.Name, err: err}
+	}
+}
+
 func (a *App) containerStartOrRestart(c core.Container) tea.Cmd {
 	if collectors.IsContainerStopped(c) {
 		return a.containerStart(c)
@@ -330,11 +354,41 @@ func (a *App) handleContainerActionDone(msg containerActionDoneMsg) {
 			a.containerStatusMsg = "▶ " + msg.name + " iniciado ✓"
 		case "restart":
 			a.containerStatusMsg = "⟳ " + msg.name + " reiniciado ✓"
+		case "always":
+			a.containerStatusMsg = "∞ " + msg.name + " restart=always ✓"
+			a.markContainerRestartPolicy(msg.name, "always")
+		case "no-always":
+			a.containerStatusMsg = "○ " + msg.name + " restart=no ✓"
+			a.markContainerRestartPolicy(msg.name, "no")
 		default:
 			a.containerStatusMsg = msg.action + " " + msg.name + " ✓"
 		}
 	}
+	_ = a.currentProject() // refresh selectedProject from snapshot
 	a.restoreContainerCursor(a.containerPreviewID)
+}
+
+// markContainerRestartPolicy keeps the indicator in sync if inspect lags behind update.
+func (a *App) markContainerRestartPolicy(name, policy string) {
+	if a.store != nil {
+		a.store.Update(func(snap *core.Snapshot) {
+			for i := range snap.Projects {
+				for j := range snap.Projects[i].Containers {
+					if snap.Projects[i].Containers[j].Name == name {
+						snap.Projects[i].Containers[j].Restart = policy
+					}
+				}
+			}
+		})
+		a.snapshot = a.store.Get()
+	}
+	if a.selectedProject != nil {
+		for j := range a.selectedProject.Containers {
+			if a.selectedProject.Containers[j].Name == name {
+				a.selectedProject.Containers[j].Restart = policy
+			}
+		}
+	}
 }
 
 func (a *App) handleContainerShellDone(msg containerShellDoneMsg) tea.Cmd {

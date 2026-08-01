@@ -24,8 +24,8 @@ refresh:
   git_interval: 30s
 
 ui:
-  # dark | dracula | nord | monokai | catppuccin | gruvbox | solarized | light | auto
-  theme: dark
+  # devscope | dark | tokyo-night | catppuccin | rose-pine | solarized | dracula | dracula-vivid | nord | monokai | gruvbox | light | auto
+  theme: devscope
 
 health:
   timeout: 5s

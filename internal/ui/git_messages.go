@@ -38,6 +38,8 @@ type gitActionDoneMsg struct {
 	branch    string
 	newBranch string
 	count     int
+	cmdline   string
+	output    string
 	err       error
 }
 
@@ -93,13 +95,20 @@ func (a *App) handleGitWTRefreshed(msg gitWTRefreshedMsg) {
 	a.syncGitBranchesFrom(p)
 	if len(p.Git.Files) == 0 {
 		a.gitFileCursor = 0
+		a.gitFileTreeCursor = 0
 		a.gitFileScroll = 0
 		return
 	}
-	if a.gitFileCursor >= len(p.Git.Files) {
-		a.gitFileCursor = len(p.Git.Files) - 1
+	rows := wtFileTreeFrom(p.Git.Files)
+	a.gitFileTreeCursor = clampCursor(a.gitFileTreeCursor, len(rows))
+	a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, a.gitFilesViewport(), len(rows))
+	if len(rows) > 0 {
+		if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
+			a.gitFileCursor = r.fileIdx
+		} else {
+			a.gitFileCursor = clampCursor(a.gitFileCursor, len(p.Git.Files))
+		}
 	}
-	a.gitFileScroll = ensureVisible(a.gitFileCursor, a.gitFileScroll, a.gitFilesViewport(), len(p.Git.Files))
 }
 
 func (a *App) requestGitWorkingTreeDiff(path, file string) tea.Cmd {
@@ -128,6 +137,46 @@ func (a *App) pushGitActivity(msg gitActionDoneMsg) {
 	if len(a.gitActivity) > 20 {
 		a.gitActivity = a.gitActivity[:20]
 	}
+}
+
+func (a *App) appendGitCommandLog(msg gitActionDoneMsg) {
+	title := msg.action
+	if title != "" {
+		title = strings.ToUpper(title[:1]) + title[1:]
+	}
+	switch msg.action {
+	case "pull":
+		title = "Pull"
+	case "push":
+		title = "Push"
+	case "checkout":
+		title = "Checkout"
+	}
+	cmdline := msg.cmdline
+	if cmdline == "" {
+		cmdline = "git " + msg.action
+		if msg.branch != "" {
+			cmdline += " " + msg.branch
+		}
+	}
+	out := strings.TrimSpace(msg.output)
+	if out == "" {
+		if msg.err != nil {
+			out = msg.err.Error()
+		} else {
+			out = "ok"
+		}
+	}
+	a.gitCommandLog = append(a.gitCommandLog, gitCmdLogEntry{
+		Title:   title,
+		Cmdline: cmdline,
+		Output:  out,
+		Time:    timeNowHHMM(),
+	})
+	if len(a.gitCommandLog) > 40 {
+		a.gitCommandLog = a.gitCommandLog[len(a.gitCommandLog)-40:]
+	}
+	a.gitCmdLogScroll = 0
 }
 
 func timeNowHHMM() string {
@@ -177,11 +226,11 @@ func (a *App) gitAddFile(p *core.Project) tea.Cmd {
 		a.gitStatusMsg = "checkout da branch para stage"
 		return nil
 	}
-	if len(p.Git.Files) == 0 || a.gitFileCursor >= len(p.Git.Files) {
-		a.gitStatusMsg = "nenhum arquivo para stage"
+	f, ok := a.selectedWTFile(p.Git)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo para stage"
 		return nil
 	}
-	f := p.Git.Files[a.gitFileCursor]
 	file := f.Path
 	path := p.Path
 	a.gitActionLoading = true
@@ -242,8 +291,8 @@ func (a *App) gitCheckoutBranch(p *core.Project, branch string) tea.Cmd {
 	a.gitStatusMsg = "checkout " + branch + "..."
 	path := p.Path
 	return func() tea.Msg {
-		err := collectors.GitCheckout(path, branch)
-		return gitActionDoneMsg{path: path, action: "checkout", branch: branch, err: err}
+		out, err := collectors.GitCheckout(path, branch)
+		return gitActionDoneMsg{path: path, action: "checkout", branch: branch, cmdline: "git checkout " + branch, output: out, err: err}
 	}
 }
 
@@ -283,14 +332,19 @@ func (a *App) gitMergeBranch(p *core.Project, branch string) tea.Cmd {
 	a.gitStatusMsg = "mesclando " + branch + " em " + target + "..."
 	path := p.Path
 	return func() tea.Msg {
+		var parts []string
 		current := collectors.GitCurrentBranch(path)
 		if branch != current && target != current {
-			if err := collectors.GitCheckout(path, target); err != nil {
-				return gitActionDoneMsg{path: path, action: "merge", branch: branch, err: err}
+			out, err := collectors.GitCheckout(path, target)
+			if out != "" {
+				parts = append(parts, out)
+			}
+			if err != nil {
+				return gitActionDoneMsg{path: path, action: "merge", branch: branch, cmdline: "git merge " + branch, output: strings.Join(parts, "\n"), err: err}
 			}
 		}
 		err := collectors.GitMerge(path, branch)
-		return gitActionDoneMsg{path: path, action: "merge", branch: branch, err: err}
+		return gitActionDoneMsg{path: path, action: "merge", branch: branch, cmdline: "git merge " + branch, output: strings.Join(parts, "\n"), err: err}
 	}
 }
 
@@ -304,8 +358,8 @@ func (a *App) gitPull(p *core.Project) tea.Cmd {
 	a.gitStatusMsg = "pull origin " + source + "..."
 	path := p.Path
 	return func() tea.Msg {
-		err := collectors.GitPullOrigin(path, source)
-		return gitActionDoneMsg{path: path, action: "pull", branch: source, err: err}
+		out, err := collectors.GitPullOrigin(path, source)
+		return gitActionDoneMsg{path: path, action: "pull", branch: source, cmdline: "git pull origin " + source + " --ff-only", output: out, err: err}
 	}
 }
 
@@ -313,9 +367,23 @@ func (a *App) gitPush(p *core.Project) tea.Cmd {
 	a.gitActionLoading = true
 	a.gitStatusMsg = "push..."
 	path := p.Path
+	remote := ""
+	if p.Git != nil {
+		remote = p.Git.Remote
+	}
 	return func() tea.Msg {
-		err := collectors.GitPush(path)
-		return gitActionDoneMsg{path: path, action: "push", err: err}
+		out, err := collectors.GitPush(path)
+		if err == nil {
+			head := collectors.GitCurrentBranch(path)
+			base := collectors.GitDefaultPRBase(path, head)
+			if url := collectors.GitHubCompareURL(remote, base, head); url != "" {
+				if out != "" {
+					out += "\n"
+				}
+				out += "Create a pull request for '" + head + "' on GitHub by visiting:\n  " + url
+			}
+		}
+		return gitActionDoneMsg{path: path, action: "push", cmdline: "git push", output: out, err: err}
 	}
 }
 
@@ -334,14 +402,19 @@ func (a *App) gitCherryPickPaste(p *core.Project) tea.Cmd {
 	hashes := append([]string(nil), a.gitCherryPickBuffer...)
 	count := len(hashes)
 	return func() tea.Msg {
+		var parts []string
 		current := collectors.GitCurrentBranch(path)
 		if target != "" && target != current {
-			if err := collectors.GitCheckout(path, target); err != nil {
-				return gitActionDoneMsg{path: path, action: "cherry-pick", branch: target, count: count, err: err}
+			out, err := collectors.GitCheckout(path, target)
+			if out != "" {
+				parts = append(parts, out)
+			}
+			if err != nil {
+				return gitActionDoneMsg{path: path, action: "cherry-pick", branch: target, count: count, cmdline: "git cherry-pick", output: strings.Join(parts, "\n"), err: err}
 			}
 		}
 		err := collectors.GitCherryPick(path, hashes)
-		return gitActionDoneMsg{path: path, action: "cherry-pick", branch: target, count: count, err: err}
+		return gitActionDoneMsg{path: path, action: "cherry-pick", branch: target, count: count, cmdline: "git cherry-pick " + strings.Join(hashes, " "), output: strings.Join(parts, "\n"), err: err}
 	}
 }
 
@@ -370,13 +443,28 @@ func (a *App) handleGitCommitDetailLoaded(msg gitCommitDetailLoadedMsg) tea.Cmd 
 	a.gitCommitFullMsg = msg.fullMessage
 	a.gitCommitFilesLoading = false
 	a.gitCommitFileCursor = 0
+	a.gitCommitTreeCursor = 0
 	a.gitCommitFileScroll = 0
+	a.gitCommitCollapsed = nil
+	a.gitCommitFileOpen = false
+	a.gitCommitDetailFocus = gitCommitFocusFiles
+	a.gitCommitDiffLoading = false
 	if len(msg.files) == 0 {
 		a.gitCommitDiff = "(nenhum arquivo alterado)"
-		a.gitCommitDiffLoading = false
 		return nil
 	}
-	return a.requestGitCommitFileDiff(msg.path, msg.hash, msg.files[0].Path)
+	// Preview the first file under the tree cursor (stay on Arquivos).
+	rows := a.commitFileTreeRows()
+	for i, r := range rows {
+		if r.isDir {
+			continue
+		}
+		a.gitCommitTreeCursor = i
+		a.gitCommitFileCursor = r.fileIdx
+		return a.requestGitCommitFileDiff(msg.path, msg.hash, msg.files[r.fileIdx].Path)
+	}
+	a.gitCommitDiff = ""
+	return nil
 }
 
 func (a *App) requestGitCommitFileDiff(path, hash, file string) tea.Cmd {

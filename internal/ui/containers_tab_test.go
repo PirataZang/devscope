@@ -4,6 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -40,6 +43,120 @@ func TestRestoreContainerCursorKeepsShowAllSelection(t *testing.T) {
 	a.restoreContainerCursor("b1")
 	if a.tabCursor != 2 {
 		t.Fatalf("restore should recover show-all selection, got %d", a.tabCursor)
+	}
+}
+
+func TestContainerRestartAlwaysIndicator(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", Restart: "always", ProjectPath: "/apps/one"},
+			{ID: "c2", Name: "db", Status: "running", Restart: "no", ProjectPath: "/apps/one"},
+		},
+	}
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+	}
+	if !containerRestartAlways(p.Containers[0]) || containerRestartAlways(p.Containers[1]) {
+		t.Fatal("always detector")
+	}
+	got := stripANSI(a.renderContainerList(&p))
+	if !strings.Contains(got, "∞always") {
+		t.Fatalf("STATE should show ∞always:\n%s", truncate(got, 400))
+	}
+	if !strings.Contains(got, "∞ web") {
+		t.Fatalf("missing always marker on web name:\n%s", truncate(got, 400))
+	}
+	if strings.Contains(got, "∞ db") {
+		t.Fatal("db should not show always marker")
+	}
+	if !strings.Contains(got, "S-R") || !strings.Contains(strings.ToLower(got), "always") {
+		t.Fatalf("AÇÕES should list S-R always:\n%s", truncate(got, 400))
+	}
+}
+
+func TestShiftRSetsRestartAlwaysOnContainers(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", ProjectPath: "/apps/one"},
+		},
+		HasDockerCompose: true,
+	}
+	store := core.NewStateStore(nil)
+	store.SetProjects([]core.Project{p})
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: store.Get(), store: store,
+		cfg: &config.Config{},
+	}
+	// Terminals send Shift+R as "R" — must not fall through to compose restart.
+	_, cmd := a.updateProject(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'R'}})
+	if cmd == nil {
+		t.Fatal("R on containers should start restart=always action")
+	}
+	if a.containerActionKind("web") != "always" {
+		t.Fatalf("expected always action pending, got %q", a.containerActionKind("web"))
+	}
+}
+
+func TestShiftRTogglesRestartAlwaysOff(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", Restart: "always", ProjectPath: "/apps/one"},
+		},
+	}
+	store := core.NewStateStore(nil)
+	store.SetProjects([]core.Project{p})
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: store.Get(), store: store,
+		cfg: &config.Config{},
+	}
+	_, cmd := a.updateProject(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'R'}})
+	if cmd == nil {
+		t.Fatal("R on always container should clear policy")
+	}
+	if a.containerActionKind("web") != "no-always" {
+		t.Fatalf("expected no-always action, got %q", a.containerActionKind("web"))
+	}
+}
+
+func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", ProjectPath: "/apps/one"},
+		},
+	}
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p,
+		snapshot:        core.Snapshot{Projects: []core.Project{p}},
+		containerPreviewID: "c1",
+		// \r + ANSI + tab are what smash JoinHorizontal in real docker logs.
+		containerPreviewLogs: "boot\r\x1b[31mERR\x1b[0m\tCould not find 'bundler'\nReady to run Vite...",
+		containerPreviewVolumes: []string{
+			"/home/igor/Área de trabalho/projetos/digiliza-chat-v2/packs",
+			"/home/igor/Área de trabalho/projetos/digiliza-chat-v2/cache",
+		},
+	}
+	bottom := a.renderContainersBottom(100, 10)
+	if w := lipgloss.Width(bottom); w > 102 {
+		t.Fatalf("bottom width %d exceeds pane (dirty docker output leaked)", w)
+	}
+	plain := stripANSI(bottom)
+	if strings.Contains(plain, "\r") || strings.Contains(plain, "\t") {
+		t.Fatal("control chars must be sanitized before render")
+	}
+	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "VOLUMES") || !strings.Contains(plain, "AÇÕES") {
+		t.Fatalf("bottom panels missing:\n%s", truncate(plain, 300))
 	}
 }
 

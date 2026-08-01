@@ -1,10 +1,12 @@
 package ui
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -283,40 +285,78 @@ func (a *App) renderGitPrompt() string {
 	background := a.renderProject()
 	runes := []rune(a.gitPromptInput)
 	a.gitPromptCursor = minInt(a.gitPromptCursor, len(runes))
-	input := string(runes[:a.gitPromptCursor]) + "█" + string(runes[a.gitPromptCursor:])
+	typed := string(runes[:a.gitPromptCursor]) + "█" + string(runes[a.gitPromptCursor:])
+	name := strings.TrimSpace(a.gitPromptInput)
 
+	boxW := minInt(a.width-4, maxInt(52, a.width*62/100))
+	boxH := minInt(a.height-2, maxInt(20, a.height*60/100))
+	innerW := maxInt(28, boxW-6)
+
+	isRename := a.gitPromptKind == gitPromptRenameBranch
+	brand := lipgloss.NewStyle().Bold(true).Foreground(ColorAccent).Render("GIT")
 	title := "Nova branch"
-	context := ""
-	footer := "enter cria  ·  esc cancela"
-	if a.gitPromptKind == gitPromptRenameBranch {
+	subtitle := "criar a partir de outra branch"
+	baseLabel := "a partir de"
+	actionHint := "enter cria"
+	if isRename {
 		title = "Renomear branch"
-		if a.gitPromptBranch != "" {
-			context = StyleMuted.Render("atual  ") + StyleWarning.Render(a.gitPromptBranch)
-		}
-		footer = "enter renomeia  ·  esc cancela"
-	} else if a.gitPromptBranch != "" {
-		context = StyleMuted.Render("a partir de  ") + StyleWarning.Render(a.gitPromptBranch)
+		subtitle = "definir um novo nome"
+		baseLabel = "branch atual"
+		actionHint = "enter renomeia"
+	}
+
+	baseBranch := strings.TrimSpace(a.gitPromptBranch)
+	if baseBranch == "" {
+		baseBranch = "—"
+	}
+
+	proj := ""
+	if p := a.currentProject(); p != nil {
+		proj = p.Name
 	}
 
 	lines := []string{
-		StyleSection.Render(title),
-		StyleMuted.Render("digite o nome da branch"),
-		"",
+		brand + StyleMuted.Render("  ·  ") + StyleNormal.Render(title),
+		StyleMuted.Render(subtitle),
+		StyleMuted.Render(strings.Repeat("─", minInt(innerW, 48))),
 	}
-	if context != "" {
-		lines = append(lines, context, "")
+	if proj != "" {
+		lines = append(lines, StyleMuted.Render("projeto  ")+StyleNormal.Render(truncate(proj, maxInt(12, innerW-10))))
 	}
-	lines = append(lines,
-		StyleMuted.Render("nome"),
-		StyleSelected.Render("▸ "+input),
-		"",
-		StyleMuted.Render(footer),
+
+	baseBox := renderApiTitledBox(baseLabel,
+		[]string{StyleWarning.Bold(true).Render(truncate(baseBranch, innerW-2))},
+		innerW, 3, false,
+	)
+	nameBox := renderApiTitledBox("nome",
+		[]string{StyleSelected.Render(truncate(typed, innerW-2))},
+		innerW, 3, true,
 	)
 
-	boxW := minInt(56, maxInt(36, a.width-10))
+	preview := StyleMuted.Render("preview  ")
+	if name == "" {
+		preview += StyleMuted.Render("(digite um nome)")
+	} else {
+		preview += StyleWarning.Render(truncate(baseBranch, 18)) +
+			StyleMuted.Render("  →  ") +
+			StyleHealthy.Render(truncate(name, 22))
+	}
+
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(baseBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(nameBox, "\n")...)
+	lines = append(lines, "",
+		preview,
+		StyleMuted.Render("letras, números, / e -  ·  sem espaços"),
+		"",
+		StyleMuted.Render(fmt.Sprintf("%s  ·  ←→ move cursor  ·  esc cancela", actionHint)),
+	)
+
 	box := StylePanel.
 		Width(boxW).
+		BorderForeground(ColorAccent).
 		Background(ColorBgPanel).
-		Render(strings.Join(lines, "\n"))
+		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
 	return overlayCentered(background, box, a.width, a.height)
 }

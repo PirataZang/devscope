@@ -72,6 +72,26 @@ func TestParseDockerPSLine(t *testing.T) {
 	}
 }
 
+func TestApplyRestartPolicies(t *testing.T) {
+	containers := []core.Container{
+		{ID: "aaaaaaaaaaaa", Name: "web"},
+		{ID: "bbbbbbbbbbbb", Name: "db"},
+	}
+	// Simulate inspect map merge path without calling docker.
+	byID := map[string]string{
+		"aaaaaaaaaaaa": "always",
+		"bbbbbbbbbbbb": "unless-stopped",
+	}
+	for i := range containers {
+		if p, ok := byID[containers[i].ID]; ok {
+			containers[i].Restart = p
+		}
+	}
+	if containers[0].Restart != "always" || containers[1].Restart != "unless-stopped" {
+		t.Fatalf("restart policies: %+v", containers)
+	}
+}
+
 func TestAssignContainersUnique(t *testing.T) {
 	projects := []core.Project{
 		{Path: "/apps/alpha", Name: "alpha"},

@@ -7,6 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -226,42 +227,50 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 
 func (a *App) renderContainersBottom(width, height int) string {
 	cmdW := actionsCmdWidth(width)
-	rest := width - cmdW
-	w1 := rest * 42 / 100
-	w2 := rest * 30 / 100
-	w3 := rest - w1 - w2
+	rest := maxInt(12, width-cmdW)
+	w1 := maxInt(10, rest*42/100)
+	w2 := maxInt(10, rest*30/100)
+	w3 := maxInt(10, rest-w1-w2)
+	// Keep columns exact so JoinHorizontal never wraps the terminal line.
+	if w1+w2+w3 > rest {
+		w3 = maxInt(8, rest-w1-w2)
+	}
 	inner := maxInt(2, height-2)
 
-	logs := a.containerPreviewLogLines(inner, w1-4)
-	stats := a.containerPreviewStatLines(inner, w2-4)
-	vols := a.containerPreviewVolumeLines(inner, w3-4)
+	logs := a.containerPreviewLogLines(inner, maxInt(4, w1-4))
+	stats := a.containerPreviewStatLines(inner, maxInt(4, w2-4))
+	vols := a.containerPreviewVolumeLines(inner, maxInt(4, w3-4))
 
 	title := "LOGS"
 	if a.containerPreviewID != "" {
 		if c, ok := a.selectedContainer(a.currentProject()); ok {
-			title = "LOGS · " + truncate(c.Name, 18)
+			title = "LOGS · " + truncate(sanitizeTerminalLine(c.Name), 18)
 		}
 	}
 	scope := "todos"
 	if a.containerShowAll {
 		scope = "projeto"
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top,
+	parts := []string{
 		renderApiTitledBox(title, fitExactLines(logs, inner), w1, height, false),
 		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
 		renderApiTitledBox("VOLUMES", fitExactLines(vols, inner), w3, height, false),
-		renderActionsBox(cmdW, height,
+	}
+	if cmdW >= 12 {
+		parts = append(parts, 		renderActionsBox(cmdW, height,
 			[2]string{"enter", "detalhe"},
 			[2]string{"n", "novo svc"},
 			[2]string{"s", "stop"},
 			[2]string{"r", "restart"},
+			[2]string{"S-R", "∞/off"},
 			[2]string{"p", "pause"},
 			[2]string{"d", "remove"},
 			[2]string{"e", "shell"},
 			[2]string{"A", scope},
 			[2]string{"/", "buscar"},
-		),
-	)
+		))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
 }
 
 func (a *App) containerStatsTitle() string {
@@ -287,6 +296,7 @@ func (a *App) containerPreviewLogLines(maxLines, width int) []string {
 	}
 	lines := make([]string, 0, maxLines)
 	for _, line := range raw {
+		line = sanitizeTerminalLine(line)
 		style := StyleMuted
 		low := strings.ToLower(line)
 		switch {
@@ -308,15 +318,24 @@ func (a *App) containerPreviewStatLines(maxLines, width int) []string {
 	showMem := a.containerStatsMode == 0 || a.containerStatsMode == 2
 	showNet := a.containerStatsMode == 0 || a.containerStatsMode == 3
 
+	fit := func(s string) string {
+		if width <= 0 {
+			return s
+		}
+		if lipgloss.Width(s) > width {
+			return ansi.Truncate(s, width, "…")
+		}
+		return s
+	}
 	lines := make([]string, 0, maxLines)
 	if showCPU {
-		lines = append(lines, StyleMuted.Render("CPU ")+StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, sparkW, 100)))
+		lines = append(lines, fit(StyleMuted.Render("CPU ")+StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, sparkW, 100))))
 	}
 	if showMem {
-		lines = append(lines, StyleMuted.Render("MEM ")+StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, sparkW, 100)))
+		lines = append(lines, fit(StyleMuted.Render("MEM ")+StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, sparkW, 100))))
 	}
 	if showNet {
-		lines = append(lines, StyleMuted.Render("NET ")+StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, sparkW, 0)))
+		lines = append(lines, fit(StyleMuted.Render("NET ")+StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, sparkW, 0))))
 	}
 
 	if c, ok := a.selectedContainer(a.currentProject()); ok {
@@ -334,9 +353,9 @@ func (a *App) containerPreviewStatLines(maxLines, width int) []string {
 			net = formatNetKB(a.containerNetHistory[n-1])
 		}
 		lines = append(lines,
-			StyleNormal.Render(fmt.Sprintf("CPU %.1f%%", cpu)),
-			StyleNormal.Render("MEM "+mem+memPct),
-			StyleNormal.Render("NET "+net),
+			fit(StyleNormal.Render(fmt.Sprintf("CPU %.1f%%", cpu))),
+			fit(StyleNormal.Render("MEM "+mem+memPct)),
+			fit(StyleNormal.Render("NET "+net)),
 		)
 	} else if len(lines) == 0 {
 		lines = append(lines, StyleMuted.Render("selecione um container"))
@@ -464,7 +483,8 @@ func (a *App) containerPreviewVolumeLines(maxLines, width int) []string {
 		if i >= maxLines {
 			break
 		}
-		lines = append(lines, StyleNormal.Render("● "+truncate(v, width-2)))
+		v = sanitizeTerminalLine(v)
+		lines = append(lines, StyleNormal.Render("● "+truncate(v, maxInt(1, width-2))))
 	}
 	return lines
 }
@@ -574,8 +594,16 @@ func (a *App) renderContainerRow(c core.Container, selected bool) string {
 		}
 		parts = append(parts, projStyle.Width(cols.project).MaxWidth(cols.project).Render(truncate(a.containerProjectLabel(c), cols.project)), gap)
 	}
+	nameCell := cell(cols.name, c.Name)
+	if containerRestartAlways(c) {
+		nameStyle := StyleAccent
+		if selected {
+			nameStyle = StyleSelected
+		}
+		nameCell = nameStyle.Width(cols.name).MaxWidth(cols.name).Render(truncate("∞ "+c.Name, cols.name))
+	}
 	parts = append(parts,
-		cell(cols.name, c.Name),
+		nameCell,
 		gap,
 		cell(cols.image, c.Image),
 	)
@@ -600,7 +628,7 @@ type containerCols struct {
 
 func (a *App) containerColumns() containerCols {
 	tableWidth := maxInt(38, a.width-8)
-	cols := containerCols{state: 9}
+	cols := containerCols{state: 10} // room for "∞always"
 	flexible := tableWidth - 1 - cols.state - 2
 	if a.containerShowAll {
 		cols.project = maxInt(10, flexible*18/100)
@@ -669,6 +697,10 @@ func compactContainerUptime(state string) string {
 	return truncate(s, 10)
 }
 
+func containerRestartAlways(c core.Container) bool {
+	return strings.EqualFold(strings.TrimSpace(c.Restart), "always")
+}
+
 func (a *App) containerStateCell(c core.Container, selected bool) string {
 	width := a.containerColumns().state
 	if kind := a.containerActionKind(c.Name); kind != "" {
@@ -680,6 +712,10 @@ func (a *App) containerStateCell(c core.Container, selected bool) string {
 			label = "▶ start"
 		case "restart":
 			label = "⟳ rest"
+		case "always":
+			label = "∞ always"
+		case "no-always":
+			label = "○ no"
 		case "pause":
 			label = "⏸ pause"
 		case "unpause":
@@ -692,6 +728,13 @@ func (a *App) containerStateCell(c core.Container, selected bool) string {
 			s = StyleWarning.Bold(true).Background(lipgloss.Color("#78350F"))
 		}
 		return s.Width(width).MaxWidth(width).Render(truncate(label, width))
+	}
+	if containerRestartAlways(c) {
+		s := StyleAccent.Bold(true)
+		if selected {
+			s = StyleSelected.Foreground(ColorAccent).Bold(true)
+		}
+		return s.Width(width).MaxWidth(width).Render(truncate("∞always", width))
 	}
 	if selected {
 		return styleSelectedState(c.Status, width)

@@ -50,8 +50,8 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 	}
 	got := stripANSI(a.renderGitTab(&project))
 	for _, want := range []string{
-		"BRANCHES", "COMMITS", "MODIFIED FILES",
-		"RECENT ACTIVITY", "STASHES", "REMOTES",
+		"BRANCHES", "COMMITS", "MODIFIED FILES", "COMMAND LOG",
+		"ACTIVITY", "STASHES", "REMOTES", "AÇÕES",
 		"DES-2834", "stash@{0}", "origin",
 	} {
 		if !strings.Contains(got, want) {
@@ -63,6 +63,27 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 	}
 }
 
+func TestExtractGitURL(t *testing.T) {
+	got := extractGitURL("  https://github.com/acme/app/compare/main...feat?expand=1")
+	if got != "https://github.com/acme/app/compare/main...feat?expand=1" {
+		t.Fatalf("got %q", got)
+	}
+}
+
+func TestRenderGitCommandLogShowsOutput(t *testing.T) {
+	a := &App{
+		width: 100, height: 40,
+		gitFocus: gitFocusCmdLog,
+		gitCommandLog: []gitCmdLogEntry{
+			{Title: "Push", Cmdline: "git push", Output: "Create a pull request:\n  https://github.com/acme/app/pull/new/feat"},
+		},
+	}
+	got := stripANSI(a.renderGitCommandLog(60, 10))
+	if !strings.Contains(got, "COMMAND LOG") || !strings.Contains(got, "git push") || !strings.Contains(got, "https://github.com") {
+		t.Fatalf("%q", got)
+	}
+}
+
 func TestGitFileLinesShowsStagedBadge(t *testing.T) {
 	g := &core.GitInfo{
 		IsRepo: true, Branch: "main", Staged: 1,
@@ -71,7 +92,7 @@ func TestGitFileLinesShowsStagedBadge(t *testing.T) {
 			{Path: "ready.go", Staging: "A", Worktree: " "},
 		},
 	}
-	a := &App{gitFocus: gitFocusFiles, gitFileCursor: 1, gitViewBranch: "main"}
+	a := &App{gitFocus: gitFocusFiles, gitFileCursor: 1, gitFileTreeCursor: 1, gitViewBranch: "main"}
 	got := stripANSI(strings.Join(a.gitFileLines(g, "main", 10), "\n"))
 	if !strings.Contains(got, "ready.go") || !strings.Contains(got, "● staged") {
 		t.Fatalf("expected staged badge, got %q", got)
@@ -81,6 +102,53 @@ func TestGitFileLinesShowsStagedBadge(t *testing.T) {
 	}
 	if !gitFileStaged(g.Files[1]) || gitFileStaged(g.Files[0]) {
 		t.Fatal("worktree-only M must not count as staged")
+	}
+}
+
+func TestMoveWTFileTreeCursorSkipsFolders(t *testing.T) {
+	files := []core.GitFileStatus{
+		{Path: "app/Http/Controllers/SetorController.php", Staging: " ", Worktree: "M"},
+		{Path: "resources/views/setor/alterar.blade.php", Staging: " ", Worktree: "M"},
+		{Path: "features/foo.json", Staging: "?", Worktree: "?"},
+	}
+	rows := wtFileTreeFrom(files)
+	// start snapped off leading folder onto first file
+	cur := moveWTFileTreeCursor(rows, 0, 0)
+	if rows[cur].isDir || rows[cur].label != "SetorController.php" {
+		t.Fatalf("start=%+v", rows[cur])
+	}
+	cur = moveWTFileTreeCursor(rows, cur, 1)
+	if rows[cur].label != "alterar.blade.php" {
+		t.Fatalf("down should skip folders, got %+v", rows[cur])
+	}
+	cur = moveWTFileTreeCursor(rows, cur, 1)
+	if rows[cur].label != "foo.json" {
+		t.Fatalf("down again=%+v", rows[cur])
+	}
+	cur = moveWTFileTreeCursor(rows, cur, -1)
+	if rows[cur].label != "alterar.blade.php" {
+		t.Fatalf("up should skip folders, got %+v", rows[cur])
+	}
+}
+
+func TestGitFileLinesShowsTree(t *testing.T) {
+	g := &core.GitInfo{
+		IsRepo: true, Branch: "main",
+		Files: []core.GitFileStatus{
+			{Path: "app/Http/Controllers/SetorController.php", Staging: " ", Worktree: "M"},
+			{Path: "resources/views/setor/alterar.blade.php", Staging: " ", Worktree: "M"},
+			{Path: "features/foo.json", Staging: "?", Worktree: "?"},
+		},
+	}
+	a := &App{gitFocus: gitFocusFiles, gitViewBranch: "main"}
+	got := stripANSI(strings.Join(a.gitFileLines(g, "main", 20), "\n"))
+	for _, want := range []string{"▾ app/Http/Controllers", "SetorController.php", "▾ resources/views/setor", "alterar.blade.php", "▾ features", "foo.json"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in tree: %q", want, got)
+		}
+	}
+	if strings.Contains(got, "app/Http/Controllers/SetorController.php") {
+		t.Fatal("should show basename under folder, not full flat path")
 	}
 }
 
@@ -119,9 +187,10 @@ func TestOpenGitFileDiffAllowsScroll(t *testing.T) {
 		view:            ViewProject,
 		tab:             TabGit,
 		gitSubview:      gitSubviewMain,
-		gitFocus:        gitFocusFiles,
-		gitViewBranch:   "main",
-		gitFileCursor:   0,
+		gitFocus:          gitFocusFiles,
+		gitViewBranch:     "main",
+		gitFileCursor:     0,
+		gitFileTreeCursor: 1, // file under ▾ src
 		selectedProject: &project,
 		snapshot:        core.Snapshot{Projects: []core.Project{project}},
 		gitWTDiff:       diff,
@@ -167,6 +236,66 @@ func TestFilteredGitBranches(t *testing.T) {
 	got := a.filteredGitBranches(branches)
 	if len(got) != 1 || got[0].Name != "feat/kanban" {
 		t.Fatalf("unexpected filter result: %+v", got)
+	}
+}
+
+func TestGitBranchFilterLiveInline(t *testing.T) {
+	a := &App{
+		view: ViewProject,
+		tab:  TabGit,
+		selectedProject: &core.Project{
+			Path: "/tmp/repo",
+			Git: &core.GitInfo{
+				IsRepo: true,
+				Branches: []core.GitBranch{
+					{Name: "develop"},
+					{Name: "feat/kanban"},
+					{Name: "master"},
+				},
+			},
+		},
+		gitBranchFilterOn: true,
+	}
+	a.gitBranches = a.selectedProject.Git.Branches
+	for _, ch := range "feat" {
+		_, _ = a.updateGitBranchFilter(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{ch}})
+	}
+	if a.gitBranchFilter != "feat" || !a.gitBranchFilterOn {
+		t.Fatalf("live filter: on=%v filter=%q", a.gitBranchFilterOn, a.gitBranchFilter)
+	}
+	got := a.filteredGitBranches(a.gitBranches)
+	if len(got) != 1 || got[0].Name != "feat/kanban" {
+		t.Fatalf("live filter result: %+v", got)
+	}
+	line := stripANSI(a.renderGitBranchFilterLine(80))
+	if !strings.Contains(line, "filter") || !strings.Contains(line, "feat") {
+		t.Fatalf("inline filter line: %q", line)
+	}
+	_, _ = a.updateGitBranchFilter(tea.KeyMsg{Type: tea.KeyEnter})
+	if a.gitBranchFilterOn || a.gitBranchFilter != "feat" {
+		t.Fatalf("after enter: on=%v filter=%q", a.gitBranchFilterOn, a.gitBranchFilter)
+	}
+}
+
+func TestGitDiffSearchInlineLive(t *testing.T) {
+	a := &App{
+		gitSubview:         gitSubviewCommit,
+		gitDiffSearchOn:    true,
+		gitCommitDiff:      "@@ -1 +1 @@\n context\n-old value\n+new search-target\n",
+		gitDiffSearchInput: "",
+	}
+	for _, ch := range "search-target" {
+		_, _ = a.updateGitDiffSearch(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{ch}})
+	}
+	if a.gitDiffSearchQuery != "search-target" || !a.gitDiffSearchOn {
+		t.Fatalf("live search: on=%v q=%q", a.gitDiffSearchOn, a.gitDiffSearchQuery)
+	}
+	if len(a.gitDiffSearchMatches()) == 0 {
+		t.Fatal("expected matches while typing")
+	}
+	line := stripANSI(a.renderGitDiffSearchLine(80))
+	if !strings.Contains(line, "search") || !strings.Contains(line, "search-target") {
+		t.Fatalf("inline search line: %q", line)
 	}
 }
 
@@ -307,6 +436,86 @@ func TestGitDiffHorizontalScrollRevealsTail(t *testing.T) {
 	}
 }
 
+func TestBuildCommitFileTreeCompactsFolders(t *testing.T) {
+	files := []core.GitCommitFileChange{
+		{Status: "M", Path: "src/components/HomeCtaSection.astro"},
+		{Status: "M", Path: "src/components/HomeFAQSection.astro"},
+		{Status: "M", Path: "astro.config.mjs"},
+	}
+	rows := buildCommitFileTree(files, nil)
+	got := make([]string, 0, len(rows))
+	for _, r := range rows {
+		if r.isDir {
+			got = append(got, fmt.Sprintf("dir:%d:%s", r.depth, r.label))
+		} else {
+			got = append(got, fmt.Sprintf("file:%d:%s:%s:%d", r.depth, r.status, r.label, r.fileIdx))
+		}
+	}
+	want := []string{
+		"dir:0:src/components",
+		"file:1:M:HomeCtaSection.astro:0",
+		"file:1:M:HomeFAQSection.astro:1",
+		"file:0:M:astro.config.mjs:2",
+	}
+	if strings.Join(got, "|") != strings.Join(want, "|") {
+		t.Fatalf("tree=%v want=%v", got, want)
+	}
+
+	collapsed := buildCommitFileTree(files, map[string]bool{"src/components": true})
+	if len(collapsed) != 2 || !collapsed[0].isDir || collapsed[0].label != "src/components" || collapsed[1].label != "astro.config.mjs" {
+		t.Fatalf("collapsed tree unexpected: %+v", collapsed)
+	}
+}
+
+func TestGitCommitTreeKeysOpenCollapse(t *testing.T) {
+	project := core.Project{Path: "/tmp/repo", Git: &core.GitInfo{IsRepo: true}}
+	a := &App{
+		width:                100,
+		height:               30,
+		selectedProject:      &project,
+		gitSubview:           gitSubviewCommit,
+		gitCommitDetailFocus: gitCommitFocusFiles,
+		gitSelectedCommit:    core.GitCommit{Hash: "abc"},
+		gitCommitFiles: []core.GitCommitFileChange{
+			{Status: "M", Path: "src/components/A.astro"},
+			{Status: "M", Path: "src/components/B.astro"},
+		},
+		gitCommitTreeCursor: 0,
+		gitCommitDiffCache:  map[string]string{"src/components/A.astro": "diff a"},
+	}
+
+	a.collapseGitCommitTree()
+	if !a.gitCommitCollapsed["src/components"] {
+		t.Fatal("left should collapse folder")
+	}
+	a.expandGitCommitTree()
+	if a.gitCommitCollapsed["src/components"] {
+		t.Fatal("right should expand folder")
+	}
+
+	a.gitCommitTreeCursor = 1 // first file under folder
+	cmd := a.previewGitCommitTreeSelection()
+	if cmd != nil {
+		t.Fatal("cached preview should not schedule load")
+	}
+	if a.gitCommitFileOpen || a.gitCommitDetailFocus != gitCommitFocusFiles || a.gitCommitDiff != "diff a" {
+		t.Fatalf("preview should load sideways without access: open=%v focus=%v diff=%q", a.gitCommitFileOpen, a.gitCommitDetailFocus, a.gitCommitDiff)
+	}
+
+	cmd = a.openSelectedGitCommitFile()
+	if cmd != nil {
+		t.Fatal("enter on already previewed file should not reload")
+	}
+	if !a.gitCommitFileOpen || a.gitCommitDetailFocus != gitCommitFocusDiff {
+		t.Fatalf("enter should access diff panel: open=%v focus=%v", a.gitCommitFileOpen, a.gitCommitDetailFocus)
+	}
+
+	_, _ = a.handleGitDedicatedKeys(tea.KeyMsg{Type: tea.KeyEsc}, &project)
+	if a.gitCommitFileOpen || a.gitCommitDetailFocus != gitCommitFocusFiles || a.gitSubview != gitSubviewCommit || a.gitCommitDiff != "diff a" {
+		t.Fatalf("esc should leave access but keep preview: open=%v focus=%v sub=%v diff=%q", a.gitCommitFileOpen, a.gitCommitDetailFocus, a.gitSubview, a.gitCommitDiff)
+	}
+}
+
 func TestGitCommitDetailShowsSidebarAndDiff(t *testing.T) {
 	project := core.Project{Path: "/tmp/repo", Name: "repo", Git: &core.GitInfo{IsRepo: true, Branch: "main"}}
 	a := &App{
@@ -319,6 +528,8 @@ func TestGitCommitDetailShowsSidebarAndDiff(t *testing.T) {
 		gitCommitFullMsg:    "fix things\n\nbody",
 		gitCommitFiles:      []core.GitCommitFileChange{{Status: "M", Path: "app/main.go"}, {Status: "A", Path: "app/new.go"}},
 		gitCommitFileCursor: 0,
+		gitCommitTreeCursor: 1,
+		gitCommitFileOpen:   true,
 		gitCommitDiff:       "--- a/app/main.go\n+++ b/app/main.go\n@@ -1 +1 @@\n-old\n+new\n",
 		selectedProject:     &project,
 		snapshot:            core.Snapshot{Projects: []core.Project{project}},
@@ -328,8 +539,48 @@ func TestGitCommitDetailShowsSidebarAndDiff(t *testing.T) {
 	if strings.Contains(stripANSI(got), "SCOPE") {
 		t.Fatal("commit detail must hide project sidebar")
 	}
-	if !strings.Contains(got, "Arquivos") || !strings.Contains(got, "main.go") || !strings.Contains(got, "+new") || !strings.Contains(got, "-old") {
-		t.Fatalf("commit detail missing sidebar/diff: %q", got)
+	plain := stripANSI(got)
+	if !strings.Contains(plain, "Arquivos") || !strings.Contains(plain, "▾ app") || !strings.Contains(plain, "main.go") || !strings.Contains(got, "+new") || !strings.Contains(got, "-old") {
+		t.Fatalf("commit detail missing sidebar/diff: %q", plain)
+	}
+}
+
+func TestCommitFileChangeCounts(t *testing.T) {
+	files := []core.GitCommitFileChange{
+		{Status: "A", Path: "new.go"},
+		{Status: "A", Path: "new2.go"},
+		{Status: "M", Path: "edit.go"},
+		{Status: "R", Path: "renamed.go"},
+		{Status: "D", Path: "gone.go"},
+	}
+	add, mod, del := commitFileChangeCounts(files)
+	if add != 2 || mod != 2 || del != 1 {
+		t.Fatalf("counts A=%d M=%d D=%d", add, mod, del)
+	}
+}
+
+func TestGitCommitDetailShowsFileStats(t *testing.T) {
+	project := core.Project{Path: "/tmp/repo", Name: "repo", Git: &core.GitInfo{IsRepo: true}}
+	a := &App{
+		width:  100,
+		height: 30,
+		view:   ViewProject,
+		tab:    TabGit,
+		gitSubview: gitSubviewCommit,
+		gitSelectedCommit: core.GitCommit{Hash: "abc1234", Message: "stats", Author: "dev", Date: "now"},
+		gitCommitFiles: []core.GitCommitFileChange{
+			{Status: "A", Path: "a.go"},
+			{Status: "M", Path: "b.go"},
+			{Status: "D", Path: "c.go"},
+		},
+		selectedProject: &project,
+		snapshot:        core.Snapshot{Projects: []core.Project{project}},
+	}
+	plain := stripANSI(a.renderGitCommitDetail(&project))
+	for _, want := range []string{"A 1", "novos", "M 1", "alterados", "D 1", "deletados", "3 arquivos", "Arquivos (3)"} {
+		if !strings.Contains(plain, want) {
+			t.Fatalf("missing %q in:\n%s", want, truncate(plain, 500))
+		}
 	}
 }
 
@@ -373,8 +624,8 @@ func TestGitCommitDetailKeepsFileColumnClean(t *testing.T) {
 	if strings.Count(got, "Arquivos") != 1 {
 		t.Fatal("expected a single Arquivos header")
 	}
-	if !strings.Contains(got, "VeryLongServiceName.php") {
-		t.Fatal("expected file name in sidebar")
+	if !strings.Contains(stripANSI(got), "VeryLongServiceName") {
+		t.Fatalf("expected file name in sidebar: %q", stripANSI(got))
 	}
 }
 
@@ -407,6 +658,7 @@ func TestSwitchGitCommitFileUsesCache(t *testing.T) {
 			{Status: "M", Path: "b.go"},
 		},
 		gitCommitFileCursor: 0,
+		gitCommitFileOpen:    true,
 		gitCommitDiffCache: map[string]string{
 			"a.go": "diff a",
 			"b.go": "diff b",
@@ -466,7 +718,7 @@ func TestGitComposeModalMultiline(t *testing.T) {
 		t.Fatalf("multiline msg=%q", a.gitComposeMsg)
 	}
 	got := stripANSI(a.renderGitCompose())
-	for _, want := range []string{"Novo commit", "main", "Commitar", "Cancelar"} {
+	for _, want := range []string{"GIT", "Novo commit", "main", "STAGED", "MODIFIED", "preview", "Commitar", "Cancelar"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in %q", want, truncate(got, 300))
 		}

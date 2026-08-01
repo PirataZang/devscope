@@ -49,6 +49,7 @@ type App struct {
 	gitCommitCursor             int
 	gitCommitScroll             int
 	gitFileCursor               int
+	gitFileTreeCursor           int
 	gitFileScroll               int
 	gitWTDiffScroll             int
 	gitWTDiffHScroll            int
@@ -57,13 +58,22 @@ type App struct {
 	gitWTDiff                   string
 	gitWTDiffFile               string
 	gitActivity                 []string
+	gitCommandLog               []gitCmdLogEntry
+	gitCmdLogScroll             int
+	gitCmdLogCursor             int
+	gitCmdLogRelY               int
+	gitCmdLogOffsetX            int
+	gitCmdLogLinks              []gitCmdLogLink
 	gitBranchCommits            []core.GitCommit
 	gitBranchLoading            bool
 	gitSelectedCommit           core.GitCommit
 	gitCommitFiles              []core.GitCommitFileChange
 	gitCommitFilesLoading       bool
 	gitCommitFileCursor         int
+	gitCommitTreeCursor         int
 	gitCommitFileScroll         int
+	gitCommitCollapsed          map[string]bool
+	gitCommitFileOpen           bool
 	gitBranchFilterOn           bool
 	gitBranchFilterInput        string
 	gitBranchFilter             string
@@ -89,11 +99,26 @@ type App struct {
 	dockerAddQuery              string
 	dockerAddCursor             int
 	dockerAddResults            []collectors.DockerHubRepo
+	dockerAddPage               int
+	dockerAddHasMore            bool
+	dockerAddImage              string
+	dockerAddResultsFocus       dockerAddResultsFocus
 	dockerAddEdit               string
 	dockerAddEditState          editorState
 	dockerAddFocus              dockerAddFocus
 	dockerAddSearchFocus        dockerAddSearchFocus
 	dockerAddLoading            bool
+	dockerAddComposeSource      string
+	dockerAddDetailsCache       map[string]collectors.DockerHubDetails
+	dockerAddDetailsName        string
+	dockerAddDetailsLoading     bool
+	dockerAddDetailsSeq         int
+	dockerAddDetailsScroll      int
+	dockerAddTags               []collectors.DockerHubTag
+	dockerAddTagsRepo           string
+	dockerAddTagsLoading        bool
+	dockerAddTagCursor          int
+	dockerAddTagsScroll         int
 	gitConfirmOn                bool
 	gitConfirmAction            string
 	gitConfirmBranch            string
@@ -337,6 +362,7 @@ type App struct {
 	ngrokReqCursor              int
 	ngrokReqScroll              int
 	ngrokLogScroll              int
+	ngrokDetailsScroll          int
 	ngrokNewPort                int
 	ngrokNewPortStr             string
 	ngrokNewName                string
@@ -362,6 +388,7 @@ type App struct {
 	cfAcctCursor                int
 	cfAcctScroll                int
 	cfLogScroll                 int
+	cfDetailsScroll             int
 	cfNewURL                    string
 	cfNewName                   string
 	cfNewHostname               string
@@ -454,13 +481,16 @@ func (a *App) Init() tea.Cmd {
 
 func (a *App) Run() error {
 	defer RestoreTerminalTheme()
-	p := tea.NewProgram(a, tea.WithAltScreen())
+	p := tea.NewProgram(a, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err := p.Run()
 	return err
 }
 
 func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.MouseMsg:
+		a.handleGitMouseClick(msg)
+		return a, nil
 	case tea.KeyMsg:
 		if a.themeOn {
 			return a.updateThemePicker(msg)
@@ -590,6 +620,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case gitActionDoneMsg:
 		a.handleGitActionDone(msg)
 		a.pushGitActivity(msg)
+		a.appendGitCommandLog(msg)
 		if msg.err == nil && needsGitBranchCommitsReload(msg.action) {
 			branch := a.gitViewBranch
 			if msg.action == "rename-branch" && msg.newBranch != "" {
@@ -705,7 +736,18 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case dockerHubSearchDoneMsg:
-		a.handleDockerHubSearchDone(msg)
+		return a, a.handleDockerHubSearchDone(msg)
+
+	case dockerHubDetailsDoneMsg:
+		a.handleDockerHubDetailsDone(msg)
+		return a, nil
+
+	case dockerHubTagsDoneMsg:
+		a.handleDockerHubTagsDone(msg)
+		return a, nil
+
+	case dockerAddComposeReadyMsg:
+		a.handleDockerAddComposeReady(msg)
 		return a, nil
 
 	case dockerAddSavedMsg:
@@ -740,18 +782,27 @@ func (a *App) updateGitBranchFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter":
 		a.gitBranchFilterOn = false
-		a.gitBranchFilter = a.gitBranchFilterInput
+		a.gitBranchFilter = strings.TrimSpace(a.gitBranchFilterInput)
 		a.gitBranchFilterInput = ""
 		if p := a.currentProject(); p != nil && p.Git != nil {
 			a.syncGitBranchCursor(p.Git.Branches)
 		}
 	case "backspace":
 		if len(a.gitBranchFilterInput) > 0 {
-			a.gitBranchFilterInput = a.gitBranchFilterInput[:len(a.gitBranchFilterInput)-1]
+			r := []rune(a.gitBranchFilterInput)
+			a.gitBranchFilterInput = string(r[:len(r)-1])
+		}
+		a.gitBranchFilter = strings.TrimSpace(a.gitBranchFilterInput)
+		if p := a.currentProject(); p != nil && p.Git != nil {
+			a.syncGitBranchCursor(p.Git.Branches)
 		}
 	default:
 		if len(msg.String()) == 1 {
 			a.gitBranchFilterInput += msg.String()
+			a.gitBranchFilter = strings.TrimSpace(a.gitBranchFilterInput)
+			if p := a.currentProject(); p != nil && p.Git != nil {
+				a.syncGitBranchCursor(p.Git.Branches)
+			}
 		}
 	}
 	return a, nil
@@ -763,18 +814,27 @@ func (a *App) updateFilter(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.filterOn = false
 		a.filterInput = ""
 		a.filter = ""
+		a.cursor = 0
+		a.dashboardScroll = 0
 	case "enter":
 		a.filterOn = false
-		a.filter = a.filterInput
+		a.filter = strings.TrimSpace(a.filterInput)
 		a.filterInput = ""
 		a.dashboardScroll = 0
 	case "backspace":
 		if len(a.filterInput) > 0 {
-			a.filterInput = a.filterInput[:len(a.filterInput)-1]
+			r := []rune(a.filterInput)
+			a.filterInput = string(r[:len(r)-1])
 		}
+		a.filter = strings.TrimSpace(a.filterInput)
+		a.cursor = 0
+		a.dashboardScroll = 0
 	default:
 		if len(msg.String()) == 1 {
 			a.filterInput += msg.String()
+			a.filter = strings.TrimSpace(a.filterInput)
+			a.cursor = 0
+			a.dashboardScroll = 0
 		}
 	}
 	return a, nil
@@ -815,15 +875,12 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.openThemePicker()
 		return a, nil
 
-	case msg.String() == "/":
-		a.filterOn = true
-		a.filterInput = ""
-		return a, nil
-
 	case msg.String() == "ctrl+p":
-		a.fuzzyOn = true
-		a.fuzzyInput = a.filter
-		return a, nil
+		if a.view == ViewDashboard {
+			a.fuzzyOn = true
+			a.fuzzyInput = a.filter
+			return a, nil
+		}
 	}
 
 	switch a.view {
@@ -884,6 +941,18 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	projects := filterNestedProjects(sortProjects(a.filteredProjects()))
 
 	switch msg.String() {
+	case "/":
+		a.filterOn = true
+		a.filterInput = a.filter
+		return a, nil
+	case "esc":
+		if a.filter != "" {
+			a.filter = ""
+			a.filterInput = ""
+			a.cursor = 0
+			a.dashboardScroll = 0
+		}
+		return a, nil
 	case "up", "k":
 		if a.cursor > 0 {
 			a.cursor--
@@ -1130,6 +1199,14 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.containerDetailCache = nil
 			return a, nil
 		}
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitBranchFilter != "" {
+			a.gitBranchFilter = ""
+			a.gitBranchFilterInput = ""
+			if p.Git != nil {
+				a.syncGitBranchCursor(p.Git.Branches)
+			}
+			return a, nil
+		}
 		a.view = ViewDashboard
 		a.selectedProject = nil
 		a.gitRenderCache = nil
@@ -1160,6 +1237,10 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, a.openLazyGit(p.Path)
 	case "o", "O":
 		if a.gitTabReady(p) {
+			if a.gitFocus == gitFocusCmdLog {
+				a.openSelectedGitCmdLogURL()
+				return a, nil
+			}
 			a.gitOpenPullRequest(p)
 			return a, nil
 		}
@@ -1198,14 +1279,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.composeDown(p.Path)
 		}
 		a.statusMsg = "docker-compose não encontrado"
-	case "R":
-		if a.gitTabReady(p) {
-			a.startGitRenameBranch(p)
-			return a, nil
-		}
-		if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
-			return a, a.composeRestart(p.Path)
-		}
 	case "d":
 		if a.gitTabReady(p) {
 			a.startGitDeleteBranch(p)
@@ -1293,10 +1366,20 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.startDockerAdd(p)
 			return a, nil
 		}
-	case "shift+r", "shift+R":
+	case "R", "shift+r", "shift+R":
+		// Terminals usually report Shift+R as "R", not "shift+r".
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			if c, ok := a.selectedContainer(p); ok {
+				return a, a.containerToggleRestartAlways(c)
+			}
+			return a, nil
+		}
 		if a.gitTabReady(p) {
 			a.startGitRenameBranch(p)
 			return a, nil
+		}
+		if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
+			return a, a.composeRestart(p.Path)
 		}
 	case "shift+m", "shift+M", "M":
 		if a.gitTabReady(p) {
@@ -1463,6 +1546,10 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			if a.gitFocus == gitFocusFiles {
 				return a, a.openGitFileDiff(p)
 			}
+			if a.gitFocus == gitFocusCmdLog {
+				a.openSelectedGitCmdLogURL()
+				return a, nil
+			}
 		}
 	}
 	return a, nil
@@ -1537,12 +1624,6 @@ func (a *App) View() string {
 		content = a.renderHelpPopup(a.renderCurrentView())
 	case a.fuzzyOn:
 		content = a.renderFuzzyPrompt()
-	case a.filterOn:
-		content = a.renderFilterPrompt()
-	case a.gitBranchFilterOn:
-		content = a.renderGitBranchFilterPrompt()
-	case a.gitDiffSearchOn:
-		content = a.renderGitDiffSearchPrompt()
 	case a.containerDetailSearchOn:
 		content = a.renderContainerDetailSearchPrompt()
 	case a.apiSearchOn:
@@ -1570,30 +1651,6 @@ func (a *App) renderCurrentView() string {
 	default:
 		return a.renderDashboard()
 	}
-}
-
-func (a *App) renderGitBranchFilterPrompt() string {
-	p := a.currentProject()
-	content := a.renderProject()
-	if p == nil {
-		return content
-	}
-	prompt := StylePanel.Render("Buscar branch: " + a.gitBranchFilterInput + "█")
-	return lipgloss.JoinVertical(lipgloss.Left,
-		content,
-		"",
-		prompt,
-		a.renderStatusBar("type to filter branches | enter confirm | esc cancel"),
-	)
-}
-
-func (a *App) renderFilterPrompt() string {
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderHeader(),
-		"",
-		StylePanel.Render("Filter: "+a.filterInput+"█"),
-		a.renderStatusBar("type to filter | enter confirm | esc cancel"),
-	)
 }
 
 func (a *App) renderHeader() string {
@@ -1658,7 +1715,9 @@ func (a *App) renderProject() string {
 	if a.projectTiny() {
 		minContent = 24
 	}
-	contentWidth := maxInt(minContent, a.width-lipgloss.Width(sidebar)-3)
+	sidebarW := lipgloss.Width(sidebar)
+	a.gitCmdLogOffsetX = sidebarW + 1 // gap between sidebar and content
+	contentWidth := maxInt(minContent, a.width-sidebarW-3)
 	panelH := a.projectPanelHeight()
 	accent := tabAccentColor(a.tab)
 
@@ -1693,13 +1752,17 @@ func (a *App) renderProject() string {
 		hints = "tab/shift+tab módulo  pgup/pgdown scroll  esc back  q quit"
 	}
 	if a.tab == TabGit {
-		hints = "←→ painéis  enter detail/diff  space checkout  shift+↑↓ range  x cherry  b filter  " + hints
+		if a.gitBranchFilterOn {
+			hints = "filtro branch: digite  enter aplicar  esc limpar"
+		} else {
+			hints = "←→ painéis  enter detail/diff  space checkout  shift+↑↓ range  x cherry  b filter  " + hints
+		}
 	}
 	if a.tab == TabContainers {
 		if a.containerSubview == containerSubviewDetail {
 			hints = "←→ tabs  ↑↓ scroll  esc back  " + hints
 		} else {
-			hints = "↑↓ lista  enter/l detalhe  / buscar  e shell  s/r/p/d  shift+u/d compose  " + hints
+			hints = "↑↓ lista  enter/l detalhe  / buscar  e shell  s/r/S-R/p/d  shift+u/d compose  " + hints
 		}
 	}
 	if a.tab == TabHealth || a.tab == TabLogs {
@@ -1973,18 +2036,18 @@ func (a *App) renderThemePopup(background string) string {
 	}
 	for i, t := range Themes {
 		mark := "  "
-		label := StyleNormal.Render(fmt.Sprintf("%-12s", t.Label)) + StyleMuted.Render("  "+t.Desc)
+		label := StyleNormal.Render(fmt.Sprintf("%-14s", t.Label)) + StyleMuted.Render("  "+t.Desc)
 		if i == a.themeCursor {
 			mark = StyleSelected.Render("▸ ")
-			label = StyleSelected.Render(fmt.Sprintf("%-12s", t.Label)) + "  " + StyleMuted.Render(t.Desc)
+			label = StyleSelected.Render(fmt.Sprintf("%-14s", t.Label)) + "  " + StyleMuted.Render(t.Desc)
 		} else if t.ID == a.themePrevious {
 			mark = StyleHealthy.Render("● ")
 		}
-		sw := swatch(t.pal.Bg) + swatch(t.pal.Primary) + swatch(t.pal.Accent) + swatch(t.pal.Success)
+		sw := swatch(t.pal.Bg) + swatch(t.pal.Primary) + swatch(t.pal.Accent) + swatch(t.pal.Pink) + swatch(t.pal.Success)
 		lines = append(lines, mark+sw+"  "+label)
 	}
 	lines = append(lines, "", StyleMuted.Render("salvo em ~/.config/devscope/config.yaml"))
-	boxWidth := minInt(64, maxInt(40, a.width-8))
+	boxWidth := minInt(72, maxInt(48, a.width-6))
 	box := StylePanel.Width(boxWidth).Background(ColorBgPanel).Render(strings.Join(lines, "\n"))
 	return overlayCentered(background, box, a.width, a.height)
 }
@@ -2087,8 +2150,8 @@ func getHelpText() string {
   Enter        Abrir projeto / Ver detalhes
   Esc          Voltar / Fechar
   Tab          Próxima aba (na view de projeto)
-  /            Filtrar projetos
-  ctrl+p       Filtro fuzzy de projetos
+  /            Filtrar projetos (só na lista; ao vivo, estilo rotas)
+  ctrl+p       Filtro fuzzy de projetos (só na lista)
   ?            Alternar exibição de ajuda
   T            Escolher theme (modal)
   q            Sair do DevScope
@@ -2210,6 +2273,7 @@ Aba Containers:
   shift+e      Abrir shell interativo dentro do container
   s            Parar container (stop)
   r            Iniciar/Reiniciar container
+  shift+R      Toggle restart=always / no (∞ no STATE)
   p            Pausar/Retomar container
   d            Remover container (confirmação y/n)
   shift+u      Docker compose up -d

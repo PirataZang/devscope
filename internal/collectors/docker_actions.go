@@ -29,6 +29,21 @@ func DockerRestart(id string) error {
 	return dockerAction(id, "restart")
 }
 
+// DockerSetRestartPolicy sets HostConfig.RestartPolicy (always, no, unless-stopped, on-failure).
+func DockerSetRestartPolicy(id, policy string) error {
+	if policy == "" {
+		policy = "no"
+	}
+	out, err := exec.Command("docker", "update", "--restart="+policy, id).CombinedOutput()
+	if err != nil {
+		if len(out) > 0 {
+			return fmt.Errorf("%s", strings.TrimSpace(string(out)))
+		}
+		return err
+	}
+	return nil
+}
+
 func DockerRemove(id string) error {
 	return dockerAction(id, "rm", "-f")
 }

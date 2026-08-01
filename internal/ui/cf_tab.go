@@ -40,6 +40,7 @@ type cfFocus int
 
 const (
 	cfFocusTable cfFocus = iota
+	cfFocusDetails
 	cfFocusLogs
 )
 
@@ -72,6 +73,7 @@ func (a *App) openCFClient(p *core.Project) tea.Cmd {
 	a.cfAcctCursor = 0
 	a.cfAcctScroll = 0
 	a.cfLogScroll = 0
+	a.cfDetailsScroll = 0
 	a.cfErr = ""
 	a.cfStatus = ""
 	a.cfWizard = false
@@ -229,39 +231,44 @@ func (a *App) renderCFTab(p *core.Project) string {
 	bodyH := maxInt(4, h-headerH-2)
 
 	var body string
-	if a.cfWizard {
-		body = a.renderCFWizard(p, w, bodyH)
-	} else {
-		switch a.cfSubTab {
-		case cfTabOverview:
-			body = a.renderCFOverview(p, w, bodyH)
-		case cfTabAccount:
-			body = a.renderCFAccount(w, bodyH)
-		case cfTabHistory:
-			body = a.renderCFHistory(w, bodyH)
-		case cfTabSetup:
-			body = a.renderCFSetup(w, bodyH)
-		case cfTabSettings:
-			body = a.renderCFSettings(p, w, bodyH)
-		default:
-			body = a.renderCFTunnelsView(p, w, bodyH)
-		}
+	switch a.cfSubTab {
+	case cfTabOverview:
+		body = a.renderCFOverview(p, w, bodyH)
+	case cfTabAccount:
+		body = a.renderCFAccount(w, bodyH)
+	case cfTabHistory:
+		body = a.renderCFHistory(w, bodyH)
+	case cfTabSetup:
+		body = a.renderCFSetup(w, bodyH)
+	case cfTabSettings:
+		body = a.renderCFSettings(p, w, bodyH)
+	default:
+		body = a.renderCFTunnelsView(p, w, bodyH)
 	}
-	return lipgloss.JoinVertical(lipgloss.Left, header, nav, body, a.renderStatusBar(a.cfHints()))
+	view := lipgloss.JoinVertical(lipgloss.Left, header, nav, body, a.renderStatusBar(a.cfHints()))
+	if a.cfWizard {
+		view = overlayCentered(view, a.renderCFWizard(p, w, h), w, h)
+	}
+	if a.cfConfirmDelete {
+		target, detail := a.cfDeleteConfirmLabels()
+		box := renderTunnelDeleteConfirmBox("CLOUDFLARE", tabAccentColor(TabCFTunnel), target, detail, w, h)
+		view = overlayCentered(view, box, w, h)
+	}
+	return view
 }
 
 func (a *App) cfHints() string {
 	if a.cfConfirmDelete {
-		return "confirmar delete?  y sim  n/esc cancelar"
+		return "modal delete  y confirma  n/esc cancela"
 	}
 	if a.cfWizard {
-		return "tab campo  ←→ cursor  space mode  backspace/del  enter salvar+start  esc"
+		return "modal novo túnel  tab campo  ←→ cursor  space mode  enter salvar+start  esc"
 	}
 	scope := "A todos"
 	if a.cfShowAll {
 		scope = "A projeto"
 	}
-	base := "0-5 aba  tab painel  n new  s start  x stop  I install  L login  C create  R route  c copy  o open  d delete  " + scope + "  esc"
+	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  I install  L login  C create  R route  c copy  o open  d delete  " + scope + "  esc"
 	if a.cfLoading {
 		base = "carregando…  " + base
 	}
@@ -405,29 +412,19 @@ func (a *App) renderCFTunnelsView(p *core.Project, width, height int) string {
 	if height < 6 {
 		height = 6
 	}
-	bottomH := height * 30 / 100
-	if bottomH < 4 {
-		bottomH = 4
+	leftW := maxInt(32, width*40/100)
+	rightW := maxInt(28, width-leftW-1)
+	logsH := maxInt(4, height*34/100)
+	if logsH > height-6 {
+		logsH = height - 6
 	}
-	if bottomH > height-4 {
-		bottomH = height - 4
-	}
-	tableH := height - bottomH
-	cmdW := tunnelCmdWidth(width)
-	rest := width - cmdW
-	statsW := rest / 2
-	logsW := rest - statsW
-	bottom := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderCFQuickStats(statsW, bottomH),
-		a.renderCFLogsPane(logsW, bottomH),
+	detailsH := height - logsH
+	left := a.renderCFTunnelTable(leftW, height)
+	right := lipgloss.JoinVertical(lipgloss.Left,
+		a.renderCFDetailsPane(rightW, detailsH),
+		a.renderCFLogsPane(rightW, logsH),
 	)
-	if cmdW >= 12 {
-		bottom = lipgloss.JoinHorizontal(lipgloss.Top, bottom, a.renderCFCommands(cmdW, bottomH))
-	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderCFTunnelTable(width, tableH),
-		bottom,
-	)
+	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
 }
 
 func (a *App) renderCFQuickStats(width, height int) string {
@@ -475,17 +472,8 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 	focus := a.cfFocus == cfFocusTable
 	n := len(a.cfTunnels)
 	a.cfScroll = ensureVisible(a.cfCursor, a.cfScroll, height-3, n)
-	cols := tunnelTableCols(width)
-	header := fmt.Sprintf("%-3s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
-		"ST",
-		cols.name, "NAME",
-		cols.project, "PROJECT",
-		cols.port, "PORT",
-		cols.mode, "MODE",
-		cols.host, "HOSTNAME / URL",
-		cols.uptime, "UPTIME",
-		cols.pid, "PID",
-	)
+	nameW := maxInt(8, width-20)
+	header := fmt.Sprintf("%-3s %-*s %4s %-6s", "ST", nameW, "NAME", "PORT", "MODE")
 	lines := []string{StyleMuted.Render(truncate(header, width-2))}
 	if n == 0 {
 		hint := "  (nenhum túnel do projeto — n para criar"
@@ -505,34 +493,12 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 			case "starting":
 				dot = StyleWarning.Render("●")
 			}
-			host := t.Hostname
-			if host == "" {
-				host = publicHostFromURL(t.PublicURL)
-			}
-			if host == "" {
-				host = "—"
-			}
-			pid := "—"
-			if t.PID > 0 {
-				pid = strconv.Itoa(t.PID)
-			}
 			port := "—"
 			if t.Port > 0 {
 				port = strconv.Itoa(t.Port)
 			}
-			proj := t.Project
-			if proj == "" {
-				proj = "—"
-			}
-			row := fmt.Sprintf("%s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
-				" ",
-				cols.name, truncate(t.Name, cols.name),
-				cols.project, truncate(proj, cols.project),
-				cols.port, truncate(port, cols.port),
-				cols.mode, truncate(t.Mode, cols.mode),
-				cols.host, truncate(host, cols.host),
-				cols.uptime, truncate(t.Uptime, cols.uptime),
-				cols.pid, truncate(pid, cols.pid),
+			row := fmt.Sprintf("%-*s %4s %-6s",
+				nameW, truncate(t.Name, nameW), port, truncate(t.Mode, 6),
 			)
 			prefix := "  "
 			style := StyleMuted
@@ -544,12 +510,66 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 					style = StyleNormal
 				}
 			}
-			lines = append(lines, style.Render(truncate(prefix+dot+" "+strings.TrimSpace(row), width-2)))
+			lines = append(lines, style.Render(truncate(prefix+dot+" "+row, width-2)))
 		}
 	}
 	title := fmt.Sprintf("TUNNELS (%d)", n)
 	if focus {
 		title = "> " + title
+	}
+	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+}
+
+func (a *App) renderCFDetailsPane(width, height int) string {
+	focus := a.cfFocus == cfFocusDetails
+	innerW := maxInt(20, width-2)
+	var raw []string
+	t, ok := a.cfSelected()
+	if !ok {
+		raw = []string{StyleMuted.Render("(selecione um túnel na lista)")}
+	} else {
+		host := t.Hostname
+		if host == "" {
+			host = publicHostFromURL(t.PublicURL)
+		}
+		pid := "—"
+		if t.PID > 0 {
+			pid = strconv.Itoa(t.PID)
+		}
+		raw = append(raw,
+			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status),
+			"",
+		)
+		portLabel := "—"
+		if t.Port > 0 {
+			portLabel = strconv.Itoa(t.Port)
+		}
+		metrics := tunnelMetricRow([][2]string{
+			{"STATUS", t.Status},
+			{"MODE", firstNonEmpty(t.Mode, "—")},
+			{"PORT", portLabel},
+			{"PID", pid},
+		}, innerW)
+		if metrics != "" {
+			raw = append(raw, strings.Split(metrics, "\n")...)
+			raw = append(raw, "")
+		}
+		raw = append(raw,
+			tunnelDetailKV("Public", t.PublicURL),
+			tunnelDetailKV("Local", t.LocalURL),
+			tunnelDetailKV("Host", host),
+			tunnelDetailKV("Uptime", t.Uptime),
+			tunnelDetailKV("Project", t.Project),
+			tunnelDetailKV("TunnelID", t.TunnelID),
+		)
+	}
+	a.cfDetailsScroll = clampScroll(a.cfDetailsScroll, height-2, len(raw))
+	start := a.cfDetailsScroll
+	end := minInt(start+height-2, len(raw))
+	lines := raw[start:end]
+	title := "DETALHES"
+	if focus {
+		title = "> DETALHES"
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
@@ -713,28 +733,92 @@ func (a *App) renderCFWizard(p *core.Project, width, height int) string {
 	if p != nil {
 		proj = p.Name
 	}
-	lines := []string{
-		a.renderCFWizardField("Nome", a.cfNewName, cfWizName, true),
-		a.renderCFWizardField("URL/Port", a.cfNewURL, cfWizURL, true),
-		a.renderCFWizardField("Host", a.cfNewHostname, cfWizHostname, true),
-		a.renderCFWizardField("Mode", a.cfNewMode, cfWizMode, false),
-		StyleMuted.Render("Projeto   ") + StyleMuted.Render(proj+"  (fixo)"),
-		"",
-		StyleMuted.Render("URL/Port: http://127.0.0.1:3000 ou só 4321 · localhost → 127.0.0.1"),
-		StyleMuted.Render("quick = trycloudflare · named = hostname no domínio"),
-		StyleMuted.Render("tab/↑↓ campo · space mode · enter salvar+start · esc"),
+	boxW := minInt(width-4, maxInt(54, width*62/100))
+	boxH := minInt(height-2, maxInt(22, height*62/100))
+	innerW := maxInt(28, boxW-6)
+	accent := tabAccentColor(TabCFTunnel)
+
+	lines := tunnelModalChrome("CLOUDFLARE", accent, "Novo túnel", "quick tunnel ou named + hostname", proj, innerW)
+	lines = append(lines, "")
+
+	nameBox := renderApiTitledBox("nome",
+		[]string{a.renderCFWizardFieldValue(a.cfNewName, cfWizName, true)},
+		innerW, 3, a.cfWizardField == cfWizName,
+	)
+	urlBox := renderApiTitledBox("url / porta",
+		[]string{a.renderCFWizardFieldValue(a.cfNewURL, cfWizURL, true)},
+		innerW, 3, a.cfWizardField == cfWizURL,
+	)
+	hostBox := renderApiTitledBox("hostname",
+		[]string{a.renderCFWizardFieldValue(a.cfNewHostname, cfWizHostname, true)},
+		innerW, 3, a.cfWizardField == cfWizHostname,
+	)
+	modeShown := a.cfNewMode
+	if a.cfWizardField == cfWizMode {
+		modeShown = a.cfNewMode + "  ⟨space⟩"
 	}
-	return renderApiTitledBox("NOVO TÚNEL", fitExactLines(lines, height-2), width, height, true)
+	modeBox := renderApiTitledBox("mode",
+		[]string{a.renderCFWizardFieldValue(modeShown, cfWizMode, false)},
+		innerW, 3, a.cfWizardField == cfWizMode,
+	)
+
+	preview := StyleMuted.Render("preview  ")
+	name := strings.TrimSpace(a.cfNewName)
+	if name == "" {
+		preview += StyleMuted.Render("(preencha nome e destino)")
+	} else {
+		preview += StyleHealthy.Render(truncate(name, 14)) +
+			StyleMuted.Render("  ·  ") +
+			StyleWarning.Render(truncate(firstNonEmpty(a.cfNewURL, "?"), 22)) +
+			StyleMuted.Render("  ·  ") +
+			StyleNormal.Render(a.cfNewMode)
+	}
+
+	lines = append(lines, strings.Split(nameBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(urlBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(hostBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(modeBox, "\n")...)
+	lines = append(lines, "",
+		StyleMuted.Render("projeto fixo — túnel fica ligado a "+firstNonEmpty(proj, "este projeto")),
+		StyleMuted.Render("url: http://127.0.0.1:3000 ou só 4321 · localhost → 127.0.0.1"),
+		StyleMuted.Render("quick = trycloudflare · named = hostname no domínio"),
+		preview,
+		"",
+		StyleMuted.Render("tab campo  ·  ←→ cursor  ·  space mode  ·  enter salva e inicia  ·  esc"),
+	)
+	return tunnelModalBox(lines, boxW, boxH, accent)
 }
 
-func (a *App) renderCFWizardField(label, value string, field int, editable bool) string {
-	prefix := StyleMuted.Render(fmt.Sprintf("%-9s ", label))
+func (a *App) cfDeleteConfirmLabels() (target, detail string) {
+	if a.cfSubTab == cfTabAccount {
+		if a.cfAcctCursor >= 0 && a.cfAcctCursor < len(a.cfAccount) {
+			t := a.cfAccount[a.cfAcctCursor]
+			return t.Name, "named tunnel da conta · " + truncate(t.ID, 36)
+		}
+		return "—", ""
+	}
+	t, ok := a.cfSelected()
+	if !ok {
+		return "—", ""
+	}
+	host := t.Hostname
+	if host == "" {
+		host = publicHostFromURL(t.PublicURL)
+	}
+	detail = fmt.Sprintf("%s  %s", firstNonEmpty(t.Mode, "quick"), firstNonEmpty(host, t.LocalURL))
+	return t.Name, detail
+}
+
+func (a *App) renderCFWizardFieldValue(value string, field int, editable bool) string {
 	focused := a.cfWizardField == field
 	if !focused {
-		return prefix + StyleNormal.Render(value)
+		return StyleNormal.Render(value)
 	}
 	if !editable {
-		return prefix + StyleSelected.Render(value+"  ⟨space⟩")
+		return StyleSelected.Render(value)
 	}
 	runes := []rune(value)
 	cur := a.cfWizardCursor
@@ -745,7 +829,7 @@ func (a *App) renderCFWizardField(label, value string, field int, editable bool)
 		cur = len(runes)
 	}
 	shown := string(runes[:cur]) + "█" + string(runes[cur:])
-	return prefix + StyleSelected.Render(shown)
+	return StyleSelected.Render(shown)
 }
 
 func (a *App) beginCFWizard(_ *core.Project) {
@@ -873,7 +957,9 @@ func (a *App) handleCFKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 	case "esc":
 		return a, a.leaveCFTab()
 	case "tab":
-		a.cfFocus = (a.cfFocus + 1) % 2
+		if a.cfSubTab == cfTabTunnels {
+			a.cfFocus = (a.cfFocus + 1) % 3 // table → details → logs
+		}
 	case "0":
 		a.cfSubTab = cfTabOverview
 	case "1":
@@ -969,18 +1055,28 @@ func (a *App) cfMove(delta int) tea.Cmd {
 		if a.cfAcctCursor > len(a.cfAccount)-1 {
 			a.cfAcctCursor = maxInt(0, len(a.cfAccount)-1)
 		}
+	case a.cfFocus == cfFocusDetails:
+		a.cfDetailsScroll += delta
+		if a.cfDetailsScroll < 0 {
+			a.cfDetailsScroll = 0
+		}
 	case a.cfFocus == cfFocusLogs:
 		a.cfLogScroll += delta
 		if a.cfLogScroll < 0 {
 			a.cfLogScroll = 0
 		}
 	default:
+		prev := a.cfCursor
 		a.cfCursor += delta
 		if a.cfCursor < 0 {
 			a.cfCursor = 0
 		}
 		if a.cfCursor > len(a.cfTunnels)-1 {
 			a.cfCursor = maxInt(0, len(a.cfTunnels)-1)
+		}
+		if a.cfCursor != prev {
+			a.cfDetailsScroll = 0
+			a.cfLogScroll = 0
 		}
 	}
 	return nil

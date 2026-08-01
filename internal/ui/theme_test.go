@@ -11,12 +11,36 @@ import (
 )
 
 func TestThemesCatalog(t *testing.T) {
-	if len(Themes) < 7 {
-		t.Fatalf("want >=7 themes, got %d", len(Themes))
+	if len(Themes) < 12 {
+		t.Fatalf("want >=12 themes, got %d", len(Themes))
+	}
+	ApplyTheme("devscope")
+	if CurrentTheme() != "devscope" || string(ColorPrimary) != "#7C3AED" {
+		t.Fatalf("devscope primary=%q theme=%q", ColorPrimary, CurrentTheme())
+	}
+	ApplyTheme("dracula-vivid")
+	if CurrentTheme() != "dracula-vivid" || string(ColorPrimary) != "#D4A5FF" {
+		t.Fatalf("dracula-vivid primary=%q theme=%q", ColorPrimary, CurrentTheme())
+	}
+	ApplyTheme("dracula")
+	if string(ColorPrimary) != "#BD93F9" {
+		t.Fatalf("classic dracula must stay #BD93F9, got %q", ColorPrimary)
 	}
 	ApplyTheme("dracula")
 	if CurrentTheme() != "dracula" || string(ColorBg) != "#282A36" {
 		t.Fatalf("dracula bg=%q theme=%q", ColorBg, CurrentTheme())
+	}
+	ApplyTheme("tokyo-night")
+	if CurrentTheme() != "tokyo-night" || string(ColorBg) != "#1A1B26" {
+		t.Fatalf("tokyo-night bg=%q theme=%q", ColorBg, CurrentTheme())
+	}
+	ApplyTheme("rose-pine")
+	if CurrentTheme() != "rose-pine" || string(ColorPrimary) != "#C4A7E7" {
+		t.Fatalf("rose-pine primary=%q theme=%q", ColorPrimary, CurrentTheme())
+	}
+	ApplyTheme("github")
+	if CurrentTheme() != "dark" {
+		t.Fatalf("github alias → dark, got %q", CurrentTheme())
 	}
 	ApplyTheme("nord")
 	if CurrentTheme() != "nord" {
@@ -39,27 +63,27 @@ func TestThemePickerSaves(t *testing.T) {
 	if !a.themeOn {
 		t.Fatal("picker closed")
 	}
-	// move to dracula (index 1)
-	_, _ = a.updateThemePicker(tea.KeyMsg{Type: tea.KeyDown})
+	// openThemePicker starts on current theme (dark = index 1); move to DevScope (index 0)
+	_, _ = a.updateThemePicker(tea.KeyMsg{Type: tea.KeyUp})
 	_, _ = a.updateThemePicker(tea.KeyMsg{Type: tea.KeyEnter})
 	if a.themeOn {
 		t.Fatal("should close on save")
 	}
-	if a.cfg.UI.Theme != "dracula" {
+	if a.cfg.UI.Theme != "devscope" {
 		t.Fatalf("cfg=%q", a.cfg.UI.Theme)
 	}
 	b, err := os.ReadFile(cfgPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(b), "dracula") {
+	if !strings.Contains(string(b), "devscope") {
 		t.Fatalf("config missing theme: %s", b)
 	}
 	loaded, err := config.Load("")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if loaded.UI.Theme != "dracula" {
+	if loaded.UI.Theme != "devscope" {
 		t.Fatalf("reload theme=%q", loaded.UI.Theme)
 	}
 }
@@ -86,7 +110,9 @@ func TestRenderThemePopup(t *testing.T) {
 	a := &App{width: 100, height: 30, themeOn: true, themeCursor: 0, themePrevious: "dark"}
 	ApplyTheme("dark")
 	got := stripANSI(a.renderThemePopup("bg"))
-	if !strings.Contains(got, "Themes") || !strings.Contains(got, "Dracula") || !strings.Contains(got, "Nord") {
-		t.Fatalf("%q", truncate(got, 300))
+	for _, want := range []string{"Themes", "DevScope", "GitHub Dark", "Tokyo Night", "Dracula", "Dracula Vivid"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in %q", want, truncate(got, 400))
+		}
 	}
 }

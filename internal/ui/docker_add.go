@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,10 +33,43 @@ const (
 	dockerAddSearchRefuse
 )
 
+type dockerAddResultsFocus int
+
+const (
+	dockerAddResultsList dockerAddResultsFocus = iota
+	dockerAddResultsImage
+	dockerAddResultsDetails
+)
+
+const dockerHubPageSize = 15
+
 type dockerHubSearchDoneMsg struct {
 	query   string
+	page    int
 	results []collectors.DockerHubRepo
+	hasMore bool
+	append  bool
 	err     error
+}
+
+type dockerHubDetailsDoneMsg struct {
+	seq     int
+	name    string
+	details collectors.DockerHubDetails
+	err     error
+}
+
+type dockerHubTagsDoneMsg struct {
+	seq  int
+	name string
+	tags []collectors.DockerHubTag
+	err  error
+}
+
+type dockerAddComposeReadyMsg struct {
+	image  string
+	yaml   string
+	source string
 }
 
 type dockerAddSavedMsg struct {
@@ -56,12 +90,26 @@ func (a *App) startDockerAdd(p *core.Project) {
 	a.dockerAddQuery = ""
 	a.dockerAddCursor = 0
 	a.dockerAddResults = nil
+	a.dockerAddPage = 0
+	a.dockerAddHasMore = false
+	a.dockerAddImage = ""
+	a.dockerAddResultsFocus = dockerAddResultsList
 	a.dockerAddEdit = ""
 	a.dockerAddEditState = editorState{Cursor: 0, Anchor: -1}
 	a.dockerAddFocus = dockerAddFocusEditor
 	a.dockerAddSearchFocus = dockerAddSearchQuery
 	a.dockerAddLoading = false
-	a.containerStatusMsg = "Docker Hub · tab recusar"
+	a.dockerAddComposeSource = ""
+	a.dockerAddDetailsCache = map[string]collectors.DockerHubDetails{}
+	a.dockerAddDetailsName = ""
+	a.dockerAddDetailsLoading = false
+	a.dockerAddDetailsScroll = 0
+	a.dockerAddTags = nil
+	a.dockerAddTagsRepo = ""
+	a.dockerAddTagsLoading = false
+	a.dockerAddTagCursor = 0
+	a.dockerAddTagsScroll = 0
+	a.containerStatusMsg = "Docker Hub · buscar imagem ou YAML manual"
 }
 
 func (a *App) closeDockerAdd() {
@@ -70,27 +118,223 @@ func (a *App) closeDockerAdd() {
 	a.dockerAddQuery = ""
 	a.dockerAddCursor = 0
 	a.dockerAddResults = nil
+	a.dockerAddPage = 0
+	a.dockerAddHasMore = false
+	a.dockerAddImage = ""
+	a.dockerAddResultsFocus = dockerAddResultsList
 	a.dockerAddEdit = ""
 	a.dockerAddEditState = editorState{Anchor: -1}
 	a.dockerAddFocus = dockerAddFocusEditor
 	a.dockerAddSearchFocus = dockerAddSearchQuery
 	a.dockerAddLoading = false
+	a.dockerAddComposeSource = ""
+	a.dockerAddDetailsCache = nil
+	a.dockerAddDetailsName = ""
+	a.dockerAddDetailsLoading = false
+	a.dockerAddDetailsScroll = 0
+	a.dockerAddTags = nil
+	a.dockerAddTagsRepo = ""
+	a.dockerAddTagsLoading = false
+	a.dockerAddTagCursor = 0
+	a.dockerAddTagsScroll = 0
+}
+
+func (a *App) applyDockerAddCompose(yamlText, source string) {
+	a.dockerAddLoading = false
+	a.dockerAddComposeSource = source
+	a.dockerAddStep = dockerAddStepEdit
+	a.dockerAddEdit = yamlText
+	a.dockerAddEditState = editorState{Cursor: len([]rune(a.dockerAddEdit)), Anchor: -1}
+	a.dockerAddFocus = dockerAddFocusEditor
+	a.containerStatusMsg = "compose · " + source + " · tab Salvar"
 }
 
 func (a *App) openDockerAddManualEdit() {
-	a.dockerAddStep = dockerAddStepEdit
-	a.dockerAddEdit = collectors.ComposeServiceTemplate("")
-	a.dockerAddEditState = editorState{Cursor: len([]rune(a.dockerAddEdit)), Anchor: -1}
-	a.dockerAddFocus = dockerAddFocusEditor
-	a.containerStatusMsg = "edite o YAML · tab Salvar"
+	yamlText, source := collectors.BuildComposeServiceYAML("")
+	a.applyDockerAddCompose(yamlText, source)
 }
 
-func (a *App) openDockerAddEditFromImage(image string) {
-	a.dockerAddStep = dockerAddStepEdit
-	a.dockerAddEdit = collectors.ComposeServiceTemplate(image)
-	a.dockerAddEditState = editorState{Cursor: len([]rune(a.dockerAddEdit)), Anchor: -1}
-	a.dockerAddFocus = dockerAddFocusEditor
-	a.containerStatusMsg = "edite o YAML · tab Salvar"
+func (a *App) openDockerAddEditFromImage(image string) tea.Cmd {
+	image = strings.TrimSpace(image)
+	if image == "" {
+		a.containerStatusMsg = "imagem vazia"
+		return nil
+	}
+	if yamlText, source, ok := collectors.ComposeServiceYAMLFromPreset(image); ok {
+		a.applyDockerAddCompose(yamlText, source)
+		return nil
+	}
+	a.dockerAddLoading = true
+	a.containerStatusMsg = "detectando config da imagem…"
+	return func() tea.Msg {
+		yamlText, source := collectors.BuildComposeServiceYAML(image)
+		return dockerAddComposeReadyMsg{image: image, yaml: yamlText, source: source}
+	}
+}
+
+func (a *App) handleDockerAddComposeReady(msg dockerAddComposeReadyMsg) {
+	if !a.dockerAddOn {
+		return
+	}
+	a.applyDockerAddCompose(msg.yaml, msg.source)
+}
+
+func (a *App) syncDockerAddImageFromCursor() {
+	if a.dockerAddCursor < 0 || a.dockerAddCursor >= len(a.dockerAddResults) {
+		return
+	}
+	name := a.dockerAddResults[a.dockerAddCursor].Name
+	a.dockerAddImage = name
+	a.dockerAddDetailsScroll = 0
+	if a.dockerAddTagsRepo != name {
+		a.dockerAddTags = nil
+		a.dockerAddTagsRepo = ""
+		a.dockerAddTagCursor = 0
+		a.dockerAddTagsScroll = 0
+	}
+}
+
+func (a *App) selectedDockerHubRepo() (collectors.DockerHubRepo, bool) {
+	if a.dockerAddCursor < 0 || a.dockerAddCursor >= len(a.dockerAddResults) {
+		return collectors.DockerHubRepo{}, false
+	}
+	return a.dockerAddResults[a.dockerAddCursor], true
+}
+
+func (a *App) applyDockerAddTagAtCursor() {
+	if a.dockerAddTagCursor < 0 || a.dockerAddTagCursor >= len(a.dockerAddTags) {
+		return
+	}
+	repo := collectors.ImageRepoName(a.dockerAddImage)
+	if repo == "" {
+		if r, ok := a.selectedDockerHubRepo(); ok {
+			repo = r.Name
+		}
+	}
+	a.dockerAddImage = collectors.WithImageTag(repo, a.dockerAddTags[a.dockerAddTagCursor].Name)
+}
+
+func (a *App) ensureDockerHubDetails() tea.Cmd {
+	repo, ok := a.selectedDockerHubRepo()
+	if !ok {
+		return nil
+	}
+	if a.dockerAddDetailsCache == nil {
+		a.dockerAddDetailsCache = map[string]collectors.DockerHubDetails{}
+	}
+	name := repo.Name
+
+	needDetails := false
+	if _, hit := a.dockerAddDetailsCache[name]; hit {
+		a.dockerAddDetailsName = name
+		a.dockerAddDetailsLoading = false
+	} else if a.dockerAddDetailsLoading && a.dockerAddDetailsName == name {
+		// já pedindo
+	} else {
+		needDetails = true
+	}
+
+	needTags := false
+	if a.dockerAddTagsRepo == name && len(a.dockerAddTags) > 0 {
+		// ok
+	} else if a.dockerAddTagsLoading && a.dockerAddTagsRepo == name {
+		// já pedindo
+	} else {
+		needTags = true
+	}
+
+	if !needDetails && !needTags {
+		return nil
+	}
+
+	a.dockerAddDetailsSeq++
+	seq := a.dockerAddDetailsSeq
+	var cmds []tea.Cmd
+	if needDetails {
+		a.dockerAddDetailsName = name
+		a.dockerAddDetailsLoading = true
+		cmds = append(cmds, func() tea.Msg {
+			d, err := collectors.FetchDockerHubDetails(name)
+			return dockerHubDetailsDoneMsg{seq: seq, name: name, details: d, err: err}
+		})
+	}
+	if needTags {
+		a.dockerAddTagsRepo = name
+		a.dockerAddTagsLoading = true
+		a.dockerAddTags = nil
+		a.dockerAddTagCursor = 0
+		a.dockerAddTagsScroll = 0
+		cmds = append(cmds, func() tea.Msg {
+			tags, err := collectors.ListDockerHubTags(name, 30)
+			return dockerHubTagsDoneMsg{seq: seq, name: name, tags: tags, err: err}
+		})
+	}
+	return tea.Batch(cmds...)
+}
+
+func (a *App) handleDockerHubDetailsDone(msg dockerHubDetailsDoneMsg) {
+	if !a.dockerAddOn || msg.seq != a.dockerAddDetailsSeq {
+		return
+	}
+	if msg.name != a.dockerAddDetailsName {
+		return
+	}
+	a.dockerAddDetailsLoading = false
+	if msg.err != nil {
+		a.containerStatusMsg = "detalhes: " + msg.err.Error()
+		return
+	}
+	if a.dockerAddDetailsCache == nil {
+		a.dockerAddDetailsCache = map[string]collectors.DockerHubDetails{}
+	}
+	a.dockerAddDetailsCache[msg.name] = msg.details
+}
+
+func (a *App) handleDockerHubTagsDone(msg dockerHubTagsDoneMsg) {
+	if !a.dockerAddOn || msg.seq != a.dockerAddDetailsSeq {
+		return
+	}
+	if msg.name != a.dockerAddTagsRepo {
+		return
+	}
+	a.dockerAddTagsLoading = false
+	if msg.err != nil {
+		a.containerStatusMsg = "tags: " + msg.err.Error()
+		a.dockerAddTags = nil
+		return
+	}
+	a.dockerAddTags = msg.tags
+	a.dockerAddTagCursor = 0
+	a.dockerAddTagsScroll = 0
+	// Prefere "latest" se existir; senão a mais recente.
+	for i, t := range a.dockerAddTags {
+		if t.Name == "latest" {
+			a.dockerAddTagCursor = i
+			break
+		}
+	}
+}
+
+func (a *App) requestDockerHubPage(query string, page int, appendResults bool) tea.Cmd {
+	a.dockerAddLoading = true
+	if appendResults {
+		a.containerStatusMsg = "carregando mais imagens…"
+	} else {
+		a.containerStatusMsg = "buscando no Docker Hub…"
+	}
+	return func() tea.Msg {
+		pageData, err := collectors.SearchDockerHubPage(query, page, dockerHubPageSize)
+		if err != nil {
+			return dockerHubSearchDoneMsg{query: query, page: page, append: appendResults, err: err}
+		}
+		return dockerHubSearchDoneMsg{
+			query:   query,
+			page:    pageData.Page,
+			results: pageData.Results,
+			hasMore: pageData.HasMore,
+			append:  appendResults,
+		}
+	}
 }
 
 func (a *App) updateDockerAdd(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -124,16 +368,14 @@ func (a *App) updateDockerAddSearch(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		q := strings.TrimSpace(a.dockerAddQuery)
 		if q == "" {
-			a.containerStatusMsg = "digite um termo ou tab → recusar"
+			a.containerStatusMsg = "digite um termo ou tab → YAML manual"
 			return a, nil
 		}
-		a.dockerAddLoading = true
-		a.containerStatusMsg = "buscando no Docker Hub…"
-		query := q
-		return a, func() tea.Msg {
-			results, err := collectors.SearchDockerHub(query, 15)
-			return dockerHubSearchDoneMsg{query: query, results: results, err: err}
-		}
+		a.dockerAddResults = nil
+		a.dockerAddPage = 0
+		a.dockerAddHasMore = false
+		a.dockerAddCursor = 0
+		return a, a.requestDockerHubPage(q, 1, false)
 	case "backspace":
 		if a.dockerAddSearchFocus != dockerAddSearchQuery {
 			return a, nil
@@ -161,27 +403,147 @@ func (a *App) updateDockerAddResults(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.dockerAddStep = dockerAddStepSearch
 		a.dockerAddResults = nil
 		a.dockerAddCursor = 0
+		a.dockerAddPage = 0
+		a.dockerAddHasMore = false
+		a.dockerAddImage = ""
+		a.dockerAddResultsFocus = dockerAddResultsList
 		a.dockerAddSearchFocus = dockerAddSearchQuery
-		a.containerStatusMsg = "Docker Hub · tab recusar"
+		a.dockerAddDetailsCache = map[string]collectors.DockerHubDetails{}
+		a.dockerAddDetailsName = ""
+		a.dockerAddDetailsLoading = false
+		a.dockerAddDetailsScroll = 0
+		a.dockerAddTags = nil
+		a.dockerAddTagsRepo = ""
+		a.dockerAddTagsLoading = false
+		a.dockerAddTagCursor = 0
+		a.dockerAddTagsScroll = 0
+		a.containerStatusMsg = "Docker Hub · buscar imagem ou YAML manual"
+		return a, nil
+	case "tab":
+		switch a.dockerAddResultsFocus {
+		case dockerAddResultsList:
+			a.dockerAddResultsFocus = dockerAddResultsImage
+		case dockerAddResultsImage:
+			a.dockerAddResultsFocus = dockerAddResultsDetails
+		default:
+			a.dockerAddResultsFocus = dockerAddResultsList
+		}
+		return a, nil
+	case "shift+tab":
+		switch a.dockerAddResultsFocus {
+		case dockerAddResultsList:
+			a.dockerAddResultsFocus = dockerAddResultsDetails
+		case dockerAddResultsImage:
+			a.dockerAddResultsFocus = dockerAddResultsList
+		default:
+			a.dockerAddResultsFocus = dockerAddResultsImage
+		}
+		return a, nil
+	case "o", "O":
+		a.openSelectedDockerHubLink()
 		return a, nil
 	case "up", "k":
+		switch a.dockerAddResultsFocus {
+		case dockerAddResultsImage:
+			// ↑↓ só navega tags; troca de painel é só via tab.
+			if len(a.dockerAddTags) > 0 && a.dockerAddTagCursor > 0 {
+				a.dockerAddTagCursor--
+				a.applyDockerAddTagAtCursor()
+			}
+			return a, nil
+		case dockerAddResultsDetails:
+			if a.dockerAddDetailsScroll > 0 {
+				a.dockerAddDetailsScroll--
+			}
+			return a, nil
+		}
 		if a.dockerAddCursor > 0 {
 			a.dockerAddCursor--
+			a.syncDockerAddImageFromCursor()
+			return a, a.ensureDockerHubDetails()
 		}
 		return a, nil
 	case "down", "j":
+		switch a.dockerAddResultsFocus {
+		case dockerAddResultsImage:
+			if len(a.dockerAddTags) > 0 && a.dockerAddTagCursor < len(a.dockerAddTags)-1 {
+				a.dockerAddTagCursor++
+				a.applyDockerAddTagAtCursor()
+			}
+			return a, nil
+		case dockerAddResultsDetails:
+			a.dockerAddDetailsScroll++
+			return a, nil
+		}
 		if a.dockerAddCursor < len(a.dockerAddResults)-1 {
 			a.dockerAddCursor++
+			a.syncDockerAddImageFromCursor()
+			return a, a.ensureDockerHubDetails()
+		}
+		if a.dockerAddHasMore && !a.dockerAddLoading {
+			q := strings.TrimSpace(a.dockerAddQuery)
+			return a, a.requestDockerHubPage(q, a.dockerAddPage+1, true)
+		}
+		return a, nil
+	case "pgup":
+		if a.dockerAddResultsFocus == dockerAddResultsDetails {
+			a.dockerAddDetailsScroll = maxInt(0, a.dockerAddDetailsScroll-5)
+			return a, nil
+		}
+		return a, nil
+	case "pgdown":
+		if a.dockerAddResultsFocus == dockerAddResultsDetails {
+			a.dockerAddDetailsScroll += 5
+			return a, nil
+		}
+		if a.dockerAddHasMore && !a.dockerAddLoading {
+			q := strings.TrimSpace(a.dockerAddQuery)
+			return a, a.requestDockerHubPage(q, a.dockerAddPage+1, true)
 		}
 		return a, nil
 	case "enter":
-		if a.dockerAddCursor < 0 || a.dockerAddCursor >= len(a.dockerAddResults) {
+		img := strings.TrimSpace(a.dockerAddImage)
+		if img == "" {
+			if r, ok := a.selectedDockerHubRepo(); ok {
+				img = r.Name
+			}
+		}
+		return a, a.openDockerAddEditFromImage(img)
+	case "backspace":
+		if a.dockerAddResultsFocus != dockerAddResultsImage {
 			return a, nil
 		}
-		a.openDockerAddEditFromImage(a.dockerAddResults[a.dockerAddCursor].Name)
+		runes := []rune(a.dockerAddImage)
+		if len(runes) > 0 {
+			a.dockerAddImage = string(runes[:len(runes)-1])
+		}
+		return a, nil
+	case "ctrl+u":
+		if a.dockerAddResultsFocus == dockerAddResultsImage {
+			a.dockerAddImage = ""
+		}
 		return a, nil
 	}
+	if a.dockerAddResultsFocus == dockerAddResultsImage && msg.Type == tea.KeyRunes {
+		a.dockerAddImage += string(msg.Runes)
+	}
 	return a, nil
+}
+
+func (a *App) openSelectedDockerHubLink() {
+	name := strings.TrimSpace(a.dockerAddImage)
+	if name == "" {
+		if r, ok := a.selectedDockerHubRepo(); ok {
+			name = r.Name
+		}
+	}
+	url := collectors.DockerHubURL(name)
+	if url == "" {
+		a.containerStatusMsg = "link Docker Hub indisponível"
+		return
+	}
+	_ = exec.Command("xdg-open", url).Start()
+	a.containerStatusMsg = "abrindo " + truncate(url, 48)
 }
 
 func (a *App) updateDockerAddEdit(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -239,23 +601,47 @@ func (a *App) submitDockerAdd() tea.Cmd {
 	}
 }
 
-func (a *App) handleDockerHubSearchDone(msg dockerHubSearchDoneMsg) {
+func (a *App) handleDockerHubSearchDone(msg dockerHubSearchDoneMsg) tea.Cmd {
 	a.dockerAddLoading = false
 	if !a.dockerAddOn {
-		return
+		return nil
 	}
 	if msg.err != nil {
 		a.containerStatusMsg = "docker hub: " + msg.err.Error()
-		return
+		return nil
+	}
+	if msg.append {
+		if len(msg.results) == 0 {
+			a.dockerAddHasMore = false
+			a.containerStatusMsg = "não há mais resultados"
+			return nil
+		}
+		a.dockerAddResults = append(a.dockerAddResults, msg.results...)
+		a.dockerAddPage = msg.page
+		a.dockerAddHasMore = msg.hasMore
+		a.dockerAddCursor = len(a.dockerAddResults) - len(msg.results)
+		a.syncDockerAddImageFromCursor()
+		a.containerStatusMsg = fmt.Sprintf("%d imagens · ↓ carrega mais", len(a.dockerAddResults))
+		return a.ensureDockerHubDetails()
 	}
 	if len(msg.results) == 0 {
 		a.containerStatusMsg = "nenhum resultado para " + msg.query
-		return
+		return nil
 	}
 	a.dockerAddResults = msg.results
+	a.dockerAddPage = msg.page
+	a.dockerAddHasMore = msg.hasMore
 	a.dockerAddCursor = 0
+	a.dockerAddResultsFocus = dockerAddResultsList
+	a.dockerAddDetailsCache = map[string]collectors.DockerHubDetails{}
+	a.syncDockerAddImageFromCursor()
 	a.dockerAddStep = dockerAddStepResults
-	a.containerStatusMsg = fmt.Sprintf("%d resultados · enter seleciona", len(msg.results))
+	more := ""
+	if a.dockerAddHasMore {
+		more = " · ↓ mais"
+	}
+	a.containerStatusMsg = fmt.Sprintf("%d resultados%s · tab ajusta imagem", len(msg.results), more)
+	return a.ensureDockerHubDetails()
 }
 
 func (a *App) handleDockerAddSaved(msg dockerAddSavedMsg) tea.Cmd {
@@ -280,106 +666,4 @@ func (a *App) renderDockerAdd() string {
 		box = a.renderDockerAddEditBox()
 	}
 	return overlayCentered(background, box, a.width, a.height)
-}
-
-func (a *App) renderDockerAddSearchBox() string {
-	input := a.dockerAddQuery + "█"
-	if a.dockerAddLoading {
-		input = a.dockerAddQuery + " …"
-	}
-	queryLine := StyleMuted.Render("  " + input)
-	refuseLine := StyleMuted.Render("  Recusar buscar do docker hub")
-	if a.dockerAddSearchFocus == dockerAddSearchQuery {
-		queryLine = StyleSelected.Render("▸ " + input)
-	} else {
-		refuseLine = StyleSelected.Render("▸ Recusar buscar do docker hub")
-	}
-	lines := []string{
-		StyleSection.Render("Novo serviço Docker"),
-		StyleMuted.Render("buscar imagem no Docker Hub"),
-		"",
-		StyleMuted.Render("termo"),
-		queryLine,
-		"",
-		refuseLine,
-		"",
-		StyleMuted.Render("enter confirma  ·  tab alterna  ·  esc cancela"),
-	}
-	boxW := minInt(64, maxInt(40, a.width-8))
-	return StylePanel.Width(boxW).Background(ColorBgPanel).Render(strings.Join(lines, "\n"))
-}
-
-func (a *App) renderDockerAddResultsBox() string {
-	boxW := minInt(72, maxInt(48, a.width*85/100))
-	boxH := minInt(22, maxInt(12, a.height*60/100))
-	viewport := maxInt(4, boxH-6)
-	start := 0
-	if a.dockerAddCursor >= viewport {
-		start = a.dockerAddCursor - viewport + 1
-	}
-	end := minInt(start+viewport, len(a.dockerAddResults))
-
-	lines := []string{
-		StyleSection.Render("Docker Hub"),
-		StyleMuted.Render(fmt.Sprintf("%d imagens · ↑↓ seleciona", len(a.dockerAddResults))),
-		"",
-	}
-	for i := start; i < end; i++ {
-		r := a.dockerAddResults[i]
-		mark := "  "
-		style := StyleMuted
-		if i == a.dockerAddCursor {
-			mark = "▸ "
-			style = StyleSelected
-		}
-		badge := ""
-		if r.Official {
-			badge = StyleHealthy.Render(" official")
-		}
-		desc := truncate(r.Description, maxInt(16, boxW-30))
-		line := style.Render(mark+r.Name) + StyleMuted.Render(fmt.Sprintf(" ★%d", r.Stars)) + badge
-		if desc != "" {
-			line += StyleMuted.Render("  " + desc)
-		}
-		lines = append(lines, line)
-	}
-	lines = append(lines, "",
-		StyleMuted.Render("enter usa imagem  ·  esc volta à busca"),
-	)
-	return StylePanel.Width(boxW).Background(ColorBgPanel).
-		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
-}
-
-func (a *App) renderDockerAddEditBox() string {
-	boxW := minInt(a.width-4, maxInt(56, a.width*90/100))
-	boxH := minInt(a.height-2, maxInt(16, a.height*75/100))
-	editorH := maxInt(6, boxH-10)
-
-	editing := a.dockerAddFocus == dockerAddFocusEditor
-	ed := a.dockerAddEditState
-	body := renderEditorLines(a.dockerAddEdit, &ed, boxW-4, editorH, editing, false)
-	a.dockerAddEditState = ed
-
-	saveBtn := StyleMuted.Render("  Salvar no compose  ")
-	cancelBtn := StyleMuted.Render("  Cancelar  ")
-	switch a.dockerAddFocus {
-	case dockerAddFocusSave:
-		saveBtn = StyleSelected.Render("▸ Salvar no compose ◂")
-	case dockerAddFocusCancel:
-		cancelBtn = StyleSelected.Render("▸ Cancelar ◂")
-	}
-
-	lines := []string{
-		StyleSection.Render("Editar serviço"),
-		StyleMuted.Render("conteúdo será mesclado no docker-compose do projeto"),
-		"",
-		StyleMuted.Render("YAML  (enter = nova linha · tab = botões)"),
-	}
-	lines = append(lines, body...)
-	lines = append(lines, "",
-		saveBtn+"    "+cancelBtn,
-		StyleMuted.Render("tab troca foco  ·  enter no botão confirma  ·  esc sai"),
-	)
-	return StylePanel.Width(boxW).Background(ColorBgPanel).
-		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
 }

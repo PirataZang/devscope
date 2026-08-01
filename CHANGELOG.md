@@ -8,6 +8,52 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Compose presets** para imagens comuns (Postgres, MySQL, MariaDB, Mongo, Redis, Nginx, Traefik, RabbitMQ, Elasticsearch, Node e outras)
+  - Geração automática de portas, env, volumes e healthcheck
+  - Fallback por manifesto da imagem ou template mínimo
+- **Registry inspect** — lê config pública do Docker Hub (ports/env/volumes) para semear o YAML do compose
+- **Docker Hub avançado**
+  - Detalhes do repositório, listagem de tags e paginação na busca
+  - Formatação de downloads, tamanho e datas relativas
+- **Wizard Add Container** em 3 passos (Busca → Imagem → Compose)
+  - Painéis de resultados, tags e detalhes; edição manual do YAML
+  - Render dedicado (`docker_add_render`)
+- **Modais compartilhados de túnel** (Cloudflare e Ngrok)
+  - Confirmação de exclusão, badges de status e layout unificado
+- **Aba Git redesenhada**
+  - Coluna lateral: activity, stashes e remotes
+  - Log de comandos com URLs clicáveis (mouse)
+  - Árvore de arquivos no working tree e no diff do commit
+  - Filtro de branches ao vivo (`b`)
+- **Restart policy de containers** — exibição na lista e alteração via UI (`docker update --restart`)
+- **Temas novos e refinados**
+  - `devscope` (padrão), `tokyo-night`, `rose-pine`, `dracula-vivid`
+  - Aliases (`github`, `tokyonight`, `mocha`, …) e paletas ajustadas para TUI
+  - Tema padrão no exemplo de config: `devscope`
+
+### Changed
+- Aba Cloudflare e Ngrok: painel de detalhes, wizard e confirmações aprimorados
+- Merge de compose passa a unir volumes de top-level ao adicionar serviços
+- Collectors Git com helpers de exec (`GitExec`, checkout/pull/push com output)
+- Dashboard e app: suporte a mouse e atalhos extras na aba Git/Containers
+
+### Fixed
+- Layout de colunas na lista de containers para não quebrar linha no terminal
+
+## [1.3.1] - 2026-07-29
+
+### Added
+- **Aba Cloudflare Tunnel (TOOLS)**
+  - Cliente `cfutil`: agent, config e descoberta de túneis
+  - Listagem, criação (wizard), detalhes e exclusão de túneis por projeto
+  - Integração na sidebar e no fluxo de módulos
+
+### Changed
+- Polimento de layout em várias abas (module shell, sidebar, overview, ngrok, k8s, ws)
+
+## [1.3.0] - 2026-07-23
+
+### Added
 - **Configuração de projeto para WebSocket URLs**
   - Gerenciamento de URLs de WebSocket por projeto (salvar/carregar de JSON)
   - Limpeza e deduplicação de URLs
@@ -146,7 +192,9 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - GoReleaser + GitHub Releases
 - CLI: `devscope`, `scan --json`, `watch`, `version`
 
-[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/PirataZang/devscope/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/PirataZang/devscope/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/PirataZang/devscope/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/PirataZang/devscope/compare/v0.1.2...v1.0.0
 [0.1.2]: https://github.com/PirataZang/devscope/compare/v0.1.1...v0.1.2

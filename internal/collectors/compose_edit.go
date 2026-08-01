@@ -41,22 +41,21 @@ func MergeComposeYAML(projectPath, yamlText string) (composePath string, err err
 		}
 	}
 
-	services, _ := doc["services"].(map[string]any)
-	if services == nil {
-		// yaml.v3 may decode as map[any]any
-		if raw, ok := doc["services"].(map[any]any); ok {
-			services = map[string]any{}
-			for k, v := range raw {
-				services[fmt.Sprint(k)] = v
-			}
-		} else {
-			services = map[string]any{}
-		}
-	}
+	services := ensureStringMap(doc, "services")
 	for name, cfg := range incoming {
 		services[name] = cfg
 	}
 	doc["services"] = services
+
+	if volIn, err := parseComposeTopLevelVolumes(yamlText); err == nil && len(volIn) > 0 {
+		volumes := ensureStringMap(doc, "volumes")
+		for name, cfg := range volIn {
+			if _, exists := volumes[name]; !exists {
+				volumes[name] = cfg
+			}
+		}
+		doc["volumes"] = volumes
+	}
 
 	out, err := yaml.Marshal(doc)
 	if err != nil {
@@ -99,20 +98,39 @@ func asStringMap(v any) (map[string]any, error) {
 }
 
 // ComposeServiceTemplate returns a starter YAML snippet for manual or hub-based add.
+// Prefer BuildComposeServiceYAML when the caller needs the source label.
 func ComposeServiceTemplate(image string) string {
-	image = strings.TrimSpace(image)
-	if image == "" {
-		image = "nginx:latest"
+	yamlText, _ := BuildComposeServiceYAML(image)
+	return yamlText
+}
+
+func ensureStringMap(doc map[string]any, key string) map[string]any {
+	if m, ok := doc[key].(map[string]any); ok && m != nil {
+		return m
 	}
-	name := serviceNameFromImage(image)
-	return fmt.Sprintf(`services:
-  %s:
-    image: %s
-    ports:
-      - "8080:80"
-    environment:
-      EXAMPLE: value
-`, name, image)
+	if raw, ok := doc[key].(map[any]any); ok {
+		out := map[string]any{}
+		for k, v := range raw {
+			out[fmt.Sprint(k)] = v
+		}
+		return out
+	}
+	return map[string]any{}
+}
+
+func parseComposeTopLevelVolumes(yamlText string) (map[string]any, error) {
+	var root map[string]any
+	if err := yaml.Unmarshal([]byte(yamlText), &root); err != nil {
+		return nil, err
+	}
+	if root == nil {
+		return nil, nil
+	}
+	raw, ok := root["volumes"]
+	if !ok || raw == nil {
+		return nil, nil
+	}
+	return asStringMap(raw)
 }
 
 func serviceNameFromImage(image string) string {

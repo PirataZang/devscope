@@ -78,7 +78,49 @@ func CollectDockerPS(ctx context.Context) ([]core.Container, map[string]containe
 		meta[c.ID] = m
 		containers = append(containers, c)
 	}
+	applyRestartPolicies(containers)
 	return containers, meta, nil
+}
+
+// applyRestartPolicies fills Container.Restart via one batch inspect.
+func applyRestartPolicies(containers []core.Container) {
+	if len(containers) == 0 {
+		return
+	}
+	ids := make([]string, 0, len(containers))
+	for _, c := range containers {
+		if c.ID != "" {
+			ids = append(ids, c.ID)
+		}
+	}
+	if len(ids) == 0 {
+		return
+	}
+	args := append([]string{"inspect", "-f", "{{.Id}}\t{{.HostConfig.RestartPolicy.Name}}"}, ids...)
+	out, err := exec.Command("docker", args...).Output()
+	if err != nil {
+		return
+	}
+	byID := make(map[string]string, len(ids))
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		parts := strings.SplitN(line, "\t", 2)
+		if len(parts) < 2 {
+			continue
+		}
+		id := parts[0]
+		short := id
+		if len(short) > 12 {
+			short = short[:12]
+		}
+		policy := strings.TrimSpace(parts[1])
+		byID[id] = policy
+		byID[short] = policy
+	}
+	for i := range containers {
+		if p, ok := byID[containers[i].ID]; ok {
+			containers[i].Restart = p
+		}
+	}
 }
 
 func parseDockerPSLine(line string) (core.Container, containerMeta, bool) {

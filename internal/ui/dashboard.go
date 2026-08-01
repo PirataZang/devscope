@@ -42,9 +42,11 @@ func (a *App) renderDashboard() string {
 		projectsBlock = a.renderProjectsList(projects, tableW)
 	}
 
+	filterLine := a.renderProjectsFilterLine(tableW)
+
 	var sections []string
 	sections = append(sections, a.renderDashboardHeader(m)...)
-	sections = append(sections, "", projectsBlock)
+	sections = append(sections, "", filterLine, "", projectsBlock)
 	sections = append(sections, "", a.renderDashboardFooter(projects))
 	out := StyleDashboard.Render(strings.Join(sections, "\n"))
 	// Garante que nada empurre as métricas para fora da viewport.
@@ -53,6 +55,18 @@ func (a *App) renderDashboard() string {
 		out = strings.Join(lines[:a.height], "\n")
 	}
 	return out
+}
+
+func (a *App) renderProjectsFilterLine(width int) string {
+	if a.filterOn {
+		return StyleKey.Render("filter ") + StyleSelected.Render(a.filterInput+"▌") +
+			StyleMuted.Render("  (nome · path · branch · framework)")
+	}
+	if q := strings.TrimSpace(a.filter); q != "" {
+		return StyleMuted.Render("filter: ") + StyleNormal.Render(q) +
+			StyleMuted.Render("  (/ editar · esc limpar)")
+	}
+	return StyleMuted.Render(truncate("/ filtrar · tip: nome, path, branch ou framework", maxInt(20, width-2)))
 }
 
 func (a *App) renderDashboardHeader(m core.HostMetrics) []string {
@@ -173,6 +187,13 @@ func (a *App) renderDashboardFooter(projects []core.Project) string {
 		renderKeybind("?", "help"),
 		renderKeybind("q", "quit"),
 	}, "  ")
+	if a.filterOn {
+		footer = strings.Join([]string{
+			renderKeybind("type", "filtrar"),
+			renderKeybind("ENTER", "aplicar"),
+			renderKeybind("ESC", "limpar"),
+		}, "  ")
+	}
 
 	return summary + "\n\n" + StyleStatusBar.Render(footer)
 }
@@ -187,12 +208,11 @@ func (a *App) dashboardProjectsViewport() int {
 		return 6
 	}
 	// Chrome fixo: borda/padding do dashboard (~4) + metrics + brand (~2) +
-	// system overview (~1 compact / ~4 wide) + gaps (~2) + footer (~3) +
-	// chrome da lista PROJECTS (~6). Precisa caber na altura do terminal
-	// senão o topo (CPU/RAM/DISK) é empurrado para fora da tela.
-	reserved := 22
+	// system overview (~1 compact / ~4 wide) + gaps (~2) + filter (~1) +
+	// footer (~3) + chrome da lista PROJECTS (~6).
+	reserved := 23
 	if a.dashboardCompact() {
-		reserved = 16
+		reserved = 17
 	}
 	v := h - reserved
 	if v < 3 {

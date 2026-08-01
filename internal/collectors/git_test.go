@@ -232,7 +232,7 @@ func TestGitPullOrigin(t *testing.T) {
 	runGit(t, dir, "config", "user.name", "Test")
 	runGit(t, dir, "remote", "add", "origin", dir+".remote")
 	// bare remote setup is heavy; just verify empty source errors
-	if err := GitPullOrigin(dir, ""); err == nil {
+	if _, err := GitPullOrigin(dir, ""); err == nil {
 		t.Fatal("expected error for empty source branch")
 	}
 }
@@ -286,7 +286,7 @@ func TestGitCheckoutAndCherryPick(t *testing.T) {
 	featureHash := strings.TrimSpace(gitOutput(dir, "rev-parse", "HEAD"))
 
 	runGit(t, dir, "checkout", mainBranch)
-	if err := GitCheckout(dir, "feature"); err != nil {
+	if _, err := GitCheckout(dir, "feature"); err != nil {
 		t.Fatal(err)
 	}
 	if branch := strings.TrimSpace(gitOutput(dir, "rev-parse", "--abbrev-ref", "HEAD")); branch != "feature" {

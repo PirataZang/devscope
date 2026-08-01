@@ -41,13 +41,13 @@ func TestCFLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderCFTab(&p))
-	for _, want := range []string{"devscope", "cloudflare", "TUNNELS", "QUICK STATS", "LOGS", "AÇÕES"} {
+	for _, want := range []string{"devscope", "cloudflare", "TUNNELS", "DETALHES", "LOGS"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}
 	}
-	if strings.Contains(view, "NAV") || strings.Contains(view, "DETAILS") {
-		t.Fatalf("side panels should be gone:\n%s", view)
+	if strings.Contains(view, "NAV") || strings.Contains(view, "QUICK STATS") {
+		t.Fatalf("old layout leftovers:\n%s", view)
 	}
 }
 
@@ -121,12 +121,41 @@ func TestCFTunnelsViewLayout(t *testing.T) {
 		},
 	}
 	got := stripANSI(a.renderCFTunnelsView(&core.Project{Name: "digiliza-site"}, 120, 20))
-	for _, want := range []string{"QUICK STATS", "LOGS", "AÇÕES", "TUNNELS", "digiliza-site", "messaging-cal-ghz-kid"} {
+	for _, want := range []string{"DETALHES", "LOGS", "TUNNELS", "site", "messaging-cal-ghz-kid"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
 	}
-	if strings.Contains(got, "NAV") {
-		t.Fatalf("NAV should be removed:\n%s", got)
+	if strings.Contains(got, "QUICK STATS") || strings.Contains(got, "NAV") {
+		t.Fatalf("old layout leftovers:\n%s", got)
+	}
+}
+
+func TestCFWizardIsModal(t *testing.T) {
+	a := &App{
+		width: 110, height: 32, cfOpen: true, cfWizard: true, cfSubTab: cfTabTunnels,
+		cfNewName: "api", cfNewURL: "http://127.0.0.1:3000", cfNewMode: "quick",
+	}
+	view := stripANSI(a.renderCFTab(&core.Project{Name: "digiliza"}))
+	for _, want := range []string{"CLOUDFLARE", "Novo túnel", "fixo", "digiliza", "preview", "TUNNELS"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in wizard modal:\n%s", want, view)
+		}
+	}
+}
+
+func TestCFDeleteConfirmModal(t *testing.T) {
+	a := &App{
+		width: 100, height: 30, cfOpen: true, cfSubTab: cfTabTunnels,
+		cfConfirmDelete: true,
+		cfTunnels: []cfutil.Tunnel{
+			{Name: "site", Mode: "quick", Hostname: "x.trycloudflare.com", Status: "online"},
+		},
+	}
+	view := stripANSI(a.renderCFTab(&core.Project{Name: "demo"}))
+	for _, want := range []string{"Excluir túnel", "site", "y confirma"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in delete modal:\n%s", want, view)
+		}
 	}
 }

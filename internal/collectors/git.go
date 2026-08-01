@@ -443,24 +443,34 @@ func gitDiffOutput(path string, args ...string) string {
 }
 
 func gitRun(path string, args ...string) error {
+	_, err := gitRunOutput(path, args...)
+	return err
+}
+
+// GitExec runs git and returns combined stdout/stderr (for command log).
+func GitExec(path string, args ...string) (string, error) {
+	return gitRunOutput(path, args...)
+}
+
+func gitRunOutput(path string, args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
+	msg := strings.TrimSpace(string(out))
 	if err != nil {
-		msg := strings.TrimSpace(string(out))
 		if msg == "" {
-			return err
+			return "", err
 		}
-		return fmt.Errorf("%s", msg)
+		return msg, fmt.Errorf("%s", msg)
 	}
-	return nil
+	return msg, nil
 }
 
-func GitCheckout(path, branch string) error {
+func GitCheckout(path, branch string) (string, error) {
 	if branch == "" {
-		return fmt.Errorf("branch vazia")
+		return "", fmt.Errorf("branch vazia")
 	}
-	return gitRun(path, "checkout", branch)
+	return gitRunOutput(path, "checkout", branch)
 }
 
 // GitAdd stages paths (git add -- <files...>). Empty files stages everything (git add -A).
@@ -626,24 +636,24 @@ func GitBranchOrigin(path, branch string) string {
 	return ""
 }
 
-func GitPullOrigin(path, sourceBranch string) error {
+func GitPullOrigin(path, sourceBranch string) (string, error) {
 	sourceBranch = strings.TrimSpace(sourceBranch)
 	if sourceBranch == "" {
-		return fmt.Errorf("branch de origem não detectada")
+		return "", fmt.Errorf("branch de origem não detectada")
 	}
-	return gitRun(path, "pull", "origin", sourceBranch, "--ff-only")
+	return gitRunOutput(path, "pull", "origin", sourceBranch, "--ff-only")
 }
 
-func GitPush(path string) error {
+func GitPush(path string) (string, error) {
 	branch := GitCurrentBranch(path)
 	if branch == "" || branch == "HEAD" {
-		return fmt.Errorf("branch atual inválida")
+		return "", fmt.Errorf("branch atual inválida")
 	}
 	upstream := strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", branch+"@{upstream}"))
 	if upstream == "" {
-		return gitRun(path, "push", "-u", "origin", branch)
+		return gitRunOutput(path, "push", "-u", "origin", branch)
 	}
-	return gitRun(path, "push")
+	return gitRunOutput(path, "push")
 }
 
 func GitMerge(path, branch string) error {

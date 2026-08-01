@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -77,6 +78,45 @@ func TestDashboardProjectsViewport(t *testing.T) {
 	}
 	if v < 3 {
 		t.Fatal("viewport too small")
+	}
+}
+
+func TestProjectFilterInlineLive(t *testing.T) {
+	a := &App{
+		view:   ViewDashboard,
+		width:  120,
+		height: 40,
+		snapshot: core.Snapshot{
+			Projects: []core.Project{
+				{Name: "alpha", Path: "/apps/alpha", Framework: core.FrameworkInfo{Name: "go"}},
+				{Name: "beta-api", Path: "/apps/beta", Framework: core.FrameworkInfo{Name: "laravel"}},
+			},
+		},
+	}
+	_, _ = a.updateDashboard(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'/'}})
+	if !a.filterOn {
+		t.Fatal("/ should enable inline project filter on dashboard")
+	}
+	for _, ch := range "beta" {
+		_, _ = a.updateFilter(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{ch}})
+	}
+	if a.filter != "beta" || !a.filterOn {
+		t.Fatalf("live filter: on=%v filter=%q", a.filterOn, a.filter)
+	}
+	got := a.filteredProjects()
+	if len(got) != 1 || got[0].Name != "beta-api" {
+		t.Fatalf("filtered: %+v", got)
+	}
+	line := stripANSI(a.renderProjectsFilterLine(80))
+	if !strings.Contains(line, "filter") || !strings.Contains(line, "beta") {
+		t.Fatalf("inline filter line: %q", line)
+	}
+	view := stripANSI(a.renderDashboard())
+	if !strings.Contains(view, "filter") {
+		t.Fatal("dashboard should show inline filter, not a separate prompt screen")
+	}
+	if strings.Contains(view, "Filter: beta█") {
+		t.Fatal("old full-screen filter prompt should be gone")
 	}
 }
 

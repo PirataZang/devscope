@@ -41,13 +41,13 @@ func TestNgrokLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderNgrokTab(&p))
-	for _, want := range []string{"devscope", "ngrok", "TUNNELS", "QUICK STATS", "LOGS", "AÇÕES"} {
+	for _, want := range []string{"devscope", "ngrok", "TUNNELS", "DETALHES", "LOGS"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}
 	}
-	if strings.Contains(view, "NAV") || strings.Contains(view, "DETAILS") {
-		t.Fatalf("side panels should be gone:\n%s", view)
+	if strings.Contains(view, "NAV") || strings.Contains(view, "QUICK STATS") {
+		t.Fatalf("old layout leftovers:\n%s", view)
 	}
 }
 
@@ -131,12 +131,41 @@ func TestNgrokTunnelsViewLayout(t *testing.T) {
 		ngrokCfg: ngrokutil.ProjectConfig{Project: "demo", Region: "us"},
 	}
 	got := stripANSI(a.renderNgrokTunnelsView(&core.Project{Name: "demo"}, 100, 18))
-	for _, want := range []string{"QUICK STATS", "LOGS", "AÇÕES", "TUNNELS", "digiliza-site", "DOMAIN", "x.ngrok-free.app"} {
+	for _, want := range []string{"DETALHES", "LOGS", "TUNNELS", "api", "x.ngrok-free.app"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
 	}
-	if strings.Contains(got, "NAV") {
-		t.Fatalf("NAV should be removed:\n%s", got)
+	if strings.Contains(got, "QUICK STATS") || strings.Contains(got, "NAV") {
+		t.Fatalf("old layout leftovers:\n%s", got)
+	}
+}
+
+func TestNgrokWizardIsModal(t *testing.T) {
+	a := &App{
+		width: 100, height: 30, ngrokOpen: true, ngrokWizard: true, ngrokSubTab: ngrokTabTunnels,
+		ngrokNewName: "api", ngrokNewPortStr: "3000", ngrokNewProto: "http",
+	}
+	view := stripANSI(a.renderNgrokTab(&core.Project{Name: "digiliza"}))
+	for _, want := range []string{"NGROK", "Novo túnel", "fixo", "digiliza", "preview", "TUNNELS"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in wizard modal:\n%s", want, view)
+		}
+	}
+}
+
+func TestNgrokDeleteConfirmModal(t *testing.T) {
+	a := &App{
+		width: 100, height: 30, ngrokOpen: true, ngrokSubTab: ngrokTabTunnels,
+		ngrokConfirmDelete: true,
+		ngrokTunnels: []ngrokutil.Tunnel{
+			{Name: "api", Port: 3000, Proto: "http", Domain: "x.ngrok.app", Status: "online"},
+		},
+	}
+	view := stripANSI(a.renderNgrokTab(&core.Project{Name: "demo"}))
+	for _, want := range []string{"Excluir túnel", "api", "y confirma"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("missing %q in delete modal:\n%s", want, view)
+		}
 	}
 }

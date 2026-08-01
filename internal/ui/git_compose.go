@@ -102,9 +102,10 @@ func (a *App) renderGitCompose() string {
 	p := a.currentProject()
 	g := a.projectGitInfo(p)
 
-	boxW := minInt(a.width-4, maxInt(56, a.width*90/100))
-	boxH := minInt(a.height-2, maxInt(18, a.height*80/100))
-	editorH := maxInt(8, boxH-12)
+	boxW := minInt(a.width-4, maxInt(58, a.width*72/100))
+	boxH := minInt(a.height-2, maxInt(22, a.height*72/100))
+	innerW := maxInt(32, boxW-6)
+	accent := tabAccentColor(TabGit)
 
 	branch := "—"
 	staged, modified, untracked := 0, 0, 0
@@ -112,11 +113,53 @@ func (a *App) renderGitCompose() string {
 		branch = g.Branch
 		staged, modified, untracked = g.Staged, g.Modified, g.Untracked
 	}
+	proj := ""
+	if p != nil {
+		proj = p.Name
+	}
 
 	editing := a.gitComposeFocus == gitComposeFocusEditor
+	editorH := maxInt(6, boxH-20)
 	ed := a.gitComposeEdit
-	bodyLines := renderEditorLines(a.gitComposeMsg, &ed, boxW-4, editorH, editing, false)
+	bodyLines := renderEditorLines(a.gitComposeMsg, &ed, innerW-2, editorH, editing, false)
 	a.gitComposeEdit = ed
+
+	lines := tunnelModalChrome("GIT", accent, "Novo commit", "escrever mensagem e confirmar", proj, innerW)
+	lines = append(lines, "")
+
+	branchBox := renderApiTitledBox("branch",
+		[]string{StyleWarning.Bold(true).Render(truncate(branch, innerW-2))},
+		innerW, 3, false,
+	)
+	lines = append(lines, strings.Split(branchBox, "\n")...)
+	lines = append(lines, "")
+
+	metrics := tunnelMetricRow([][2]string{
+		{"STAGED", fmt.Sprintf("%d", staged)},
+		{"MODIFIED", fmt.Sprintf("%d", modified)},
+		{"UNTRACKED", fmt.Sprintf("%d", untracked)},
+	}, innerW)
+	if metrics != "" {
+		lines = append(lines, strings.Split(metrics, "\n")...)
+		lines = append(lines, "")
+	}
+
+	msgTitle := "mensagem"
+	if editing {
+		msgTitle = "mensagem · enter nova linha"
+	}
+	msgBox := renderApiTitledBox(msgTitle, bodyLines, innerW, editorH+2, editing)
+	lines = append(lines, strings.Split(msgBox, "\n")...)
+	lines = append(lines, "")
+
+	preview := StyleMuted.Render("preview  ")
+	first := strings.TrimSpace(strings.SplitN(a.gitComposeMsg, "\n", 2)[0])
+	if first == "" {
+		preview += StyleMuted.Render("(digite a mensagem)")
+	} else {
+		preview += StyleHealthy.Render(truncate(first, maxInt(20, innerW-12)))
+	}
+	lines = append(lines, preview)
 
 	commitBtn := "  Commitar  "
 	cancelBtn := "  Cancelar  "
@@ -131,30 +174,22 @@ func (a *App) renderGitCompose() string {
 		commitBtn = StyleMuted.Render(commitBtn)
 		cancelBtn = StyleMuted.Render(cancelBtn)
 	}
-
-	msgLabel := "mensagem"
-	if editing {
-		msgLabel = "mensagem  (enter = nova linha · tab = botões)"
-	}
-
-	lines := []string{
-		StyleSection.Render("Novo commit"),
-		StyleMuted.Render("branch  ") + StyleWarning.Render(branch),
-		StyleMuted.Render(fmt.Sprintf("staged %d  ·  modified %d  ·  untracked %d", staged, modified, untracked)),
-		"",
-		StyleMuted.Render(msgLabel),
-	}
-	lines = append(lines, bodyLines...)
 	lines = append(lines, "",
-		commitBtn+"    "+cancelBtn,
-		StyleMuted.Render("tab troca foco  ·  enter no botão confirma  ·  esc sai"),
+		commitBtn+StyleMuted.Render("    ")+cancelBtn,
 	)
 	if staged == 0 {
-		lines = append(lines, StyleMuted.Render("sem stage: tracked modificados entram no commit (git add -u)"))
+		lines = append(lines, StyleMuted.Render("sem stage: tracked modificados entram (git add -u)"))
 	}
+	lines = append(lines, "",
+		StyleMuted.Render("tab troca foco  ·  enter no botão confirma  ·  esc cancela"),
+	)
 
+	if boxH < len(lines) {
+		boxH = len(lines)
+	}
 	box := StylePanel.
 		Width(boxW).
+		BorderForeground(accent).
 		Background(ColorBgPanel).
 		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
 	return overlayCentered(background, box, a.width, a.height)

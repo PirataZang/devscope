@@ -35,6 +35,7 @@ type ngrokFocus int
 
 const (
 	ngrokFocusTable ngrokFocus = iota
+	ngrokFocusDetails
 	ngrokFocusLogs
 	ngrokFocusRequests
 )
@@ -68,6 +69,7 @@ func (a *App) openNgrokClient(p *core.Project) tea.Cmd {
 	a.ngrokReqCursor = 0
 	a.ngrokReqScroll = 0
 	a.ngrokLogScroll = 0
+	a.ngrokDetailsScroll = 0
 	a.ngrokErr = ""
 	a.ngrokStatus = ""
 	a.ngrokWizard = false
@@ -214,39 +216,44 @@ func (a *App) renderNgrokTab(p *core.Project) string {
 	bodyH := maxInt(4, h-headerH-2)
 
 	var body string
-	if a.ngrokWizard {
-		body = a.renderNgrokWizard(p, w, bodyH)
-	} else {
-		switch a.ngrokSubTab {
-		case ngrokTabOverview:
-			body = a.renderNgrokOverview(p, w, bodyH)
-		case ngrokTabRequests:
-			body = a.renderNgrokRequestsFull(w, bodyH)
-		case ngrokTabHistory:
-			body = a.renderNgrokHistory(w, bodyH)
-		case ngrokTabDomains:
-			body = a.renderNgrokDomains(w, bodyH)
-		case ngrokTabSettings:
-			body = a.renderNgrokSettings(p, w, bodyH)
-		default:
-			body = a.renderNgrokTunnelsView(p, w, bodyH)
-		}
+	switch a.ngrokSubTab {
+	case ngrokTabOverview:
+		body = a.renderNgrokOverview(p, w, bodyH)
+	case ngrokTabRequests:
+		body = a.renderNgrokRequestsFull(w, bodyH)
+	case ngrokTabHistory:
+		body = a.renderNgrokHistory(w, bodyH)
+	case ngrokTabDomains:
+		body = a.renderNgrokDomains(w, bodyH)
+	case ngrokTabSettings:
+		body = a.renderNgrokSettings(p, w, bodyH)
+	default:
+		body = a.renderNgrokTunnelsView(p, w, bodyH)
 	}
-	return lipgloss.JoinVertical(lipgloss.Left, header, nav, body, a.renderStatusBar(a.ngrokHints()))
+	view := lipgloss.JoinVertical(lipgloss.Left, header, nav, body, a.renderStatusBar(a.ngrokHints()))
+	if a.ngrokWizard {
+		view = overlayCentered(view, a.renderNgrokWizard(p, w, h), w, h)
+	}
+	if a.ngrokConfirmDelete {
+		target, detail := a.ngrokDeleteConfirmLabels()
+		box := renderTunnelDeleteConfirmBox("NGROK", tabAccentColor(TabNgrok), target, detail, w, h)
+		view = overlayCentered(view, box, w, h)
+	}
+	return view
 }
 
 func (a *App) ngrokHints() string {
 	if a.ngrokConfirmDelete {
-		return "confirmar delete?  y sim  n/esc cancelar"
+		return "modal delete  y confirma  n/esc cancela"
 	}
 	if a.ngrokWizard {
-		return "tab campo  ←→ cursor  space proto  backspace/del  enter salvar+start  esc"
+		return "modal novo túnel  tab campo  ←→ cursor  space proto  enter salvar+start  esc"
 	}
 	scope := "A todos"
 	if a.ngrokShowAll {
 		scope = "A projeto"
 	}
-	base := "0-5 aba  tab painel  n new  s start  x stop  r restart  c copy  o open  d delete  " + scope + "  esc"
+	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  r restart  c copy  o open  d delete  " + scope + "  esc"
 	if a.ngrokLoading {
 		base = "carregando…  " + base
 	}
@@ -390,29 +397,19 @@ func (a *App) renderNgrokTunnelsView(p *core.Project, width, height int) string 
 	if height < 6 {
 		height = 6
 	}
-	bottomH := height * 32 / 100
-	if bottomH < 4 {
-		bottomH = 4
+	leftW := maxInt(32, width*40/100)
+	rightW := maxInt(28, width-leftW-1)
+	logsH := maxInt(4, height*34/100)
+	if logsH > height-6 {
+		logsH = height - 6
 	}
-	if bottomH > height-4 {
-		bottomH = height - 4
-	}
-	tableH := height - bottomH
-	cmdW := tunnelCmdWidth(width)
-	rest := width - cmdW
-	statsW := rest / 2
-	logsW := rest - statsW
-	bottom := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderNgrokQuickStats(statsW, bottomH),
-		a.renderNgrokLogsPane(logsW, bottomH),
+	detailsH := height - logsH
+	left := a.renderNgrokTunnelTable(leftW, height)
+	right := lipgloss.JoinVertical(lipgloss.Left,
+		a.renderNgrokDetailsPane(rightW, detailsH),
+		a.renderNgrokLogsPane(rightW, logsH),
 	)
-	if cmdW >= 12 {
-		bottom = lipgloss.JoinHorizontal(lipgloss.Top, bottom, a.renderNgrokCommands(cmdW, bottomH))
-	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderNgrokTunnelTable(width, tableH),
-		bottom,
-	)
+	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
 }
 
 func (a *App) renderNgrokQuickStats(width, height int) string {
@@ -462,17 +459,8 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 	focus := a.ngrokFocus == ngrokFocusTable
 	n := len(a.ngrokTunnels)
 	a.ngrokScroll = ensureVisible(a.ngrokCursor, a.ngrokScroll, height-3, n)
-	cols := tunnelTableCols(width)
-	header := fmt.Sprintf("%-3s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
-		"ST",
-		cols.name, "NAME",
-		cols.project, "PROJECT",
-		cols.port, "PORT",
-		cols.mode, "PROTO",
-		cols.host, "DOMAIN",
-		cols.uptime, "UPTIME",
-		cols.pid, "REQ",
-	)
+	nameW := maxInt(8, width-22)
+	header := fmt.Sprintf("%-3s %-*s %4s %-5s", "ST", nameW, "NAME", "PORT", "PROTO")
 	lines := []string{StyleMuted.Render(truncate(header, width-2))}
 	if n == 0 {
 		lines = append(lines, StyleMuted.Render("  (nenhum túnel — n para criar)"))
@@ -481,24 +469,15 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 		end := minInt(start+height-3, n)
 		for i := start; i < end; i++ {
 			t := a.ngrokTunnels[i]
-			dot := StyleMuted.Render("○")
+			dot := StyleUnhealthy.Render("●")
 			switch t.Status {
 			case "online":
 				dot = StyleHealthy.Render("●")
 			case "starting":
 				dot = StyleWarning.Render("●")
-			default:
-				dot = StyleUnhealthy.Render("●")
 			}
-			row := fmt.Sprintf("%s %-*s %-*s %-*s %-*s %-*s %-*s %-*s",
-				" ",
-				cols.name, truncate(t.Name, cols.name),
-				cols.project, truncate(t.Project, cols.project),
-				cols.port, truncate(fmt.Sprintf("%d", t.Port), cols.port),
-				cols.mode, truncate(t.Proto, cols.mode),
-				cols.host, truncate(t.Domain, cols.host),
-				cols.uptime, truncate(t.Uptime, cols.uptime),
-				cols.pid, truncate(fmt.Sprintf("%d", t.Requests), cols.pid),
+			row := fmt.Sprintf("%-*s %4d %-5s",
+				nameW, truncate(t.Name, nameW), t.Port, truncate(t.Proto, 5),
 			)
 			prefix := "  "
 			style := StyleMuted
@@ -510,12 +489,54 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 					style = StyleNormal
 				}
 			}
-			lines = append(lines, style.Render(truncate(prefix+dot+" "+strings.TrimSpace(row), width-2)))
+			lines = append(lines, style.Render(truncate(prefix+dot+" "+row, width-2)))
 		}
 	}
 	title := fmt.Sprintf("TUNNELS (%d)", n)
 	if focus {
 		title = "> " + title
+	}
+	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+}
+
+func (a *App) renderNgrokDetailsPane(width, height int) string {
+	focus := a.ngrokFocus == ngrokFocusDetails
+	innerW := maxInt(20, width-2)
+	var raw []string
+	t, ok := a.ngrokSelected()
+	if !ok {
+		raw = []string{StyleMuted.Render("(selecione um túnel na lista)")}
+	} else {
+		raw = append(raw,
+			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status),
+			"",
+		)
+		metrics := tunnelMetricRow([][2]string{
+			{"STATUS", t.Status},
+			{"PORT", fmt.Sprintf("%d", t.Port)},
+			{"REQ", fmt.Sprintf("%d", t.Requests)},
+			{"UPTIME", firstNonEmpty(t.Uptime, "—")},
+		}, innerW)
+		if metrics != "" {
+			raw = append(raw, strings.Split(metrics, "\n")...)
+			raw = append(raw, "")
+		}
+		raw = append(raw,
+			tunnelDetailKV("Public", t.PublicURL),
+			tunnelDetailKV("Local", t.LocalURL),
+			tunnelDetailKV("Domain", t.Domain),
+			tunnelDetailKV("Proto", t.Proto),
+			tunnelDetailKV("Region", firstNonEmpty(t.Region, a.ngrokCfg.Region)),
+			tunnelDetailKV("Project", t.Project),
+		)
+	}
+	a.ngrokDetailsScroll = clampScroll(a.ngrokDetailsScroll, height-2, len(raw))
+	start := a.ngrokDetailsScroll
+	end := minInt(start+height-2, len(raw))
+	lines := raw[start:end]
+	title := "DETALHES"
+	if focus {
+		title = "> DETALHES"
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
@@ -677,25 +698,74 @@ func (a *App) renderNgrokWizard(p *core.Project, width, height int) string {
 	if p != nil {
 		proj = p.Name
 	}
-	lines := []string{
-		a.renderNgrokWizardField("Nome", a.ngrokNewName, ngrokWizName, true),
-		a.renderNgrokWizardField("Porta", a.ngrokNewPortStr, ngrokWizPort, true),
-		a.renderNgrokWizardField("Proto", a.ngrokNewProto, ngrokWizProto, false),
-		StyleMuted.Render("Projeto   ") + StyleMuted.Render(proj+"  (fixo)"),
-		"",
-		StyleMuted.Render("tab/↑↓ campo · ←→ cursor · space proto · enter salvar · esc"),
+	boxW := minInt(width-4, maxInt(52, width*58/100))
+	boxH := minInt(height-2, maxInt(18, height*55/100))
+	innerW := maxInt(28, boxW-6)
+	accent := tabAccentColor(TabNgrok)
+
+	lines := tunnelModalChrome("NGROK", accent, "Novo túnel", "expor porta local via agent", proj, innerW)
+	lines = append(lines, "")
+
+	nameBox := renderApiTitledBox("nome",
+		[]string{a.renderNgrokWizardFieldValue(a.ngrokNewName, ngrokWizName, true)},
+		innerW, 3, a.ngrokWizardField == ngrokWizName,
+	)
+	portBox := renderApiTitledBox("porta",
+		[]string{a.renderNgrokWizardFieldValue(a.ngrokNewPortStr, ngrokWizPort, true)},
+		innerW, 3, a.ngrokWizardField == ngrokWizPort,
+	)
+	protoShown := a.ngrokNewProto
+	if a.ngrokWizardField == ngrokWizProto {
+		protoShown = a.ngrokNewProto + "  ⟨space⟩"
 	}
-	return renderApiTitledBox("NOVO TÚNEL", fitExactLines(lines, height-2), width, height, true)
+	protoBox := renderApiTitledBox("proto",
+		[]string{a.renderNgrokWizardFieldValue(protoShown, ngrokWizProto, false)},
+		innerW, 3, a.ngrokWizardField == ngrokWizProto,
+	)
+
+	preview := StyleMuted.Render("preview  ")
+	name := strings.TrimSpace(a.ngrokNewName)
+	port := strings.TrimSpace(a.ngrokNewPortStr)
+	if name == "" {
+		preview += StyleMuted.Render("(preencha nome e porta)")
+	} else {
+		preview += StyleHealthy.Render(truncate(name, 16)) +
+			StyleMuted.Render("  ·  ") +
+			StyleWarning.Render(":"+firstNonEmpty(port, "?")) +
+			StyleMuted.Render("  ·  ") +
+			StyleNormal.Render(a.ngrokNewProto)
+	}
+
+	lines = append(lines, strings.Split(nameBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(portBox, "\n")...)
+	lines = append(lines, "")
+	lines = append(lines, strings.Split(protoBox, "\n")...)
+	lines = append(lines, "",
+		StyleMuted.Render("projeto fixo — túnel fica ligado a "+firstNonEmpty(proj, "este projeto")),
+		preview,
+		"",
+		StyleMuted.Render("tab campo  ·  ←→ cursor  ·  space proto  ·  enter salva e inicia  ·  esc"),
+	)
+	return tunnelModalBox(lines, boxW, boxH, accent)
 }
 
-func (a *App) renderNgrokWizardField(label, value string, field int, editable bool) string {
-	prefix := StyleMuted.Render(fmt.Sprintf("%-9s ", label))
+func (a *App) ngrokDeleteConfirmLabels() (target, detail string) {
+	t, ok := a.ngrokSelected()
+	if !ok {
+		return "—", ""
+	}
+	detail = fmt.Sprintf("%s  :%d  %s", firstNonEmpty(t.Proto, "http"), t.Port, firstNonEmpty(t.Domain, t.PublicURL))
+	return t.Name, detail
+}
+
+func (a *App) renderNgrokWizardFieldValue(value string, field int, editable bool) string {
 	focused := a.ngrokWizardField == field
 	if !focused {
-		return prefix + StyleNormal.Render(value)
+		return StyleNormal.Render(value)
 	}
 	if !editable {
-		return prefix + StyleSelected.Render(value+"  ⟨space⟩")
+		return StyleSelected.Render(value)
 	}
 	runes := []rune(value)
 	cur := a.ngrokWizardCursor
@@ -706,7 +776,7 @@ func (a *App) renderNgrokWizardField(label, value string, field int, editable bo
 		cur = len(runes)
 	}
 	shown := string(runes[:cur]) + "█" + string(runes[cur:])
-	return prefix + StyleSelected.Render(shown)
+	return StyleSelected.Render(shown)
 }
 
 func (a *App) beginNgrokWizard(p *core.Project) {
@@ -815,8 +885,8 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 	case "tab":
 		if a.ngrokSubTab == ngrokTabRequests {
 			a.ngrokFocus = ngrokFocusRequests
-		} else {
-			a.ngrokFocus = (a.ngrokFocus + 1) % 2
+		} else if a.ngrokSubTab == ngrokTabTunnels {
+			a.ngrokFocus = (a.ngrokFocus + 1) % 3 // table → details → logs
 		}
 	case "0":
 		a.ngrokSubTab = ngrokTabOverview
@@ -900,18 +970,28 @@ func (a *App) ngrokMove(delta int) tea.Cmd {
 		if a.ngrokReqCursor > len(a.ngrokRequests)-1 {
 			a.ngrokReqCursor = maxInt(0, len(a.ngrokRequests)-1)
 		}
+	case ngrokFocusDetails:
+		a.ngrokDetailsScroll += delta
+		if a.ngrokDetailsScroll < 0 {
+			a.ngrokDetailsScroll = 0
+		}
 	case ngrokFocusLogs:
 		a.ngrokLogScroll += delta
 		if a.ngrokLogScroll < 0 {
 			a.ngrokLogScroll = 0
 		}
 	default:
+		prev := a.ngrokCursor
 		a.ngrokCursor += delta
 		if a.ngrokCursor < 0 {
 			a.ngrokCursor = 0
 		}
 		if a.ngrokCursor > len(a.ngrokTunnels)-1 {
 			a.ngrokCursor = maxInt(0, len(a.ngrokTunnels)-1)
+		}
+		if a.ngrokCursor != prev {
+			a.ngrokDetailsScroll = 0
+			a.ngrokLogScroll = 0
 		}
 	}
 	return nil
