@@ -396,12 +396,38 @@ func (a *App) renderK8sTab(p *core.Project) string {
 
 	rel := a.renderK8sRelation(w)
 	hints := a.k8sHints()
-	return lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, rel, a.renderStatusBar(hints))
+	view := lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, rel, a.renderStatusBar(hints))
+	if a.k8sConfirmDelete {
+		target, detail := a.k8sDeleteConfirmLabels()
+		box := renderDeleteConfirmBox(deleteConfirmOpts{
+			Brand:    "KUBERNETES",
+			Color:    tabAccentColor(TabKubernetes),
+			Title:    "Excluir recurso",
+			Subtitle: "kubectl delete no cluster",
+			Label:    "recurso",
+			Target:   target,
+			Detail:   detail,
+		}, w, h)
+		view = overlayCentered(view, box, w, h)
+	}
+	return view
+}
+
+func (a *App) k8sDeleteConfirmLabels() (target, detail string) {
+	r, ok := a.k8sSelectedResource()
+	if !ok {
+		return "—", ""
+	}
+	detail = strings.ToLower(r.Kind)
+	if a.k8sNamespace != "" {
+		detail += "  ·  ns " + a.k8sNamespace
+	}
+	return r.Name, detail
 }
 
 func (a *App) k8sHints() string {
 	if a.k8sConfirmDelete {
-		return "confirmar delete?  y sim  esc/n cancelar"
+		return "modal delete  y confirma  n/esc cancela"
 	}
 	if a.k8sEditing {
 		return "editando YAML  enter=nova linha  ctrl+s=aplicar  esc=pausar"
@@ -996,7 +1022,7 @@ func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 		}
 		if r, ok := a.k8sSelectedResource(); ok {
 			a.k8sConfirmDelete = true
-			a.k8sStatus = "delete " + r.Name + "?"
+			a.k8sStatus = "modal delete · " + r.Name
 		}
 	case "l":
 		return a, a.k8sShowLogs()

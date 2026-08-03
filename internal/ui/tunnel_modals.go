@@ -35,26 +35,6 @@ func tunnelModalBox(lines []string, boxW, boxH int, border lipgloss.Color) strin
 		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
 }
 
-func renderTunnelDeleteConfirmBox(brand string, brandColor lipgloss.Color, target, detail string, width, height int) string {
-	boxW := minInt(width-4, maxInt(44, width*50/100))
-	boxH := minInt(height-2, maxInt(12, 14))
-	innerW := maxInt(28, boxW-6)
-	lines := tunnelModalChrome(brand, brandColor, "Excluir túnel", "remove da config do projeto", "", innerW)
-	lines = append(lines, "")
-	nameBox := renderApiTitledBox("túnel",
-		[]string{StyleWarning.Bold(true).Render(truncate(target, innerW-2))},
-		innerW, 3, true,
-	)
-	lines = append(lines, strings.Split(nameBox, "\n")...)
-	if detail != "" {
-		lines = append(lines, "", StyleMuted.Render(truncate(detail, innerW)))
-	}
-	lines = append(lines, "",
-		StyleMuted.Render("y confirma  ·  n/esc cancela"),
-	)
-	return tunnelModalBox(lines, boxW, boxH, brandColor)
-}
-
 func tunnelStatusBadge(status string) string {
 	switch status {
 	case "online":

@@ -23,8 +23,8 @@ func TestAllTabsIncludesKubernetes(t *testing.T) {
 	if TabKubernetes.String() != "Kubernetes" {
 		t.Fatalf("String=%q", TabKubernetes.String())
 	}
-	if int(TabKubernetes) != 3 || int(TabDatabase) != 8 || int(TabJSON) != 9 {
-		t.Fatalf("tab indices shifted unexpectedly: k8s=%d db=%d json=%d", TabKubernetes, TabDatabase, TabJSON)
+	if int(TabKubernetes) != 3 || int(TabSwarm) != 4 || int(TabDatabase) != 9 || int(TabJSON) != 10 {
+		t.Fatalf("tab indices shifted unexpectedly: k8s=%d swarm=%d db=%d json=%d", TabKubernetes, TabSwarm, TabDatabase, TabJSON)
 	}
 }
 

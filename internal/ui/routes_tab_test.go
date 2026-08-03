@@ -25,8 +25,8 @@ func TestAllTabsIncludesRoutes(t *testing.T) {
 	if TabRoutes.String() != "Rotas" {
 		t.Fatalf("String=%q", TabRoutes.String())
 	}
-	if int(TabRoutes) != 11 {
-		t.Fatalf("TabRoutes index=%d want 11", TabRoutes)
+	if int(TabRoutes) != 12 {
+		t.Fatalf("TabRoutes index=%d want 12", TabRoutes)
 	}
 }
 

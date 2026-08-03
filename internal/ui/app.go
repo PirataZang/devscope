@@ -16,6 +16,7 @@ import (
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/routeutil"
+	"github.com/devscope/devscope/internal/sshutil"
 	"github.com/devscope/devscope/internal/wsutil"
 	"github.com/mattn/go-runewidth"
 )
@@ -274,6 +275,43 @@ type App struct {
 	k8sStatus                   string
 	k8sErr                      string
 	k8sInspectName              string
+	swarmOpen                   bool
+	swarmLoading                bool
+	swarmConfirm                bool
+	swarmConfirmAction          string
+	swarmKind                   swarmKind
+	swarmScreen                 swarmScreen
+	swarmForm                   swarmFormKind
+	swarmFormField              int
+	swarmFormInput              string
+	swarmFormName               string
+	swarmFormImage              string
+	swarmFormReplicas           string
+	swarmFormPort               string
+	swarmFormNetwork            string
+	swarmFormAvail              string
+	swarmFocus                  int
+	swarmActionIdx              int
+	swarmCursor                 int
+	swarmScroll                 int
+	swarmDetailScroll           int
+	swarmGen                    int
+	swarmNav                    []swarmNavFrame
+	swarmInfo                   collectors.SwarmInfo
+	swarmNodes                  []collectors.SwarmNode
+	swarmServices               []collectors.SwarmService
+	swarmStacks                 []collectors.SwarmStack
+	swarmTasks                  []collectors.SwarmTask
+	swarmNetworks               []collectors.SwarmNetwork
+	swarmSecrets                []collectors.SwarmSecret
+	swarmConfigs                []collectors.SwarmConfig
+	swarmEvents                 []collectors.SwarmEvent
+	swarmDetail                 string
+	swarmLogs                   string
+	swarmStatus                 string
+	swarmErr                    string
+	swarmCompose                string
+	swarmProject                string
 	jsonOpen                    bool
 	jsonEditing                 bool
 	jsonSearchOn                bool
@@ -403,6 +441,32 @@ type App struct {
 	cfAccount                   []cfutil.AccountTunnel
 	cfCfg                       cfutil.ProjectConfig
 	cfAuth                      cfutil.AuthInfo
+	sshOpen                     bool
+	sshLoading                  bool
+	sshWizard                   bool
+	sshSeedWizard               bool
+	sshConfirmDelete            bool
+	sshSubTab                   sshSubTab
+	sshFocus                    sshFocus
+	sshCursor                   int
+	sshScroll                   int
+	sshLogScroll                int
+	sshDetailsScroll            int
+	sshNewLocalPort             int
+	sshNewLocalPortStr          string
+	sshNewName                  string
+	sshNewMode                  string
+	sshNewBind                  string
+	sshNewTarget                string
+	sshNewIdentity              string
+	sshWizardField              int
+	sshWizardCursor             int
+	sshStatus                   string
+	sshErr                      string
+	sshForeign                  int
+	sshShowAll                  bool
+	sshTunnels                  []sshutil.Tunnel
+	sshCfg                      sshutil.ProjectConfig
 	jenkinsOpen                 bool
 	jenkinsLoading              bool
 	jenkinsEditing              bool
@@ -433,6 +497,62 @@ type App struct {
 	jenkinsBuilds               []jenkinsutil.Build
 	jenkinsCfg                  jenkinsutil.ProjectConfig
 	jenkinsInfo                 jenkinsutil.ServerInfo
+	ghaOpen                     bool
+	ghaLoading                  bool
+	ghaConfirm                  bool
+	ghaConfirmAction            string
+	ghaKind                     ghaKind
+	ghaScreen                   ghaScreen
+	ghaForm                     ghaFormKind
+	ghaFormField                int
+	ghaFormName                 string
+	ghaFormDesc                 string
+	ghaFormTemplate             string
+	ghaFormInput                string
+	ghaFocus                    int
+	ghaActionIdx                int
+	ghaCursor                   int
+	ghaScroll                   int
+	ghaDetailScroll             int
+	ghaGen                      int
+	ghaPath                     string
+	ghaRemote                   string
+	ghaInfo                     collectors.GHAInfo
+	ghaBilling                  collectors.GHAActionsBilling
+	ghaProcesses                []collectors.GHAProcess
+	ghaWorkflows                []collectors.GHAWorkflow
+	ghaRuns                     []collectors.GHARun
+	ghaDetail                   string
+	ghaStatus                   string
+	ghaErr                      string
+	ghaSetupShown               bool
+	ghaProcTab                  ghaProcTab
+	ghaProcName                 string
+	ghaProcFile                 string
+	ghaProcRunID                string
+	ghaProcJobs                 string
+	ghaProcLogs                 string
+	ghaProcYAML                 string
+	ghaProcScroll               int
+	ghaProcRunCursor            int
+	ghaTriggerBranches          []string
+	ghaTriggerCursor            int
+	ghaTriggerScroll            int
+	ghaTriggerWF                string
+	ghaTriggerProc              string
+	ghaTriggerReturn            ghaScreen
+	ghaRunScope                 ghaRunScope
+	ghaRunProcFilter            string // "" = todos os processos
+	ghaRunMarked                map[string]bool // bulk stop selection
+	ghaNotes                    map[string]string
+	ghaTriggerInputs            []collectors.GHAWorkflowInput
+	ghaTriggerInputVals         []string
+	ghaTriggerInputIdx          int // -1 = focus branches
+	ghaTriggerAhead             int
+	ghaTriggerForce             bool // confirm disparo com commits ahead
+	ghaNoteEditing              bool
+	ghaNoteInput                string
+	ghaTriggered                map[string]time.Time
 	fuzzyOn                     bool
 	fuzzyInput                  string
 	deployConfirm               bool
@@ -657,6 +777,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case k8sLoadedMsg, k8sActionMsg, k8sDetailMsg, k8sNsMsg, k8sEditReadyMsg, k8sInspectMsg, k8sMetaMsg:
 		return a.handleK8sMsg(msg)
 
+	case swarmLoadedMsg, swarmActionMsg, swarmDetailMsg, swarmTickMsg:
+		return a.handleSwarmMsg(msg)
+
 	case routesLoadedMsg:
 		a.handleRoutesLoaded(msg)
 		return a, nil
@@ -669,8 +792,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case cfLoadedMsg, cfActionMsg:
 		return a.handleCFMsg(msg)
 
+	case sshLoadedMsg, sshActionMsg:
+		return a.handleSSHMsg(msg)
+
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
+
+	case ghaLoadedMsg, ghaActionMsg, ghaDetailMsg, ghaTickMsg, ghaAuthDoneMsg:
+		return a.handleGHAMsg(msg)
 
 	case projectLogFollowMsg:
 		if a.projectLogContainerID == msg.id && a.projectLogsFollow && !a.projectLogsPaused {
@@ -993,6 +1122,9 @@ func (a *App) closeToolClients() {
 	a.apiOpen = false
 	a.dbOpen = false
 	a.k8sOpen = false
+	a.swarmOpen = false
+	a.swarmConfirm = false
+	a.swarmGen++
 	a.jsonOpen = false
 	a.jwtOpen = false
 	a.routesOpen = false
@@ -1010,10 +1142,16 @@ func (a *App) closeToolClients() {
 	a.cfOpen = false
 	a.cfWizard = false
 	a.cfConfirmDelete = false
+	a.sshOpen = false
+	a.sshWizard = false
+	a.sshConfirmDelete = false
 	a.jenkinsOpen = false
 	a.jenkinsEditing = false
 	a.jenkinsBuildDetail = false
 	a.jenkinsGen++
+	a.ghaOpen = false
+	a.ghaConfirm = false
+	a.ghaGen++
 }
 
 func tabIndex(t Tab) int {
@@ -1046,6 +1184,8 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		return a.requestContainerPreview()
 	case TabKubernetes:
 		a.enterK8sTab(p)
+	case TabSwarm:
+		a.enterSwarmTab(p)
 	case TabLogs:
 		if p != nil {
 			return a.initLogsTab(p)
@@ -1066,8 +1206,12 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterNgrokTab(p)
 	case TabCFTunnel:
 		a.enterCFTab(p)
+	case TabSSH:
+		a.enterSSHTab(p)
 	case TabJenkins:
 		a.enterJenkinsTab(p)
+	case TabActions:
+		a.enterGHATab(p)
 	}
 	return nil
 }
@@ -1102,6 +1246,12 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabKubernetes {
 		a.k8sOpen = false
 	}
+	if tab == TabSwarm {
+		a.swarmOpen = false
+	}
+	if tab == TabActions {
+		a.ghaOpen = false
+	}
 	if tab == TabJSON {
 		a.jsonOpen = false
 	}
@@ -1119,6 +1269,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	}
 	if tab == TabCFTunnel {
 		a.cfOpen = false
+	}
+	if tab == TabSSH {
+		a.sshOpen = false
 	}
 	if tab == TabJenkins {
 		a.jenkinsOpen = false
@@ -1170,6 +1323,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabKubernetes && a.k8sOpen {
 		return a.handleK8sKeys(msg, p)
 	}
+	if a.tab == TabSwarm && a.swarmOpen {
+		return a.handleSwarmKeys(msg, p)
+	}
+	if a.tab == TabActions && a.ghaOpen {
+		return a.handleGHAKeys(msg, p)
+	}
 	if a.tab == TabJSON && a.jsonOpen {
 		return a.handleJsonKeys(msg, p)
 	}
@@ -1187,6 +1346,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabCFTunnel && a.cfOpen {
 		return a.handleCFKeys(msg, p)
+	}
+	if a.tab == TabSSH && a.sshOpen {
+		return a.handleSSHKeys(msg, p)
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.handleJenkinsKeys(msg, p)
@@ -1234,7 +1396,23 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.projectContentScroll += maxInt(1, a.projectPanelHeight()-4)
 		return a, nil
 	case "L":
+		if a.tab == TabActions && !a.ghaOpen {
+			// Login gh na landing do Actions (não conflictar com lazygit).
+			a.ghaPath = p.Path
+			if p.Git != nil {
+				a.ghaRemote = p.Git.Remote
+			}
+			if a.ghaRemote == "" {
+				a.ghaRemote = collectors.GitRemoteOrigin(p.Path)
+			}
+			a.ghaInfo = collectors.GHARepoInfo(a.ghaPath, a.ghaRemote)
+			return a, a.ghaBeginLogin()
+		}
 		return a, a.openLazyGit(p.Path)
+	case "!":
+		if a.tab == TabActions && !a.ghaOpen {
+			return a, a.openGHAClient(p)
+		}
 	case "o", "O":
 		if a.gitTabReady(p) {
 			if a.gitFocus == gitFocusCmdLog {
@@ -1285,9 +1463,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
-			if c, ok := a.selectedContainer(p); ok {
+			if _, ok := a.selectedContainer(p); ok {
 				a.containerConfirmRemove = true
-				a.containerStatusMsg = "remover " + c.Name + "? y/n"
+				a.containerStatusMsg = "modal delete  y confirma  n/esc cancela"
 			}
 		}
 	case "f":
@@ -1332,7 +1510,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			if c, ok := a.selectedContainer(p); ok {
 				return a, a.openContainerDetail(c, p.Path)
 			}
+			return a, nil
 		}
+		a.closeToolClients()
+		a.tab = TabMetrics
+		a.tabCursor = 0
+		return a, nil
 	case "c":
 		if a.gitTabReady(p) {
 			a.startGitCompose(p)
@@ -1485,12 +1668,11 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 		if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
+			// Logs saíram do menu — atalho l vai pra Containers (logs no detalhe).
 			a.closeToolClients()
-			a.tab = TabLogs
+			a.tab = TabContainers
 			a.tabCursor = 0
-			if cmd := a.initLogsTab(p); cmd != nil {
-				return a, cmd
-			}
+			a.containerSubview = containerSubviewList
 		}
 	case "enter":
 		if a.tab == TabAPI && !a.apiOpen {
@@ -1502,6 +1684,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		if a.tab == TabKubernetes && !a.k8sOpen {
 			return a, a.openK8sClient(p)
+		}
+		if a.tab == TabSwarm && !a.swarmOpen {
+			return a, a.openSwarmClient(p)
+		}
+		if a.tab == TabActions && !a.ghaOpen {
+			return a, a.openGHAClient(p)
 		}
 		if a.tab == TabJSON && !a.jsonOpen {
 			return a, a.openJsonClient(p)
@@ -1520,6 +1708,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		if a.tab == TabCFTunnel && !a.cfOpen {
 			return a, a.openCFClient(p)
+		}
+		if a.tab == TabSSH && !a.sshOpen {
+			return a, a.openSSHClient(p)
 		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			return a, a.openJenkinsClient(p)
@@ -1634,6 +1825,8 @@ func (a *App) View() string {
 		content = a.renderDockerAdd()
 	case a.gitPromptOn:
 		content = a.renderGitPrompt()
+	case a.gitConfirmOn:
+		content = a.renderGitConfirm()
 	case a.dashboardSubview == dashboardSubviewShellReturn && a.view == ViewDashboard:
 		content = a.renderFullShellReturn(a.projectShellExitErr)
 	case a.containerSubview == containerSubviewShellReturn:
@@ -1688,6 +1881,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabKubernetes && a.k8sOpen {
 		return a.renderK8sTab(p)
 	}
+	if a.tab == TabSwarm && a.swarmOpen {
+		return a.renderSwarmTab(p)
+	}
 	if a.tab == TabJSON && a.jsonOpen {
 		return a.renderJsonTab(p)
 	}
@@ -1706,8 +1902,14 @@ func (a *App) renderProject() string {
 	if a.tab == TabCFTunnel && a.cfOpen {
 		return a.renderCFTab(p)
 	}
+	if a.tab == TabSSH && a.sshOpen {
+		return a.renderSSHTab(p)
+	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.renderJenkinsTab(p)
+	}
+	if a.tab == TabActions && a.ghaOpen {
+		return a.renderGHATab(p)
 	}
 
 	sidebar := a.renderProjectSidebar()
@@ -1734,10 +1936,11 @@ func (a *App) renderProject() string {
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && a.containerSubview == containerSubviewList) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
+		(a.tab == TabKubernetes && !a.k8sOpen) || (a.tab == TabSwarm && !a.swarmOpen) ||
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
 		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen) ||
-		(a.tab == TabCFTunnel && !a.cfOpen) ||
-		(a.tab == TabJenkins && !a.jenkinsOpen)
+		(a.tab == TabCFTunnel && !a.cfOpen) || (a.tab == TabSSH && !a.sshOpen) ||
+		(a.tab == TabJenkins && !a.jenkinsOpen) || (a.tab == TabActions && !a.ghaOpen)
 	switch {
 	case moduleDash:
 		content = lipgloss.Place(contentWidth, panelH, lipgloss.Left, lipgloss.Top, content)
@@ -1765,8 +1968,11 @@ func (a *App) renderProject() string {
 			hints = "↑↓ lista  enter/l detalhe  / buscar  e shell  s/r/S-R/p/d  shift+u/d compose  " + hints
 		}
 	}
-	if a.tab == TabHealth || a.tab == TabLogs {
-		hints = "↑↓ scroll  " + hints
+	if a.tab == TabHealth {
+		hints = "Status · probes/portas/SSL  ↑↓ scroll  " + hints
+	}
+	if a.tab == TabMetrics {
+		hints = "Metrics · CPU/RAM containers  " + hints
 	}
 	if a.tab == TabAPI && !a.apiOpen {
 		hints = "enter abrir API  " + hints
@@ -1776,6 +1982,9 @@ func (a *App) renderProject() string {
 	}
 	if a.tab == TabKubernetes && !a.k8sOpen {
 		hints = "enter abrir Kubernetes  " + hints
+	}
+	if a.tab == TabSwarm && !a.swarmOpen {
+		hints = "enter abrir Swarm  " + hints
 	}
 	if a.tab == TabJSON && !a.jsonOpen {
 		hints = "enter abrir JSON  " + hints
@@ -1795,8 +2004,14 @@ func (a *App) renderProject() string {
 	if a.tab == TabCFTunnel && !a.cfOpen {
 		hints = "enter abrir CF Tunnel  " + hints
 	}
+	if a.tab == TabSSH && !a.sshOpen {
+		hints = "enter abrir SSH Tunnel  " + hints
+	}
 	if a.tab == TabJenkins && !a.jenkinsOpen {
 		hints = "enter abrir Jenkins  " + hints
+	}
+	if a.tab == TabActions && !a.ghaOpen {
+		hints = "enter abrir Actions  " + hints
 	}
 	compact := a.projectCompact()
 	if compact {
@@ -1809,6 +2024,12 @@ func (a *App) renderProject() string {
 		}
 		if a.tab == TabKubernetes && !a.k8sOpen {
 			hints = "enter abrir Kubernetes  " + hints
+		}
+		if a.tab == TabSwarm && !a.swarmOpen {
+			hints = "enter abrir Swarm  " + hints
+		}
+		if a.tab == TabActions && !a.ghaOpen {
+			hints = "enter abrir Actions  " + hints
 		}
 		if a.tab == TabJSON && !a.jsonOpen {
 			hints = "enter abrir JSON  " + hints
@@ -1827,6 +2048,9 @@ func (a *App) renderProject() string {
 		}
 		if a.tab == TabCFTunnel && !a.cfOpen {
 			hints = "enter abrir CF Tunnel  " + hints
+		}
+		if a.tab == TabSSH && !a.sshOpen {
+			hints = "enter abrir SSH Tunnel  " + hints
 		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			hints = "enter abrir Jenkins  " + hints
@@ -1962,6 +2186,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderDbLanding(p)
 	case TabKubernetes:
 		return a.renderK8sLanding(p)
+	case TabSwarm:
+		return a.renderSwarmLanding(p)
 	case TabJSON:
 		return a.renderJsonLanding(p)
 	case TabJWT:
@@ -1974,8 +2200,12 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderNgrokLanding(p)
 	case TabCFTunnel:
 		return a.renderCFLanding(p)
+	case TabSSH:
+		return a.renderSSHLanding(p)
 	case TabJenkins:
 		return a.renderJenkinsLanding(p)
+	case TabActions:
+		return a.renderGHALanding(p)
 	default:
 		return a.renderOverviewTab(p)
 	}
@@ -2166,8 +2396,8 @@ Dashboard:
 Abas de Projeto:
   tab          Próximo módulo (sidebar)
   shift+tab    Módulo anterior
-  h            Ir para aba Health
-  l            Ir para aba Logs
+  h            Ir para Status (probes / portas / SSL)
+  l            Ir para Containers (logs no detalhe)
   L            Abrir LazyGit no projeto
   D            Executar Deploy script (confirmação y/n)
   shift+u      Docker compose up -d
@@ -2223,6 +2453,36 @@ Aba Kubernetes:
   l            Logs do pod
   +/-          Scale deployment
   r            Refresh
+
+Aba Swarm (Control Center):
+  enter        Abrir Control Center / detalhes do recurso
+  esc          Voltar (detalhe → cluster → landing)
+  [] / 1-8     Alternar Services · Nodes · Tasks · Stacks · Networks · Secrets · Configs · Events
+  tab          Painel tabela · nodes · ações
+  s            Scale service (form)
+  u            Update image/replicas
+  c            Create service
+  d            Deploy stack do projeto
+  l            Logs do service
+  t / T        Join token worker / manager
+  i            Swarm init
+  p / m        Promote / demote node
+  a            Availability (active/pause/drain)
+  R / b        Force update / rollback
+  D/x          Remove (y confirma)
+  P            Prune networks (y confirma)
+  r            Refresh (auto 5s)
+
+Aba Actions (GitHub Actions):
+  enter        Abrir Control Center / detalhe do processo (Overview·Runs·Logs·YAML)
+  esc          Voltar detalhe → lista → landing
+  tab          Painéis lista: Lista → RESUMO → Ações
+  [] / 1-3     Processes · Runs · Workflows (só na Lista)
+  No detalhe:  [] abas  t trigger  l logs  R re-run  o github
+  Status:      idle · triggered · queued · running · success · failure · stopped
+  L            Login gh
+  c / d / t    Criar / deletar / trigger
+  r            Refresh (auto 8s)
 
 Aba API:
   tab          Request → URL → Headers → Auth

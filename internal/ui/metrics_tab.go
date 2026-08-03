@@ -11,7 +11,7 @@ import (
 func (a *App) renderMetricsTab(p *core.Project) string {
 	w, h := a.moduleSize()
 	cpu, memoryMB := projectRuntimeMetrics(p)
-	ctx := a.renderModuleContext(p, w, "Metrics", fmt.Sprintf("CPU %.1f%% · RAM %d MB", cpu, memoryMB))
+	ctx := a.renderModuleContext(p, w, "Metrics", fmt.Sprintf("monitor containers · CPU %.1f%% · RAM %d MB", cpu, memoryMB))
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
 
 	rightW := a.moduleRightWidth(w)
@@ -41,8 +41,7 @@ func (a *App) renderMetricsTab(p *core.Project) string {
 	}
 	actions := moduleActionLines(
 		[2]string{"3", "containers"},
-		[2]string{"5", "health"},
-		[2]string{"6", "logs"},
+		[2]string{"h", "status probes"},
 		[2]string{"1", "visão geral"},
 		[2]string{"r", "refresh"},
 	)

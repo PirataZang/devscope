@@ -379,3 +379,49 @@ func writeFile(t *testing.T, path, content string) {
 		t.Fatal(err)
 	}
 }
+
+func TestGitRemoteBranchNames(t *testing.T) {
+	remote := t.TempDir()
+	runGit(t, remote, "init", "--bare")
+
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	writeFile(t, filepath.Join(dir, "a.txt"), "a")
+	runGit(t, dir, "add", "a.txt")
+	runGit(t, dir, "commit", "-m", "init")
+	mainBranch := strings.TrimSpace(gitOutput(dir, "rev-parse", "--abbrev-ref", "HEAD"))
+	runGit(t, dir, "remote", "add", "origin", remote)
+	runGit(t, dir, "push", "-u", "origin", mainBranch)
+
+	runGit(t, dir, "checkout", "-b", "local-only")
+	writeFile(t, filepath.Join(dir, "b.txt"), "b")
+	runGit(t, dir, "add", "b.txt")
+	runGit(t, dir, "commit", "-m", "local")
+
+	runGit(t, dir, "checkout", "-b", "pushed-feat")
+	writeFile(t, filepath.Join(dir, "c.txt"), "c")
+	runGit(t, dir, "add", "c.txt")
+	runGit(t, dir, "commit", "-m", "feat")
+	runGit(t, dir, "push", "-u", "origin", "pushed-feat")
+
+	names := GitRemoteBranchNames(dir)
+	hasMain, hasFeat, hasLocal := false, false, false
+	for _, n := range names {
+		switch n {
+		case mainBranch:
+			hasMain = true
+		case "pushed-feat":
+			hasFeat = true
+		case "local-only":
+			hasLocal = true
+		}
+	}
+	if !hasMain || !hasFeat {
+		t.Fatalf("expected pushed branches, got %v", names)
+	}
+	if hasLocal {
+		t.Fatalf("local-only should not appear: %v", names)
+	}
+}

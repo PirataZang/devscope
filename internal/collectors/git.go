@@ -378,6 +378,37 @@ func findBranchBase(path, branch string) string {
 	return ""
 }
 
+// GitRemoteBranchNames returns short branch names that exist on origin
+// (already pushed). Sorted by newest committerdate. Excludes origin/HEAD.
+func GitRemoteBranchNames(path string) []string {
+	out := gitOutput(path, "for-each-ref", "refs/remotes/origin/",
+		"--sort=-committerdate",
+		"--format=%(refname:short)")
+	if out == "" {
+		return nil
+	}
+	seen := map[string]bool{}
+	var names []string
+	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || line == "origin" || line == "origin/HEAD" {
+			continue
+		}
+		name := strings.TrimPrefix(line, "origin/")
+		if name == "" || name == "HEAD" || seen[name] {
+			continue
+		}
+		seen[name] = true
+		names = append(names, name)
+	}
+	return names
+}
+
+// GitCurrentBranchName is a thin alias used by Actions trigger UI.
+func GitCurrentBranchName(path string) string {
+	return GitCurrentBranch(path)
+}
+
 func collectGitBranches(path string) []core.GitBranch {
 	out := gitOutput(path, "for-each-ref", "refs/heads/", "--format=%(committerdate:unix)|%(creatordate:unix)|%(refname:short)|%(HEAD)")
 	if out == "" {
@@ -666,6 +697,11 @@ func GitMerge(path, branch string) error {
 		return fmt.Errorf("não é possível mesclar a branch atual nela mesma")
 	}
 	return gitRun(path, "merge", branch)
+}
+
+// GitRemoteOrigin returns remote.origin.url for a repo path.
+func GitRemoteOrigin(path string) string {
+	return strings.TrimSpace(gitOutput(path, "config", "--get", "remote.origin.url"))
 }
 
 func ParseGitHubRepo(remote string) (owner, repo string, ok bool) {

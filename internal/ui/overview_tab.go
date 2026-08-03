@@ -436,13 +436,12 @@ func (a *App) renderOverviewDetailsBox(p *core.Project, width, height int) strin
 func (a *App) renderOverviewActionsBox(width, height int) string {
 	return renderActionsBox(width, height,
 		[2]string{"a", "analisar"},
-		[2]string{"2", "git"},
-		[2]string{"5", "health"},
-		[2]string{"6", "logs"},
+		[2]string{"h", "status (probes)"},
+		[2]string{"m", "metrics CPU/RAM"},
 		[2]string{"o", "browser"},
 		[2]string{"E", "shell"},
 		[2]string{"3", "containers"},
-		[2]string{"7", "métricas"},
+		[2]string{"l", "containers/logs"},
 	)
 }
 

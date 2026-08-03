@@ -104,7 +104,7 @@ func (a *App) startGitDeleteBranch(p *core.Project) {
 	a.gitConfirmOn = true
 	a.gitConfirmAction = "delete"
 	a.gitConfirmBranch = branch
-	a.gitStatusMsg = "apagar branch " + branch + "? y/esc"
+	a.gitStatusMsg = "modal delete  y confirma  n/esc cancela"
 }
 
 func (a *App) startGitMerge(p *core.Project) {
@@ -124,7 +124,7 @@ func (a *App) startGitMerge(p *core.Project) {
 	a.gitConfirmOn = true
 	a.gitConfirmAction = "merge"
 	a.gitConfirmBranch = branch
-	a.gitStatusMsg = "mesclar " + branch + " em " + g.Branch + "? y/esc"
+	a.gitStatusMsg = "modal merge  y confirma  n/esc cancela"
 }
 
 func (a *App) gitToggleMarkedBranch(p *core.Project) {
@@ -272,13 +272,43 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "merge":
 			return a, a.gitMergeBranch(p, branch)
 		}
-	case "esc":
+	case "esc", "n", "N":
 		a.gitConfirmOn = false
 		a.gitConfirmBranch = ""
 		a.gitConfirmAction = ""
 		a.gitStatusMsg = "cancelado"
 	}
 	return a, nil
+}
+
+func (a *App) renderGitConfirm() string {
+	background := a.renderProject()
+	w, h := maxInt(40, a.width), maxInt(12, a.height)
+	branch := firstNonEmpty(a.gitConfirmBranch, "—")
+	opts := deleteConfirmOpts{
+		Brand:  "GIT",
+		Color:  tabAccentColor(TabGit),
+		Target: branch,
+		Label:  "branch",
+	}
+	switch a.gitConfirmAction {
+	case "merge":
+		into := "HEAD"
+		if p := a.currentProject(); p != nil {
+			if g := a.projectGitInfo(p); g != nil && g.Branch != "" {
+				into = g.Branch
+			}
+		}
+		opts.Title = "Mesclar branch"
+		opts.Subtitle = "git merge na branch atual"
+		opts.Detail = truncate(branch+"  →  "+into, 48)
+	default:
+		opts.Title = "Excluir branch"
+		opts.Subtitle = "git branch -D — remove a branch local"
+		opts.Detail = "branch local"
+	}
+	box := renderDeleteConfirmBox(opts, w, h)
+	return overlayCentered(background, box, w, h)
 }
 
 func (a *App) renderGitPrompt() string {

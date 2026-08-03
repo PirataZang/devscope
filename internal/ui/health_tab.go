@@ -11,22 +11,30 @@ import (
 
 func (a *App) renderHealthTab(p *core.Project) string {
 	w, h := a.moduleSize()
-	ctx := a.renderModuleContext(p, w, "Health", healthPlain(p.Health))
+	// Status = o projeto está acessível? probes + portas + SSL/domains (não é métrica de CPU).
+	ctx := a.renderModuleContext(p, w, "Status", healthPlain(p.Health)+" · probes / portas / SSL")
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
 
 	rightW := a.moduleRightWidth(w)
 	centerW := maxInt(36, w-rightW-1)
 
-	topH := maxInt(6, bodyH*40/100)
-	midH := maxInt(5, bodyH*30/100)
-	botH := maxInt(4, bodyH-topH-midH)
+	introH := 3
+	topH := maxInt(6, (bodyH-introH)*40/100)
+	midH := maxInt(5, (bodyH-introH)*30/100)
+	botH := maxInt(4, bodyH-introH-topH-midH)
 
 	checksW := maxInt(20, centerW*58/100)
 	portsW := centerW - checksW
 	ctrW := centerW / 2
 	sslW := centerW - ctrW
 
+	intro := renderApiTitledBox("O QUE É", fitExactLines([]string{
+		StyleMuted.Render("Responde: o app está no ar e alcançável?"),
+		StyleMuted.Render("HTTP/TCP · portas · SSL · domains  ·  Metrics = CPU/RAM"),
+	}, introH-2), centerW, introH, false)
+
 	center := lipgloss.JoinVertical(lipgloss.Left,
+		intro,
 		lipgloss.JoinHorizontal(lipgloss.Top,
 			a.renderHealthChecksBox(p, checksW, topH),
 			a.renderHealthPortsBox(p, portsW, topH),
@@ -54,7 +62,7 @@ func (a *App) renderHealthTab(p *core.Project) string {
 	}
 	details := []string{
 		StyleMuted.Render("Overall  ") + healthLabel(p.Health),
-		StyleMuted.Render("Checks   ") + StyleNormal.Render(fmt.Sprintf("%d", len(p.HealthChecks))),
+		StyleMuted.Render("Probes   ") + StyleNormal.Render(fmt.Sprintf("%d", len(p.HealthChecks))),
 		StyleHealthy.Render(fmt.Sprintf("ok %d", ok)) + "  " +
 			StyleUnhealthy.Render(fmt.Sprintf("bad %d", bad)) + "  " +
 			StyleMuted.Render(fmt.Sprintf("n/a %d", unk)),
@@ -64,8 +72,8 @@ func (a *App) renderHealthTab(p *core.Project) string {
 	}
 	actions := moduleActionLines(
 		[2]string{"r", "refresh scan"},
-		[2]string{"6", "ver logs"},
 		[2]string{"3", "containers"},
+		[2]string{"m", "metrics CPU/RAM"},
 		[2]string{"o", "abrir browser"},
 		[2]string{"1", "visão geral"},
 	)
@@ -92,7 +100,7 @@ func (a *App) renderHealthChecksBox(p *core.Project, width, height int) string {
 			lines = append(lines, st.Render(truncate(fmt.Sprintf("%s  %dms%s", c.URL, c.LatencyMS, msg), width-2)))
 		}
 	}
-	return renderApiTitledBox("CHECKS", fitExactLines(lines, height-2), width, height, false)
+	return renderApiTitledBox("PROBES HTTP/TCP", fitExactLines(lines, height-2), width, height, false)
 }
 
 func (a *App) renderHealthPortsBox(p *core.Project, width, height int) string {

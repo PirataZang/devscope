@@ -55,14 +55,45 @@ func (a *App) initContainersTab() {
 }
 
 func (a *App) renderContainersTab(p *core.Project) string {
+	var view string
 	switch a.containerSubview {
 	case containerSubviewDetail:
-		return a.renderContainerDetail(p)
+		view = a.renderContainerDetail(p)
 	case containerSubviewShellReturn:
-		return renderShellReturnMessage(a.containerShellExitErr)
+		view = renderShellReturnMessage(a.containerShellExitErr)
 	default:
-		return a.renderContainerList(p)
+		view = a.renderContainerList(p)
 	}
+	if a.containerConfirmRemove {
+		w, h := maxInt(40, a.width), maxInt(12, a.height)
+		target, detail := a.containerDeleteConfirmLabels(p)
+		box := renderDeleteConfirmBox(deleteConfirmOpts{
+			Brand:    "DOCKER",
+			Color:    tabAccentColor(TabContainers),
+			Title:    "Excluir container",
+			Subtitle: "docker rm — remove o container",
+			Label:    "container",
+			Target:   target,
+			Detail:   detail,
+		}, w, h)
+		view = overlayCentered(view, box, w, h)
+	}
+	return view
+}
+
+func (a *App) containerDeleteConfirmLabels(p *core.Project) (target, detail string) {
+	if p == nil {
+		return "—", ""
+	}
+	c, ok := a.selectedContainer(p)
+	if !ok {
+		return "—", ""
+	}
+	detail = truncate(firstNonEmpty(c.Image, c.ID), 48)
+	if c.Status != "" {
+		detail = c.Status + "  ·  " + detail
+	}
+	return c.Name, detail
 }
 
 func (a *App) dismissContainerShellReturn() tea.Cmd {
@@ -257,7 +288,7 @@ func (a *App) renderContainersBottom(width, height int) string {
 		renderApiTitledBox("VOLUMES", fitExactLines(vols, inner), w3, height, false),
 	}
 	if cmdW >= 12 {
-		parts = append(parts, 		renderActionsBox(cmdW, height,
+		parts = append(parts, renderActionsBox(cmdW, height,
 			[2]string{"enter", "detalhe"},
 			[2]string{"n", "novo svc"},
 			[2]string{"s", "stop"},

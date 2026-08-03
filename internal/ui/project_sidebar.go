@@ -182,9 +182,9 @@ func sidebarGroups() []struct {
 		title string
 		tabs  []Tab
 	}{
-		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes}},
-		{"WATCH", []Tab{TabHealth, TabLogs, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabJenkins}},
+		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes, TabSwarm}},
+		{"WATCH", []Tab{TabHealth, TabMetrics}},
+		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabSSH, TabJenkins, TabActions}},
 		{"UTILS", []Tab{TabRoutes}},
 	}
 }
@@ -244,6 +244,8 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorDocker
 	case TabKubernetes:
 		return ColorK8s
+	case TabSwarm:
+		return ColorDocker
 	case TabHealth:
 		return ColorSuccess
 	case TabLogs:
@@ -266,8 +268,12 @@ func tabAccentColor(t Tab) lipgloss.Color {
 		return ColorSuccess
 	case TabCFTunnel:
 		return ColorWarning
+	case TabSSH:
+		return ColorAccent
 	case TabJenkins:
 		return ColorK8s
+	case TabActions:
+		return ColorPrimary
 	default:
 		return ColorHighlight
 	}
@@ -283,6 +289,8 @@ func tabGlyph(t Tab) string {
 		return "▣"
 	case TabKubernetes:
 		return "⎈"
+	case TabSwarm:
+		return "⬡"
 	case TabHealth:
 		return "✚"
 	case TabLogs:
@@ -305,8 +313,12 @@ func tabGlyph(t Tab) string {
 		return "⇪"
 	case TabCFTunnel:
 		return "☁"
+	case TabSSH:
+		return "⇌"
 	case TabJenkins:
 		return "⚙"
+	case TabActions:
+		return "▶"
 	default:
 		return "·"
 	}

@@ -22,6 +22,7 @@ const (
 	TabGit
 	TabContainers
 	TabKubernetes
+	TabSwarm
 	TabHealth
 	TabLogs
 	TabMetrics
@@ -33,7 +34,9 @@ const (
 	TabWebSocket
 	TabNgrok
 	TabCFTunnel
+	TabSSH
 	TabJenkins
+	TabActions
 )
 
 func (t Tab) String() string {
@@ -46,8 +49,10 @@ func (t Tab) String() string {
 		return "Containers"
 	case TabKubernetes:
 		return "Kubernetes"
+	case TabSwarm:
+		return "Swarm"
 	case TabHealth:
-		return "Health"
+		return "Status"
 	case TabLogs:
 		return "Logs"
 	case TabMetrics:
@@ -68,8 +73,12 @@ func (t Tab) String() string {
 		return "Ngrok"
 	case TabCFTunnel:
 		return "CF Tunnel"
+	case TabSSH:
+		return "SSH Tunnel"
 	case TabJenkins:
 		return "Jenkins"
+	case TabActions:
+		return "Actions"
 	default:
 		return "Overview"
 	}
@@ -77,8 +86,8 @@ func (t Tab) String() string {
 
 // AllTabs follows sidebar order (SCOPE → WATCH → TOOLS → UTILS).
 var AllTabs = []Tab{
-	TabOverview, TabGit, TabContainers, TabKubernetes,
-	TabHealth, TabLogs, TabMetrics,
-	TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabJenkins,
+	TabOverview, TabGit, TabContainers, TabKubernetes, TabSwarm,
+	TabHealth, TabMetrics,
+	TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabSSH, TabJenkins, TabActions,
 	TabRoutes,
 }
