@@ -8,6 +8,35 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Aba Swarm (SCOPE)** — Control Center de Docker Swarm
+  - Visões: Services, Nodes, Tasks, Stacks, Networks, Secrets, Configs e Events
+  - Scale, update de imagem, create service, force update e rollback
+  - Deploy de stack a partir do compose do projeto
+  - Swarm init, join tokens (worker/manager), promote/demote e availability
+  - Logs de service, inspect e remoção com confirmação; prune de networks
+  - Refresh automático (~5s) e modais de confirmação para ações destrutivas
+- **Aba Actions (TOOLS)** — GitHub Actions via `gh`
+  - Control Center com Processes, Runs e Workflows
+  - Catálogo de processos por projeto (`.devscope/actions.yaml`) e templates (ci/deploy/manual)
+  - Detalhe do processo: Overview, Runs, Timeline (jobs/steps), Logs e YAML
+  - Trigger (`workflow_dispatch`) com branch, inputs e aviso de commits ahead
+  - Re-run, cancel/stop (incl. bulk), login `gh` na landing e billing de Actions
+  - Notas por run (`.devscope/actions-notes.yaml`) e links para o GitHub
+- **Aba SSH Tunnel (TOOLS)**
+  - Cliente `sshutil`: start/stop de túneis locais (`-L`) e remotos (`-R`)
+  - Config por projeto em `.devscope/ssh.json`, merge com processos vivos
+  - Wizard de criação (nome, modo, porta, bind, target, identity)
+  - Overview, Tunnels, History e Settings; seed de porta/target pelo projeto/git
+  - Confirmação de exclusão e badges de status (online/offline/starting)
+
+### Changed
+- Sidebar e ordem de abas: Swarm em SCOPE; SSH e Actions em TOOLS
+- Help screen com atalhos de Swarm e Actions
+- Modais de confirmação genéricos reutilizados (túneis e Swarm)
+
+## [1.4.0] - 2026-08-01
+
+### Added
 - **Compose presets** para imagens comuns (Postgres, MySQL, MariaDB, Mongo, Redis, Nginx, Traefik, RabbitMQ, Elasticsearch, Node e outras)
   - Geração automática de portas, env, volumes e healthcheck
   - Fallback por manifesto da imagem ou template mínimo
@@ -192,7 +221,8 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - GoReleaser + GitHub Releases
 - CLI: `devscope`, `scan --json`, `watch`, `version`
 
-[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/PirataZang/devscope/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/PirataZang/devscope/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/PirataZang/devscope/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/PirataZang/devscope/compare/v1.0.0...v1.2.0
