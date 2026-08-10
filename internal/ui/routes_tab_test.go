@@ -172,8 +172,8 @@ func TestRoutesFilterAuthAndRender(t *testing.T) {
 func TestSidebarShowsUtilsRoutes(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabRoutes}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "UTILS") || !strings.Contains(got, "Rotas") {
-		t.Fatalf("sidebar missing UTILS/Rotas: %q", got)
+	if !strings.Contains(got, "TOOLS") || !strings.Contains(got, "Rotas") {
+		t.Fatalf("sidebar missing TOOLS/Rotas: %q", got)
 	}
 	if !strings.Contains(got, "tab · shift+tab") {
 		t.Fatalf("footer should mention tab · shift+tab: %q", got)

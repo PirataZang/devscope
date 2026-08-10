@@ -1,7 +1,7 @@
 # DevScope
 
 <p align="center">
-  <strong>O "htop" dos seus projetos</strong> — visualize, monitore e opere todos os projetos e contêineres da sua VPS em uma única TUI (Interface de Terminal).
+  <strong>O "htop" dos seus projetos</strong> — visualize, monitore e opere todos os projetos da sua máquina ou VPS em uma única TUI (Interface de Terminal).
 </p>
 
 <p align="center">
@@ -47,7 +47,7 @@ Após instalar, basta rodar:
 devscope
 ```
 
-O DevScope faz um scan automático nos diretórios mais comuns (`/var/www`, `/home`, `/opt`) e exibe o painel interativo.
+O DevScope faz um scan automático nos diretórios mais comuns (`/var/www`, `/home`, `/opt`, …) e abre o painel interativo.
 
 ### 🔧 Outros Modos de Uso
 
@@ -61,80 +61,117 @@ devscope version              # Informações de versão e build
 
 ## 🔍 O Problema
 
-Gerenciar uma VPS Linux típica exige monitorar dezenas de utilitários isolados:
+Gerenciar vários projetos ao mesmo tempo exige saltar entre utilitários isolados:
 
 ```bash
 docker ps -a                    # Ver contêineres rodando
 docker stats --no-stream        # Monitorar uso de recursos
 pm2 list                        # Processos Node.js/PM2
 git -C /var/www/projeto status  # Verificar alterações de código
+gh run list                     # Pipelines do GitHub Actions
+ngrok http 3000                 # Expor um serviço local
 ss -ltn | grep LISTEN           # Ver portas abertas
 nginx -T | grep server_name     # Ver domínios configurados
 certbot certificates            # Monitorar validade do SSL
 ```
 
-Cada ferramenta expõe uma unidade diferente. No entanto, como desenvolvedor, **você pensa em projetos**.
+Cada ferramenta fala a língua dela. Como desenvolvedor, **você pensa em projetos**.
 
 ## 💡 A Solução
 
-O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projetos automaticamente e agrupa tudo em uma única tela interativa:
+O **DevScope** nasce dessa dor: descobre seus projetos automaticamente e agrupa containers, Git, CI, tunnels, banco, API e saúde — tudo no contexto do projeto, direto no terminal:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
-│ DevScope v0.1.0          CPU 21%   RAM 54%   DISK 31%        14:32:01 │
+│ DevScope                 CPU 21%   RAM 54%   DISK 31%        14:32:01 │
 ├───────────────────────────────────────────────────────────────────────┤
 │ SYSTEM OVERVIEW                                                       │
 │ Uptime: 12d 4h  •  Load: 0.42  •  Docker: 8  •  RAM: 8192/16384 MB   │
 ├───────────────────────────────────────────────────────────────────────┤
 │ PROJECTS (12)                                                         │
 │   NAME              STATUS    BRANCH   CPU   RAM    PORTS             │
-│ ● projeto           ● Run     main     12%   340M   :3000             │
-│ ● projeto           ● Deg     develop   8%   128M   :5173             │
-│ ○ projeto           ● Stop    main      -     -     -                 │
+│ ● api               ● Run     main     12%   340M   :3000             │
+│ ● frontend          ● Deg     develop   8%   128M   :5173             │
+│ ○ worker            ● Stop    main      -     -     -                 │
 ├───────────────────────────────────────────────────────────────────────┤
 │ Total: 12   Running: 8   Stopped: 3   Degraded: 1                     │
 │ ↑↓ navigate  ENTER open  / filter  g git  c containers  ? help  q quit│
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
+Dentro de cada projeto, os módulos ficam organizados por grupo:
+
+| Grupo | Módulos |
+|---|---|
+| **WATCH** | Visão Geral · Metrics · Status |
+| **SCOPE** | Git · Containers |
+| **AUTOMATION** | GH Actions · Jenkins |
+| **MANAGER** | Swarm · Kubernetes |
+| **TUNNEL** | Ngrok · SSH Tunnel · CF Tunnel |
+| **TOOLS** | Rotas · API · Database · WebSocket |
+
 ---
 
-## ⚖️ Por que DevScope?
+## 🎯 Por que DevScope?
 
-| Ferramenta | Unidade Principal | Como o DevScope Complementa/Ajuda |
-|---|---|---|
-| 🐳 [LazyDocker](https://github.com/jesseduffield/lazydocker) | Contêiner | Agrupa e exibe contêineres e recursos **por projeto** |
-| 🐙 [LazyGit](https://github.com/jesseduffield/lazygit) | Repositório | Integração direta (abre o LazyGit com a tecla `L` no contexto do projeto) |
-| 📊 `docker ps` / `htop` | Contêiner / Processo | Visão unificada orientada ao projeto (status, saúde, domínios, etc.) |
-| 🌐 Portainer | Web UI | TUI nativa leve, binário único, roda sem necessidade de navegador |
-| 📬 Postman / Insomnia | Request HTTP | Cliente API embutido no contexto do projeto (aba `8`) |
+* **Orientado a projeto** — não lista recursos soltos; tudo aparece no contexto do projeto certo.
+* **TUI nativa** — binário único, leve, sem browser e sem daemon.
+* **Operação no terminal** — logs, shell, compose, deploy, tunnels e SQL sem trocar de ferramenta.
+* **Descoberta automática** — scan + detecção de stack; você abre e já vê o que está rodando.
+* **Open source (MIT)** — feito para quem vive entre vários projetos ao mesmo tempo.
 
 ---
 
 ## ✨ Funcionalidades
 
-### 🟢 Disponível Agora
-* 📂 **Descoberta Automática** — Varre os diretórios `/var/www`, `/home`, `/opt` e caminhos configurados.
-* 🏷️ **Detecção Inteligente de Frameworks** — Suporte nativo para NestJS, Laravel, Django, Next.js, Vue, React, Nuxt, Go, Python, Rust, PHP, Java, etc.
-* 📊 **Métricas do Sistema** — Monitoramento de CPU, RAM, Disco, Swap, Load e Uptime direto do host.
-* 🐳 **Integração com Docker** — Status de contêineres, estatísticas em tempo real e correlação automática com seus projetos.
-* 🐙 **Integração com Git** — Branch atual, status da working tree, histórico de commits e diff colorido (estilo LazyGit).
-* 📡 **Cliente API (estilo Postman)** — Aba dedicada para testar HTTP no contexto do projeto: métodos coloridos, URL, headers, auth, body editor e response viewer.
-* ⚡ **WebSocket Inspector (TOOLS)** — Overview 3 colunas (connections/stats/filters · messages+send · inspector), abas Messages/Send/History/Settings, busca e filtros de frames.
-* 🗃️ **Database** — Aba TOOLS para listar tabelas e rodar SQL em Postgres/MySQL detectados nos containers do projeto.
-* ⎈ **Kubernetes** — Aba SCOPE estilo LazyDocker: pods, deployments, services, apply/edit/delete YAML e manifests do projeto via `kubectl`.
-* `{ }` **JSON (UTILS)** — Pretty/minify/validate, sort keys, strip nulls, convert JSON⇄YAML/TOML/XML, diff e busca por chave.
-* ⚿ **JWT (UTILS)** — Decode/verify/generate/sign estilo jwt.io (HMAC HS256/384/512), copy claims e export JSON.
-* ⇄ **Rotas (UTILS)** — Detecta a stack do projeto, descobre endpoints (OpenAPI + parsers) e abre na aba API com method + URL.
-* ⚙️ **Suporte a PM2** — Identifica e lista workers vinculados a cada projeto.
-* 🩺 **Health Checks** — Validação de endpoints via HTTP/TCP com status inteligente (`Running`, `Degraded`, `Stopped`).
-* 🔒 **Nginx & SSL** — Mapeamento de domínios reversos e monitoramento de certificados Let's Encrypt.
-* ⚡ **Ações Interativas** — Terminal no projeto, pausar/reiniciar/remover contêineres, logs em tempo real.
+### WATCH — Observabilidade
+
+* 📂 **Descoberta Automática** — Varre `/var/www`, `/home`, `/opt` e caminhos configurados.
+* 🏷️ **Detecção de Frameworks** — NestJS, Laravel, Django, Next.js, Vue, React, Nuxt, Go, Python, Rust, PHP, Java e outros.
+* 📊 **Métricas do Sistema e do Projeto** — CPU, RAM, Disco, Swap, Load, Uptime e métricas agregadas por projeto.
+* 🩺 **Status / Health Checks** — Probes HTTP/TCP, portas, domínios e SSL (Let's Encrypt) com status `Running`, `Degraded`, `Stopped`.
+* 🔒 **Nginx & SSL** — Mapeamento de vhosts / proxy reverso e validade de certificados.
+
+### SCOPE — Código e runtime
+
+* 🐙 **Git nativo** — Branches, stage/unstage, commit, pull/push, merge, cherry-pick, diff colorido e abertura de PR no GitHub — tudo dentro do DevScope.
+* 🐳 **Containers por projeto** — Correlação automática com Docker, stats, logs, env, config, shell (`exec`), start/stop/restart/pause/remove, portas e preview HTTP.
+* 📦 **Docker Compose** — `up -d`, `down`, `restart` e criação de serviços no contexto do projeto.
+* ⚙️ **PM2** — Workers Node vinculados a cada projeto.
+
+### AUTOMATION — CI/CD
+
+* ⚙️ **GitHub Actions** — Processes, runs, workflows, logs, YAML, trigger, re-run e login via `gh`.
+* 🧱 **Jenkins** — Visão e operação de jobs no contexto do projeto.
+
+### MANAGER — Orquestração
+
+* 🐝 **Docker Swarm** — Services, nodes, tasks, stacks, networks, secrets, configs, scale, update, rollback e logs.
+* ⎈ **Kubernetes** — Pods, deployments, services, manifests do projeto, apply/edit/delete, logs e scale via `kubectl`.
+
+### TUNNEL — Exposição local
+
+* 🌐 **Ngrok** — Tunnels, requests, histórico, domains e settings ligados ao projeto.
+* 🔐 **SSH Tunnel** — Túneis SSH gerenciados no painel.
+* ☁️ **Cloudflare Tunnel** — CF Tunnel no mesmo fluxo de operação.
+
+### TOOLS — Dia a dia do desenvolvedor
+
+* ⇄ **Rotas** — Detecta a stack, descobre endpoints (OpenAPI + parsers) e abre direto na aba API.
+* 📡 **Cliente API** — HTTP no contexto do projeto: método, URL, headers, auth, body e response.
+* 🗃️ **Database** — Lista tabelas e roda SQL em Postgres/MySQL detectados nos containers do projeto.
+* ⚡ **WebSocket** — Connections, envio de frames, histórico, filtros e inspector.
+
+### Operação geral
+
+* ⚡ **Ações rápidas** — Terminal no projeto, OpenCode, deploy com confirmação, abrir URL no navegador.
+* 🎨 **Temas** — `devscope`, dark, tokyo-night, catppuccin, rose-pine, solarized, dracula, nord, monokai, gruvbox, light, auto.
+* 🔍 **Busca** — Filtro por nome (`/`) e fuzzy finder global (`Ctrl+P`).
 
 ### 🟡 Em Desenvolvimento
-* [ ] Conexão e monitoramento multi-host via SSH (v2.0)
+
+* [ ] Conexão e monitoramento multi-host via SSH
 * [ ] Alertas e notificações via Webhooks (Slack, Discord)
-* [ ] Integração com CI/CD (GitHub Actions / GitLab CI)
 * [ ] Demo em GIF na página principal
 
 ---
@@ -142,7 +179,7 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 ## ⌨️ Atalhos do Teclado
 
 <details>
-<summary>📂 <b>Dashboard Principal</b> (Clique para expandir)</summary>
+<summary>📂 <b>Dashboard Principal</b></summary>
 
 | Tecla | Ação |
 |---|---|
@@ -150,125 +187,173 @@ O **DevScope** resolve isso unificando o monitoramento. Ele descobre seus projet
 | `Enter` | Abrir detalhes do projeto selecionado |
 | `/` | Filtrar projetos por nome |
 | `Ctrl+P` | Busca global rápida (Fuzzy Finder) |
-| `g` | Alternar diretamente para a aba Git |
-| `c` | Alternar diretamente para a aba Containers |
+| `g` | Abrir direto na aba Git |
+| `c` | Abrir direto na aba Containers |
 | `Shift+E` | Abrir terminal no diretório do projeto |
 | `Shift+O` | Abrir OpenCode no diretório do projeto |
-| `r` | Atualizar dados do sistema manualmente |
+| `T` | Escolher theme |
+| `r` | Atualizar dados do sistema |
 | `?` | Abrir menu de ajuda |
 | `q` | Sair do DevScope |
 
 </details>
 
 <details>
-<summary>📄 <b>Detalhes do Projeto</b> (Clique para expandir)</summary>
+<summary>📄 <b>Detalhes do Projeto</b></summary>
 
 | Tecla | Ação |
 |---|---|
-| `Esc` | Voltar para o Dashboard principal |
-| `Tab` / `Shift+Tab` | Próxima / aba anterior |
-| `1` – `9` / `0` / `-` / `=` / `+` | Atalhos: … **JSON** (`0`), **JWT** (`-`), **Rotas** (`=`), **WebSocket** (`+`) |
-| `4` | Aba **Kubernetes** (Enter abre cliente pods/deploy/svc/manifests) |
-| `8` | Aba **API** (Enter abre o cliente HTTP) |
-| `9` | Aba **Database** (Enter abre tabelas/SQL do Postgres/MySQL do projeto) |
-| `+` | Aba **WebSocket** (Enter abre connect/send/messages) |
-| `0` | Aba **JSON** (Enter abre utilitário input/output) |
-| `-` | Aba **JWT** (Enter abre decode/verify/sign) |
-| `=` | Aba **Rotas** (Enter escaneia; Enter numa rota abre a API) |
-| `L` | Abrir o **LazyGit** no contexto do projeto atual |
-| `D` | Executar script de Deploy (com confirmação) |
+| `Esc` | Voltar para o Dashboard |
+| `Tab` / `Shift+Tab` | Próximo / módulo anterior (sidebar) |
+| `h` | Ir para Status |
+| `l` | Ir para Containers (logs no detalhe) |
+| `D` | Executar script de Deploy (confirmação) |
+| `Shift+U` / `Shift+D` / `R` | Compose up / down / restart |
 | `o` | Abrir URL do projeto no navegador |
-| `h` | Aba de monitoramento de Saúde (Health) |
-| `l` | Aba de Logs |
 
 </details>
 
 <details>
-<summary>⎈ <b>Aba Kubernetes</b> (Clique para expandir)</summary>
-
-Cliente fullscreen via `kubectl` (estilo LazyDocker): lista pods/deployments/services, manifests do projeto, create/edit/apply/delete.
+<summary>🐙 <b>Git</b></summary>
 
 | Tecla | Ação |
 |---|---|
-| `Enter` (na landing) | Abrir o cliente |
+| `←` / `→` / `h` / `l` | Alternar foco (Branches / Commits) |
+| `a` / `A` | Stage arquivo / stage all |
+| `c` | Novo commit |
+| `n` / `d` / `R` | Criar / apagar / renomear branch |
+| `Space` | Checkout de branch |
+| `p` / `P` | Pull / Push |
+| `M` | Merge na branch atual |
+| `Shift+C` / `Shift+V` | Copiar / colar commits (cherry-pick) |
+| `o` | Abrir Pull Request no GitHub |
+| `Enter` | Detalhe ou diff em tela cheia |
+| `b` | Filtrar branches |
+| `/` | Buscar no diff |
+
+</details>
+
+<details>
+<summary>🐳 <b>Containers</b></summary>
+
+| Tecla | Ação |
+|---|---|
+| `Enter` | Portas do container / preview HTTP |
+| `m` / `l` | Detalhes (Logs, Stats, Env, Config…) |
+| `Shift+E` | Shell (`exec`) no container |
+| `s` / `r` / `p` | Stop / start·restart / pause·resume |
+| `d` | Remover container (confirmação) |
+| `n` | Novo serviço (Docker Hub ou YAML) |
+| `A` | Todos os projetos + órfãos / só do projeto |
+| `v` | Filtrar só containers Docker reais |
+| `Shift+U` / `Shift+D` | Compose up / down |
+| `f` | Seguir logs |
+| `/` | Buscar nos logs |
+
+</details>
+
+<details>
+<summary>⚙️ <b>GitHub Actions</b></summary>
+
+| Tecla | Ação |
+|---|---|
+| `Enter` | Abrir Control Center / detalhe do processo |
+| `[` / `]` ou `1`–`3` | Processes · Runs · Workflows |
+| `c` / `d` / `t` | Criar / deletar / trigger |
+| `R` | Re-run |
+| `L` | Login `gh` |
+| `o` | Abrir no GitHub |
+| `r` | Refresh |
+
+</details>
+
+<details>
+<summary>⎈ <b>Kubernetes</b></summary>
+
+| Tecla | Ação |
+|---|---|
+| `Enter` | Abrir cliente / describe / YAML |
 | `[` / `]` | Alternar kind: pods / deploy / svc / yaml |
 | `n` / `N` | Namespace seguinte / anterior |
-| `Enter` | Describe / ver YAML |
-| `a` | Apply (recurso ou manifesto do projeto) |
-| `c` | Criar template Deployment + Service |
-| `e` | Editar YAML (`Ctrl+Enter` aplica) |
-| `d` | Delete (confirmação `y`) |
+| `a` | Apply |
+| `c` / `e` | Criar template / editar YAML |
+| `d` | Delete (confirmação) |
 | `l` | Logs do pod |
 | `+` / `-` | Scale deployment |
 | `r` | Refresh |
-| `Esc` | Voltar painel / landing |
 
 </details>
 
 <details>
-<summary>📡 <b>Aba API</b> (Clique para expandir)</summary>
-
-Cliente HTTP fullscreen no estilo LazyDocker/Postman: painéis à esquerda e Body/Response à direita.
+<summary>🐝 <b>Docker Swarm</b></summary>
 
 | Tecla | Ação |
 |---|---|
-| `Tab` / `Shift+Tab` | Ciclar **Request → URL → Headers → Auth** |
-| `1` – `4` | Ir direto para Request / URL / Headers / Auth |
-| `→` | Focar o painel direito (Body / Response) |
-| `[` / `]` | Alternar abas **Body** / **Response** (fora da edição) |
-| `↑` / `↓` | Trocar método HTTP (no Request) ou rolar conteúdo |
-| `m` | Ciclar método (GET, POST, PUT, PATCH, DELETE) |
-| Digitar | Edita URL / Headers / Auth automaticamente |
-| `e` | Entrar no editor do **Body** (Auth também usa `e`) |
-| `Ctrl+A` | Selecionar tudo (URL / Headers / Auth / Body) |
-| `Shift+←→` (`Shift+↑↓` no Body/Headers) | Selecionar trecho |
-| `Backspace` / `Delete` / digitar | Apaga ou substitui a seleção |
-| `Enter` | Enviar o request |
+| `Enter` | Control Center / detalhes |
+| `[` / `]` ou `1`–`8` | Services · Nodes · Tasks · Stacks · Networks · Secrets · Configs · Events |
+| `s` / `u` / `c` | Scale / update / create service |
+| `d` | Deploy stack do projeto |
+| `l` | Logs do service |
+| `R` / `b` | Force update / rollback |
+| `i` | Swarm init |
+| `t` / `T` | Join token worker / manager |
+
+</details>
+
+<details>
+<summary>📡 <b>API</b></summary>
+
+| Tecla | Ação |
+|---|---|
+| `Tab` | Ciclar Request → URL → Headers → Auth |
+| `m` / `↑↓` | Alternar método HTTP |
+| `e` | Editor do Body |
+| `Enter` | Enviar request |
 | `r` | Reenviar |
-| `u` | Ciclar porta detectada do projeto na URL |
-| `a` | Ciclar tipo de Auth (`none` / `bearer` / `basic`) |
-| `/` | Buscar na Response (somente no painel direito) |
-| `H` | Alternar headers da Response |
-| `Esc` | Sair da edição / voltar aos blocos / Dashboard |
-
-**Recursos:**
-* Métodos coloridos (GET verde, POST azul, PUT ciano, PATCH amarelo, DELETE vermelho)
-* Sugestão automática de `http://localhost:<porta>` a partir das portas do projeto
-* Auth Bearer / Basic
-* Editor de Body com indentação (`Tab`), navegação por linhas e expansão de `{|}` / `[|]`
-* Response com status, tempo, JSON formatado, scroll e busca
-* Histórico leve em memória dos últimos requests da sessão
+| `u` | Ciclar porta detectada do projeto |
+| `a` | Auth (`none` / `bearer` / `basic`) |
+| `[` / `]` | Alternar Body / Response |
+| `/` | Buscar na Response |
 
 </details>
 
 <details>
-<summary>🐙 <b>Controle Git</b> (Clique para expandir)</summary>
+<summary>🗃️ <b>Database</b></summary>
 
 | Tecla | Ação |
 |---|---|
-| `←` / `→` / `h` / `l` | Alternar entre seções do Git |
-| `b` | Filtrar branches |
-| `Enter` | Ver detalhes de commits ou arquivos (somente leitura) |
-| `n` / `p` | Próximo / arquivo anterior no diff |
-| `m` | Expandir mensagem do commit |
-| `/` | Buscar no diff |
-| `←` / `→` | Scroll horizontal no diff |
+| `Enter` | Abrir cliente / preview `SELECT * LIMIT 50` |
+| `Tab` | Tables · SQL · Result |
+| `e` | Editar SQL |
+| `Ctrl+Enter` | Executar SQL |
+| `[` / `]` | Trocar banco detectado |
+| `r` | Recarregar tabelas |
 
 </details>
 
 <details>
-<summary>🐳 <b>Controle de Contêineres</b> (Clique para expandir)</summary>
+<summary>⇄ <b>Rotas</b></summary>
 
 | Tecla | Ação |
 |---|---|
-| `Enter` / `m` | Abrir detalhes do contêiner (Logs, Stats, Env, Config…) |
-| `Shift+E` | Entrar no Shell (`exec`) do contêiner |
-| `p` | Pausar / retomar contêiner |
-| `r` | Iniciar / reiniciar contêiner |
-| `d` | Remover contêiner (requer confirmação com `y`) |
-| `f` | Seguir logs em tempo real |
-| `/` | Buscar nos logs |
-| `,` / `.` | Scroll horizontal nos logs |
+| `Enter` | Escanear rotas / abrir na aba API |
+| `b` | Filtrar por path |
+| `r` | Reescanear |
+
+</details>
+
+<details>
+<summary>⚡ <b>WebSocket</b></summary>
+
+| Tecla | Ação |
+|---|---|
+| `Enter` | Abrir Overview / conectar / enviar |
+| `n` / `e` / `x` | Nova / editar / deletar connection |
+| `c` / `d` | Conectar / desconectar |
+| `0`–`3` | Overview · Messages · History · Settings |
+| `f` | Filtrar frames |
+| `/` | Buscar no payload |
+| `Ctrl+L` | Limpar frames |
 
 </details>
 
@@ -365,7 +450,8 @@ refresh:
   git_interval: 30s
 
 ui:
-  theme: auto          # Opções: dark | light | auto
+  theme: devscope   # dark | tokyo-night | catppuccin | rose-pine | …
+                    # solarized | dracula | nord | monokai | gruvbox | light | auto
 
 health:
   timeout: 5s
@@ -388,10 +474,10 @@ DEVSCOPE_SCAN_PATHS=/var/www,/home/usuario/projetos devscope
 ## 🏗️ Arquitetura
 
 ```
-Caminhos de Scan (ScanPaths) ──> Varredura do Disco (Walk filesystem) ──> Detectores de Framework
-                                                                               │
-                                                                               ▼
-Bubble Tea UI <── Snapshot Imutável <── Coletores (Docker, PM2, Git, Health, Nginx)
+Caminhos de Scan ──> Varredura do Disco ──> Detectores de Framework
+                                                    │
+                                                    ▼
+Bubble Tea UI <── Snapshot Imutável <── Coletores (Docker, PM2, Git, Health, Nginx, …)
 ```
 
 Para detalhes técnicos, consulte [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -400,7 +486,7 @@ Para detalhes técnicos, consulte [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## 🤝 Contribuindo
 
-Adoramos contribuições! Se você encontrou um bug ou quer propor melhorias, siga os passos em [CONTRIBUTING.md](CONTRIBUTING.md).
+Adoramos contribuições! Se você encontrou um bug ou quer propor melhorias:
 
 * 🐛 Encontrou um bug? [Abra uma Issue de Bug](https://github.com/PirataZang/devscope/issues/new?template=bug_report.md)
 * 💡 Tem uma ideia? [Solicite uma Feature](https://github.com/PirataZang/devscope/issues/new?template=feature_request.md)

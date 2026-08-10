@@ -12,20 +12,20 @@ import (
 
 func (a *App) renderSwarmLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	info := collectors.SwarmClusterInfo()
-	compose := ""
-	if p != nil {
-		compose = collectors.DiscoverSwarmCompose(p.Path)
-	}
-	status := "offline"
-	if collectors.SwarmAvailable() {
-		switch {
-		case info.State == "unavailable":
-			status = "unavailable"
-		case info.Active:
-			status = "active"
-		default:
-			status = "inactive"
+	info := a.landingSwarm
+	compose := a.landingSwarmCompose
+	status := "…"
+	if a.landingSwarmOK {
+		status = "offline"
+		if a.landingSwarmAvail {
+			switch {
+			case info.State == "unavailable":
+				status = "unavailable"
+			case info.Active:
+				status = "active"
+			default:
+				status = "inactive"
+			}
 		}
 	}
 	ctx := a.renderModuleContext(p, w, "SWARM", status)
@@ -39,15 +39,18 @@ func (a *App) renderSwarmLanding(p *core.Project) string {
 		StyleMuted.Render("cluster · services · nodes · tasks · stacks"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !collectors.SwarmAvailable() {
+	switch {
+	case !a.landingSwarmOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !a.landingSwarmAvail:
 		openLines = append(openLines, "", StyleUnhealthy.Render("docker não encontrado no PATH"))
-	} else if info.Error != "" {
+	case info.Error != "":
 		openLines = append(openLines, "", StyleUnhealthy.Render(truncate(info.Error, 40)))
-	} else if info.Active {
+	case info.Active:
 		openLines = append(openLines, "",
 			StyleHealthy.Render("● ACTIVE")+
 				StyleMuted.Render(fmt.Sprintf("  ·  %d mgr  ·  %d nodes", info.Managers, info.Nodes)))
-	} else {
+	default:
 		openLines = append(openLines, "", StyleWarning.Render("○ INACTIVE — i inicia o cluster"))
 	}
 
@@ -64,10 +67,15 @@ func (a *App) renderSwarmLanding(p *core.Project) string {
 		renderApiTitledBox("DOCKER SWARM", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, nodesLabel := "…", "…"
+	if a.landingSwarmOK {
+		cliLabel = boolLabel(a.landingSwarmAvail)
+		nodesLabel = fmt.Sprintf("%d", info.Nodes)
+	}
 	details := []string{
-		StyleMuted.Render("CLI    ") + StyleNormal.Render(boolLabel(collectors.SwarmAvailable())),
+		StyleMuted.Render("CLI    ") + StyleNormal.Render(cliLabel),
 		StyleMuted.Render("Swarm  ") + StyleMuted.Render(status),
-		StyleMuted.Render("Nodes  ") + StyleNormal.Render(fmt.Sprintf("%d", info.Nodes)),
+		StyleMuted.Render("Nodes  ") + StyleNormal.Render(nodesLabel),
 	}
 	if compose != "" {
 		details = append(details, StyleMuted.Render("Stack  ")+StyleMuted.Render(swarmComposeBase(compose)))
@@ -177,7 +185,7 @@ func (a *App) renderSwarmHeader(width int, p *core.Project) string {
 		StyleMuted.Render("  ·  ") + StyleNormal.Render(truncate(proj, 20))
 	right := StyleMuted.Render(time.Now().Format("15:04:05"))
 	if a.swarmLoading {
-		right = StyleMuted.Render("Loading…")
+		right = a.loadingMuted("Loading…")
 	}
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {

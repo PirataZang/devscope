@@ -150,7 +150,16 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	got := a.renderProjectSidebar()
 	plain := stripANSI(got)
 
-	for _, want := range []string{"SCOPE", "WATCH", "TOOLS", "UTILS", "Visão Geral", "Containers", "Kubernetes", "Status", "Metrics", "API", "Database", "WS", "Ngrok", "CF Tunnel", "SSH Tunnel", "Rotas", "tab · shift+tab"} {
+	for _, want := range []string{
+		"WATCH", "SCOPE", "AUTOMATION", "MANAGER", "TUNNEL", "TOOLS",
+		"Visão Geral", "Metrics", "Status",
+		"Git", "Containers",
+		"GH Actions", "Jenkins",
+		"Swarm", "Kubernetes",
+		"Ngrok", "SSH Tunnel", "CF Tunnel",
+		"Rotas", "API", "Database", "WS",
+		"tab · shift+tab",
+	} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
 		}
@@ -257,7 +266,7 @@ func TestProjectViewHidesHostMetricsBar(t *testing.T) {
 		if strings.Contains(got, pills) {
 			t.Fatalf("%dx%d: barra de métricas do host só no dashboard: %q", size.w, size.h, got)
 		}
-		if !strings.Contains(got, "Visão Geral") || !strings.Contains(got, "SCOPE") {
+		if !strings.Contains(got, "Visão Geral") || !strings.Contains(got, "WATCH") {
 			t.Fatalf("%dx%d: sidebar deve continuar", size.w, size.h)
 		}
 	}
@@ -375,7 +384,7 @@ func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
 		Path: "/tmp/digiliza",
 		Name: "digiliza",
 		Containers: []core.Container{
-			{ID: "abc", Name: "laradock-workspace-1", Image: "laradock/workspace", Status: "running", State: "Up 2 hours", Ports: "80:80", CPU: 12.6, Memory: 400 << 20},
+			{ID: "abc", Name: "laradock-workspace-1", Image: "laradock/workspace", Status: "running", State: "Up 2 hours", Ports: "0.0.0.0:80->80/tcp", CPU: 12.6, Memory: 400 << 20},
 			{ID: "def", Name: "laradock-nginx-1", Image: "nginx", Status: "running", State: "Up 2 hours"},
 		},
 		Metrics: core.ProjectMetrics{CPUPercent: 12.6, MemoryMB: 400},
@@ -397,15 +406,18 @@ func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
 		snapshot:                core.Snapshot{Projects: []core.Project{project}},
 	}
 	got := stripANSI(a.renderContainersTab(&project))
-	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS · ALL", "VOLUMES", "laradock-workspace-1", "laradock_data", "CPU ", "MEM ", "NET "} {
+	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS · ALL", "PORTAS", "laradock-workspace-1", "CPU ", "MEM ", "NET "} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("containers main missing %q in:\n%s", want, got)
 		}
 	}
 	a.containerStatsMode = 1
-	got = stripANSI(a.renderContainersBottom(80, 10))
+	got = stripANSI(a.renderContainersBottom(120, 20))
 	if !strings.Contains(got, "STATS · CPU") {
 		t.Fatalf("cpu focus title missing: %s", got)
+	}
+	if !strings.Contains(got, "S-U") || !strings.Contains(got, "compose") {
+		t.Fatalf("actions should list compose shortcuts:\n%s", truncate(got, 400))
 	}
 }
 

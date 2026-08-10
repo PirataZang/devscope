@@ -141,12 +141,15 @@ func (a *App) leaveK8sTab() tea.Cmd {
 
 func (a *App) renderK8sLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	available := collectors.K8sAvailable()
-	kctx := collectors.K8sCurrentContext()
-	manifests := collectors.DiscoverProjectManifests(p.Path)
-	status := "offline"
-	if available {
-		status = "ready"
+	available := a.landingK8sAvail
+	kctx := a.landingK8sCtx
+	manifestsN := a.landingK8sManifests
+	status := "…"
+	if a.landingK8sOK {
+		status = "offline"
+		if available {
+			status = "ready"
+		}
 	}
 	ctx := a.renderModuleContext(p, w, "KUBERNETES", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -158,9 +161,12 @@ func (a *App) renderK8sLanding(p *core.Project) string {
 		StyleMuted.Render("explorer · workloads · logs · yaml · events"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !available {
+	switch {
+	case !a.landingK8sOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !available:
 		openLines = append(openLines, "", StyleUnhealthy.Render("kubectl não encontrado no PATH"))
-	} else {
+	default:
 		if kctx == "" {
 			kctx = "(sem context)"
 		}
@@ -171,17 +177,23 @@ func (a *App) renderK8sLanding(p *core.Project) string {
 		StyleMuted.Render("logs live · yaml · apply/edit"),
 		StyleMuted.Render("manifests do projeto (k8s/)"),
 	}
-	if len(manifests) > 0 {
-		featLines = append(featLines, StyleMuted.Render(fmt.Sprintf("%d manifests detectados", len(manifests))))
+	if a.landingK8sOK && manifestsN > 0 {
+		featLines = append(featLines, StyleMuted.Render(fmt.Sprintf("%d manifests detectados", manifestsN)))
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("KUBERNETES", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, ctxLabel, yamlLabel := "…", "…", "…"
+	if a.landingK8sOK {
+		cliLabel = boolLabel(available)
+		ctxLabel = truncate(kctx, 18)
+		yamlLabel = fmt.Sprintf("%d", manifestsN)
+	}
 	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(available)),
-		StyleMuted.Render("Context ") + StyleMuted.Render(truncate(kctx, 18)),
-		StyleMuted.Render("YAML    ") + StyleNormal.Render(fmt.Sprintf("%d", len(manifests))),
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
+		StyleMuted.Render("Context ") + StyleMuted.Render(ctxLabel),
+		StyleMuted.Render("YAML    ") + StyleNormal.Render(yamlLabel),
 	}
 	actions := moduleActionLines(
 		[2]string{"enter", "abrir console"},
@@ -437,7 +449,7 @@ func (a *App) k8sHints() string {
 	}
 	base := "? help  n/p ns  b filter  tab painel  enter detail  l logs  y yaml  e edit  c create  d delete  r refresh  esc"
 	if a.k8sLoading {
-		base = "carregando…  " + base
+		base = a.spinner() + " carregando…  " + base
 	}
 	if a.k8sStatus != "" {
 		return truncate(a.k8sStatus, 40) + "  ·  " + base

@@ -31,8 +31,8 @@ func TestAllTabsIncludesSwarm(t *testing.T) {
 func TestSidebarShowsSwarmInScope(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabSwarm}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "SCOPE") || !strings.Contains(got, "Swarm") {
-		t.Fatalf("sidebar missing Swarm in SCOPE: %q", got)
+	if !strings.Contains(got, "MANAGER") || !strings.Contains(got, "Swarm") {
+		t.Fatalf("sidebar missing Swarm in MANAGER: %q", got)
 	}
 }
 

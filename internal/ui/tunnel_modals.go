@@ -35,12 +35,12 @@ func tunnelModalBox(lines []string, boxW, boxH int, border lipgloss.Color) strin
 		Render(strings.Join(fitExactLines(lines, boxH), "\n"))
 }
 
-func tunnelStatusBadge(status string) string {
+func tunnelStatusBadge(status string, frame int) string {
 	switch status {
 	case "online":
-		return StyleHealthy.Render("● online")
+		return StyleHealthy.Render(animPulse(frame) + " online")
 	case "starting":
-		return StyleWarning.Render("● starting")
+		return StyleWarning.Render(animSpinner(frame) + " starting")
 	default:
 		return StyleUnhealthy.Render("● offline")
 	}

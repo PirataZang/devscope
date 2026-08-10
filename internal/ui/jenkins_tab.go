@@ -268,10 +268,13 @@ func (a *App) jenkinsSelectedBuild() (jenkinsutil.Build, bool) {
 
 func (a *App) renderJenkinsLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	cfg := jenkinsutil.LoadProject(p.Path)
-	status := "offline"
-	if cfg.Configured() {
-		status = "configured"
+	cfg := a.landingJenkins
+	status := "…"
+	if a.landingJenkinsOK {
+		status = "offline"
+		if cfg.Configured() {
+			status = "configured"
+		}
 	}
 	ctx := a.renderModuleContext(p, w, "JENKINS", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -284,9 +287,12 @@ func (a *App) renderJenkinsLanding(p *core.Project) string {
 		StyleMuted.Render("CI/CD — pipelines, builds e console"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !cfg.Configured() {
+	switch {
+	case !a.landingJenkinsOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !cfg.Configured():
 		openLines = append(openLines, "", StyleWarning.Render("configure URL/user/token em Settings"))
-	} else {
+	default:
 		openLines = append(openLines, "", StyleMuted.Render("server  ")+StyleNormal.Render(cfg.Host()))
 		openLines = append(openLines, StyleMuted.Render("user    ")+StyleNormal.Render(cfg.User))
 	}
@@ -300,9 +306,14 @@ func (a *App) renderJenkinsLanding(p *core.Project) string {
 		renderApiTitledBox("JENKINS", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cfgLabel, hostLabel := "…", "…"
+	if a.landingJenkinsOK {
+		cfgLabel = boolLabel(cfg.Configured())
+		hostLabel = firstNonEmpty(cfg.Host(), "—")
+	}
 	details := []string{
-		StyleMuted.Render("Config  ") + StyleNormal.Render(boolLabel(cfg.Configured())),
-		StyleMuted.Render("Host    ") + StyleMuted.Render(firstNonEmpty(cfg.Host(), "—")),
+		StyleMuted.Render("Config  ") + StyleNormal.Render(cfgLabel),
+		StyleMuted.Render("Host    ") + StyleMuted.Render(hostLabel),
 		StyleMuted.Render("Auth    ") + StyleMuted.Render("Basic token"),
 	}
 	actions := moduleActionLines(
@@ -359,7 +370,7 @@ func (a *App) jenkinsHints() string {
 		base = "↑↓ build  enter logs  r rebuild  tab painel  esc"
 	}
 	if a.jenkinsLoading {
-		base = "carregando…  " + base
+		base = a.spinner() + " carregando…  " + base
 	}
 	if a.jenkinsStatus != "" {
 		return truncate(a.jenkinsStatus, 36) + "  ·  " + base

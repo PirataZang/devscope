@@ -23,16 +23,16 @@ func TestAllTabsIncludesActions(t *testing.T) {
 	if !found {
 		t.Fatal("TabActions missing from AllTabs")
 	}
-	if TabActions.String() != "Actions" {
+	if TabActions.String() != "GH Actions" {
 		t.Fatalf("String=%q", TabActions.String())
 	}
 }
 
-func TestSidebarShowsActionsInTools(t *testing.T) {
+func TestSidebarShowsActionsInAutomation(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabActions}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "TOOLS") || !strings.Contains(got, "Actions") {
-		t.Fatalf("sidebar missing Actions in TOOLS: %q", got)
+	if !strings.Contains(got, "AUTOMATION") || !strings.Contains(got, "GH Actions") {
+		t.Fatalf("sidebar missing GH Actions in AUTOMATION: %q", got)
 	}
 }
 

@@ -1,6 +1,7 @@
 package collectors
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -134,9 +135,65 @@ func TestAssignStoppedContainerFromNestedCompose(t *testing.T) {
 		"abc123": {WorkingDir: "/apps/alpha/docker"},
 	}
 
-	AssignContainersToProjects(projects, containers, meta)
+	orphans := AssignContainersToProjects(projects, containers, meta)
 
 	if len(projects[0].Containers) != 1 || projects[0].Containers[0].Status != "exited" {
 		t.Fatalf("expected stopped container, got %+v", projects[0].Containers)
+	}
+	if len(orphans) != 0 {
+		t.Fatalf("expected no orphans, got %+v", orphans)
+	}
+}
+
+func TestReclaimOrphanByComposeName(t *testing.T) {
+	dir := t.TempDir()
+	compose := []byte("services:\n  workspace:\n    image: laradock/workspace\n")
+	if err := os.WriteFile(filepath.Join(dir, "docker-compose.yml"), compose, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	projects := []core.Project{{Path: dir, Name: "laradock", HasDockerCompose: true}}
+	containers := []core.Container{{
+		ID: "d8339bfc7478", Name: "laradock-workspace-1", Status: "exited", State: "Exited (0)",
+	}}
+	orphans := AssignContainersToProjects(projects, containers, nil)
+	if len(orphans) != 0 {
+		t.Fatalf("should reclaim by name, orphans=%+v", orphans)
+	}
+	found := false
+	for _, c := range projects[0].Containers {
+		if c.Name == "laradock-workspace-1" && c.Status == "exited" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected reclaimed stopped container, got %+v", projects[0].Containers)
+	}
+}
+
+func TestMissingComposeServiceListed(t *testing.T) {
+	dir := t.TempDir()
+	compose := []byte("services:\n  api:\n    image: api\n  db:\n    image: postgres\n")
+	if err := os.WriteFile(filepath.Join(dir, "docker-compose.yml"), compose, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	projects := []core.Project{{Path: dir, Name: "app", HasDockerCompose: true}}
+	containers := []core.Container{{
+		ID: "abc", Name: "app-api-1", Status: "running",
+	}}
+	AssignContainersToProjects(projects, containers, nil)
+	var missing, running int
+	for _, c := range projects[0].Containers {
+		switch c.Status {
+		case "missing":
+			missing++
+			if c.Name != "db" {
+				t.Fatalf("expected missing db, got %s", c.Name)
+			}
+		case "running":
+			running++
+		}
+	}
+	if running != 1 || missing != 1 {
+		t.Fatalf("want 1 running + 1 missing, got %+v", projects[0].Containers)
 	}
 }

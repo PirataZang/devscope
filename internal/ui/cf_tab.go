@@ -169,12 +169,15 @@ func (a *App) handleCFMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (a *App) renderCFLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	auth := cfutil.Auth()
-	status := "offline"
-	if auth.CLI && auth.LoggedIn {
-		status = "ready"
-	} else if auth.CLI {
-		status = "no-auth"
+	auth := a.landingCF
+	status := "…"
+	if a.landingCFOK {
+		status = "offline"
+		if auth.CLI && auth.LoggedIn {
+			status = "ready"
+		} else if auth.CLI {
+			status = "no-auth"
+		}
 	}
 	ctx := a.renderModuleContext(p, w, "CLOUDFLARE TUNNEL", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -187,10 +190,13 @@ func (a *App) renderCFLanding(p *core.Project) string {
 		StyleMuted.Render("exposição local via edge Cloudflare — quick & named"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !auth.CLI {
+	switch {
+	case !a.landingCFOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !auth.CLI:
 		openLines = append(openLines, "", StyleUnhealthy.Render("cloudflared não encontrado no PATH"))
 		openLines = append(openLines, StyleMuted.Render("abra o console e pressione I para instalar"))
-	} else {
+	default:
 		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(auth.Version))
 		if auth.LoggedIn {
 			openLines = append(openLines, StyleHealthy.Render("● autenticado (cert.pem)"))
@@ -209,9 +215,13 @@ func (a *App) renderCFLanding(p *core.Project) string {
 		renderApiTitledBox("CLOUDFLARE", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, authLabel := "…", "…"
+	if a.landingCFOK {
+		cliLabel, authLabel = boolLabel(auth.CLI), boolLabel(auth.LoggedIn)
+	}
 	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(auth.CLI)),
-		StyleMuted.Render("Auth    ") + StyleNormal.Render(boolLabel(auth.LoggedIn)),
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
+		StyleMuted.Render("Auth    ") + StyleNormal.Render(authLabel),
 		StyleMuted.Render("Edge    ") + StyleMuted.Render("global"),
 	}
 	actions := moduleActionLines(
@@ -270,7 +280,7 @@ func (a *App) cfHints() string {
 	}
 	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  I install  L login  C create  R route  c copy  o open  d delete  " + scope + "  esc"
 	if a.cfLoading {
-		base = "carregando…  " + base
+		base = a.spinner() + " carregando…  " + base
 	}
 	if a.cfStatus != "" {
 		return truncate(a.cfStatus, 72) + "  ·  " + base
@@ -489,9 +499,9 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 			dot := StyleUnhealthy.Render("●")
 			switch t.Status {
 			case "online":
-				dot = StyleHealthy.Render("●")
+				dot = StyleHealthy.Render(a.pulse())
 			case "starting":
-				dot = StyleWarning.Render("●")
+				dot = StyleWarning.Render(a.spinner())
 			}
 			port := "—"
 			if t.Port > 0 {
@@ -537,7 +547,7 @@ func (a *App) renderCFDetailsPane(width, height int) string {
 			pid = strconv.Itoa(t.PID)
 		}
 		raw = append(raw,
-			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status),
+			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status, a.animFrame),
 			"",
 		)
 		portLabel := "—"

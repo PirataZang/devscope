@@ -142,16 +142,16 @@ func (a *App) ghaStatusForProcess(name, file string) ghaProcLive {
 	return live
 }
 
-func ghaLiveBadge(label string) string {
+func ghaLiveBadge(label string, frame int) string {
 	switch label {
 	case "running":
-		return StyleWarning.Render("● running")
+		return StyleWarning.Render(animSpinner(frame) + " running")
 	case "queued":
-		return StyleWarning.Render("● queued")
+		return StyleWarning.Render(animArc(frame) + " queued")
 	case "triggered":
-		return StyleAccent.Render("▶ triggered")
+		return StyleAccent.Render(animSpinner(frame) + " triggered")
 	case "success":
-		return StyleHealthy.Render("● success")
+		return StyleHealthy.Render(animPulse(frame) + " success")
 	case "failure":
 		return StyleUnhealthy.Render("● failure")
 	case "cancelled":
@@ -399,7 +399,7 @@ func (a *App) renderGHAProcessDetail(p *core.Project) string {
 	}
 	left := accent.Render("ACTION") + StyleMuted.Render(" › ") + StyleNormal.Render(truncate(a.ghaProcName, 28)) +
 		StyleMuted.Render("  ·  ") + StyleMuted.Render(truncate(proj, 16))
-	right := ghaLiveBadge(live.Label)
+	right := ghaLiveBadge(live.Label, a.animFrame)
 	pad := w - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {
 		pad = 1
@@ -526,7 +526,7 @@ func (a *App) renderGHAProcOverview(width, height int, live ghaProcLive) string 
 	lines := []string{
 		StyleMuted.Render("Process   ") + StyleNormal.Render(a.ghaProcName),
 		StyleMuted.Render("File      ") + StyleNormal.Render(firstNonEmpty(a.ghaProcFile, "—")),
-		StyleMuted.Render("Status    ") + ghaLiveBadge(live.Label),
+		StyleMuted.Render("Status    ") + ghaLiveBadge(live.Label, a.animFrame),
 		StyleMuted.Render("Event     ") + StyleNormal.Render(firstNonEmpty(live.Event, "—")),
 		StyleMuted.Render("Run       ") + StyleNormal.Render(firstNonEmpty(live.RunID, "—")),
 		StyleMuted.Render("Title     ") + StyleNormal.Render(truncate(firstNonEmpty(live.Title, "—"), width-16)),

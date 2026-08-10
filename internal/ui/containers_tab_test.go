@@ -155,8 +155,91 @@ func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
 	if strings.Contains(plain, "\r") || strings.Contains(plain, "\t") {
 		t.Fatal("control chars must be sanitized before render")
 	}
-	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "VOLUMES") || !strings.Contains(plain, "AÇÕES") {
+	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "PORTAS") || !strings.Contains(plain, "AÇÕES") {
 		t.Fatalf("bottom panels missing:\n%s", truncate(plain, 300))
+	}
+}
+
+func TestContainerPortsSubviewListsAndOpensPreview(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", Ports: "0.0.0.0:3000->3000/tcp, :::5173->5173/tcp", ProjectPath: "/apps/one"},
+		},
+	}
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+	}
+	_, cmd := a.updateProject(tea.KeyMsg{Type: tea.KeyEnter})
+	if a.containerSubview != containerSubviewPorts {
+		t.Fatalf("enter should open ports view, got %v", a.containerSubview)
+	}
+	got := stripANSI(a.renderContainerPorts(&p))
+	if !strings.Contains(got, ":3000") || !strings.Contains(got, ":5173") {
+		t.Fatalf("ports missing:\n%s", truncate(got, 400))
+	}
+	if cmd == nil {
+		// two ports → no auto preview; enter on selected loads it
+		_, cmd = a.handleContainerPortsKeys(tea.KeyMsg{Type: tea.KeyEnter}, &p)
+	}
+	if cmd == nil {
+		t.Fatal("enter on port should load preview")
+	}
+}
+
+func TestContainerOnlyDockerHidesMissing(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", ProjectPath: "/apps/one"},
+			{ID: "c2", Name: "worker", Status: "exited", ProjectPath: "/apps/one"},
+			{Name: "db", Status: "missing", Image: "compose", ProjectPath: "/apps/one"},
+		},
+	}
+	a := &App{
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+		containerOnlyDocker: true,
+	}
+	got := a.filteredContainers(&p)
+	if len(got) != 2 {
+		t.Fatalf("expected 2 docker instances, got %+v", got)
+	}
+	for _, c := range got {
+		if c.Status == "missing" || c.ID == "" {
+			t.Fatalf("missing leaked: %+v", c)
+		}
+	}
+}
+
+func TestContainersActionsBoxListsAllShortcuts(t *testing.T) {
+	a := &App{containerOnlyDocker: true, containerShowAll: false}
+	items := a.containerActionItems()
+	if len(items) < 12 {
+		t.Fatalf("too few actions: %d", len(items))
+	}
+	box := renderContainersActionsBox(30, 8, items...)
+	plain := stripANSI(box)
+	for _, key := range []string{"enter", "m", "v", "S-U", "S-D", "g", "/"} {
+		if !strings.Contains(plain, key) {
+			t.Fatalf("missing action %q in:\n%s", key, truncate(plain, 500))
+		}
+	}
+}
+
+func TestContainerPreviewPortLines(t *testing.T) {
+	p := core.Project{
+		Path: "/apps/one", Name: "alpha",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", Ports: "127.0.0.1:8080->80/tcp", ProjectPath: "/apps/one"},
+		},
+	}
+	a := &App{selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}}}
+	lines := a.containerPreviewPortLines(5, 40)
+	plain := stripANSI(strings.Join(lines, "\n"))
+	if !strings.Contains(plain, ":8080") {
+		t.Fatalf("expected host port in bottom panel:\n%s", plain)
 	}
 }
 
@@ -182,7 +265,7 @@ func TestContainerShowAllIncludesProjectColumn(t *testing.T) {
 		snapshot:         core.Snapshot{Projects: []core.Project{p1, p2}},
 	}
 	got := stripANSI(a.renderContainerList(&p1))
-	for _, want := range []string{"TODOS OS PROJETOS", "PROJECT", "alpha-app", "beta-app", "one-web", "two-db"} {
+	for _, want := range []string{"TODOS + ÓRFÃOS", "PROJECT", "alpha-app", "beta-app", "one-web", "two-db"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, truncate(got, 400))
 		}

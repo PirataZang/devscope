@@ -56,6 +56,7 @@ func (a *App) openProjectFromCwd() {
 	cp := *p
 	a.selectedProject = &cp
 	a.view = ViewProject
-	a.tab = TabOverview
+	a.tab = TabGit
 	a.tabCursor = 0
+	a.initGitTab(&cp)
 }

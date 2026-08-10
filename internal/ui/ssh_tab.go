@@ -191,11 +191,14 @@ func (a *App) handleSSHMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (a *App) renderSSHLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	available := sshutil.Available()
-	live := sshutil.ListLiveTunnels()
-	status := "offline"
-	if len(live) > 0 {
-		status = "connected"
+	available := a.landingSSHAvail
+	liveN := a.landingSSHLive
+	status := "…"
+	if a.landingSSHOK {
+		status = "offline"
+		if liveN > 0 {
+			status = "connected"
+		}
 	}
 	ctx := a.renderModuleContext(p, w, "SSH TUNNEL", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -208,13 +211,15 @@ func (a *App) renderSSHLanding(p *core.Project) string {
 		StyleMuted.Render("padrão: remote (−R) — abre porta no servidor → seu PC/projeto"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !available {
+	switch {
+	case !a.landingSSHOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !available:
 		openLines = append(openLines, "", StyleUnhealthy.Render("ssh não encontrado no PATH"))
-	} else {
-		ver := sshutil.Version()
-		openLines = append(openLines, "", StyleMuted.Render("cliente  ")+StyleNormal.Render(firstNonEmpty(ver, "OpenSSH")))
-		if n := len(live); n > 0 {
-			openLines = append(openLines, StyleHealthy.Render(fmt.Sprintf("● %d túnel(is) ativo(s) nesta sessão", n)))
+	default:
+		openLines = append(openLines, "", StyleMuted.Render("cliente  ")+StyleNormal.Render(firstNonEmpty(a.landingSSHVer, "OpenSSH")))
+		if liveN > 0 {
+			openLines = append(openLines, StyleHealthy.Render(fmt.Sprintf("● %d túnel(is) ativo(s) nesta sessão", liveN)))
 		} else {
 			openLines = append(openLines, StyleMuted.Render("○ nenhum túnel ativo — n cria e s inicia"))
 		}
@@ -229,9 +234,13 @@ func (a *App) renderSSHLanding(p *core.Project) string {
 		renderApiTitledBox("SSH TUNNEL", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, liveLabel := "…", "…"
+	if a.landingSSHOK {
+		cliLabel, liveLabel = boolLabel(available), fmt.Sprintf("%d", liveN)
+	}
 	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(available)),
-		StyleMuted.Render("Live    ") + StyleNormal.Render(fmt.Sprintf("%d", len(live))),
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
+		StyleMuted.Render("Live    ") + StyleNormal.Render(liveLabel),
 	}
 	if p != nil && len(p.Ports) > 0 {
 		details = append(details, StyleMuted.Render("ports  ")+StyleAccent.Render(fmt.Sprintf("%v", p.Ports)))
@@ -314,7 +323,7 @@ func (a *App) sshHints() string {
 	}
 	base := "0-3 aba  tab lista/detalhes/logs  n new  s start  x stop  r restart  c copy  d delete  " + scope + "  esc"
 	if a.sshLoading {
-		base = "carregando…  " + base
+		base = a.spinner() + " carregando…  " + base
 	}
 	if a.sshStatus != "" {
 		return truncate(a.sshStatus, 36) + "  ·  " + base
@@ -465,9 +474,9 @@ func (a *App) renderSSHTunnelTable(width, height int) string {
 			dot := StyleUnhealthy.Render("●")
 			switch t.Status {
 			case "online":
-				dot = StyleHealthy.Render("●")
+				dot = StyleHealthy.Render(a.pulse())
 			case "starting":
-				dot = StyleWarning.Render("●")
+				dot = StyleWarning.Render(a.spinner())
 			}
 			row := fmt.Sprintf("%-*s %4d %-7s",
 				nameW, truncate(t.Name, nameW), t.LocalPort, truncate(t.Mode, 7),
@@ -504,7 +513,7 @@ func (a *App) renderSSHDetailsPane(width, height int) string {
 			fwd = sshutil.FormatForward(t.Mode, t.LocalPort, t.RemoteHost, t.RemotePort)
 		}
 		raw = []string{
-			tunnelStatusBadge(t.Status),
+			tunnelStatusBadge(t.Status, a.animFrame),
 			"",
 			tunnelDetailKV("name", t.Name),
 			tunnelDetailKV("mode", t.Mode),

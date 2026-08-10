@@ -204,9 +204,10 @@ type HostMetrics struct {
 }
 
 type Snapshot struct {
-	Projects    []Project   `json:"projects"`
-	HostMetrics HostMetrics `json:"host_metrics"`
-	ScannedAt   time.Time   `json:"scanned_at"`
-	ScanPaths   []string    `json:"scan_paths"`
-	ProjectCount int        `json:"project_count"`
+	Projects          []Project   `json:"projects"`
+	OrphanContainers  []Container `json:"orphan_containers,omitempty"` // docker ps -a sem projeto
+	HostMetrics       HostMetrics `json:"host_metrics"`
+	ScannedAt         time.Time   `json:"scanned_at"`
+	ScanPaths         []string    `json:"scan_paths"`
+	ProjectCount      int         `json:"project_count"`
 }

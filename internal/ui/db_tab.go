@@ -60,7 +60,8 @@ func (a *App) openDbClient(p *core.Project) tea.Cmd {
 	a.dbFilterOn = false
 	a.dbFilter = ""
 	a.dbFilterInput = ""
-	a.dbTargets = collectors.DetectProjectDatabases(p)
+	// Lite on open (no docker exec). Env from container is resolved when querying.
+	a.dbTargets = collectors.DetectProjectDatabasesLite(p)
 	a.dbTargetIdx = 0
 	if a.dbSQL == "" {
 		a.dbSQL = "SELECT 1;"
@@ -81,7 +82,8 @@ func (a *App) leaveDbTab() tea.Cmd {
 
 func (a *App) renderDbLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	targets := collectors.DetectProjectDatabases(p)
+	// Lite: never docker exec in View (full detect runs on open client).
+	targets := collectors.DetectProjectDatabasesLite(p)
 	status := fmt.Sprintf("%d detectado(s)", len(targets))
 	ctx := a.renderModuleContext(p, w, "Database", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -380,7 +382,7 @@ func (a *App) renderDbTab(p *core.Project) string {
 		hints = "filtro de tabelas  enter aplicar  esc limpar"
 	}
 	if a.dbLoading {
-		hints = "carregando…  " + hints
+		hints = a.spinner() + " carregando…  " + hints
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		header, cards, filterLine,

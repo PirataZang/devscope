@@ -11,6 +11,7 @@ import (
 
 type containerMeta struct {
 	ComposeProject string
+	ComposeService string
 	WorkingDir     string
 	ConfigFiles    string
 	Mounts         []string
@@ -52,7 +53,7 @@ func CollectDocker(ctx context.Context) ([]core.Container, map[string]containerM
 }
 
 // dockerPSFormat uses tabs — JSON templates break docker's Label quoting.
-const dockerPSFormat = "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.State}}\t{{.Status}}\t{{.Ports}}\t{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.project.working_dir\"}}\t{{.Label \"com.docker.compose.project.config_files\"}}"
+const dockerPSFormat = "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.State}}\t{{.Status}}\t{{.Ports}}\t{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.project.working_dir\"}}\t{{.Label \"com.docker.compose.project.config_files\"}}\t{{.Label \"com.docker.compose.service\"}}"
 
 // CollectDockerPS lists containers via docker ps only (no inspect) — fast path for the dashboard.
 func CollectDockerPS(ctx context.Context) ([]core.Container, map[string]containerMeta, error) {
@@ -142,6 +143,9 @@ func parseDockerPSLine(line string) (core.Container, containerMeta, bool) {
 	if len(parts) > 8 {
 		m.ConfigFiles = parts[8]
 	}
+	if len(parts) > 9 {
+		m.ComposeService = parts[9]
+	}
 	name := strings.TrimPrefix(parts[1], "/")
 	return core.Container{
 		ID:          id,
@@ -214,12 +218,14 @@ func lookupMeta(id string, meta map[string]containerMeta) containerMeta {
 }
 
 // AssignContainersToProjects links each container to at most one project (best match).
-func AssignContainersToProjects(projects []core.Project, containers []core.Container, meta map[string]containerMeta) {
+// Returns containers that matched no scanned project (still in docker ps -a).
+func AssignContainersToProjects(projects []core.Project, containers []core.Container, meta map[string]containerMeta) []core.Container {
 	for i := range projects {
 		projects[i].Containers = nil
 		projects[i].ContainerCount = 0
 	}
 
+	var orphans []core.Container
 	for _, c := range containers {
 		m := lookupMeta(c.ID, meta)
 		bestIdx := -1
@@ -241,7 +247,129 @@ func AssignContainersToProjects(projects []core.Project, containers []core.Conta
 		if bestIdx >= 0 {
 			projects[bestIdx].Containers = append(projects[bestIdx].Containers, c)
 			projects[bestIdx].ContainerCount = len(projects[bestIdx].Containers)
+		} else {
+			orphans = append(orphans, c)
 		}
+	}
+	orphans = reclaimOrphansByComposeName(projects, orphans, meta)
+	EnrichProjectsWithMissingComposeServices(projects)
+	return orphans
+}
+
+// reclaimOrphansByComposeName pulls unassigned containers into a project when the
+// name/service matches a compose service — surfaces stopped containers that would
+// conflict on `compose up`.
+func reclaimOrphansByComposeName(projects []core.Project, orphans []core.Container, meta map[string]containerMeta) []core.Container {
+	if len(orphans) == 0 || len(projects) == 0 {
+		return orphans
+	}
+	services := make([][]string, len(projects))
+	hasAny := false
+	for i := range projects {
+		services[i] = ListComposeServiceNames(projects[i].Path)
+		if len(services[i]) > 0 {
+			hasAny = true
+		}
+	}
+	if !hasAny {
+		return orphans
+	}
+	var still []core.Container
+	for _, c := range orphans {
+		m := lookupMeta(c.ID, meta)
+		claimed := -1
+		for i := range projects {
+			if len(services[i]) == 0 {
+				continue
+			}
+			base := filepath.Base(projects[i].Path)
+			if m.ComposeService != "" {
+				cp := strings.ToLower(m.ComposeProject)
+				if cp == "" || cp == strings.ToLower(base) || cp == strings.ToLower(projects[i].Name) {
+					for _, svc := range services[i] {
+						if strings.EqualFold(m.ComposeService, svc) {
+							claimed = i
+							break
+						}
+					}
+				}
+			}
+			if claimed < 0 {
+				for _, svc := range services[i] {
+					if containerMatchesComposeService(c.Name, projects[i].Name, base, svc) {
+						claimed = i
+						break
+					}
+				}
+			}
+			if claimed >= 0 {
+				break
+			}
+		}
+		if claimed >= 0 {
+			projects[claimed].Containers = append(projects[claimed].Containers, c)
+			projects[claimed].ContainerCount = len(projects[claimed].Containers)
+			continue
+		}
+		still = append(still, c)
+	}
+	return still
+}
+
+func containerMatchesComposeService(containerName, projectName, projectBase, service string) bool {
+	n := strings.ToLower(strings.TrimPrefix(containerName, "/"))
+	s := strings.ToLower(service)
+	if s == "" || n == "" {
+		return false
+	}
+	if n == s {
+		return true
+	}
+	// compose default: {project}-{service}-{replica}
+	for _, p := range []string{strings.ToLower(projectName), strings.ToLower(projectBase), strings.ToLower(strings.ReplaceAll(projectBase, "_", "-"))} {
+		if p == "" {
+			continue
+		}
+		if strings.HasPrefix(n, p+"-"+s+"-") || n == p+"-"+s {
+			return true
+		}
+	}
+	if strings.Contains(n, "-"+s+"-") || strings.HasSuffix(n, "-"+s) {
+		return true
+	}
+	return false
+}
+
+// EnrichProjectsWithMissingComposeServices adds synthetic rows for compose services
+// with no container yet (Status=missing).
+func EnrichProjectsWithMissingComposeServices(projects []core.Project) {
+	for i := range projects {
+		services := ListComposeServiceNames(projects[i].Path)
+		if len(services) == 0 {
+			continue
+		}
+		present := make(map[string]bool, len(projects[i].Containers))
+		for _, c := range projects[i].Containers {
+			for _, svc := range services {
+				if strings.EqualFold(c.Name, svc) ||
+					containerMatchesComposeService(c.Name, projects[i].Name, filepath.Base(projects[i].Path), svc) {
+					present[strings.ToLower(svc)] = true
+				}
+			}
+		}
+		for _, svc := range services {
+			if present[strings.ToLower(svc)] {
+				continue
+			}
+			projects[i].Containers = append(projects[i].Containers, core.Container{
+				Name:        svc,
+				Image:       "compose",
+				Status:      "missing",
+				State:       "not created",
+				ProjectPath: projects[i].Path,
+			})
+		}
+		projects[i].ContainerCount = len(projects[i].Containers)
 	}
 }
 

@@ -31,7 +31,8 @@ func EnrichProjectDockerDetail(ctx context.Context, store *core.StateStore, proj
 	if len(project.Containers) == 0 {
 		containers, meta, err := CollectDockerPS(ctx)
 		if err == nil {
-			assignContainersToProject(&project, snap.Projects, containers, meta)
+			orphans := assignContainersToProject(&project, snap.Projects, containers, meta)
+			store.SetOrphanContainers(orphans)
 			store.UpdateProjectRuntime(projectPath, project)
 		}
 	}
@@ -65,7 +66,8 @@ func RefreshProjectDocker(store *core.StateStore, projectPath string, healthCfg 
 
 	containers, meta, err := CollectDockerPS(ctx)
 	if err == nil {
-		assignContainersToProject(&project, snap.Projects, containers, meta)
+		orphans := assignContainersToProject(&project, snap.Projects, containers, meta)
+		store.SetOrphanContainers(orphans)
 	}
 
 	projects := []core.Project{project}
@@ -84,33 +86,19 @@ func RefreshProjectDocker(store *core.StateStore, projectPath string, healthCfg 
 	store.UpdateProjectRuntime(projectPath, projects[0])
 }
 
-func assignContainersToProject(p *core.Project, allProjects []core.Project, containers []core.Container, meta map[string]containerMeta) {
-	p.Containers = nil
-	p.ContainerCount = 0
-
-	for _, c := range containers {
-		m := lookupMeta(c.ID, meta)
-		bestIdx := -1
-		bestScore := 0
-		for i, proj := range allProjects {
-			if score := matchScore(proj.Path, m); score > bestScore {
-				bestScore = score
-				bestIdx = i
-			}
-		}
-		if bestIdx < 0 && c.ProjectPath != "" {
-			for i, proj := range allProjects {
-				if filepath.Clean(proj.Path) == filepath.Clean(c.ProjectPath) {
-					bestIdx = i
-					break
-				}
-			}
-		}
-		if bestIdx >= 0 && filepath.Clean(allProjects[bestIdx].Path) == filepath.Clean(p.Path) {
-			p.Containers = append(p.Containers, c)
+func assignContainersToProject(p *core.Project, allProjects []core.Project, containers []core.Container, meta map[string]containerMeta) []core.Container {
+	// Full assign across projects so reclaim/missing-compose stay consistent, then keep this project.
+	clones := make([]core.Project, len(allProjects))
+	copy(clones, allProjects)
+	orphans := AssignContainersToProjects(clones, containers, meta)
+	for i := range clones {
+		if filepath.Clean(clones[i].Path) == filepath.Clean(p.Path) {
+			p.Containers = clones[i].Containers
+			p.ContainerCount = clones[i].ContainerCount
+			break
 		}
 	}
-	p.ContainerCount = len(p.Containers)
+	return orphans
 }
 
 // enrichProjectsFull runs docker, stats, health and git for all projects (CLI scan).
@@ -123,7 +111,10 @@ func enrichProjectsFull(ctx context.Context, projects []core.Project, m *Manager
 	pm2Roots := scanner.DiscoverRunningRoots(ctx)
 	pm2Apps := CollectPM2(ctx)
 
-	AssignContainersToProjects(projects, containers, meta)
+	orphans := AssignContainersToProjects(projects, containers, meta)
+	if m != nil && m.store != nil {
+		m.store.SetOrphanContainers(orphans)
+	}
 	stats := CollectDockerStats(ctx)
 	ApplyDockerStats(projects, stats)
 	AssignWorkersToProjects(projects, pm2Apps)

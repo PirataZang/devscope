@@ -107,7 +107,7 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 		StyleMuted.Render(truncate(p.Name, width)),
 		projectStatusStyle(p.Status).Render(statusText(p.Status))+
 			StyleMuted.Render("  ")+
-			healthDot(p.Health)+" "+healthShort(p.Health),
+			a.healthDotAnim(p.Health)+" "+healthShort(p.Health),
 	)
 	if !a.projectCompact() {
 		if branch := sidebarBranchLine(p, width); branch != "" {
@@ -118,9 +118,17 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 }
 
 func healthDot(h core.HealthStatus) string {
+	return healthDotFrame(h, 0)
+}
+
+func (a *App) healthDotAnim(h core.HealthStatus) string {
+	return healthDotFrame(h, a.animFrame)
+}
+
+func healthDotFrame(h core.HealthStatus, frame int) string {
 	switch h {
 	case core.HealthHealthy:
-		return StyleHealthy.Render("●")
+		return StyleHealthy.Render(animPulse(frame))
 	case core.HealthUnhealthy:
 		return StyleUnhealthy.Render("●")
 	default:
@@ -153,7 +161,7 @@ func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
 		if gi > 0 && !a.projectTiny() {
 			rows = append(rows, "")
 		}
-		rows = append(rows, sidebarGroupLabel(g.title, width, tabAccentColor(g.tabs[0])))
+		rows = append(rows, sidebarGroupLabel(g.title, width, g.color))
 		for _, t := range g.tabs {
 			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
 		}
@@ -166,7 +174,7 @@ func (a *App) sidebarNavBlockDense(p *core.Project, width int) []string {
 	groups := sidebarGroups()
 	var rows []string
 	for _, g := range groups {
-		rows = append(rows, sidebarGroupLabel(g.title, width, tabAccentColor(g.tabs[0])))
+		rows = append(rows, sidebarGroupLabel(g.title, width, g.color))
 		for _, t := range g.tabs {
 			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
 		}
@@ -174,19 +182,32 @@ func (a *App) sidebarNavBlockDense(p *core.Project, width int) []string {
 	return rows
 }
 
-func sidebarGroups() []struct {
+type sidebarGroup struct {
 	title string
+	color lipgloss.Color
 	tabs  []Tab
-} {
-	return []struct {
-		title string
-		tabs  []Tab
-	}{
-		{"SCOPE", []Tab{TabOverview, TabGit, TabContainers, TabKubernetes, TabSwarm}},
-		{"WATCH", []Tab{TabHealth, TabMetrics}},
-		{"TOOLS", []Tab{TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabSSH, TabJenkins, TabActions}},
-		{"UTILS", []Tab{TabRoutes}},
+}
+
+func sidebarGroups() []sidebarGroup {
+	return []sidebarGroup{
+		{"WATCH", ColorAccent, []Tab{TabOverview, TabMetrics, TabHealth}},
+		{"SCOPE", ColorWarning, []Tab{TabGit, TabContainers}},
+		{"AUTOMATION", ColorPrimary, []Tab{TabActions, TabJenkins}},
+		{"MANAGER", ColorDocker, []Tab{TabSwarm, TabKubernetes}},
+		{"TUNNEL", ColorSuccess, []Tab{TabNgrok, TabSSH, TabCFTunnel}},
+		{"TOOLS", ColorPink, []Tab{TabRoutes, TabAPI, TabDatabase, TabWebSocket}},
 	}
+}
+
+func sidebarGroupColorForTab(t Tab) lipgloss.Color {
+	for _, g := range sidebarGroups() {
+		for _, tab := range g.tabs {
+			if tab == t {
+				return g.color
+			}
+		}
+	}
+	return ColorHighlight
 }
 
 func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []string {
@@ -237,46 +258,16 @@ func sidebarRule(width int, accent lipgloss.Color) string {
 }
 
 func tabAccentColor(t Tab) lipgloss.Color {
+	// Abas ocultas do menu (Logs/JSON/JWT) mantêm cor própria.
 	switch t {
-	case TabGit:
-		return ColorWarning
-	case TabContainers:
-		return ColorDocker
-	case TabKubernetes:
-		return ColorK8s
-	case TabSwarm:
-		return ColorDocker
-	case TabHealth:
-		return ColorSuccess
 	case TabLogs:
 		return ColorAccent
-	case TabMetrics:
-		return ColorPython
-	case TabAPI:
-		return ColorPrimary
-	case TabDatabase:
-		return ColorDocker
 	case TabJSON:
 		return ColorWarning
 	case TabJWT:
 		return ColorSuccess
-	case TabRoutes:
-		return ColorPrimary
-	case TabWebSocket:
-		return ColorAccent
-	case TabNgrok:
-		return ColorSuccess
-	case TabCFTunnel:
-		return ColorWarning
-	case TabSSH:
-		return ColorAccent
-	case TabJenkins:
-		return ColorK8s
-	case TabActions:
-		return ColorPrimary
-	default:
-		return ColorHighlight
 	}
+	return sidebarGroupColorForTab(t)
 }
 
 func tabGlyph(t Tab) string {

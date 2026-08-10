@@ -62,8 +62,8 @@ func TestK8sLandingEnterAndEsc(t *testing.T) {
 func TestSidebarShowsKubernetesInScope(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabKubernetes}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "SCOPE") || !strings.Contains(got, "Kubernetes") {
-		t.Fatalf("sidebar missing Kubernetes in SCOPE: %q", got)
+	if !strings.Contains(got, "MANAGER") || !strings.Contains(got, "Kubernetes") {
+		t.Fatalf("sidebar missing Kubernetes in MANAGER: %q", got)
 	}
 	if !strings.Contains(got, "tab · shift+tab") {
 		t.Fatalf("footer should mention tab · shift+tab: %q", got)

@@ -158,6 +158,7 @@ type App struct {
 	containerFilterInput        string
 	containerFilter             string
 	containerShowAll            bool // A = todos os projetos / só o atual
+	containerOnlyDocker         bool // v = só containers reais (running/exited/created), esconde missing
 	containerPreviewID          string
 	containerPreviewLogs        string
 	containerPreviewStats       string
@@ -167,6 +168,12 @@ type App struct {
 	containerNetHistory         []float64
 	containerStatsMode          int // 0=all 1=cpu 2=mem 3=net
 	containerPreviewGen         int
+	containerPortCursor         int
+	containerPortPreview        string
+	containerPortPreviewPort    int
+	containerPortLoading        bool
+	containerPortGen            int
+	containerConfirmClosePort   bool
 	containerDetailTab          containerDetailTab
 	containerDetailID           string
 	containerDetailName         string
@@ -572,7 +579,33 @@ type App struct {
 	width                       int
 	height                      int
 	now                         time.Time
+	animFrame                   int
 	quitting                    bool
+
+	// Landing probes — filled async; View must never call CLI/network.
+	landingNgrokOK      bool
+	landingNgrokAvail   bool
+	landingNgrokAgent   ngrokutil.AgentInfo
+	landingNgrokVer     string
+	landingGHAOK        bool
+	landingGHA          collectors.GHAInfo
+	landingGHAProcs     int
+	landingCFOK         bool
+	landingCF           cfutil.AuthInfo
+	landingSSHOK        bool
+	landingSSHAvail     bool
+	landingSSHVer       string
+	landingSSHLive      int
+	landingSwarmOK      bool
+	landingSwarmAvail   bool
+	landingSwarm        collectors.SwarmInfo
+	landingSwarmCompose string
+	landingK8sOK        bool
+	landingK8sAvail     bool
+	landingK8sCtx       string
+	landingK8sManifests int
+	landingJenkinsOK    bool
+	landingJenkins      jenkinsutil.ProjectConfig
 }
 
 func NewApp(store *core.StateStore, cfg *config.Config) *App {
@@ -582,7 +615,7 @@ func NewApp(store *core.StateStore, cfg *config.Config) *App {
 		cfg:      cfg,
 		snapshot: store.Get(),
 		view:     ViewDashboard,
-		tab:      TabOverview,
+		tab:      TabGit,
 		now:      time.Now(),
 	}
 	a.openProjectFromCwd()
@@ -592,6 +625,9 @@ func NewApp(store *core.StateStore, cfg *config.Config) *App {
 func (a *App) Init() tea.Cmd {
 	cmds := []tea.Cmd{
 		tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }),
+	}
+	if cmd := a.kickAnim(); cmd != nil {
+		cmds = append(cmds, cmd)
 	}
 	if a.selectedProject != nil {
 		cmds = append(cmds, a.startProjectLoad(a.selectedProject.Path))
@@ -677,6 +713,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.containerConfirmRemove {
 			return a.updateContainerRemoveConfirm(msg)
 		}
+		if a.containerConfirmClosePort {
+			return a.updateContainerClosePortConfirm(msg)
+		}
 		return a.updateKey(msg)
 
 	case tea.WindowSizeMsg:
@@ -688,11 +727,25 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return a, nil
 
+	case animTickMsg:
+		a.animFrame++
+		if a.needsAnim() {
+			return a, scheduleAnimTick()
+		}
+		return a, nil
+
+	case toolLandingMsg:
+		a.handleToolLandingMsg(msg)
+		return a, nil
+
 	case tickMsg:
 		a.snapshot = a.store.Get()
 		a.now = time.Now()
 		var cmds []tea.Cmd
 		cmds = append(cmds, tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }))
+		if cmd := a.kickAnim(); cmd != nil {
+			cmds = append(cmds, cmd)
+		}
 		if a.view == ViewProject {
 			if p := a.currentProject(); p != nil {
 				if a.projectGitLoading && p.Git != nil {
@@ -842,6 +895,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case containerPreviewMsg:
 		a.handleContainerPreview(msg)
+		return a, nil
+
+	case containerPortPreviewMsg:
+		a.handleContainerPortPreview(msg)
 		return a, nil
 
 	case dockerRefreshedMsg:
@@ -1094,7 +1151,7 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			return a, a.openProject(projects[a.cursor], TabOverview)
+			return a, a.openProject(projects[a.cursor], TabGit)
 		}
 	case "E", "shift+e":
 		if len(projects) > 0 && a.cursor < len(projects) {
@@ -1174,6 +1231,7 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 	a.tab = t
 	a.tabCursor = 0
 	a.projectContentScroll = 0
+	var cmds []tea.Cmd
 	switch t {
 	case TabGit:
 		if p != nil {
@@ -1181,14 +1239,20 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		}
 	case TabContainers:
 		a.initContainersTab()
-		return a.requestContainerPreview()
+		cmds = append(cmds, a.requestContainerPreview())
 	case TabKubernetes:
 		a.enterK8sTab(p)
+		if !a.landingK8sOK {
+			cmds = append(cmds, a.probeToolLanding(TabKubernetes, p))
+		}
 	case TabSwarm:
 		a.enterSwarmTab(p)
+		if !a.landingSwarmOK {
+			cmds = append(cmds, a.probeToolLanding(TabSwarm, p))
+		}
 	case TabLogs:
 		if p != nil {
-			return a.initLogsTab(p)
+			cmds = append(cmds, a.initLogsTab(p))
 		}
 	case TabAPI:
 		a.enterApiTab(p)
@@ -1204,16 +1268,31 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterWsTab(p)
 	case TabNgrok:
 		a.enterNgrokTab(p)
+		if !a.landingNgrokOK {
+			cmds = append(cmds, a.probeToolLanding(TabNgrok, p))
+		}
 	case TabCFTunnel:
 		a.enterCFTab(p)
+		if !a.landingCFOK {
+			cmds = append(cmds, a.probeToolLanding(TabCFTunnel, p))
+		}
 	case TabSSH:
 		a.enterSSHTab(p)
+		if !a.landingSSHOK {
+			cmds = append(cmds, a.probeToolLanding(TabSSH, p))
+		}
 	case TabJenkins:
 		a.enterJenkinsTab(p)
+		if !a.landingJenkinsOK {
+			cmds = append(cmds, a.probeToolLanding(TabJenkins, p))
+		}
 	case TabActions:
 		a.enterGHATab(p)
+		if !a.landingGHAOK {
+			cmds = append(cmds, a.probeToolLanding(TabActions, p))
+		}
 	}
-	return nil
+	return tea.Batch(cmds...)
 }
 
 func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
@@ -1311,6 +1390,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabContainers && a.containerSubview == containerSubviewDetail {
 		return a.handleContainerDetailKeys(msg, p)
 	}
+	if a.tab == TabContainers && a.containerSubview == containerSubviewPorts {
+		return a.handleContainerPortsKeys(msg, p)
+	}
 	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit || a.gitSubview == gitSubviewFileDiff) {
 		return a.handleGitDedicatedKeys(msg, p)
 	}
@@ -1405,7 +1487,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			if a.ghaRemote == "" {
 				a.ghaRemote = collectors.GitRemoteOrigin(p.Path)
 			}
-			a.ghaInfo = collectors.GHARepoInfo(a.ghaPath, a.ghaRemote)
+			if a.landingGHAOK {
+				a.ghaInfo = a.landingGHA
+			}
 			return a, a.ghaBeginLogin()
 		}
 		return a, a.openLazyGit(p.Path)
@@ -1437,12 +1521,18 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "e":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerExecShell(c)
 			}
 		}
 	case "E", "shift+e":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerExecShell(c)
 			}
 		}
@@ -1463,7 +1553,10 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
-			if _, ok := a.selectedContainer(p); ok {
+			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				a.containerConfirmRemove = true
 				a.containerStatusMsg = "modal delete  y confirma  n/esc cancela"
 			}
@@ -1475,6 +1568,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "r":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerStartOrRestart(c)
 			}
 		}
@@ -1495,6 +1591,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerPause(c)
 			}
 		}
@@ -1508,6 +1607,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "m":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.openContainerDetail(c, p.Path)
 			}
 			return a, nil
@@ -1534,9 +1636,21 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.tabCursor = 0
 			a.containerScroll = 0
 			if a.containerShowAll {
-				a.containerStatusMsg = "mostrando containers de todos os projetos"
+				a.containerStatusMsg = "todos os projetos + órfãos do docker (evita conflito de nome)"
 			} else {
-				a.containerStatusMsg = "filtrando containers do projeto"
+				a.containerStatusMsg = "filtrando containers do projeto (inclui missing do compose)"
+			}
+			return a, a.requestContainerPreview()
+		}
+	case "v":
+		if a.containersTabReady(p) && a.containerSubview == containerSubviewList {
+			a.containerOnlyDocker = !a.containerOnlyDocker
+			a.tabCursor = 0
+			a.containerScroll = 0
+			if a.containerOnlyDocker {
+				a.containerStatusMsg = "só docker: running · exited · created · paused (sem missing)"
+			} else {
+				a.containerStatusMsg = "mostrando também serviços compose ainda não criados (missing)"
 			}
 			return a, a.requestContainerPreview()
 		}
@@ -1553,6 +1667,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		// Terminals usually report Shift+R as "R", not "shift+r".
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerToggleRestartAlways(c)
 			}
 			return a, nil
@@ -1581,6 +1698,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "s":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
 				return a, a.containerStop(c)
 			}
 		}
@@ -1717,7 +1837,10 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
-				return a, a.openContainerDetail(c, p.Path)
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
+				return a, a.openContainerPorts(c)
 			}
 		}
 		if a.tab == TabGit && p.Git != nil && p.Git.IsRepo && a.gitSubview == gitSubviewMain {
@@ -1934,7 +2057,7 @@ func (a *App) renderProject() string {
 	StylePanel = originalPanel
 	moduleDash := a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs || a.tab == TabMetrics ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
-		(a.tab == TabContainers && a.containerSubview == containerSubviewList) ||
+		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
 		(a.tab == TabKubernetes && !a.k8sOpen) || (a.tab == TabSwarm && !a.swarmOpen) ||
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
@@ -1962,10 +2085,13 @@ func (a *App) renderProject() string {
 		}
 	}
 	if a.tab == TabContainers {
-		if a.containerSubview == containerSubviewDetail {
+		switch a.containerSubview {
+		case containerSubviewDetail:
 			hints = "←→ tabs  ↑↓ scroll  esc back  " + hints
-		} else {
-			hints = "↑↓ lista  enter/l detalhe  / buscar  e shell  s/r/S-R/p/d  shift+u/d compose  " + hints
+		case containerSubviewPorts:
+			hints = "↑↓ porta  enter preview  o browser  x fechar  esc back  " + hints
+		default:
+			hints = "↑↓ lista  enter portas  m detalhe  v só docker  / buscar  e shell  s/r/S-R/p/d  " + hints
 		}
 	}
 	if a.tab == TabHealth {
@@ -2405,7 +2531,7 @@ Abas de Projeto:
   R            Docker compose restart
   o            Abrir URL do projeto no navegador
 
-Aba Rotas (UTILS):
+Aba Rotas (TOOLS):
   enter        Detectar stack + escanear rotas (OpenAPI/parsers)
   ↑↓ / j k     Navegar rotas
   b            Filtrar rotas por palavra no path (ex: users)
@@ -2528,8 +2654,10 @@ Aba Git:
 
 Aba Containers:
   n            Novo serviço (Docker Hub ou YAML manual → compose)
-  A            Alternar todos os containers / só do projeto
-  enter / m    Monitoramento de detalhes do container
+  A            Todos os projetos + órfãos docker / só do projeto
+  v            Só containers docker (running/exited/created) — esconde missing
+  enter        Telinha de portas do container
+  m / l        Logs, stats, env, config e demais detalhes
   shift+e      Abrir shell interativo dentro do container
   s            Parar container (stop)
   r            Iniciar/Reiniciar container
@@ -2538,6 +2666,13 @@ Aba Containers:
   d            Remover container (confirmação y/n)
   shift+u      Docker compose up -d
   shift+d      Docker compose down
+
+Portas do Container:
+  ↑/↓          Selecionar porta
+  enter        Preview HTTP (telinha)
+  o            Abrir no browser
+  x            Fechar porta (recria sem publicar)
+  esc          Fechar preview / voltar à lista
 
 Detalhes do Container:
   ←/→          Alternar abas (Logs, Stats, Env, Config, etc.)

@@ -156,11 +156,14 @@ func (a *App) handleNgrokMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (a *App) renderNgrokLanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	available := ngrokutil.Available()
-	agent := ngrokutil.PingAgent()
-	status := "offline"
-	if agent.Connected {
-		status = "connected"
+	available := a.landingNgrokAvail
+	agent := a.landingNgrokAgent
+	status := "…"
+	if a.landingNgrokOK {
+		status = "offline"
+		if agent.Connected {
+			status = "connected"
+		}
 	}
 	ctx := a.renderModuleContext(p, w, "NGROK", status)
 	bodyH := maxInt(12, h-lipgloss.Height(ctx))
@@ -173,11 +176,13 @@ func (a *App) renderNgrokLanding(p *core.Project) string {
 		StyleMuted.Render("central de exposição de ambientes locais"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
-	if !available {
+	switch {
+	case !a.landingNgrokOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
+	case !available:
 		openLines = append(openLines, "", StyleUnhealthy.Render("ngrok não encontrado no PATH"))
-	} else {
-		ver := ngrokutil.Version()
-		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(ver))
+	default:
+		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(a.landingNgrokVer))
 		if agent.Connected {
 			openLines = append(openLines, StyleHealthy.Render("● agente local online (:4040)"))
 		} else {
@@ -194,9 +199,13 @@ func (a *App) renderNgrokLanding(p *core.Project) string {
 		renderApiTitledBox("NGROK", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, agentLabel := "…", "…"
+	if a.landingNgrokOK {
+		cliLabel, agentLabel = boolLabel(available), boolLabel(agent.Connected)
+	}
 	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(available)),
-		StyleMuted.Render("Agent   ") + StyleNormal.Render(boolLabel(agent.Connected)),
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
+		StyleMuted.Render("Agent   ") + StyleNormal.Render(agentLabel),
 		StyleMuted.Render("API     ") + StyleMuted.Render(":4040"),
 	}
 	actions := moduleActionLines(
@@ -255,7 +264,7 @@ func (a *App) ngrokHints() string {
 	}
 	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  r restart  c copy  o open  d delete  " + scope + "  esc"
 	if a.ngrokLoading {
-		base = "carregando…  " + base
+		base = a.spinner() + " carregando…  " + base
 	}
 	if a.ngrokStatus != "" {
 		return truncate(a.ngrokStatus, 36) + "  ·  " + base
@@ -472,9 +481,9 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 			dot := StyleUnhealthy.Render("●")
 			switch t.Status {
 			case "online":
-				dot = StyleHealthy.Render("●")
+				dot = StyleHealthy.Render(a.pulse())
 			case "starting":
-				dot = StyleWarning.Render("●")
+				dot = StyleWarning.Render(a.spinner())
 			}
 			row := fmt.Sprintf("%-*s %4d %-5s",
 				nameW, truncate(t.Name, nameW), t.Port, truncate(t.Proto, 5),
@@ -508,7 +517,7 @@ func (a *App) renderNgrokDetailsPane(width, height int) string {
 		raw = []string{StyleMuted.Render("(selecione um túnel na lista)")}
 	} else {
 		raw = append(raw,
-			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status),
+			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status, a.animFrame),
 			"",
 		)
 		metrics := tunnelMetricRow([][2]string{

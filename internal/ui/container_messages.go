@@ -360,6 +360,18 @@ func (a *App) handleContainerActionDone(msg containerActionDoneMsg) {
 		case "no-always":
 			a.containerStatusMsg = "○ " + msg.name + " restart=no ✓"
 			a.markContainerRestartPolicy(msg.name, "no")
+		case "close-port":
+			a.containerStatusMsg = "porta fechada · " + msg.name + " ✓"
+			a.containerPortPreview = ""
+			a.containerPortPreviewPort = 0
+			a.containerPortCursor = 0
+			// Recreate muda o ID — reancora pelo nome.
+			for _, c := range a.filteredContainers(a.currentProject()) {
+				if c.Name == msg.name {
+					a.containerPreviewID = c.ID
+					break
+				}
+			}
 		default:
 			a.containerStatusMsg = msg.action + " " + msg.name + " ✓"
 		}

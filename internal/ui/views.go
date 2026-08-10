@@ -78,16 +78,18 @@ func (t Tab) String() string {
 	case TabJenkins:
 		return "Jenkins"
 	case TabActions:
-		return "Actions"
+		return "GH Actions"
 	default:
 		return "Overview"
 	}
 }
 
-// AllTabs follows sidebar order (SCOPE → WATCH → TOOLS → UTILS).
+// AllTabs follows sidebar order (WATCH → SCOPE → AUTOMATION → MANAGER → TUNNEL → TOOLS).
 var AllTabs = []Tab{
-	TabOverview, TabGit, TabContainers, TabKubernetes, TabSwarm,
-	TabHealth, TabMetrics,
-	TabAPI, TabDatabase, TabWebSocket, TabNgrok, TabCFTunnel, TabSSH, TabJenkins, TabActions,
-	TabRoutes,
+	TabOverview, TabMetrics, TabHealth,
+	TabGit, TabContainers,
+	TabActions, TabJenkins,
+	TabSwarm, TabKubernetes,
+	TabNgrok, TabSSH, TabCFTunnel,
+	TabRoutes, TabAPI, TabDatabase, TabWebSocket,
 }

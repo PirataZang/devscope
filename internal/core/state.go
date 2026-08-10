@@ -41,6 +41,10 @@ func (s *Snapshot) Clone() Snapshot {
 		clone.Projects = make([]Project, len(s.Projects))
 		copy(clone.Projects, s.Projects)
 	}
+	if s.OrphanContainers != nil {
+		clone.OrphanContainers = make([]Container, len(s.OrphanContainers))
+		copy(clone.OrphanContainers, s.OrphanContainers)
+	}
 	if s.ScanPaths != nil {
 		clone.ScanPaths = make([]string, len(s.ScanPaths))
 		copy(clone.ScanPaths, s.ScanPaths)
@@ -87,6 +91,12 @@ func (s *StateStore) SetProjects(projects []Project) {
 		snap.Projects = projects
 		snap.ScannedAt = time.Now()
 		snap.ProjectCount = len(projects)
+	})
+}
+
+func (s *StateStore) SetOrphanContainers(containers []Container) {
+	s.Update(func(snap *Snapshot) {
+		snap.OrphanContainers = containers
 	})
 }
 

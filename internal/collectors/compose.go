@@ -5,7 +5,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 var composePortRe = regexp.MustCompile(`(?m)(?:^|\s)(?:-\s*)?(?:["']?(?:\d+\.){0,3}(\d+)\s*:\s*(\d+)["']?|["']?(\d+)["']?\s*$)`)
@@ -22,6 +24,31 @@ func ComposeFile(projectPath string) string {
 		}
 	}
 	return ""
+}
+
+// ListComposeServiceNames returns service keys from the project's compose file.
+func ListComposeServiceNames(projectPath string) []string {
+	file := ComposeFile(projectPath)
+	if file == "" {
+		return nil
+	}
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil
+	}
+	services, err := parseComposeServices(string(data))
+	if err != nil || len(services) == 0 {
+		return nil
+	}
+	names := make([]string, 0, len(services))
+	for name := range services {
+		name = strings.TrimSpace(name)
+		if name != "" {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+	return names
 }
 
 // ParseComposePorts reads host ports from docker-compose files.

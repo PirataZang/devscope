@@ -18,7 +18,14 @@ const (
 	containerSubviewList containerSubview = iota
 	containerSubviewDetail
 	containerSubviewShellReturn
+	containerSubviewPorts
 )
+
+type containerPortPreviewMsg struct {
+	port int
+	gen  int
+	body string
+}
 
 type containerPreviewMsg struct {
 	id      string
@@ -45,6 +52,7 @@ func (a *App) initContainersTab() {
 	a.containerFilterInput = ""
 	a.containerFilter = ""
 	a.containerShowAll = false
+	a.containerOnlyDocker = true
 	a.containerPreviewID = ""
 	a.containerPreviewLogs = ""
 	a.containerPreviewStats = ""
@@ -52,6 +60,16 @@ func (a *App) initContainersTab() {
 	a.containerCPUHistory = nil
 	a.containerMemHistory = nil
 	a.containerNetHistory = nil
+	a.resetContainerPortsView()
+}
+
+func (a *App) resetContainerPortsView() {
+	a.containerPortCursor = 0
+	a.containerPortPreview = ""
+	a.containerPortPreviewPort = 0
+	a.containerPortLoading = false
+	a.containerConfirmClosePort = false
+	a.containerPortGen++
 }
 
 func (a *App) renderContainersTab(p *core.Project) string {
@@ -59,6 +77,8 @@ func (a *App) renderContainersTab(p *core.Project) string {
 	switch a.containerSubview {
 	case containerSubviewDetail:
 		view = a.renderContainerDetail(p)
+	case containerSubviewPorts:
+		view = a.renderContainerPorts(p)
 	case containerSubviewShellReturn:
 		view = renderShellReturnMessage(a.containerShellExitErr)
 	default:
@@ -75,6 +95,24 @@ func (a *App) renderContainersTab(p *core.Project) string {
 			Label:    "container",
 			Target:   target,
 			Detail:   detail,
+		}, w, h)
+		view = overlayCentered(view, box, w, h)
+	}
+	if a.containerConfirmClosePort {
+		w, h := maxInt(40, a.width), maxInt(12, a.height)
+		port, ok := a.selectedContainerPort(p)
+		target := "—"
+		if ok {
+			target = fmt.Sprintf(":%d", port.HostPort)
+		}
+		box := renderDeleteConfirmBox(deleteConfirmOpts{
+			Brand:    "DOCKER",
+			Color:    tabAccentColor(TabContainers),
+			Title:    "Fechar porta",
+			Subtitle: "recria o container sem publicar esta porta",
+			Label:    "porta",
+			Target:   target,
+			Detail:   "docker stop → recreate sem -p " + target,
 		}, w, h)
 		view = overlayCentered(view, box, w, h)
 	}
@@ -116,7 +154,7 @@ func (a *App) renderContainerList(p *core.Project) string {
 
 	containers := a.filteredContainers(p)
 	if a.projectDockerLoading && len(containers) == 0 {
-		return renderApiTitledBox("CONTAINERS", fitExactLines([]string{StyleMuted.Render("Carregando containers...")}, h-2), w, h, true)
+		return renderApiTitledBox("CONTAINERS", fitExactLines([]string{a.loadingText("Carregando containers…")}, h-2), w, h, true)
 	}
 	if len(containers) == 0 {
 		msg := []string{
@@ -125,27 +163,38 @@ func (a *App) renderContainerList(p *core.Project) string {
 			StyleMuted.Render("A · ver containers de todos os projetos"),
 		}
 		if a.containerShowAll {
-			msg = []string{StyleMuted.Render("Nenhum container nos projetos escaneados."), StyleMuted.Render("A · voltar ao projeto atual")}
+			msg = []string{StyleMuted.Render("Nenhum container no docker (ps -a) nem nos projetos."), StyleMuted.Render("A · voltar ao projeto atual")}
 		}
 		return renderApiTitledBox("CONTAINERS", fitExactLines(msg, h-2), w, h, true)
 	}
 
-	running, stopped := 0, 0
+	running, stopped, missing := 0, 0, 0
 	for _, c := range containers {
-		if strings.EqualFold(c.Status, "running") {
+		switch strings.ToLower(c.Status) {
+		case "running":
 			running++
-		} else {
+		case "missing":
+			missing++
+		default:
 			stopped++
 		}
 	}
 
-	header := a.renderContainersHeader(p, running, stopped, w)
+	header := a.renderContainersHeader(p, running, stopped, missing, w)
 	stats := a.renderContainersStatsRow(p, w)
 	search := a.renderContainersSearch(w)
 	notif := a.renderContainersNotif()
 	chromeH := lipgloss.Height(header) + lipgloss.Height(stats) + lipgloss.Height(search) + lipgloss.Height(notif) + 1
 	bodyH := maxInt(10, h-chromeH-1)
-	bottomH := maxInt(5, bodyH*28/100)
+	// AÇÕES tem muitos atalhos — reserva altura pra não cortar a lista.
+	actionsNeed := len(a.containerActionItems()) + 3
+	bottomH := maxInt(actionsNeed, bodyH*36/100)
+	if bottomH > bodyH-6 {
+		bottomH = maxInt(actionsNeed, bodyH-6)
+	}
+	if bottomH > bodyH {
+		bottomH = bodyH
+	}
 	tableH := maxInt(6, bodyH-bottomH)
 
 	table := a.renderContainersTable(containers, w, tableH)
@@ -154,13 +203,22 @@ func (a *App) renderContainerList(p *core.Project) string {
 	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, bottom)
 }
 
-func (a *App) renderContainersHeader(p *core.Project, running, stopped, width int) string {
+func (a *App) renderContainersHeader(p *core.Project, running, stopped, missing, width int) string {
 	scope := StyleMuted.Render("  " + shortenPath(p.Path))
 	if a.containerShowAll {
-		scope = StyleAccent.Render("  TODOS OS PROJETOS")
+		scope = StyleAccent.Render("  TODOS + ÓRFÃOS")
+	}
+	if a.containerOnlyDocker {
+		scope += StyleAccent.Render(" · só docker")
 	}
 	left := StyleSection.Render("CONTAINERS") + scope
 	right := StyleHealthy.Render(fmt.Sprintf("%d running", running)) + StyleMuted.Render("  ") + StyleStopped.Render(fmt.Sprintf("%d stopped", stopped))
+	if missing > 0 && !a.containerOnlyDocker {
+		right += StyleMuted.Render("  ") + StyleWarning.Render(fmt.Sprintf("%d missing", missing))
+	}
+	if n := len(a.snapshot.OrphanContainers); a.containerShowAll && n > 0 {
+		right += StyleMuted.Render("  ") + StyleWarning.Render(fmt.Sprintf("%d orphan", n))
+	}
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {
 		pad = 1
@@ -256,8 +314,53 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
 }
 
+func (a *App) containerActionItems() [][2]string {
+	scope := "todos"
+	if a.containerShowAll {
+		scope = "projeto"
+	}
+	only := "só docker"
+	if a.containerOnlyDocker {
+		only = "c/ missing"
+	}
+	return [][2]string{
+		{"enter", "portas"},
+		{"m", "detalhe"},
+		{"n", "novo svc"},
+		{"s", "stop"},
+		{"r", "start/rest"},
+		{"S-R", "∞/off"},
+		{"p", "pause"},
+		{"d", "remove"},
+		{"e", "shell"},
+		{"A", scope},
+		{"v", only},
+		{"g", "métrica"},
+		{"S-U", "compose↑"},
+		{"S-D", "compose↓"},
+		{"/", "buscar"},
+	}
+}
+
+func containersActionsWidth(total int) int {
+	if total < 70 {
+		return 0
+	}
+	w := 28
+	if total >= 120 {
+		w = 30
+	}
+	if total >= 160 {
+		w = 32
+	}
+	if w > total*34/100 {
+		w = maxInt(24, total*34/100)
+	}
+	return w
+}
+
 func (a *App) renderContainersBottom(width, height int) string {
-	cmdW := actionsCmdWidth(width)
+	cmdW := containersActionsWidth(width)
 	rest := maxInt(12, width-cmdW)
 	w1 := maxInt(10, rest*42/100)
 	w2 := maxInt(10, rest*30/100)
@@ -270,7 +373,7 @@ func (a *App) renderContainersBottom(width, height int) string {
 
 	logs := a.containerPreviewLogLines(inner, maxInt(4, w1-4))
 	stats := a.containerPreviewStatLines(inner, maxInt(4, w2-4))
-	vols := a.containerPreviewVolumeLines(inner, maxInt(4, w3-4))
+	ports := a.containerPreviewPortLines(inner, maxInt(4, w3-4))
 
 	title := "LOGS"
 	if a.containerPreviewID != "" {
@@ -278,30 +381,31 @@ func (a *App) renderContainersBottom(width, height int) string {
 			title = "LOGS · " + truncate(sanitizeTerminalLine(c.Name), 18)
 		}
 	}
-	scope := "todos"
-	if a.containerShowAll {
-		scope = "projeto"
-	}
+	actions := a.containerActionItems()
 	parts := []string{
 		renderApiTitledBox(title, fitExactLines(logs, inner), w1, height, false),
 		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
-		renderApiTitledBox("VOLUMES", fitExactLines(vols, inner), w3, height, false),
+		renderApiTitledBox("PORTAS", fitExactLines(ports, inner), w3, height, false),
 	}
 	if cmdW >= 12 {
-		parts = append(parts, renderActionsBox(cmdW, height,
-			[2]string{"enter", "detalhe"},
-			[2]string{"n", "novo svc"},
-			[2]string{"s", "stop"},
-			[2]string{"r", "restart"},
-			[2]string{"S-R", "∞/off"},
-			[2]string{"p", "pause"},
-			[2]string{"d", "remove"},
-			[2]string{"e", "shell"},
-			[2]string{"A", scope},
-			[2]string{"/", "buscar"},
-		))
+		// Usa a altura completa do rodapé — não deixa o box encolher e cortar atalhos.
+		parts = append(parts, renderContainersActionsBox(cmdW, height, actions...))
 	}
 	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+// renderContainersActionsBox like renderActionsBox but keeps the given height so
+// every shortcut stays visible (shared helper shrinks to item count).
+func renderContainersActionsBox(width, height int, items ...[2]string) string {
+	if width < 12 {
+		return ""
+	}
+	innerW := maxInt(4, width-2)
+	lines := moduleActionLinesWidth(innerW, items...)
+	if height < len(lines)+2 {
+		height = len(lines) + 2
+	}
+	return renderApiTitledBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
 }
 
 func (a *App) containerStatsTitle() string {
@@ -520,6 +624,26 @@ func (a *App) containerPreviewVolumeLines(maxLines, width int) []string {
 	return lines
 }
 
+func (a *App) containerPreviewPortLines(maxLines, width int) []string {
+	c, ok := a.selectedContainer(a.currentProject())
+	if !ok {
+		return []string{StyleMuted.Render("selecione um container")}
+	}
+	ports := collectors.ParseContainerPortMappings(c.Ports)
+	if len(ports) == 0 {
+		return []string{StyleMuted.Render("(sem portas)"), StyleMuted.Render("enter · abrir")}
+	}
+	lines := make([]string, 0, maxLines)
+	for i, p := range ports {
+		if i >= maxLines-1 {
+			lines = append(lines, StyleMuted.Render(fmt.Sprintf("+%d  enter abrir", len(ports)-i)))
+			break
+		}
+		lines = append(lines, StyleAccent.Render(truncate(fmt.Sprintf("● :%d → %d/%s", p.HostPort, p.ContainerPort, p.Proto), maxInt(1, width))))
+	}
+	return lines
+}
+
 func formatContainerMem(b int64) string {
 	if b <= 0 {
 		return "—"
@@ -537,21 +661,36 @@ func (a *App) filteredContainers(p *core.Project) []core.Container {
 	} else if p != nil {
 		base = p.Containers
 	}
+	out := base
+	if a.containerOnlyDocker {
+		only := make([]core.Container, 0, len(out))
+		for _, c := range out {
+			if containerIsDockerInstance(c) {
+				only = append(only, c)
+			}
+		}
+		out = only
+	}
 	if a.containerFilter == "" {
-		return base
+		return out
 	}
 	f := strings.ToLower(a.containerFilter)
-	var out []core.Container
-	for _, c := range base {
+	filtered := make([]core.Container, 0, len(out))
+	for _, c := range out {
 		proj := strings.ToLower(a.containerProjectLabel(c))
 		if strings.Contains(strings.ToLower(c.Name), f) ||
 			strings.Contains(strings.ToLower(c.Image), f) ||
 			strings.Contains(strings.ToLower(c.Ports), f) ||
 			strings.Contains(proj, f) {
-			out = append(out, c)
+			filtered = append(filtered, c)
 		}
 	}
-	return out
+	return filtered
+}
+
+// containerIsDockerInstance is a real docker ps row (not a synthetic compose "missing").
+func containerIsDockerInstance(c core.Container) bool {
+	return c.ID != "" && !strings.EqualFold(c.Status, "missing")
 }
 
 func (a *App) allProjectContainers() []core.Container {
@@ -568,6 +707,13 @@ func (a *App) allProjectContainers() []core.Container {
 			rows = append(rows, row{proj: p.Name, c: cc})
 		}
 	}
+	for _, c := range a.snapshot.OrphanContainers {
+		cc := c
+		if cc.ProjectPath == "" {
+			cc.ProjectPath = "—"
+		}
+		rows = append(rows, row{proj: "—", c: cc})
+	}
 	sort.SliceStable(rows, func(i, j int) bool {
 		if rows[i].proj != rows[j].proj {
 			return rows[i].proj < rows[j].proj
@@ -582,9 +728,15 @@ func (a *App) allProjectContainers() []core.Container {
 }
 
 func (a *App) containerProjectLabel(c core.Container) string {
+	if c.ProjectPath == "—" {
+		return "órfão"
+	}
 	for _, p := range a.snapshot.Projects {
 		for _, pc := range p.Containers {
 			if pc.ID != "" && pc.ID == c.ID {
+				return p.Name
+			}
+			if pc.ID == "" && c.ID == "" && pc.Name == c.Name && pathsMatch(p.Path, c.ProjectPath) {
 				return p.Name
 			}
 		}
@@ -592,10 +744,10 @@ func (a *App) containerProjectLabel(c core.Container) string {
 			return p.Name
 		}
 	}
-	if c.ProjectPath != "" {
+	if c.ProjectPath != "" && c.ProjectPath != "—" {
 		return shortenPath(c.ProjectPath)
 	}
-	return "—"
+	return "órfão"
 }
 
 func (a *App) renderContainerRow(c core.Container, selected bool) string {
@@ -781,6 +933,10 @@ func styleSelectedState(status string, width int) string {
 		return StyleSelected.Width(width).MaxWidth(width).Render("EXITED")
 	case "paused":
 		return StyleSelected.Width(width).MaxWidth(width).Render("PAUSED")
+	case "missing":
+		return StyleSelected.Width(width).MaxWidth(width).Render("MISSING")
+	case "created":
+		return StyleSelected.Width(width).MaxWidth(width).Render("CREATED")
 	default:
 		return StyleSelected.Width(width).MaxWidth(width).Render(strings.ToUpper(truncate(status, width)))
 	}
@@ -794,6 +950,10 @@ func containerStateStyled(status string, width int) string {
 		return StyleStopped.Width(width).Render("exited")
 	case "paused":
 		return StyleWarning.Width(width).Render("paused")
+	case "missing":
+		return StyleWarning.Width(width).Render("missing")
+	case "created":
+		return StyleMuted.Width(width).Render("created")
 	default:
 		return StyleMuted.Width(width).Render(truncate(status, width))
 	}
@@ -842,6 +1002,14 @@ func (a *App) selectedContainer(p *core.Project) (core.Container, bool) {
 		return core.Container{}, false
 	}
 	return containers[a.tabCursor], true
+}
+
+func (a *App) requireDockerContainer(c core.Container) bool {
+	if c.ID != "" && !strings.EqualFold(c.Status, "missing") {
+		return true
+	}
+	a.containerStatusMsg = c.Name + " ainda não criado — shift+u sobe o compose (ou remova o conflito no docker)"
+	return false
 }
 
 func (a *App) containersCount(p *core.Project) int {

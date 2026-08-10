@@ -52,7 +52,9 @@ var (
 )
 
 // DetectProjectDatabases finds Postgres/MySQL containers linked to the project.
-func DetectProjectDatabases(p *core.Project) []DBTarget {
+// DetectProjectDatabasesLite lists DB containers from project state + .env only.
+// Never runs docker exec — safe for landing View / every-frame render.
+func DetectProjectDatabasesLite(p *core.Project) []DBTarget {
 	if p == nil {
 		return nil
 	}
@@ -70,15 +72,6 @@ func DetectProjectDatabases(p *core.Project) []DBTarget {
 		}
 		seen[key] = true
 		user, db := envUser, envDB
-		if user == "" || db == "" {
-			cu, cd := readContainerDBEnv(key, eng)
-			if user == "" {
-				user = cu
-			}
-			if db == "" {
-				db = cd
-			}
-		}
 		if user == "" {
 			if eng == DBEnginePostgres {
 				user = "postgres"
@@ -101,6 +94,29 @@ func DetectProjectDatabases(p *core.Project) []DBTarget {
 			Database:  db,
 			Ports:     c.Ports,
 		})
+	}
+	return out
+}
+
+// DetectProjectDatabases enriches Lite with docker exec env (POSTGRES_USER etc.).
+// Call from tea.Cmd / open client — never from View.
+func DetectProjectDatabases(p *core.Project) []DBTarget {
+	out := DetectProjectDatabasesLite(p)
+	if p == nil || len(out) == 0 {
+		return out
+	}
+	envUser, envDB, _ := readProjectDBEnv(p.Path)
+	for i := range out {
+		if envUser != "" && envDB != "" {
+			continue
+		}
+		cu, cd := readContainerDBEnv(out[i].Container, out[i].Engine)
+		if envUser == "" && cu != "" {
+			out[i].User = cu
+		}
+		if envDB == "" && cd != "" {
+			out[i].Database = cd
+		}
 	}
 	return out
 }

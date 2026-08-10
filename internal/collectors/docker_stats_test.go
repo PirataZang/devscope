@@ -44,6 +44,19 @@ func TestParseContainerPorts(t *testing.T) {
 	}
 }
 
+func TestParseContainerPortMappings(t *testing.T) {
+	ms := ParseContainerPortMappings("0.0.0.0:3000->3000/tcp, 127.0.0.1:8080->80/tcp")
+	if len(ms) != 2 {
+		t.Fatalf("got %v", ms)
+	}
+	if ms[0].HostPort != 3000 || ms[0].ContainerPort != 3000 || ms[0].Proto != "tcp" {
+		t.Fatalf("first %v", ms[0])
+	}
+	if ms[1].HostPort != 8080 || ms[1].ContainerPort != 80 || ms[1].HostIP != "127.0.0.1" {
+		t.Fatalf("second %v", ms[1])
+	}
+}
+
 func TestFormatPortsShort(t *testing.T) {
 	s := FormatPortsShort([]int{3000, 5173, 8080}, 2)
 	if s == "-" || s == "" {

@@ -3,6 +3,7 @@ package ui
 import (
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
@@ -10,6 +11,21 @@ import (
 )
 
 // Shared layout chrome for project modules (Overview-style).
+
+var (
+	moduleHostOnce sync.Once
+	moduleHostName string
+)
+
+func moduleHostname() string {
+	moduleHostOnce.Do(func() {
+		moduleHostName, _ = os.Hostname()
+		if moduleHostName == "" {
+			moduleHostName = "—"
+		}
+	})
+	return moduleHostName
+}
 
 func (a *App) moduleSize() (width, height int) {
 	// Don't invent floors larger than the real content pane — that overflows
@@ -34,10 +50,7 @@ func (a *App) renderModuleContext(p *core.Project, width int, module, status str
 	if p != nil {
 		env = projectEnvLabel(p)
 	}
-	host, _ := os.Hostname()
-	if host == "" {
-		host = "—"
-	}
+	host := moduleHostname()
 	left := StyleMuted.Render("Projeto ") + StyleNormal.Render(truncate(name, 18)) +
 		StyleMuted.Render("  Ambiente ") + StyleWarning.Render(env) +
 		StyleMuted.Render("  Módulo ") + StyleNormal.Render(module)
@@ -94,8 +107,8 @@ func moduleActionLinesWidth(innerW int, items ...[2]string) []string {
 	if keyW < 4 {
 		keyW = 4
 	}
-	if keyW > 8 {
-		keyW = 8
+	if keyW > 10 {
+		keyW = 10
 	}
 	out := make([]string, 0, len(items))
 	for _, it := range items {

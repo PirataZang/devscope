@@ -79,8 +79,10 @@ func AgentBase() string {
 }
 
 func PingAgent() AgentInfo {
-	info := AgentInfo{URI: AgentBase(), Version: Version()}
-	client := &http.Client{Timeout: 800 * time.Millisecond}
+	// Cheap connectivity check only — Version() is a separate exec; callers
+	// that need it should call Version() once (e.g. landing probe).
+	info := AgentInfo{URI: AgentBase()}
+	client := &http.Client{Timeout: 200 * time.Millisecond}
 	resp, err := client.Get(AgentBase() + "/api/tunnels")
 	if err != nil {
 		return info

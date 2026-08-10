@@ -59,6 +59,25 @@ func (a *App) updateContainerRemoveConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) 
 	return a, nil
 }
 
+func (a *App) updateContainerClosePortConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	p := a.currentProject()
+	switch msg.String() {
+	case "y", "Y":
+		a.containerConfirmClosePort = false
+		if p != nil {
+			c, okC := a.selectedContainer(p)
+			port, okP := a.selectedContainerPort(p)
+			if okC && okP {
+				return a, a.containerClosePort(c, port.HostPort)
+			}
+		}
+	case "esc", "n", "N":
+		a.containerConfirmClosePort = false
+		a.containerStatusMsg = "fechar porta cancelado"
+	}
+	return a, nil
+}
+
 func (a *App) renderFuzzyPrompt() string {
 	return lipgloss.JoinVertical(lipgloss.Left,
 		a.renderHeader(),

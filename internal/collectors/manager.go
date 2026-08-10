@@ -42,8 +42,11 @@ func (m *Manager) QuickScan(ctx context.Context) {
 	projects = SortPinnedFirst(projects, m.cfg.Pinned)
 	populateGitSummaries(projects)
 	if containers, meta, err := CollectDockerPS(ctx); err == nil {
-		AssignContainersToProjects(projects, containers, meta)
+		orphans := AssignContainersToProjects(projects, containers, meta)
 		ApplyProjectStatus(projects, nil)
+		m.store.SetProjects(projects)
+		m.store.SetOrphanContainers(orphans)
+		return
 	}
 	m.store.SetProjects(projects)
 }
@@ -123,10 +126,11 @@ func (m *Manager) refreshDocker(ctx context.Context) {
 // refreshProjects runs a fast docker ps + lightweight metadata for the dashboard.
 func (m *Manager) refreshProjects(ctx context.Context, projects []core.Project) {
 	populateGitSummaries(projects)
+	var orphans []core.Container
 	if containers, meta, err := CollectDockerPS(ctx); err != nil {
 		log.Printf("docker ps error: %v", err)
 	} else {
-		AssignContainersToProjects(projects, containers, meta)
+		orphans = AssignContainersToProjects(projects, containers, meta)
 	}
 
 	pm2Apps := CollectPM2(ctx)
@@ -138,6 +142,7 @@ func (m *Manager) refreshProjects(ctx context.Context, projects []core.Project) 
 	ApplyProjectStatus(projects, nil)
 	projects = SortPinnedFirst(projects, m.cfg.Pinned)
 	m.store.SetProjects(projects)
+	m.store.SetOrphanContainers(orphans)
 }
 
 func populateGitSummaries(projects []core.Project) {

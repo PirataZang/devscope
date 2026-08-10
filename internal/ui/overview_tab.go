@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -65,10 +64,7 @@ func (a *App) renderOverviewCompact(p *core.Project, width, height int) string {
 
 func (a *App) renderOverviewContext(p *core.Project, width int) string {
 	env := projectEnvLabel(p)
-	host, _ := os.Hostname()
-	if host == "" {
-		host = "—"
-	}
+	host := moduleHostname()
 	up := formatUptime(p.Uptime)
 	if p.Uptime <= 0 {
 		up = formatUptime(a.snapshot.HostMetrics.Uptime)
@@ -413,10 +409,7 @@ func (a *App) renderOverviewRight(p *core.Project, width, height int) string {
 
 func (a *App) renderOverviewDetailsBox(p *core.Project, width, height int) string {
 	env := projectEnvLabel(p)
-	host, _ := os.Hostname()
-	if host == "" {
-		host = "—"
-	}
+	host := moduleHostname()
 	scan := "—"
 	if !a.snapshot.ScannedAt.IsZero() {
 		scan = a.snapshot.ScannedAt.Format("15:04:05")

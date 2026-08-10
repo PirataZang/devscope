@@ -13,25 +13,20 @@ import (
 
 func (a *App) renderGHALanding(p *core.Project) string {
 	w, h := a.moduleSize()
-	remote := ""
-	if p != nil && p.Git != nil {
-		remote = p.Git.Remote
-	}
-	path := ""
-	if p != nil {
-		path = p.Path
-	}
-	info := collectors.GHARepoInfo(path, remote)
-	procs, _ := collectors.GHAListLocalWorkflowFiles(path)
+	info := a.landingGHA
+	procs := a.landingGHAProcs
 
-	status := "offline"
-	switch {
-	case !info.Available:
-		status = "no-gh"
-	case info.Error != "" && !info.Authed:
-		status = "auth"
-	case info.Authed:
-		status = "ready"
+	status := "…"
+	if a.landingGHAOK {
+		status = "offline"
+		switch {
+		case !info.Available:
+			status = "no-gh"
+		case info.Error != "" && !info.Authed:
+			status = "auth"
+		case info.Authed:
+			status = "ready"
+		}
 	}
 
 	ctx := a.renderModuleContext(p, w, "ACTIONS", status)
@@ -46,6 +41,8 @@ func (a *App) renderGHALanding(p *core.Project) string {
 	}
 	openLines = append(openLines, moduleOpenHint()...)
 	switch {
+	case !a.landingGHAOK:
+		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
 	case !info.Available:
 		openLines = append(openLines, "",
 			StyleUnhealthy.Render("⚠ GitHub CLI (gh) não instalado"),
@@ -59,7 +56,7 @@ func (a *App) renderGHALanding(p *core.Project) string {
 	default:
 		openLines = append(openLines, "",
 			StyleHealthy.Render("● READY")+
-				StyleMuted.Render(fmt.Sprintf("  %s/%s  ·  %d processos", info.Owner, info.Repo, len(procs))))
+				StyleMuted.Render(fmt.Sprintf("  %s/%s  ·  %d processos", info.Owner, info.Repo, procs)))
 	}
 
 	featLines := []string{
@@ -72,10 +69,15 @@ func (a *App) renderGHALanding(p *core.Project) string {
 		renderApiTitledBox("GITHUB ACTIONS", fitExactLines(openLines, openH-2), centerW, openH, true),
 		renderApiTitledBox("POR PROJETO", fitExactLines(featLines, featH-2), centerW, featH, false),
 	)
+	cliLabel, authLabel, procsLabel := "…", "…", "…"
+	if a.landingGHAOK {
+		cliLabel, authLabel = boolLabel(info.Available), boolLabel(info.Authed)
+		procsLabel = fmt.Sprintf("%d", procs)
+	}
 	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(boolLabel(info.Available)),
-		StyleMuted.Render("Auth    ") + StyleMuted.Render(boolLabel(info.Authed)),
-		StyleMuted.Render("Procs   ") + StyleNormal.Render(fmt.Sprintf("%d", len(procs))),
+		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
+		StyleMuted.Render("Auth    ") + StyleMuted.Render(authLabel),
+		StyleMuted.Render("Procs   ") + StyleNormal.Render(procsLabel),
 	}
 	if info.Owner != "" {
 		details = append(details, StyleMuted.Render("Repo    ")+StyleMuted.Render(truncate(info.Owner+"/"+info.Repo, 22)))
@@ -219,7 +221,7 @@ func (a *App) renderGHAHeader(width int, p *core.Project) string {
 		StyleMuted.Render("  ·  ") + StyleNormal.Render(truncate(proj, 20))
 	right := StyleMuted.Render(time.Now().Format("15:04:05"))
 	if a.ghaLoading {
-		right = StyleMuted.Render("Loading…")
+		right = a.loadingMuted("Loading…")
 	} else if a.ghaOpen {
 		right = StyleMuted.Render(fmt.Sprintf("auto %ds  %s", int(a.ghaTickInterval()/time.Second), time.Now().Format("15:04:05")))
 	}
@@ -401,7 +403,7 @@ func (a *App) renderGHARow(i, width int, selected bool) string {
 				truncate(live.Label, 10), truncate(p.Name, 16), truncate(p.File, 26), truncate(firstNonEmpty(live.Event, "-"), 16))
 			return style.Width(width).MaxWidth(width).Render(truncate(text, width))
 		}
-		return padRight(ghaLiveBadge(live.Label)+StyleNormal.Render(rest), width)
+		return padRight(ghaLiveBadge(live.Label, a.animFrame)+StyleNormal.Render(rest), width)
 	case ghaKindRuns:
 		runs := a.ghaFilteredRuns()
 		if i < 0 || i >= len(runs) {
@@ -822,7 +824,7 @@ func (a *App) renderGHAYAMLBox(termW, termH int) string {
 	inner := maxInt(8, h-2)
 	raw := strings.Split(a.ghaDetail, "\n")
 	if strings.TrimSpace(a.ghaDetail) == "" {
-		raw = []string{"carregando arquivo…"}
+		raw = []string{a.loadingMuted("carregando arquivo…")}
 	}
 	a.ghaDetailScroll = clampScroll(a.ghaDetailScroll, inner, len(raw))
 	end := minInt(a.ghaDetailScroll+inner, len(raw))

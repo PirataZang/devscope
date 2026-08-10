@@ -4,15 +4,28 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/devscope/devscope/internal/core"
 )
 
-var portMappingRe = regexp.MustCompile(`:(\d+)->`)
+// hostPort→containerPort[/proto], optional host IP prefix.
+var portMappingFullRe = regexp.MustCompile(`(?:([\d.]+|\[?[0-9a-fA-F:]+\]?):)?(\d+)->(\d+)(?:/(tcp|udp))?`)
+
+// PortMapping is one published host→container port from docker ps.
+type PortMapping struct {
+	HostIP        string
+	HostPort      int
+	ContainerPort int
+	Proto         string
+	Raw           string
+}
 
 // AssignPortsToProjects fills Project.Ports from container mappings and compose files.
 func AssignPortsToProjects(projects []core.Project, _ map[int]bool) {
@@ -41,14 +54,102 @@ func AssignPortsToProjects(projects []core.Project, _ map[int]bool) {
 
 func parseContainerPorts(s string) []int {
 	var ports []int
-	for _, m := range portMappingRe.FindAllStringSubmatch(s, -1) {
-		if len(m) > 1 {
-			if p, err := strconv.Atoi(m[1]); err == nil {
-				ports = append(ports, p)
-			}
+	seen := make(map[int]bool)
+	for _, m := range ParseContainerPortMappings(s) {
+		if m.HostPort <= 0 || seen[m.HostPort] {
+			continue
 		}
+		seen[m.HostPort] = true
+		ports = append(ports, m.HostPort)
 	}
 	return ports
+}
+
+// ParseContainerPortMappings parses docker ps Ports column into structured mappings.
+func ParseContainerPortMappings(s string) []PortMapping {
+	s = strings.TrimSpace(s)
+	if s == "" || s == "-" {
+		return nil
+	}
+	var out []PortMapping
+	for _, m := range portMappingFullRe.FindAllStringSubmatch(s, -1) {
+		hostPort, err1 := strconv.Atoi(m[2])
+		contPort, err2 := strconv.Atoi(m[3])
+		if err1 != nil || err2 != nil || hostPort <= 0 {
+			continue
+		}
+		proto := m[4]
+		if proto == "" {
+			proto = "tcp"
+		}
+		hostIP := m[1]
+		raw := m[0]
+		if hostIP != "" {
+			raw = hostIP + ":" + m[2] + "->" + m[3] + "/" + proto
+		} else {
+			raw = m[2] + "->" + m[3] + "/" + proto
+		}
+		out = append(out, PortMapping{
+			HostIP:        hostIP,
+			HostPort:      hostPort,
+			ContainerPort: contPort,
+			Proto:         proto,
+			Raw:           raw,
+		})
+	}
+	return out
+}
+
+// ProbePortPreview GETs http://127.0.0.1:<port>/ and returns a short text preview.
+func ProbePortPreview(port int) string {
+	if port <= 0 {
+		return "porta inválida"
+	}
+	url := fmt.Sprintf("http://127.0.0.1:%d/", port)
+	client := &http.Client{
+		Timeout: 2 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= 3 {
+				return http.ErrUseLastResponse
+			}
+			return nil
+		},
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return fmt.Sprintf("GET %s\n%s", url, err.Error())
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	var b strings.Builder
+	fmt.Fprintf(&b, "GET %s\nHTTP %s\n", url, resp.Status)
+	if ct := resp.Header.Get("Content-Type"); ct != "" {
+		fmt.Fprintf(&b, "Content-Type: %s\n", ct)
+	}
+	b.WriteString("\n")
+	text := strings.ReplaceAll(string(body), "\r", "")
+	if strings.Contains(strings.ToLower(resp.Header.Get("Content-Type")), "html") {
+		text = stripHTMLRough(text)
+	}
+	b.WriteString(strings.TrimSpace(text))
+	return strings.TrimRight(b.String(), "\n")
+}
+
+func stripHTMLRough(s string) string {
+	var b strings.Builder
+	inTag := false
+	for _, r := range s {
+		switch {
+		case r == '<':
+			inTag = true
+		case r == '>':
+			inTag = false
+			b.WriteByte(' ')
+		case !inTag:
+			b.WriteRune(r)
+		}
+	}
+	return strings.Join(strings.Fields(b.String()), " ")
 }
 
 // ReadListeningPorts reads /proc/net/tcp and /proc/net/tcp6 for LISTEN sockets.
