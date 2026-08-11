@@ -8,31 +8,53 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
-- **Aba Swarm (SCOPE)** — Control Center de Docker Swarm
+- **Aba Swarm (MANAGER)** — Control Center de Docker Swarm
   - Visões: Services, Nodes, Tasks, Stacks, Networks, Secrets, Configs e Events
   - Scale, update de imagem, create service, force update e rollback
   - Deploy de stack a partir do compose do projeto
   - Swarm init, join tokens (worker/manager), promote/demote e availability
   - Logs de service, inspect e remoção com confirmação; prune de networks
   - Refresh automático (~5s) e modais de confirmação para ações destrutivas
-- **Aba Actions (TOOLS)** — GitHub Actions via `gh`
+- **Aba Actions (AUTOMATION)** — GitHub Actions via `gh`
   - Control Center com Processes, Runs e Workflows
   - Catálogo de processos por projeto (`.devscope/actions.yaml`) e templates (ci/deploy/manual)
   - Detalhe do processo: Overview, Runs, Timeline (jobs/steps), Logs e YAML
   - Trigger (`workflow_dispatch`) com branch, inputs e aviso de commits ahead
   - Re-run, cancel/stop (incl. bulk), login `gh` na landing e billing de Actions
   - Notas por run (`.devscope/actions-notes.yaml`) e links para o GitHub
-- **Aba SSH Tunnel (TOOLS)**
+- **Aba SSH Tunnel (TUNNEL)**
   - Cliente `sshutil`: start/stop de túneis locais (`-L`) e remotos (`-R`)
   - Config por projeto em `.devscope/ssh.json`, merge com processos vivos
   - Wizard de criação (nome, modo, porta, bind, target, identity)
   - Overview, Tunnels, History e Settings; seed de porta/target pelo projeto/git
   - Confirmação de exclusão e badges de status (online/offline/starting)
+- **Aba Containers — visão de Portas** (`enter`)
+  - Lista portas publicadas (host→container, proto tcp/udp, IP de bind)
+  - Preview HTTP da porta selecionada (probe assíncrono)
+  - "Fechar porta": recria o container sem publicar a porta, com modal de confirmação
+- **Containers órfãos e serviços missing**
+  - Containers do `docker ps -a` sem projeto escaneado aparecem como órfãos na visão "TODOS + ÓRFÃOS" (`A`)
+  - Reclaim automático quando o nome bate com um service do compose do projeto
+  - Serviços do compose sem container listados como "missing"; toggle `v` (só docker / c/ missing)
+  - Header com contadores running/stopped/missing/orphan
+- **Sistema de animações** (`anim.go`)
+  - Spinner braille (~10fps) nos estados de loading de todas as abas
+  - Pulse animado no indicador de saúde da sidebar
+  - Tick de animação só roda enquanto há algo animando (sem re-render em idle)
+- **Landing probe assíncrono** (`landing_probe.go`) — disponibilidade de Ngrok, CF Tunnel, SSH, Swarm, Kubernetes, Jenkins e GH Actions verificada em background
+- **Banner ASCII** nos scripts de instalação (`install.sh` / `install.ps1`)
 
 ### Changed
-- Sidebar e ordem de abas: Swarm em SCOPE; SSH e Actions em TOOLS
+- **Sidebar reorganizada em 6 grupos**, cada um com cor própria:
+  - WATCH (Overview, Metrics, Status) · SCOPE (Git, Containers) · AUTOMATION (Actions, Jenkins) · MANAGER (Swarm, Kubernetes) · TUNNEL (Ngrok, SSH, CF Tunnel) · TOOLS (Rotas, API, Database, WebSocket)
 - Help screen com atalhos de Swarm e Actions
-- Modais de confirmação genéricos reutilizados (túneis e Swarm)
+- Modais de confirmação genéricos reutilizados (túneis, Swarm e fechar porta)
+- Projeto abre direto na aba Git ao dar `enter` no dashboard (antes: Overview)
+- Landings de Jenkins, K8s, Ngrok, SSH e CF Tunnel passam a ler apenas campos em cache — a View nunca executa CLI/rede
+- `DetectProjectDatabases` dividido: versão Lite sem `docker exec` (segura no render) + enriquecimento assíncrono
+- Parse de portas Docker completo (IP de bind, host→container, tcp/udp)
+- Rodapé de ações da aba Containers com altura dinâmica (não corta a lista)
+- README reescrito e organizado por grupos de módulos
 
 ## [1.4.0] - 2026-08-01
 
