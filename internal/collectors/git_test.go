@@ -1,6 +1,7 @@
 package collectors
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -361,6 +362,182 @@ func TestCollectWorkingTreeDiffModifiedAndUntracked(t *testing.T) {
 	unt := CollectWorkingTreeDiff(dir, "src/New.astro")
 	if !strings.Contains(unt, "+fresh") && !strings.Contains(unt, "fresh") {
 		t.Fatalf("untracked should show content:\n%s", unt)
+	}
+}
+
+func TestGitIsFFImpossible(t *testing.T) {
+	err := fmt.Errorf("pull: fatal: Not possible to fast-forward, aborting.")
+	if !GitIsFFImpossible(err, err.Error()) {
+		t.Fatal("expected ff impossible")
+	}
+	if GitIsFFImpossible(nil, "Already up to date.") {
+		t.Fatal("clean pull must not look like ff failure")
+	}
+}
+
+func TestGitIsConflictError(t *testing.T) {
+	err := fmt.Errorf("Automatic merge failed; fix conflicts and then commit the result.")
+	if !GitIsConflictError(err, err.Error()) {
+		t.Fatal("expected conflict")
+	}
+	if GitIsConflictError(nil, "Already up to date.") {
+		t.Fatal("clean output must not look like conflict")
+	}
+}
+
+func TestGitFileUnmerged(t *testing.T) {
+	if !GitFileUnmerged("U", "U") {
+		t.Fatal("UU should be unmerged")
+	}
+	if GitFileUnmerged("M", " ") {
+		t.Fatal("staged modify is not unmerged")
+	}
+}
+
+func TestKeepBothConflictSides(t *testing.T) {
+	in := "head\n<<<<<<< ours\nmy line\n=======\ntheir line\n>>>>>>> theirs\ntail\n"
+	got := keepBothConflictSides(in)
+	want := "head\nmy line\ntheir line\ntail\n"
+	if got != want {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
+func TestCollectConflictDiffStages(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	writeFile(t, filepath.Join(dir, "f.txt"), "base\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "base")
+	main := strings.TrimSpace(gitOutput(dir, "rev-parse", "--abbrev-ref", "HEAD"))
+
+	runGit(t, dir, "checkout", "-b", "other")
+	writeFile(t, filepath.Join(dir, "f.txt"), "other-side\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "other")
+
+	runGit(t, dir, "checkout", main)
+	runGit(t, dir, "checkout", "-b", "feature")
+	writeFile(t, filepath.Join(dir, "f.txt"), "feature-side\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "feature")
+
+	cmd := exec.Command("git", "merge", "other")
+	cmd.Dir = dir
+	_ = cmd.Run()
+
+	diff := CollectConflictDiff(dir, "f.txt", "feature", "other")
+	if !strings.Contains(diff, "CONFLICT") || !strings.Contains(diff, "feature") || !strings.Contains(diff, "other") {
+		t.Fatalf("expected labeled conflict diff, got:\n%s", diff)
+	}
+	if !strings.Contains(diff, "feature-side") && !strings.Contains(diff, "-feature") {
+		// either stage diff or marker fallback should show the sides
+		if !strings.Contains(diff, "+other") && !strings.Contains(diff, "other-side") {
+			t.Fatalf("expected both sides in diff:\n%s", diff)
+		}
+	}
+
+	if err := GitResolveBoth(dir, "f.txt"); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(filepath.Join(dir, "f.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := string(raw)
+	if strings.Contains(body, "<<<<<<<") || strings.Contains(body, ">>>>>>>") {
+		t.Fatalf("markers remain: %q", body)
+	}
+	if !strings.Contains(body, "feature-side") || !strings.Contains(body, "other-side") {
+		t.Fatalf("both sides should remain: %q", body)
+	}
+}
+
+func TestGitConflictSidesMerge(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	writeFile(t, filepath.Join(dir, "f.txt"), "base\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "base")
+	main := strings.TrimSpace(gitOutput(dir, "rev-parse", "--abbrev-ref", "HEAD"))
+
+	runGit(t, dir, "checkout", "-b", "other")
+	writeFile(t, filepath.Join(dir, "f.txt"), "other\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "other")
+
+	runGit(t, dir, "checkout", main)
+	runGit(t, dir, "checkout", "-b", "feature")
+	writeFile(t, filepath.Join(dir, "f.txt"), "feature\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "feature")
+
+	cmd := exec.Command("git", "merge", "other")
+	cmd.Dir = dir
+	_ = cmd.Run()
+
+	ours, theirs := GitConflictSides(dir)
+	if ours != "feature" {
+		t.Fatalf("ours=%q", ours)
+	}
+	if theirs != "other" {
+		t.Fatalf("theirs=%q", theirs)
+	}
+	if GitUnmergedCount(collectGitFiles(dir)) != 1 {
+		t.Fatal("expected 1 unmerged file")
+	}
+}
+
+func TestGitOpInProgressMergeConflict(t *testing.T) {
+	dir := t.TempDir()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test")
+	writeFile(t, filepath.Join(dir, "f.txt"), "base\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "base")
+	main := strings.TrimSpace(gitOutput(dir, "rev-parse", "--abbrev-ref", "HEAD"))
+
+	runGit(t, dir, "checkout", "-b", "other")
+	writeFile(t, filepath.Join(dir, "f.txt"), "other\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "other")
+
+	runGit(t, dir, "checkout", main)
+	writeFile(t, filepath.Join(dir, "f.txt"), "main\n")
+	runGit(t, dir, "add", "f.txt")
+	runGit(t, dir, "commit", "-m", "main")
+
+	cmd := exec.Command("git", "merge", "other")
+	cmd.Dir = dir
+	_ = cmd.Run() // expect conflict
+
+	if kind := GitOpInProgress(dir); kind != "merge" {
+		t.Fatalf("want merge in progress, got %q", kind)
+	}
+	files := collectGitFiles(dir)
+	found := false
+	for _, f := range files {
+		if f.Path == "f.txt" && GitFileUnmerged(f.Staging, f.Worktree) {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected conflicted f.txt in %+v", files)
+	}
+
+	if err := GitCheckoutOurs(dir, "f.txt"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := GitContinue(dir); err != nil {
+		t.Fatal(err)
+	}
+	if kind := GitOpInProgress(dir); kind != "" {
+		t.Fatalf("expected no op after continue, got %q", kind)
 	}
 }
 

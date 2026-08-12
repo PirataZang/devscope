@@ -58,6 +58,7 @@ type App struct {
 	gitViewBranch               string
 	gitWTDiff                   string
 	gitWTDiffFile               string
+	gitWTDiffConflict           bool
 	gitActivity                 []string
 	gitCommandLog               []gitCmdLogEntry
 	gitCmdLogScroll             int
@@ -123,6 +124,10 @@ type App struct {
 	gitConfirmOn                bool
 	gitConfirmAction            string
 	gitConfirmBranch            string
+	gitConflictOn               bool
+	gitConflictKind             string
+	gitConflictOurs             string
+	gitConflictTheirs           string
 	gitBranchLoadGen            int
 	gitWTRefreshGen             int
 	gitWTRefreshing             bool
@@ -133,6 +138,35 @@ type App struct {
 	gitBranchDenylist           map[string]struct{}
 	dashboardScroll             int
 	dashboardSubview            dashboardSubview
+	relaxGame                   relaxGame
+	relaxReturnView             View
+	relaxCube                   relaxCubeState
+	relaxAst                    relaxAsteroidState
+	relaxCat                    relaxCatState
+	relaxSky                    relaxSkyState
+	relaxGalaxy                 relaxGalaxyState
+	relaxMoon                   relaxMoonState
+	relaxLeaves                 relaxFallState
+	relaxPetals                 relaxFallState
+	relaxTree                   relaxTreeState
+	relaxNeb                    relaxNebulaState
+	relaxBh                     relaxBlackHoleState
+	relaxAq                     relaxAquariumState
+	relaxFire                   relaxFireState
+	relaxCoffee                 relaxCoffeeState
+	relaxSea                    relaxSeaState
+	relaxClouds                 relaxCloudState
+	relaxDrop                   relaxDropState
+	relaxBurst                  relaxBurstState
+	relaxCity                   relaxCityState
+	relaxRidge                  relaxRidgeState
+	relaxFox                    relaxFoxState
+	relaxFw                     relaxFireworksState
+	relaxTetris                 relaxTetrisState
+	relaxInv                    relaxInvadersState
+	relaxEng                    relaxEngine
+	relaxPending                relaxGame
+	relaxPendingOn              bool
 	projectShellExitErr         string
 	gitCommitFullMsg            string
 	gitCommitMsgScroll          int
@@ -549,7 +583,7 @@ type App struct {
 	ghaTriggerProc              string
 	ghaTriggerReturn            ghaScreen
 	ghaRunScope                 ghaRunScope
-	ghaRunProcFilter            string // "" = todos os processos
+	ghaRunProcFilter            string          // "" = todos os processos
 	ghaRunMarked                map[string]bool // bulk stop selection
 	ghaNotes                    map[string]string
 	ghaTriggerInputs            []collectors.GHAWorkflowInput
@@ -580,6 +614,7 @@ type App struct {
 	height                      int
 	now                         time.Time
 	animFrame                   int
+	animOn                      bool
 	quitting                    bool
 
 	// Landing probes — filled async; View must never call CLI/network.
@@ -677,6 +712,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.gitConfirmOn {
 			return a.updateGitConfirm(msg)
 		}
+		if a.gitConflictOn {
+			if a.gitSubview == gitSubviewFileDiff {
+				return a.updateGitConflictDiff(msg)
+			}
+			return a.updateGitConflict(msg)
+		}
 		if a.gitBranchFilterOn {
 			return a.updateGitBranchFilter(msg)
 		}
@@ -728,10 +769,21 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case animTickMsg:
+		if a.view == ViewRelax {
+			// O engine converte tempo real em passos fixos de simulação: um
+			// tick atrasado dá os passos que faltaram, um adiantado só desenha.
+			a.relaxEng.advance(time.Now(), func() {
+				a.animFrame++
+				a.stepRelax()
+			})
+			a.applyRelaxPending()
+			return a, scheduleRelaxTick()
+		}
 		a.animFrame++
 		if a.needsAnim() {
 			return a, scheduleAnimTick()
 		}
+		a.animOn = false
 		return a, nil
 
 	case toolLandingMsg:
@@ -1061,6 +1113,14 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.openThemePicker()
 		return a, nil
 
+	case msg.String() == "ctrl+t":
+		if a.view == ViewRelax {
+			a.closeRelax()
+			return a, nil
+		}
+		a.openRelax()
+		return a, a.kickAnim()
+
 	case msg.String() == "ctrl+p":
 		if a.view == ViewDashboard {
 			a.fuzzyOn = true
@@ -1074,6 +1134,8 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a.updateDashboard(msg)
 	case ViewProject:
 		return a.updateProject(msg)
+	case ViewRelax:
+		return a.updateRelax(msg)
 	}
 	return a, nil
 }
@@ -1507,14 +1569,23 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 		a.openProjectURL(p)
-	case "D":
+	case "D", "shift+d", "shift+D":
+		// Terminals usually report Shift+D as "D", not "shift+d".
 		if a.gitTabReady(p) {
 			a.gitToggleMarkedBranch(p)
 			return a, nil
 		}
+		// Containers panel advertises S-D as compose down — prefer that there.
+		if a.tab == TabContainers && (p.HasDockerCompose || collectors.ComposeFile(p.Path) != "") {
+			a.noteCompose("compose down…")
+			return a, a.composeDown(p.Path)
+		}
 		if p.DeployScript != "" {
 			a.deployConfirm = true
 			a.statusMsg = "confirmar deploy (" + p.DeployScript + ")? y/n"
+		} else if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
+			a.noteCompose("compose down…")
+			return a, a.composeDown(p.Path)
 		} else {
 			a.statusMsg = "nenhum script de deploy detectado"
 		}
@@ -1538,15 +1609,12 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		return a, a.projectExecShell(p.Path)
 	case "shift+u", "U":
+		// Terminals usually report Shift+U as "U", not "shift+u".
 		if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
+			a.noteCompose("compose up…")
 			return a, a.composeUp(p.Path)
 		}
-		a.statusMsg = "docker-compose não encontrado"
-	case "shift+d":
-		if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
-			return a, a.composeDown(p.Path)
-		}
-		a.statusMsg = "docker-compose não encontrado"
+		a.noteCompose("docker-compose não encontrado")
 	case "d":
 		if a.gitTabReady(p) {
 			a.startGitDeleteBranch(p)
@@ -1964,6 +2032,8 @@ func (a *App) renderCurrentView() string {
 	switch a.view {
 	case ViewProject:
 		return a.renderProject()
+	case ViewRelax:
+		return a.renderRelax()
 	default:
 		return a.renderDashboard()
 	}
@@ -2508,6 +2578,7 @@ func getHelpText() string {
   Tab          Próxima aba (na view de projeto)
   /            Filtrar projetos (só na lista; ao vivo, estilo rotas)
   ctrl+p       Filtro fuzzy de projetos (só na lista)
+  ctrl+t       Relax — animações de terminal (↑↓ troca o game)
   ?            Alternar exibição de ajuda
   T            Escolher theme (modal)
   q            Sair do DevScope
@@ -2689,6 +2760,9 @@ func (a *App) renderStatusBar(hints string) string {
 	scanInfo := ""
 	if !a.snapshot.ScannedAt.IsZero() {
 		scanInfo = fmt.Sprintf("scanned %s ago | ", time.Since(a.snapshot.ScannedAt).Round(time.Second))
+	}
+	if a.statusMsg != "" {
+		return StyleStatusBar.Render(scanInfo + a.statusMsg + "  |  " + hints)
 	}
 	return StyleStatusBar.Render(scanInfo + hints)
 }

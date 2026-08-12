@@ -6,6 +6,7 @@ const (
 	ViewDashboard View = iota
 	ViewProject
 	ViewHelp
+	ViewRelax
 )
 
 type dashboardSubview int

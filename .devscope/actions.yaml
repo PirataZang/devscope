@@ -1,0 +1,8 @@
+version: 1
+processes:
+    - name: ci
+      file: .github/workflows/ci.yml
+      description: discovered
+    - name: release
+      file: .github/workflows/release.yml
+      description: discovered

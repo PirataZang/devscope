@@ -32,11 +32,18 @@ func (a *App) runCompose(path, action string, fn func(string) error) tea.Cmd {
 	}
 }
 
+func (a *App) noteCompose(msg string) {
+	a.statusMsg = msg
+	if a.tab == TabContainers {
+		a.containerStatusMsg = msg
+	}
+}
+
 func (a *App) handleComposeDone(msg composeDoneMsg) {
 	a.snapshot = a.store.Get()
+	text := "compose " + msg.action + " ✓"
 	if msg.err != nil {
-		a.statusMsg = "compose " + msg.action + ": " + msg.err.Error()
-	} else {
-		a.statusMsg = "compose " + msg.action + " ✓"
+		text = "compose " + msg.action + ": " + msg.err.Error()
 	}
+	a.noteCompose(text)
 }

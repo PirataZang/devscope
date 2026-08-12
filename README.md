@@ -192,9 +192,24 @@ Dentro de cada projeto, os módulos ficam organizados por grupo:
 | `Shift+E` | Abrir terminal no diretório do projeto |
 | `Shift+O` | Abrir OpenCode no diretório do projeto |
 | `T` | Escolher theme |
+| `Ctrl+T` | Abrir a tela Relax (animações de terminal) |
 | `r` | Atualizar dados do sistema |
 | `?` | Abrir menu de ajuda |
 | `q` | Sair do DevScope |
+
+</details>
+
+<details>
+<summary>🧘 <b>Relax</b></summary>
+
+Animações de terminal só para descansar a cabeça — nada roda nem é executado aqui.
+
+| Tecla | Ação |
+|---|---|
+| `Ctrl+T` | Abrir / fechar a tela Relax (de qualquer lugar) |
+| `↑` / `↓` / `Tab` | Trocar de game |
+| `1` / `2` / `3` | Magic Cube / Asteroid / Cat |
+| `Esc` | Voltar para a tela anterior |
 
 </details>
 
@@ -223,10 +238,13 @@ Dentro de cada projeto, os módulos ficam organizados por grupo:
 | `c` | Novo commit |
 | `n` / `d` / `R` | Criar / apagar / renomear branch |
 | `Space` | Checkout de branch |
-| `p` / `P` | Pull / Push |
+| `p` / `P` | Pull (`--ff-only`) / Push |
+| `m` / `r` | Após pull divergente: merge (`--no-ff`) / rebase |
 | `M` | Merge na branch atual |
+| `enter` / `e` | Em conflito: abrir diff (o vs t) |
+| `o` / `t` / `b` / `c` / `x` | Em conflito: ours / theirs / ambas / continue / abort |
 | `Shift+C` / `Shift+V` | Copiar / colar commits (cherry-pick) |
-| `o` | Abrir Pull Request no GitHub |
+| `o` | Abrir Pull Request no GitHub (fora de conflito) |
 | `Enter` | Detalhe ou diff em tela cheia |
 | `b` | Filtrar branches |
 | `/` | Buscar no diff |

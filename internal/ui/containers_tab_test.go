@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -74,6 +76,70 @@ func TestContainerRestartAlwaysIndicator(t *testing.T) {
 	}
 	if !strings.Contains(got, "S-R") || !strings.Contains(strings.ToLower(got), "always") {
 		t.Fatalf("AÇÕES should list S-R always:\n%s", truncate(got, 400))
+	}
+}
+
+func TestShiftUStartsComposeUp(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "docker-compose.yml"), []byte("services:\n  web:\n    image: nginx\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	p := core.Project{
+		Path: dir, Name: "alpha",
+		HasDockerCompose: true,
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "exited", ProjectPath: dir},
+		},
+	}
+	store := core.NewStateStore(nil)
+	store.SetProjects([]core.Project{p})
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: store.Get(), store: store,
+		cfg: &config.Config{},
+	}
+	// Terminals send Shift+U as "U".
+	_, cmd := a.updateProject(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'U'}})
+	if cmd == nil {
+		t.Fatal("U on containers should start compose up")
+	}
+	if a.statusMsg != "compose up…" && a.containerStatusMsg != "compose up…" {
+		t.Fatalf("expected compose up feedback, status=%q container=%q", a.statusMsg, a.containerStatusMsg)
+	}
+}
+
+func TestShiftDStartsComposeDownOnContainers(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "docker-compose.yml"), []byte("services:\n  web:\n    image: nginx\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	p := core.Project{
+		Path: dir, Name: "alpha",
+		HasDockerCompose: true,
+		DeployScript:     "make deploy",
+		Containers: []core.Container{
+			{ID: "c1", Name: "web", Status: "running", ProjectPath: dir},
+		},
+	}
+	store := core.NewStateStore(nil)
+	store.SetProjects([]core.Project{p})
+	a := &App{
+		width: 120, height: 40,
+		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
+		selectedProject: &p, snapshot: store.Get(), store: store,
+		cfg: &config.Config{},
+	}
+	// Terminals send Shift+D as "D" — must not fall through to deploy confirm.
+	_, cmd := a.updateProject(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'D'}})
+	if cmd == nil {
+		t.Fatal("D on containers should start compose down")
+	}
+	if a.deployConfirm {
+		t.Fatal("D on containers must not open deploy confirm when compose exists")
+	}
+	if a.statusMsg != "compose down…" && a.containerStatusMsg != "compose down…" {
+		t.Fatalf("expected compose down feedback, status=%q container=%q", a.statusMsg, a.containerStatusMsg)
 	}
 }
 

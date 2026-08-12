@@ -26,6 +26,14 @@ func scheduleAnimTick() tea.Cmd {
 	})
 }
 
+// scheduleRelaxTick é o frame de desenho do Relax (~30fps). A simulação segue
+// em passos fixos dentro do relaxEngine; aqui só se pede o próximo quadro.
+func scheduleRelaxTick() tea.Cmd {
+	return tea.Tick(relaxRenderInterval, func(t time.Time) tea.Msg {
+		return animTickMsg{}
+	})
+}
+
 func animSpinner(frame int) string {
 	if len(animSpinnerFrames) == 0 {
 		return "…"
@@ -89,6 +97,9 @@ func (a *App) needsAnim() bool {
 	if a == nil {
 		return false
 	}
+	if a.view == ViewRelax {
+		return true
+	}
 	if a.gitBranchLoading || a.gitCommitFilesLoading || a.gitActionLoading || a.gitCommitDiffLoading ||
 		a.dockerAddLoading || a.dockerAddDetailsLoading || a.dockerAddTagsLoading ||
 		a.containerDetailLoading || a.apiLoading || a.dbLoading || a.dbSchemaLoading ||
@@ -100,9 +111,15 @@ func (a *App) needsAnim() bool {
 	return false
 }
 
+// kickAnim starts the 10fps loop. animOn keeps a single chain alive — sem isso
+// cada tick de 300ms criaria um loop novo em paralelo.
 func (a *App) kickAnim() tea.Cmd {
-	if !a.needsAnim() {
+	if a.animOn || !a.needsAnim() {
 		return nil
+	}
+	a.animOn = true
+	if a.view == ViewRelax {
+		return scheduleRelaxTick()
 	}
 	return scheduleAnimTick()
 }

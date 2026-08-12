@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -131,16 +132,26 @@ func (a *App) renderGitTab(p *core.Project) string {
 		viewBranch = g.Branch
 	}
 
-	header := a.renderGitHeader(current, g, w)
-	stats := a.renderGitStatsRow(g, w)
-	notif := a.renderGitNotifLine()
-	filterLine := a.renderGitBranchFilterLine(w)
-	chromeH := lipgloss.Height(header) + lipgloss.Height(stats) + lipgloss.Height(notif) + lipgloss.Height(filterLine)
-	bodyH := maxInt(12, h-chromeH-1)
+	// Short terminals: stats cards (3 rows) and the filter hint are dropped so
+	// the panels keep enough room — the same numbers live in the header/sidebar.
+	tiny := a.projectTiny()
+	chrome := []string{a.renderGitHeader(current, g, w)}
+	if !tiny {
+		chrome = append(chrome, a.renderGitStatsRow(g, w))
+	}
+	chrome = append(chrome, a.renderGitNotifLine())
+	if !tiny || a.gitBranchFilterOn || strings.TrimSpace(a.gitBranchFilter) != "" {
+		chrome = append(chrome, a.renderGitBranchFilterLine(w))
+	}
+	chromeH := 0
+	for _, c := range chrome {
+		chromeH += lipgloss.Height(c)
+	}
+	bodyH := maxInt(9, h-chromeH)
 
-	logH := maxInt(6, bodyH*28/100)
-	midH := maxInt(5, (bodyH-logH)*40/100)
-	topH := maxInt(5, bodyH-logH-midH)
+	logH := maxInt(3, bodyH*28/100)
+	midH := maxInt(3, (bodyH-logH)*40/100)
+	topH := maxInt(3, bodyH-logH-midH)
 
 	cmdW := actionsCmdWidth(w)
 	if cmdW < 20 && w >= 64 {
@@ -154,7 +165,7 @@ func (a *App) renderGitTab(p *core.Project) string {
 	side := a.renderGitSideColumn(g, cmdW, lipgloss.Height(main))
 	a.gitCmdLogRelY = chromeH + topH + midH
 	body := lipgloss.JoinHorizontal(lipgloss.Top, main, side)
-	return lipgloss.JoinVertical(lipgloss.Left, header, stats, notif, filterLine, body)
+	return lipgloss.JoinVertical(lipgloss.Left, append(chrome, body)...)
 }
 
 func (a *App) renderGitBranchFilterLine(width int) string {
@@ -227,6 +238,12 @@ func (a *App) renderGitStatsRow(g *core.GitInfo, width int) string {
 
 func (a *App) renderGitNotifLine() string {
 	switch {
+	case a.gitConflictOn:
+		msg := a.gitStatusMsg
+		if msg == "" {
+			msg = a.conflictStatusMsg(a.gitConflictKind)
+		}
+		return StyleWarning.Bold(true).Render(truncate(msg, maxInt(40, a.width-4)))
 	case a.gitStatusMsg != "":
 		style := StyleMuted
 		if strings.Contains(a.gitStatusMsg, "✓") {
@@ -321,15 +338,23 @@ func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, widt
 
 func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, height int) string {
 	filesFocus := a.gitFocus == gitFocusFiles
-	fileLines := a.gitFileLines(g, viewBranch, height-2)
+	bodyH := height - 2
+	fileLines := a.gitFileLines(g, viewBranch, bodyH)
 	filesTitle := "MODIFIED FILES"
-	if g.Staged > 0 {
+	if a.gitConflictOn {
+		n := collectors.GitUnmergedCount(g.Files)
+		if n == 0 {
+			filesTitle = "CONFLICTS · resolvidos"
+		} else {
+			filesTitle = fmt.Sprintf("CONFLICTS · %d left", n)
+		}
+	} else if g.Staged > 0 {
 		filesTitle += fmt.Sprintf(" · %d staged", g.Staged)
 	}
 	if filesFocus {
 		filesTitle = "> " + filesTitle
 	}
-	return renderApiTitledBox(filesTitle, fitExactLines(fileLines, height-2), width, height, filesFocus)
+	return renderApiTitledBox(filesTitle, fitExactLines(fileLines, bodyH), width, height, filesFocus)
 }
 
 func wtFileTreeFrom(files []core.GitFileStatus) []gitFileTreeRow {
@@ -341,6 +366,32 @@ func wtFileTreeFrom(files []core.GitFileStatus) []gitFileTreeRow {
 		}
 	}
 	return buildCommitFileTree(changes, nil) // always expanded — ←→ navigate panels
+}
+
+// wtConflictRows lists only unmerged paths (flat, full path) so conflicts aren't buried.
+func wtConflictRows(files []core.GitFileStatus) []gitFileTreeRow {
+	rows := make([]gitFileTreeRow, 0, len(files))
+	for i, f := range files {
+		if !collectors.GitFileUnmerged(f.Staging, f.Worktree) {
+			continue
+		}
+		rows = append(rows, gitFileTreeRow{
+			depth:   0,
+			isDir:   false,
+			label:   f.Path,
+			path:    f.Path,
+			fileIdx: i,
+			status:  "U",
+		})
+	}
+	return rows
+}
+
+func (a *App) wtRowsForUI(files []core.GitFileStatus) []gitFileTreeRow {
+	if a.gitConflictOn {
+		return wtConflictRows(files)
+	}
+	return wtFileTreeFrom(files)
 }
 
 func snapWTFileTreeCursor(rows []gitFileTreeRow, cursor int) int {
@@ -389,7 +440,7 @@ func moveWTFileTreeCursor(rows []gitFileTreeRow, cursor, delta int) int {
 }
 
 func (a *App) syncWTFileTreeCursor(files []core.GitFileStatus, viewport int) []gitFileTreeRow {
-	rows := wtFileTreeFrom(files)
+	rows := a.wtRowsForUI(files)
 	a.gitFileTreeCursor = snapWTFileTreeCursor(rows, a.gitFileTreeCursor)
 	a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, viewport, len(rows))
 	if len(rows) > 0 {
@@ -415,9 +466,25 @@ func (a *App) selectedWTFile(g *core.GitInfo) (core.GitFileStatus, bool) {
 	return g.Files[r.fileIdx], true
 }
 
+func (a *App) focusFirstConflict(g *core.GitInfo) {
+	if g == nil {
+		return
+	}
+	a.gitFocus = gitFocusFiles
+	a.gitFileTreeCursor = 0
+	a.gitFileScroll = 0
+	rows := a.syncWTFileTreeCursor(g.Files, maxInt(1, a.gitFilesViewport()))
+	if len(rows) == 0 {
+		a.gitFileCursor = 0
+	}
+}
+
 func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []string {
 	if viewBranch != g.Branch {
 		return []string{StyleMuted.Render("checkout da branch para ver WT")}
+	}
+	if a.gitConflictOn {
+		return a.gitConflictFileLines(g, maxLines)
 	}
 	if len(g.Files) == 0 {
 		return []string{StyleHealthy.Render("✓ working tree limpo")}
@@ -449,10 +516,56 @@ func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []s
 			style = StyleSelected
 		}
 		line := style.Render(indent + mark + code + " " + r.label)
-		if gitFileStaged(f) {
+		if gitFileUnmerged(f) {
+			line += "  " + StyleGitConflictBadge.Render("⚡ CONFLICT")
+		} else if gitFileStaged(f) {
 			line += "  " + StyleHealthy.Render("● staged")
 		}
 		lines = append(lines, line)
+	}
+	return lines
+}
+
+func (a *App) gitConflictFileLines(g *core.GitInfo, maxLines int) []string {
+	ours := firstNonEmpty(a.gitConflictOurs, "HEAD")
+	theirs := firstNonEmpty(a.gitConflictTheirs, "incoming")
+	rows := a.wtRowsForUI(g.Files)
+	header := StyleGitConflictBadge.Render(fmt.Sprintf("o=%s  t=%s", truncate(ours, 18), truncate(theirs, 18)))
+	if len(rows) == 0 {
+		a.gitFileTreeCursor = 0
+		a.gitFileScroll = 0
+		return []string{
+			header,
+			StyleHealthy.Render("✓ todos os conflitos resolvidos"),
+			StyleMuted.Render("c continue   x abort"),
+		}
+	}
+	// Reserve 2 lines for legend so the list stays scannable.
+	viewport := maxInt(1, maxLines-2)
+	a.gitFileTreeCursor = snapWTFileTreeCursor(rows, a.gitFileTreeCursor)
+	a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, viewport, len(rows))
+	if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
+		a.gitFileCursor = r.fileIdx
+	}
+	start := a.gitFileScroll
+	end := minInt(start+viewport, len(rows))
+	lines := []string{
+		header,
+		StyleMuted.Render(fmt.Sprintf("%d arquivo(s) — enter/e vê diff · o/t/b resolve", len(rows))),
+	}
+	for i := start; i < end; i++ {
+		r := rows[i]
+		selected := a.gitFocus == gitFocusFiles && a.gitFileTreeCursor == i
+		label := truncate(r.label, maxInt(24, a.width/2))
+		body := fmt.Sprintf("%d. %s", i+1, label)
+		if selected {
+			lines = append(lines, StyleGitConflictCursor.Render("▸ "+body+"  CONFLICT"))
+		} else {
+			lines = append(lines, StyleGitConflict.Render("  "+body)+"  "+StyleGitConflictBadge.Render("CONFLICT"))
+		}
+	}
+	if start > 0 || end < len(rows) {
+		lines = append(lines, StyleMuted.Render(fmt.Sprintf("⋯ %d–%d / %d", start+1, end, len(rows))))
 	}
 	return lines
 }
@@ -461,19 +574,38 @@ func (a *App) renderGitSideColumn(g *core.GitInfo, width, height int) string {
 	if width < 12 {
 		return ""
 	}
-	actions := renderActionsBox(width, maxInt(8, height/3),
-		[2]string{"c", "commit"},
-		[2]string{"a/A", "stage"},
-		[2]string{"space", "checkout"},
-		[2]string{"enter", "detail"},
-		[2]string{"x", "cherry"},
-		[2]string{"p/P", "pull/push"},
-		[2]string{"n", "branch"},
-		[2]string{"d", "delete"},
-		[2]string{"b", "filter"},
-		[2]string{"←→", "painéis"},
-		[2]string{"o", "abrir link"},
-	)
+	actH := maxInt(4, height/3)
+	if actH > height-9 {
+		actH = maxInt(4, height-9)
+	}
+	var actions string
+	if a.gitConflictOn {
+		ours := firstNonEmpty(a.gitConflictOurs, "HEAD")
+		theirs := firstNonEmpty(a.gitConflictTheirs, "incoming")
+		actions = renderActionsBox(width, actH,
+			[2]string{"enter/e", "ver conflito"},
+			[2]string{"o", "ours "+truncate(ours, 10)},
+			[2]string{"t", "theirs "+truncate(theirs, 8)},
+			[2]string{"b", "ambas"},
+			[2]string{"c", "continue"},
+			[2]string{"x", "abort"},
+			[2]string{"L", "lazygit"},
+		)
+	} else {
+		actions = renderActionsBox(width, actH,
+			[2]string{"c", "commit"},
+			[2]string{"a/A", "stage"},
+			[2]string{"space", "checkout"},
+			[2]string{"enter", "detail"},
+			[2]string{"x", "cherry"},
+			[2]string{"p/P", "pull/push"},
+			[2]string{"n", "branch"},
+			[2]string{"d", "delete"},
+			[2]string{"b", "filter"},
+			[2]string{"←→", "painéis"},
+			[2]string{"o", "abrir link"},
+		)
+	}
 	used := lipgloss.Height(actions)
 	rest := maxInt(9, height-used)
 	boxH := maxInt(3, rest/3)
@@ -1872,6 +2004,7 @@ func (a *App) initGitTab(p *core.Project) {
 	a.gitWTDiffHScroll = 0
 	a.gitWTDiff = ""
 	a.gitWTDiffFile = ""
+	a.gitWTDiffConflict = false
 	a.gitCommitFileCursor = 0
 	a.gitCommitTreeCursor = 0
 	a.gitCommitFileScroll = 0
@@ -1913,6 +2046,10 @@ func (a *App) initGitTab(p *core.Project) {
 	a.gitConfirmOn = false
 	a.gitConfirmAction = ""
 	a.gitConfirmBranch = ""
+	a.gitConflictOn = false
+	a.gitConflictKind = ""
+	a.gitConflictOurs = ""
+	a.gitConflictTheirs = ""
 	a.gitBranchLoadGen = 0
 	a.gitMarkedBranch = ""
 	a.gitBranches = nil
@@ -2059,17 +2196,18 @@ func (a *App) updateGitCursor(delta int, p *core.Project, shift bool) tea.Cmd {
 		if a.gitViewBranch != "" && a.gitViewBranch != p.Git.Branch {
 			return nil
 		}
-		if len(p.Git.Files) == 0 {
+		rows := a.wtRowsForUI(p.Git.Files)
+		if len(rows) == 0 {
 			return nil
 		}
-		rows := wtFileTreeFrom(p.Git.Files)
 		viewport := a.gitFilesViewport()
+		if a.gitConflictOn {
+			viewport = maxInt(1, viewport-2)
+		}
 		a.gitFileTreeCursor = moveWTFileTreeCursor(rows, a.gitFileTreeCursor, delta)
 		a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, viewport, len(rows))
-		if len(rows) > 0 {
-			if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
-				a.gitFileCursor = r.fileIdx
-			}
+		if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
+			a.gitFileCursor = r.fileIdx
 		}
 	case gitFocusCmdLog:
 		flat := a.gitCommandLogFlatLines()
@@ -2144,10 +2282,14 @@ func (a *App) openGitFileDiff(p *core.Project) tea.Cmd {
 		a.gitStatusMsg = "selecione um arquivo"
 		return nil
 	}
+	if a.gitConflictOn && gitFileUnmerged(f) {
+		return a.openGitConflictDiff(p)
+	}
 	a.gitSubview = gitSubviewFileDiff
 	a.gitFocus = gitFocusFiles
 	a.gitWTDiffScroll = 0
 	a.gitWTDiffHScroll = 0
+	a.gitWTDiffConflict = false
 	if a.gitWTDiffFile == f.Path && strings.TrimSpace(a.gitWTDiff) != "" {
 		return nil
 	}
@@ -2179,9 +2321,28 @@ func (a *App) renderGitFileDiff(p *core.Project) string {
 	if code != "" {
 		status = gitStatusStyle(code) + " "
 	}
-	title := StyleSection.Render("DIFF") + "  " + status + StyleNormal.Render(truncate(file, maxInt(20, innerW-12)))
+	titleLabel := "DIFF"
+	border := ColorAccent
+	if a.gitWTDiffConflict {
+		titleLabel = "CONFLICT DIFF"
+		border = ColorDanger
+		ours := firstNonEmpty(a.gitConflictOurs, "ours")
+		theirs := firstNonEmpty(a.gitConflictTheirs, "theirs")
+		title := StyleGitConflictBadge.Render(titleLabel) + "  " +
+			StyleDiffRemove.Render("−"+truncate(ours, 14)) + "  " +
+			StyleDiffAdd.Render("+"+truncate(theirs, 14)) + "  " +
+			StyleNormal.Render(truncate(file, maxInt(12, innerW-36)))
+		footerH := 1
+		bodyH := maxInt(4, height-3-footerH)
+		return a.renderGitFileDiffBody(title, innerW, panelW, bodyH, height, border, true)
+	}
+	title := StyleSection.Render(titleLabel) + "  " + status + StyleNormal.Render(truncate(file, maxInt(20, innerW-12)))
 	footerH := 1
 	bodyH := maxInt(4, height-3-footerH) // title + blank + footer
+	return a.renderGitFileDiffBody(title, innerW, panelW, bodyH, height, border, false)
+}
+
+func (a *App) renderGitFileDiffBody(title string, innerW, panelW, bodyH, height int, border lipgloss.Color, conflict bool) string {
 	textW := maxInt(8, innerW-11)
 	all := a.parseWTDiffLines()
 	maxLine := 0
@@ -2214,11 +2375,16 @@ func (a *App) renderGitFileDiff(p *core.Project) string {
 	if maxH := maxInt(0, maxLine-textW); maxH > 0 || a.gitWTDiffHScroll > 0 {
 		hHint = fmt.Sprintf("  ↔ col %d", a.gitWTDiffHScroll)
 	}
-	footer := StyleMuted.Render(truncate("↑↓ scroll  ←→ lateral  pgup/pgdown  esc voltar  "+pos+hHint, innerW))
-	content := append(lines[:bodyH+2], footer)
+	footer := "↑↓ scroll  ←→ lateral  esc voltar  " + pos + hHint
+	if conflict {
+		ours := firstNonEmpty(a.gitConflictOurs, "ours")
+		theirs := firstNonEmpty(a.gitConflictTheirs, "theirs")
+		footer = fmt.Sprintf("o=%s  t=%s  b=ambas  e=editor  esc  %s%s", truncate(ours, 12), truncate(theirs, 12), pos, hHint)
+	}
+	content := append(lines[:bodyH+2], StyleMuted.Render(truncate(footer, innerW)))
 	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorAccent).
+		BorderForeground(border).
 		Width(panelW).
 		Render(strings.Join(content, "\n"))
 }
@@ -2482,6 +2648,7 @@ func (a *App) handleGitDedicatedKeys(msg tea.KeyMsg, p *core.Project) (tea.Model
 		case "esc":
 			a.gitSubview = gitSubviewMain
 			a.gitFocus = gitFocusFiles
+			a.gitWTDiffConflict = false
 			return a, nil
 		case "up", "k":
 			a.gitWTDiffScrollBy(-1)

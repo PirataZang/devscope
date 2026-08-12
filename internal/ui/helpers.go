@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/mattn/go-runewidth"
 )
@@ -81,6 +82,13 @@ func sliceColumns(s string, start, width int) string {
 		col += w
 	}
 	return padRight(b.String(), width)
+}
+
+func absInt(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
 }
 
 func maxInt(a, b int) int {
@@ -195,16 +203,27 @@ func gitStatusLabel(staging, worktree string) string {
 	if staging == "?" || worktree == "?" {
 		return "??"
 	}
+	if collectors.GitFileUnmerged(staging, worktree) {
+		return "U"
+	}
 	if worktree != " " {
 		return worktree
 	}
 	return staging
 }
 
+func gitFileUnmerged(f core.GitFileStatus) bool {
+	return collectors.GitFileUnmerged(f.Staging, f.Worktree)
+}
+
 func gitFileStaged(f core.GitFileStatus) bool {
+	// Unmerged paths are not "staged" for toggle-unstage — resolve via conflict keys.
+	if gitFileUnmerged(f) {
+		return false
+	}
 	// Index column from `git status --porcelain` (not worktree-only changes).
 	switch f.Staging {
-	case "M", "A", "D", "R", "C", "U", "T":
+	case "M", "A", "D", "R", "C", "T":
 		return true
 	default:
 		return false
@@ -219,6 +238,8 @@ func gitStatusStyle(code string) string {
 		return StyleHealthy.Render(code)
 	case "D":
 		return StyleUnhealthy.Render(code)
+	case "U", "UU", "AA", "DD":
+		return StyleWarning.Render(code)
 	case "??":
 		return StyleWarning.Render(code)
 	default:

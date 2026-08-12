@@ -254,8 +254,44 @@ func (a *App) updateGitPrompt(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return a, nil
 }
 
+func (a *App) openPullStrategyModal(source string) {
+	a.gitConfirmOn = true
+	a.gitConfirmAction = "pull-strategy"
+	a.gitConfirmBranch = source
+	a.gitStatusMsg = "fast-forward impossível — m merge  r rebase  esc cancela"
+}
+
 func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	p := a.currentProject()
+	action := a.gitConfirmAction
+	if action == "pull-strategy" {
+		switch msg.String() {
+		case "m", "M":
+			a.gitConfirmOn = false
+			source := a.gitConfirmBranch
+			a.gitConfirmBranch = ""
+			a.gitConfirmAction = ""
+			if p == nil {
+				return a, nil
+			}
+			return a, a.gitPullMerge(p, source)
+		case "r", "R":
+			a.gitConfirmOn = false
+			source := a.gitConfirmBranch
+			a.gitConfirmBranch = ""
+			a.gitConfirmAction = ""
+			if p == nil {
+				return a, nil
+			}
+			return a, a.gitPullRebase(p, source)
+		case "esc", "n", "N":
+			a.gitConfirmOn = false
+			a.gitConfirmBranch = ""
+			a.gitConfirmAction = ""
+			a.gitStatusMsg = "pull cancelado"
+		}
+		return a, nil
+	}
 	switch msg.String() {
 	case "y", "Y":
 		a.gitConfirmOn = false
@@ -263,7 +299,6 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 		branch := a.gitConfirmBranch
-		action := a.gitConfirmAction
 		a.gitConfirmBranch = ""
 		a.gitConfirmAction = ""
 		switch action {
@@ -285,6 +320,9 @@ func (a *App) renderGitConfirm() string {
 	background := a.renderProject()
 	w, h := maxInt(40, a.width), maxInt(12, a.height)
 	branch := firstNonEmpty(a.gitConfirmBranch, "—")
+	if a.gitConfirmAction == "pull-strategy" {
+		return overlayCentered(background, a.renderPullStrategyBox(branch, w, h), w, h)
+	}
 	opts := deleteConfirmOpts{
 		Brand:  "GIT",
 		Color:  tabAccentColor(TabGit),
@@ -309,6 +347,24 @@ func (a *App) renderGitConfirm() string {
 	}
 	box := renderDeleteConfirmBox(opts, w, h)
 	return overlayCentered(background, box, w, h)
+}
+
+func (a *App) renderPullStrategyBox(source string, width, height int) string {
+	color := tabAccentColor(TabGit)
+	boxW := minInt(width-4, maxInt(44, width*50/100))
+	boxH := minInt(height-2, maxInt(12, 14))
+	innerW := maxInt(28, boxW-6)
+	lines := tunnelModalChrome("GIT", color, "Pull divergente", "fast-forward impossível — escolha a estratégia", "", innerW)
+	lines = append(lines, "")
+	nameBox := renderApiTitledBox("origem",
+		[]string{StyleWarning.Bold(true).Render(truncate("origin/"+firstNonEmpty(source, "—"), innerW-2))},
+		innerW, 3, true,
+	)
+	lines = append(lines, strings.Split(nameBox, "\n")...)
+	lines = append(lines, "",
+		StyleMuted.Render("m merge (--no-ff)  ·  r rebase  ·  esc cancela"),
+	)
+	return tunnelModalBox(lines, boxW, boxH, color)
 }
 
 func (a *App) renderGitPrompt() string {

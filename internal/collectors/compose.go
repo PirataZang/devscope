@@ -1,6 +1,7 @@
 package collectors
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -91,7 +92,19 @@ func runCompose(projectPath, action string, extra ...string) error {
 	args = append(args, extra...)
 	cmd := exec.Command("docker", args...)
 	cmd.Dir = projectPath
-	return cmd.Run()
+	// Capture output so compose progress/errors don't smash the alt-screen TUI.
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		msg := strings.TrimSpace(string(out))
+		if msg == "" {
+			return err
+		}
+		if len(msg) > 240 {
+			msg = msg[:240] + "…"
+		}
+		return fmt.Errorf("%w: %s", err, msg)
+	}
+	return nil
 }
 
 func ComposeUp(projectPath string) error {

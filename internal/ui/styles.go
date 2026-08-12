@@ -234,6 +234,20 @@ var (
 			Border(lipgloss.NormalBorder()).
 			BorderForeground(ColorBorder).
 			Padding(0, 1)
+
+	StyleGitConflict = lipgloss.NewStyle().
+				Foreground(ColorText).
+				Bold(true).
+				Background(lipgloss.Color("#7F1D1D"))
+
+	StyleGitConflictCursor = lipgloss.NewStyle().
+				Foreground(ColorText).
+				Bold(true).
+				Background(lipgloss.Color("#B91C1C"))
+
+	StyleGitConflictBadge = lipgloss.NewStyle().
+				Foreground(ColorWarning).
+				Bold(true)
 )
 
 func StatusStyle(status string) lipgloss.Style {

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -71,7 +72,7 @@ func (a *App) renderProjectSidebarH(height int) string {
 		rows = append(rows, foot...)
 	}
 	if len(rows) > contentH {
-		rows = rows[:contentH]
+		rows = sidebarWindow(rows, slices.Index(rows, a.renderProjectSidebarRow(a.tab, inner, p)), contentH)
 	}
 
 	body := strings.Join(rows, "\n")
@@ -83,6 +84,22 @@ func (a *App) renderProjectSidebarH(height int) string {
 		Height(contentH).
 		Align(lipgloss.Left, lipgloss.Top).
 		Render(body)
+}
+
+// sidebarWindow scrolls the nav so the active row stays visible when the rail
+// is taller than the terminal.
+func sidebarWindow(rows []string, focus, height int) []string {
+	if height <= 0 || len(rows) <= height {
+		return rows
+	}
+	start := focus - height/2
+	if start > len(rows)-height {
+		start = len(rows) - height
+	}
+	if start < 0 {
+		start = 0
+	}
+	return rows[start : start+height]
 }
 
 func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {

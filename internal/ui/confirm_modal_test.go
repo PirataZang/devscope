@@ -46,6 +46,21 @@ func TestGitDeleteConfirmModal(t *testing.T) {
 	}
 }
 
+func TestGitPullStrategyModal(t *testing.T) {
+	p := core.Project{Name: "demo", Path: "/p", Git: &core.GitInfo{IsRepo: true, Branch: "feat"}}
+	a := &App{
+		width: 100, height: 30, view: ViewProject, tab: TabGit,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+		gitConfirmOn: true, gitConfirmAction: "pull-strategy", gitConfirmBranch: "develop",
+	}
+	got := stripANSI(a.renderGitConfirm())
+	for _, want := range []string{"Pull divergente", "origin/develop", "m merge", "r rebase"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in %q", want, got)
+		}
+	}
+}
+
 func TestContainerDeleteConfirmOverlay(t *testing.T) {
 	p := core.Project{
 		Name: "demo", Path: "/p",

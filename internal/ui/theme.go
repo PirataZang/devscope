@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 )
 
 const ThemeAuto = "auto"
@@ -321,10 +322,25 @@ func paintAppFrame(content string, width, height int) string {
 	return lipgloss.Place(
 		width, height,
 		lipgloss.Left, lipgloss.Top,
-		content,
+		cropBlock(content, width, height),
 		lipgloss.WithWhitespaceBackground(ColorBg),
 		lipgloss.WithWhitespaceForeground(ColorText),
 	)
+}
+
+// cropBlock crops a rendered view to the terminal box. lipgloss.Place only pads,
+// so an oversized layout would wrap and scroll the top of the UI off screen.
+func cropBlock(s string, width, height int) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) > height {
+		lines = lines[:height]
+	}
+	for i, l := range lines {
+		if lipgloss.Width(l) > width {
+			lines[i] = ansi.Truncate(l, width, "")
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func swatch(hex string) string {

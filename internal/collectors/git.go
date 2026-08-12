@@ -103,6 +103,10 @@ func CollectAt(path string) *core.GitInfo {
 			info.Untracked++
 			continue
 		}
+		if GitFileUnmerged(f.Staging, f.Worktree) {
+			info.Modified++
+			continue
+		}
 		if f.Staging != " " && f.Staging != "" {
 			info.Staged++
 		}
@@ -178,6 +182,110 @@ func collectGitRemotes(path string) []core.GitRemote {
 		remotes = append(remotes, core.GitRemote{Name: name, URL: url})
 	}
 	return remotes
+}
+
+// CollectConflictDiff returns a colored-diff-friendly view of ours (:2) vs theirs (:3).
+func CollectConflictDiff(repo, file, oursLabel, theirsLabel string) string {
+	if repo == "" || file == "" {
+		return ""
+	}
+	file = strings.TrimSpace(file)
+	oursLabel = firstNonEmptyStr(oursLabel, "ours")
+	theirsLabel = firstNonEmptyStr(theirsLabel, "theirs")
+
+	diff := strings.TrimSpace(gitDiffOutput(repo, "diff", "--no-color", "-U8", ":2:"+file, ":3:"+file))
+	if diff != "" {
+		var b strings.Builder
+		b.WriteString("CONFLICT  o=" + oursLabel + "  (−)  vs  t=" + theirsLabel + "  (+)\n")
+		b.WriteString("diff --git a/" + file + " b/" + file + "\n")
+		for _, line := range strings.Split(diff, "\n") {
+			switch {
+			case strings.HasPrefix(line, "---"):
+				b.WriteString("--- a/" + file + "  (" + oursLabel + " / ours)\n")
+			case strings.HasPrefix(line, "+++"):
+				b.WriteString("+++ b/" + file + "  (" + theirsLabel + " / theirs)\n")
+			default:
+				b.WriteString(line)
+				b.WriteByte('\n')
+			}
+		}
+		return strings.TrimSpace(b.String())
+	}
+
+	// Fallback: annotate conflict markers from the working tree file.
+	raw, err := os.ReadFile(filepath.Join(repo, file))
+	if err != nil {
+		return "(não foi possível ler o arquivo em conflito)"
+	}
+	return formatConflictMarkersDiff(string(raw), file, oursLabel, theirsLabel)
+}
+
+func formatConflictMarkersDiff(content, file, oursLabel, theirsLabel string) string {
+	var b strings.Builder
+	b.WriteString("CONFLICT  o=" + oursLabel + "  (−)  vs  t=" + theirsLabel + "  (+)\n")
+	b.WriteString("--- a/" + file + "  (" + oursLabel + " / ours)\n")
+	b.WriteString("+++ b/" + file + "  (" + theirsLabel + " / theirs)\n")
+	b.WriteString("@@ conflict markers @@\n")
+	state := "ctx" // ctx | ours | theirs
+	for _, line := range strings.Split(content, "\n") {
+		switch {
+		case strings.HasPrefix(line, "<<<<<<<"):
+			state = "ours"
+			b.WriteString("@@ o (" + oursLabel + ") @@\n")
+		case strings.HasPrefix(line, "======="):
+			state = "theirs"
+			b.WriteString("@@ t (" + theirsLabel + ") @@\n")
+		case strings.HasPrefix(line, ">>>>>>>"):
+			state = "ctx"
+			b.WriteString("@@ fim do conflito @@\n")
+		case state == "ours":
+			b.WriteString("-" + line + "\n")
+		case state == "theirs":
+			b.WriteString("+" + line + "\n")
+		default:
+			b.WriteString(" " + line + "\n")
+		}
+	}
+	return strings.TrimSpace(b.String())
+}
+
+// GitResolveBoth keeps both sides of conflict markers (ours then theirs) and stages the file.
+func GitResolveBoth(path, file string) error {
+	file = strings.TrimSpace(file)
+	if file == "" {
+		return fmt.Errorf("arquivo vazio")
+	}
+	abs := filepath.Join(path, file)
+	raw, err := os.ReadFile(abs)
+	if err != nil {
+		return err
+	}
+	resolved := keepBothConflictSides(string(raw))
+	if err := os.WriteFile(abs, []byte(resolved), 0o644); err != nil {
+		return err
+	}
+	return GitAdd(path, file)
+}
+
+func keepBothConflictSides(content string) string {
+	var b strings.Builder
+	for _, line := range strings.SplitAfter(content, "\n") {
+		trimNL := strings.TrimSuffix(line, "\n")
+		if strings.HasPrefix(trimNL, "<<<<<<<") || strings.HasPrefix(trimNL, "=======") || strings.HasPrefix(trimNL, ">>>>>>>") {
+			continue
+		}
+		b.WriteString(line)
+	}
+	return b.String()
+}
+
+func firstNonEmptyStr(values ...string) string {
+	for _, v := range values {
+		if strings.TrimSpace(v) != "" {
+			return strings.TrimSpace(v)
+		}
+	}
+	return ""
 }
 
 // CollectWorkingTreeDiff returns unstaged/staged/HEAD diff for a path.
@@ -675,6 +783,193 @@ func GitPullOrigin(path, sourceBranch string) (string, error) {
 	return gitRunOutput(path, "pull", "origin", sourceBranch, "--ff-only")
 }
 
+func GitPullOriginMerge(path, sourceBranch string) (string, error) {
+	sourceBranch = strings.TrimSpace(sourceBranch)
+	if sourceBranch == "" {
+		return "", fmt.Errorf("branch de origem não detectada")
+	}
+	return gitRunOutput(path, "pull", "origin", sourceBranch, "--no-ff")
+}
+
+func GitPullOriginRebase(path, sourceBranch string) (string, error) {
+	sourceBranch = strings.TrimSpace(sourceBranch)
+	if sourceBranch == "" {
+		return "", fmt.Errorf("branch de origem não detectada")
+	}
+	return gitRunOutput(path, "pull", "--rebase", "origin", sourceBranch)
+}
+
+// GitIsFFImpossible reports whether a failed pull was aborted because histories diverged.
+func GitIsFFImpossible(err error, output string) bool {
+	text := strings.ToLower(strings.TrimSpace(output))
+	if err != nil {
+		text += "\n" + strings.ToLower(err.Error())
+	}
+	return strings.Contains(text, "not possible to fast-forward") ||
+		strings.Contains(text, "diverging branches") ||
+		strings.Contains(text, "cannot fast-forward")
+}
+
+// GitIsConflictError reports whether git output indicates unresolved conflicts.
+func GitIsConflictError(err error, output string) bool {
+	text := strings.ToLower(strings.TrimSpace(output))
+	if err != nil {
+		text += "\n" + strings.ToLower(err.Error())
+	}
+	return strings.Contains(text, "fix conflicts") ||
+		strings.Contains(text, "merge conflict") ||
+		strings.Contains(text, "conflict") && (strings.Contains(text, "merge") || strings.Contains(text, "rebase") || strings.Contains(text, "cherry")) ||
+		strings.Contains(text, "needs merge") ||
+		strings.Contains(text, "unmerged paths") ||
+		strings.Contains(text, "could not apply")
+}
+
+// GitFileUnmerged reports porcelain XY codes for unmerged (conflicted) paths.
+func GitFileUnmerged(staging, worktree string) bool {
+	switch staging + worktree {
+	case "DD", "AU", "UD", "UA", "DU", "AA", "UU":
+		return true
+	default:
+		return false
+	}
+}
+
+// GitOpInProgress returns "merge", "rebase", "cherry-pick", or "".
+func GitOpInProgress(path string) string {
+	gitDir := strings.TrimSpace(gitOutput(path, "rev-parse", "--git-dir"))
+	if gitDir == "" {
+		return ""
+	}
+	if !filepath.IsAbs(gitDir) {
+		gitDir = filepath.Join(path, gitDir)
+	}
+	if fileExists(filepath.Join(gitDir, "CHERRY_PICK_HEAD")) {
+		return "cherry-pick"
+	}
+	if fileExists(filepath.Join(gitDir, "REBASE_HEAD")) ||
+		dirExists(filepath.Join(gitDir, "rebase-merge")) ||
+		dirExists(filepath.Join(gitDir, "rebase-apply")) {
+		return "rebase"
+	}
+	if fileExists(filepath.Join(gitDir, "MERGE_HEAD")) {
+		return "merge"
+	}
+	return ""
+}
+
+func GitCheckoutOurs(path, file string) error {
+	file = strings.TrimSpace(file)
+	if file == "" {
+		return fmt.Errorf("arquivo vazio")
+	}
+	if err := gitRun(path, "checkout", "--ours", "--", file); err != nil {
+		return err
+	}
+	return GitAdd(path, file)
+}
+
+func GitCheckoutTheirs(path, file string) error {
+	file = strings.TrimSpace(file)
+	if file == "" {
+		return fmt.Errorf("arquivo vazio")
+	}
+	if err := gitRun(path, "checkout", "--theirs", "--", file); err != nil {
+		return err
+	}
+	return GitAdd(path, file)
+}
+
+func GitContinue(path string) (string, error) {
+	kind := GitOpInProgress(path)
+	switch kind {
+	case "merge":
+		return gitRunOutput(path, "-c", "core.editor=true", "merge", "--continue")
+	case "rebase":
+		return gitRunOutput(path, "-c", "core.editor=true", "rebase", "--continue")
+	case "cherry-pick":
+		return gitRunOutput(path, "-c", "core.editor=true", "cherry-pick", "--continue")
+	default:
+		return "", fmt.Errorf("nenhuma operação git em andamento")
+	}
+}
+
+func GitAbort(path string) (string, error) {
+	kind := GitOpInProgress(path)
+	switch kind {
+	case "merge":
+		return gitRunOutput(path, "merge", "--abort")
+	case "rebase":
+		return gitRunOutput(path, "rebase", "--abort")
+	case "cherry-pick":
+		return gitRunOutput(path, "cherry-pick", "--abort")
+	default:
+		return "", fmt.Errorf("nenhuma operação git em andamento")
+	}
+}
+
+// GitConflictSides returns labels for --ours / --theirs during an in-progress op.
+func GitConflictSides(path string) (ours, theirs string) {
+	ours = GitCurrentBranch(path)
+	if ours == "" || ours == "HEAD" {
+		ours = "HEAD"
+	}
+	kind := GitOpInProgress(path)
+	ref := ""
+	switch kind {
+	case "merge":
+		ref = "MERGE_HEAD"
+	case "rebase":
+		ref = "REBASE_HEAD"
+		// During rebase, --ours is the branch being rebased onto.
+		if onto := strings.TrimSpace(gitOutput(path, "rev-parse", "--abbrev-ref", "HEAD")); onto != "" && onto != "HEAD" {
+			ours = onto
+		}
+	case "cherry-pick":
+		ref = "CHERRY_PICK_HEAD"
+	}
+	theirs = conflictRefLabel(path, ref)
+	if theirs == "" {
+		theirs = "incoming"
+	}
+	return ours, theirs
+}
+
+func conflictRefLabel(path, ref string) string {
+	if ref == "" {
+		return ""
+	}
+	if strings.TrimSpace(gitOutput(path, "rev-parse", "-q", "--verify", ref)) == "" {
+		return ""
+	}
+	name := strings.TrimSpace(gitOutput(path, "name-rev", "--name-only", "--no-undefined", ref))
+	name = strings.TrimSuffix(name, "^0")
+	name = strings.TrimPrefix(name, "remotes/")
+	name = strings.TrimPrefix(name, "origin/")
+	if i := strings.LastIndex(name, "/"); i >= 0 && (strings.HasPrefix(name, "tags/") || strings.Contains(name, "~")) {
+		// keep as-is for odd names
+	}
+	if name != "" && !strings.Contains(strings.ToLower(name), "could not") {
+		return name
+	}
+	return strings.TrimSpace(gitOutput(path, "rev-parse", "--short", ref))
+}
+
+// GitUnmergedCount returns how many paths are still unmerged.
+func GitUnmergedCount(files []core.GitFileStatus) int {
+	n := 0
+	for _, f := range files {
+		if GitFileUnmerged(f.Staging, f.Worktree) {
+			n++
+		}
+	}
+	return n
+}
+
+func dirExists(path string) bool {
+	fi, err := os.Stat(path)
+	return err == nil && fi.IsDir()
+}
+
 func GitPush(path string) (string, error) {
 	branch := GitCurrentBranch(path)
 	if branch == "" || branch == "HEAD" {
@@ -795,6 +1090,10 @@ func RefreshProjectGitFiles(store *core.StateStore, projectPath string) {
 	for _, f := range files {
 		if f.Staging == "?" || f.Worktree == "?" {
 			untracked++
+			continue
+		}
+		if GitFileUnmerged(f.Staging, f.Worktree) {
+			modified++
 			continue
 		}
 		if f.Staging != " " && f.Staging != "" {

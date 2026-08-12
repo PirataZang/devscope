@@ -2,6 +2,9 @@ package ui
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -93,21 +96,23 @@ func (a *App) handleGitWTRefreshed(msg gitWTRefreshedMsg) {
 		return
 	}
 	a.syncGitBranchesFrom(p)
-	if len(p.Git.Files) == 0 {
+	rows := a.wtRowsForUI(p.Git.Files)
+	if len(rows) == 0 {
 		a.gitFileCursor = 0
 		a.gitFileTreeCursor = 0
 		a.gitFileScroll = 0
 		return
 	}
-	rows := wtFileTreeFrom(p.Git.Files)
-	a.gitFileTreeCursor = clampCursor(a.gitFileTreeCursor, len(rows))
-	a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, a.gitFilesViewport(), len(rows))
-	if len(rows) > 0 {
-		if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
-			a.gitFileCursor = r.fileIdx
-		} else {
-			a.gitFileCursor = clampCursor(a.gitFileCursor, len(p.Git.Files))
-		}
+	viewport := a.gitFilesViewport()
+	if a.gitConflictOn {
+		viewport = maxInt(1, viewport-2)
+	}
+	a.gitFileTreeCursor = snapWTFileTreeCursor(rows, a.gitFileTreeCursor)
+	a.gitFileScroll = ensureVisible(a.gitFileTreeCursor, a.gitFileScroll, viewport, len(rows))
+	if r := rows[a.gitFileTreeCursor]; !r.isDir && r.fileIdx >= 0 {
+		a.gitFileCursor = r.fileIdx
+	} else {
+		a.gitFileCursor = clampCursor(a.gitFileCursor, len(p.Git.Files))
 	}
 }
 
@@ -116,8 +121,23 @@ func (a *App) requestGitWorkingTreeDiff(path, file string) tea.Cmd {
 		return nil
 	}
 	a.gitWTDiffFile = file
+	a.gitWTDiffConflict = false
 	return func() tea.Msg {
 		return gitWTDiffMsg{file: file, diff: collectors.CollectWorkingTreeDiff(path, file)}
+	}
+}
+
+func (a *App) requestGitConflictDiff(path, file string) tea.Cmd {
+	if path == "" || file == "" {
+		return nil
+	}
+	a.gitWTDiffFile = file
+	a.gitWTDiffConflict = true
+	a.gitWTDiff = ""
+	ours := a.gitConflictOurs
+	theirs := a.gitConflictTheirs
+	return func() tea.Msg {
+		return gitWTDiffMsg{file: file, diff: collectors.CollectConflictDiff(path, file, ours, theirs)}
 	}
 }
 
@@ -147,6 +167,18 @@ func (a *App) appendGitCommandLog(msg gitActionDoneMsg) {
 	switch msg.action {
 	case "pull":
 		title = "Pull"
+	case "pull-merge":
+		title = "Pull merge"
+	case "pull-rebase":
+		title = "Pull rebase"
+	case "continue":
+		title = "Continue"
+	case "abort":
+		title = "Abort"
+	case "ours", "theirs":
+		title = strings.ToUpper(msg.action[:1]) + msg.action[1:]
+	case "both":
+		title = "Ambas"
 	case "push":
 		title = "Push"
 	case "checkout":
@@ -363,6 +395,34 @@ func (a *App) gitPull(p *core.Project) tea.Cmd {
 	}
 }
 
+func (a *App) gitPullMerge(p *core.Project, source string) tea.Cmd {
+	if source == "" {
+		a.gitStatusMsg = "origem não detectada"
+		return nil
+	}
+	a.gitActionLoading = true
+	a.gitStatusMsg = "pull --no-ff origin " + source + "..."
+	path := p.Path
+	return func() tea.Msg {
+		out, err := collectors.GitPullOriginMerge(path, source)
+		return gitActionDoneMsg{path: path, action: "pull-merge", branch: source, cmdline: "git pull origin " + source + " --no-ff", output: out, err: err}
+	}
+}
+
+func (a *App) gitPullRebase(p *core.Project, source string) tea.Cmd {
+	if source == "" {
+		a.gitStatusMsg = "origem não detectada"
+		return nil
+	}
+	a.gitActionLoading = true
+	a.gitStatusMsg = "pull --rebase origin " + source + "..."
+	path := p.Path
+	return func() tea.Msg {
+		out, err := collectors.GitPullOriginRebase(path, source)
+		return gitActionDoneMsg{path: path, action: "pull-rebase", branch: source, cmdline: "git pull --rebase origin " + source, output: out, err: err}
+	}
+}
+
 func (a *App) gitPush(p *core.Project) tea.Cmd {
 	a.gitActionLoading = true
 	a.gitStatusMsg = "push..."
@@ -511,11 +571,55 @@ func (a *App) handleGitCommitDiffLoaded(msg gitCommitDiffLoadedMsg) {
 
 func needsGitBranchCommitsReload(action string) bool {
 	switch action {
-	case "checkout", "cherry-pick", "create-branch", "rename-branch", "commit":
+	case "checkout", "cherry-pick", "create-branch", "rename-branch", "commit",
+		"pull", "pull-merge", "pull-rebase", "merge", "continue", "abort":
 		return true
 	default:
 		return false
 	}
+}
+
+func (a *App) conflictStatusMsg(kind string) string {
+	if kind == "" {
+		kind = "git"
+	}
+	n := 0
+	if p := a.currentProject(); p != nil && p.Git != nil {
+		n = collectors.GitUnmergedCount(p.Git.Files)
+	}
+	ours := firstNonEmpty(a.gitConflictOurs, "HEAD")
+	theirs := firstNonEmpty(a.gitConflictTheirs, "incoming")
+	if n == 0 {
+		return fmt.Sprintf("CONFLITO (%s) resolvido — c continue  x abort", kind)
+	}
+	return fmt.Sprintf("CONFLITO (%s) · %d arquivo(s) · o=%s  t=%s", kind, n, ours, theirs)
+}
+
+func (a *App) enterGitConflictMode(path, hintKind string) bool {
+	kind := collectors.GitOpInProgress(path)
+	if kind == "" {
+		kind = hintKind
+	}
+	if kind == "" {
+		return false
+	}
+	a.gitConflictOn = true
+	a.gitConflictKind = kind
+	a.gitConflictOurs, a.gitConflictTheirs = collectors.GitConflictSides(path)
+	if p := a.currentProject(); p != nil && p.Git != nil {
+		a.focusFirstConflict(p.Git)
+	} else {
+		a.gitFocus = gitFocusFiles
+	}
+	a.gitStatusMsg = a.conflictStatusMsg(kind)
+	return true
+}
+
+func (a *App) clearGitConflictMode() {
+	a.gitConflictOn = false
+	a.gitConflictKind = ""
+	a.gitConflictOurs = ""
+	a.gitConflictTheirs = ""
 }
 
 func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
@@ -534,6 +638,28 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 	a.syncGitBranchesFrom(p)
 
 	if msg.err != nil {
+		out := msg.output
+		if out == "" {
+			out = msg.err.Error()
+		}
+		if msg.action == "pull" && collectors.GitIsFFImpossible(msg.err, out) {
+			a.openPullStrategyModal(msg.branch)
+			return
+		}
+		hint := ""
+		switch msg.action {
+		case "pull-merge", "merge":
+			hint = "merge"
+		case "pull-rebase":
+			hint = "rebase"
+		case "cherry-pick":
+			hint = "cherry-pick"
+		}
+		if collectors.GitIsConflictError(msg.err, out) || collectors.GitOpInProgress(msg.path) != "" {
+			if a.enterGitConflictMode(msg.path, hint) {
+				return
+			}
+		}
 		a.gitStatusMsg = gitCompactError(msg.action, msg.err.Error())
 		return
 	}
@@ -550,6 +676,7 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 		a.syncGitBranchCursor(p.Git.Branches)
 		a.gitStatusMsg = "checkout " + msg.branch + " ✓"
 	case "cherry-pick":
+		a.clearGitConflictMode()
 		a.gitCherryPickBuffer = nil
 		a.gitCherryPickMarked = nil
 		a.gitCherryPickActive = false
@@ -602,29 +729,78 @@ func (a *App) handleGitActionDone(msg gitActionDoneMsg) {
 		a.gitBranchCommits = p.Git.Commits
 		a.gitBranchLoading = false
 		a.gitStatusMsg = "branch " + msg.branch + " apagada ✓"
-	case "merge":
+	case "merge", "pull-merge":
+		a.clearGitConflictMode()
 		a.gitViewBranch = p.Git.Branch
 		a.gitBranchCommits = p.Git.Commits
 		a.gitBranchLoading = false
 		a.syncGitBranchCursor(p.Git.Branches)
-		a.gitStatusMsg = "merge " + msg.branch + " ✓"
-	case "pull":
+		if msg.action == "pull-merge" {
+			a.gitStatusMsg = "pull merge origin " + msg.branch + " ✓"
+		} else {
+			a.gitStatusMsg = "merge " + msg.branch + " ✓"
+		}
+	case "pull", "pull-rebase":
+		a.clearGitConflictMode()
 		a.gitViewBranch = p.Git.Branch
 		a.gitBranchCommits = p.Git.Commits
 		a.gitBranchLoading = false
 		a.syncGitBranchCursor(p.Git.Branches)
-		a.gitStatusMsg = "pull origin " + msg.branch + " ✓"
+		if msg.action == "pull-rebase" {
+			a.gitStatusMsg = "pull rebase origin " + msg.branch + " ✓"
+		} else {
+			a.gitStatusMsg = "pull origin " + msg.branch + " ✓"
+		}
+	case "continue":
+		a.clearGitConflictMode()
+		a.gitViewBranch = p.Git.Branch
+		a.gitBranchCommits = p.Git.Commits
+		a.gitBranchLoading = false
+		a.syncGitBranchCursor(p.Git.Branches)
+		a.gitStatusMsg = "continue ✓"
+	case "abort":
+		a.clearGitConflictMode()
+		a.gitViewBranch = p.Git.Branch
+		a.gitBranchCommits = p.Git.Commits
+		a.gitBranchLoading = false
+		a.syncGitBranchCursor(p.Git.Branches)
+		a.gitStatusMsg = "abort ✓"
+	case "ours", "theirs", "both":
+		a.gitSubview = gitSubviewMain
+		a.gitWTDiffConflict = false
+		a.gitWTDiff = ""
+		if collectors.GitOpInProgress(msg.path) != "" {
+			a.gitConflictOn = true
+			a.focusFirstConflict(p.Git)
+			label := msg.action
+			if label == "both" {
+				label = "ambas"
+			}
+			a.gitStatusMsg = label + " ✓ · " + a.conflictStatusMsg(a.gitConflictKind)
+		} else {
+			a.clearGitConflictMode()
+			a.gitStatusMsg = msg.action + " " + msg.branch + " ✓"
+		}
+	case "edit":
+		a.gitStatusMsg = a.conflictStatusMsg(a.gitConflictKind)
 	case "push":
 		a.gitBranchLoading = false
 		a.gitStatusMsg = "push ✓"
 	case "add":
 		a.gitStatusMsg = "staged " + msg.branch + " ✓"
+		if a.gitConflictOn {
+			a.gitStatusMsg = a.conflictStatusMsg(a.gitConflictKind)
+		}
 	case "add-all":
 		a.gitStatusMsg = "todos os arquivos em stage ✓"
 	case "unstage":
 		a.gitStatusMsg = "unstage " + msg.branch + " ✓"
 	case "unstage-all":
 		a.gitStatusMsg = "todos removidos do stage ✓"
+	}
+
+	if a.gitConflictOn && collectors.GitOpInProgress(msg.path) == "" {
+		a.clearGitConflictMode()
 	}
 }
 
@@ -725,6 +901,186 @@ func shortGitHash(hash string) string {
 		return hash[:8]
 	}
 	return hash
+}
+
+func (a *App) updateGitConflict(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	p := a.currentProject()
+	if p == nil || p.Git == nil {
+		a.clearGitConflictMode()
+		return a, nil
+	}
+	if a.gitActionLoading {
+		return a, nil
+	}
+	switch msg.String() {
+	case "o", "O":
+		return a, a.gitResolveOurs(p)
+	case "t", "T":
+		return a, a.gitResolveTheirs(p)
+	case "b", "B":
+		return a, a.gitResolveBoth(p)
+	case "e", "E", "enter":
+		return a, a.openGitConflictDiff(p)
+	case "a", "A":
+		return a, a.gitAddFile(p)
+	case "c", "C":
+		return a, a.gitConflictContinue(p)
+	case "x", "X":
+		return a, a.gitConflictAbort(p)
+	case "L", "shift+l", "shift+L":
+		return a, a.openLazyGit(p.Path)
+	case "esc":
+		a.gitStatusMsg = a.conflictStatusMsg(a.gitConflictKind)
+	}
+	// Allow panel navigation while resolving.
+	switch msg.String() {
+	case "up", "k", "down", "j", "left", "h", "right", "l", "tab", "shift+tab":
+		return a.updateProject(msg)
+	}
+	return a, nil
+}
+
+func (a *App) gitConflictSelectedFile(p *core.Project) (string, bool) {
+	if p == nil || p.Git == nil {
+		return "", false
+	}
+	f, ok := a.selectedWTFile(p.Git)
+	if !ok {
+		return "", false
+	}
+	return f.Path, true
+}
+
+func (a *App) gitResolveOurs(p *core.Project) tea.Cmd {
+	file, ok := a.gitConflictSelectedFile(p)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo em conflito"
+		return nil
+	}
+	path := p.Path
+	a.gitActionLoading = true
+	a.gitStatusMsg = "ours " + file + "…"
+	return func() tea.Msg {
+		err := collectors.GitCheckoutOurs(path, file)
+		return gitActionDoneMsg{path: path, action: "ours", branch: file, cmdline: "git checkout --ours -- " + file, err: err}
+	}
+}
+
+func (a *App) gitResolveTheirs(p *core.Project) tea.Cmd {
+	file, ok := a.gitConflictSelectedFile(p)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo em conflito"
+		return nil
+	}
+	path := p.Path
+	a.gitActionLoading = true
+	a.gitStatusMsg = "theirs " + file + "…"
+	return func() tea.Msg {
+		err := collectors.GitCheckoutTheirs(path, file)
+		return gitActionDoneMsg{path: path, action: "theirs", branch: file, cmdline: "git checkout --theirs -- " + file, err: err}
+	}
+}
+
+func (a *App) gitResolveBoth(p *core.Project) tea.Cmd {
+	file, ok := a.gitConflictSelectedFile(p)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo em conflito"
+		return nil
+	}
+	path := p.Path
+	a.gitActionLoading = true
+	a.gitStatusMsg = "ambas " + file + "…"
+	return func() tea.Msg {
+		err := collectors.GitResolveBoth(path, file)
+		return gitActionDoneMsg{path: path, action: "both", branch: file, cmdline: "resolve both -- " + file, err: err}
+	}
+}
+
+func (a *App) openGitConflictDiff(p *core.Project) tea.Cmd {
+	if p == nil || p.Git == nil {
+		return nil
+	}
+	f, ok := a.selectedWTFile(p.Git)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo em conflito"
+		return nil
+	}
+	a.gitSubview = gitSubviewFileDiff
+	a.gitFocus = gitFocusFiles
+	a.gitWTDiffScroll = 0
+	a.gitWTDiffHScroll = 0
+	a.gitWTDiff = ""
+	a.gitStatusMsg = "diff do conflito — o/t/b escolhe lado"
+	return a.requestGitConflictDiff(p.Path, f.Path)
+}
+
+func (a *App) updateGitConflictDiff(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	p := a.currentProject()
+	if p == nil {
+		return a, nil
+	}
+	if a.gitActionLoading {
+		return a, nil
+	}
+	switch msg.String() {
+	case "o", "O":
+		return a, a.gitResolveOurs(p)
+	case "t", "T":
+		return a, a.gitResolveTheirs(p)
+	case "b", "B":
+		return a, a.gitResolveBoth(p)
+	case "e", "E":
+		// External editor still available from the conflict diff screen.
+		return a, a.gitConflictEdit(p)
+	case "esc":
+		a.gitSubview = gitSubviewMain
+		a.gitFocus = gitFocusFiles
+		a.gitWTDiffConflict = false
+		a.gitStatusMsg = a.conflictStatusMsg(a.gitConflictKind)
+		return a, nil
+	}
+	return a.handleGitDedicatedKeys(msg, p)
+}
+
+func (a *App) gitConflictContinue(p *core.Project) tea.Cmd {
+	path := p.Path
+	a.gitActionLoading = true
+	a.gitStatusMsg = "continue…"
+	return func() tea.Msg {
+		out, err := collectors.GitContinue(path)
+		return gitActionDoneMsg{path: path, action: "continue", cmdline: "git … --continue", output: out, err: err}
+	}
+}
+
+func (a *App) gitConflictAbort(p *core.Project) tea.Cmd {
+	path := p.Path
+	a.gitActionLoading = true
+	a.gitStatusMsg = "abort…"
+	return func() tea.Msg {
+		out, err := collectors.GitAbort(path)
+		return gitActionDoneMsg{path: path, action: "abort", cmdline: "git … --abort", output: out, err: err}
+	}
+}
+
+func (a *App) gitConflictEdit(p *core.Project) tea.Cmd {
+	file, ok := a.gitConflictSelectedFile(p)
+	if !ok {
+		a.gitStatusMsg = "selecione um arquivo em conflito"
+		return nil
+	}
+	abs := filepath.Join(p.Path, file)
+	editor := strings.TrimSpace(os.Getenv("EDITOR"))
+	if editor == "" {
+		editor = "vi"
+	}
+	parts := strings.Fields(editor)
+	args := append(append([]string{}, parts[1:]...), abs)
+	cmd := exec.Command(parts[0], args...)
+	cmd.Dir = p.Path
+	path := p.Path
+	return tea.ExecProcess(cmd, func(err error) tea.Msg {
+		return gitActionDoneMsg{path: path, action: "edit", branch: file, cmdline: editor + " " + file, err: err}
+	})
 }
 
 // gitCompactError converte mensagens de erro multi-linha do git em uma única linha

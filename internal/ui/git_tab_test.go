@@ -152,6 +152,64 @@ func TestGitFileLinesShowsTree(t *testing.T) {
 	}
 }
 
+func TestGitConflictFileLinesOnlyUnmerged(t *testing.T) {
+	g := &core.GitInfo{
+		IsRepo: true, Branch: "feat",
+		Files: []core.GitFileStatus{
+			{Path: "ok.php", Staging: "M", Worktree: " "},
+			{Path: "app/Conflict.php", Staging: "U", Worktree: "U"},
+			{Path: "other/Also.php", Staging: "U", Worktree: "U"},
+			{Path: "clean.js", Staging: "A", Worktree: " "},
+		},
+	}
+	a := &App{
+		gitFocus: gitFocusFiles, gitViewBranch: "feat", gitConflictOn: true,
+		gitConflictOurs: "feat", gitConflictTheirs: "develop", width: 100,
+	}
+	got := stripANSI(strings.Join(a.gitFileLines(g, "feat", 20), "\n"))
+	if !strings.Contains(got, "CONFLICT") || !strings.Contains(got, "o=feat") || !strings.Contains(got, "t=develop") {
+		t.Fatalf("expected conflict legend, got %q", got)
+	}
+	if !strings.Contains(got, "app/Conflict.php") || !strings.Contains(got, "other/Also.php") {
+		t.Fatalf("expected only conflict paths, got %q", got)
+	}
+	if strings.Contains(got, "ok.php") || strings.Contains(got, "clean.js") || strings.Contains(got, "staged") {
+		t.Fatalf("clean merges must be hidden during conflict: %q", got)
+	}
+	title := stripANSI(a.renderGitWorkingRow(g, "feat", 60, 12))
+	if !strings.Contains(title, "CONFLICTS · 2 left") {
+		t.Fatalf("title=%q", title)
+	}
+}
+
+func TestGitConflictDiffScreen(t *testing.T) {
+	p := core.Project{
+		Name: "demo", Path: "/p",
+		Git: &core.GitInfo{
+			IsRepo: true, Branch: "feat",
+			Files: []core.GitFileStatus{{Path: "app/Conflict.php", Staging: "U", Worktree: "U"}},
+		},
+	}
+	a := &App{
+		width: 100, height: 30, view: ViewProject, tab: TabGit,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+		gitConflictOn: true, gitConflictOurs: "feat", gitConflictTheirs: "develop",
+		gitSubview: gitSubviewFileDiff, gitWTDiffConflict: true,
+		gitWTDiffFile: "app/Conflict.php",
+		gitWTDiff: "CONFLICT  o=feat  (−)  vs  t=develop  (+)\n" +
+			"--- a/app/Conflict.php  (feat / ours)\n" +
+			"+++ b/app/Conflict.php  (develop / theirs)\n" +
+			"@@ -1 +1 @@\n-mine\n+theirs\n",
+		gitViewBranch: "feat", gitFocus: gitFocusFiles,
+	}
+	got := stripANSI(a.renderGitFileDiff(&p))
+	for _, want := range []string{"CONFLICT DIFF", "feat", "develop", "o=", "t=", "b=ambas", "-mine", "+theirs"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in:\n%s", want, got)
+		}
+	}
+}
+
 func TestGitAddFileTogglesUnstage(t *testing.T) {
 	p := core.Project{
 		Path: "/tmp/repo", Name: "repo",
