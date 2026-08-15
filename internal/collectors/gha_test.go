@@ -136,7 +136,7 @@ func TestParseAndFormatGHAJobs(t *testing.T) {
 		t.Fatalf("%+v err=%v", jobs, err)
 	}
 	text := FormatGHATimelineText(jobs)
-	if !strings.Contains(text, "TIMELINE") || !strings.Contains(text, "✗") || !strings.Contains(text, "[") {
+	if !strings.Contains(text, "TIMELINE") || !strings.Contains(text, "✗") || !strings.Contains(text, "[") || !strings.Contains(text, "⣿") {
 		t.Fatalf("%q", text)
 	}
 }

@@ -187,7 +187,7 @@ func (a *App) renderCFLanding(p *core.Project) string {
 	openH := maxInt(7, bodyH*40/100)
 	featH := maxInt(6, bodyH-openH)
 	openLines := []string{
-		StyleMuted.Render("exposição local via edge Cloudflare — quick & named"),
+		StyleMuted.Render("exposição local via edge Cloudflare — quick, named & http2"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
 	switch {
@@ -199,7 +199,7 @@ func (a *App) renderCFLanding(p *core.Project) string {
 	default:
 		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(auth.Version))
 		if auth.LoggedIn {
-			openLines = append(openLines, StyleHealthy.Render("● autenticado (cert.pem)"))
+			openLines = append(openLines, a.livePulse("autenticado (cert.pem)"))
 		} else {
 			openLines = append(openLines, StyleWarning.Render("○ sem login — quick tunnels ainda funcionam"))
 			openLines = append(openLines, StyleMuted.Render("named tunnels: pressione L no console"))
@@ -304,7 +304,7 @@ func (a *App) renderCFHeader(p *core.Project, width int) string {
 
 	badge := StyleMuted.Render("○ CLI off")
 	if a.cfAuth.CLI && a.cfAuth.LoggedIn {
-		badge = StyleHealthy.Render("● Authenticated")
+		badge = a.livePulse("Authenticated")
 	} else if a.cfAuth.CLI {
 		badge = StyleWarning.Render("● CLI · no auth")
 	}
@@ -367,7 +367,7 @@ func (a *App) renderCFOverview(p *core.Project, width, height int) string {
 	listH := maxInt(6, height-sumH)
 	authLabel := StyleWarning.Render("○ not logged in")
 	if a.cfAuth.LoggedIn {
-		authLabel = StyleHealthy.Render("● logged in")
+		authLabel = a.livePulse("logged in")
 	}
 	cliLabel := StyleUnhealthy.Render("missing")
 	if a.cfAuth.CLI {
@@ -748,7 +748,7 @@ func (a *App) renderCFWizard(p *core.Project, width, height int) string {
 	innerW := maxInt(28, boxW-6)
 	accent := tabAccentColor(TabCFTunnel)
 
-	lines := tunnelModalChrome("CLOUDFLARE", accent, "Novo túnel", "quick tunnel ou named + hostname", proj, innerW)
+	lines := tunnelModalChrome("CLOUDFLARE", accent, "Novo túnel", "quick, named + hostname ou http2", proj, innerW)
 	lines = append(lines, "")
 
 	nameBox := renderApiTitledBox("nome",
@@ -795,6 +795,7 @@ func (a *App) renderCFWizard(p *core.Project, width, height int) string {
 		StyleMuted.Render("projeto fixo — túnel fica ligado a "+firstNonEmpty(proj, "este projeto")),
 		StyleMuted.Render("url: http://127.0.0.1:3000 ou só 4321 · localhost → 127.0.0.1"),
 		StyleMuted.Render("quick = trycloudflare · named = hostname no domínio"),
+		StyleMuted.Render("http2 = quick forçando --protocol http2, pra rede sem QUIC"),
 		preview,
 		"",
 		StyleMuted.Render("tab campo  ·  ←→ cursor  ·  space mode  ·  enter salva e inicia  ·  esc"),
@@ -897,11 +898,13 @@ func (a *App) cfWizardFocusField(field int) {
 }
 
 func (a *App) cycleCFMode() {
-	if a.cfNewMode == "quick" {
-		a.cfNewMode = "named"
-	} else {
-		a.cfNewMode = "quick"
+	for i, m := range cfutil.Modes {
+		if m == a.cfNewMode {
+			a.cfNewMode = cfutil.Modes[(i+1)%len(cfutil.Modes)]
+			return
+		}
 	}
+	a.cfNewMode = cfutil.Modes[0]
 }
 
 func (a *App) cfSelected() (cfutil.Tunnel, bool) {

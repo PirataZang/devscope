@@ -492,7 +492,7 @@ func (a *App) renderGHAProcJobs(width, height int) string {
 		body = a.ghaDetail
 	}
 	if strings.TrimSpace(body) == "" {
-		body = "carregando jobs…\n(selecione um run na aba Runs se estiver vazio)"
+		body = a.spinner() + " carregando jobs…\n(selecione um run na aba Runs se estiver vazio)"
 	}
 	raw := strings.Split(body, "\n")
 	a.ghaProcScroll = clampScroll(a.ghaProcScroll, inner, len(raw))
@@ -633,7 +633,7 @@ func (a *App) renderGHAProcLogs(width, height int) string {
 		body = a.ghaDetail
 	}
 	if strings.TrimSpace(body) == "" {
-		body = "carregando logs…\n(se vazio: selecione um run na aba Runs ou dispare com t)"
+		body = a.spinner() + " carregando logs…\n(se vazio: selecione um run na aba Runs ou dispare com t)"
 	}
 	raw := strings.Split(body, "\n")
 	a.ghaProcScroll = clampScroll(a.ghaProcScroll, inner, len(raw))
@@ -665,7 +665,7 @@ func (a *App) renderGHAProcYAML(width, height int) string {
 		body = a.ghaDetail
 	}
 	if strings.TrimSpace(body) == "" {
-		body = "carregando YAML…"
+		body = a.spinner() + " carregando YAML…"
 	}
 	raw := strings.Split(body, "\n")
 	a.ghaProcScroll = clampScroll(a.ghaProcScroll, inner, len(raw))

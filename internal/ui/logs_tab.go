@@ -20,7 +20,7 @@ func (a *App) renderLogsTab(p *core.Project) string {
 	w, h := a.moduleSize()
 	status := "idle"
 	if a.projectLogsLoading {
-		status = "carregando…"
+		status = a.spinner() + " carregando…"
 	} else if a.projectLogsFollow {
 		if a.projectLogsPaused {
 			status = "follow PAUSED"

@@ -28,6 +28,37 @@ var relaxBrailleDot = [4][2]byte{
 	{0x40, 0x80},
 }
 
+// relaxArtDots lê um desenho pronto em Braille e devolve o bitmap de subpontos
+// (largura e altura em pontos, não em células). Trabalhar em ponto é o que
+// deixa um desenho encolher pro tamanho do palco sem esfarelar: reduzir o
+// bitmap e re-encodar preserva a silhueta, jogar coluna fora não.
+func relaxArtDots(art []string) ([]bool, int, int) {
+	cols := 0
+	for _, l := range art {
+		if n := len([]rune(l)); n > cols {
+			cols = n
+		}
+	}
+	dw, dh := cols*2, len(art)*4
+	dots := make([]bool, dw*dh)
+	for y, l := range art {
+		for x, r := range []rune(l) {
+			if r < 0x2800 || r > 0x28FF {
+				continue
+			}
+			bits := byte(r - 0x2800)
+			for row := 0; row < 4; row++ {
+				for col := 0; col < 2; col++ {
+					if bits&relaxBrailleDot[row][col] != 0 {
+						dots[(y*4+row)*dw+x*2+col] = true
+					}
+				}
+			}
+		}
+	}
+	return dots, dw, dh
+}
+
 type relaxBraille struct {
 	w, h  int
 	bits  []byte
@@ -78,6 +109,34 @@ func (b *relaxBraille) text(cx, cy int, glyph string, lvl int) {
 	}
 	i := cy*b.w + cx
 	b.over[i], b.force[i] = glyph, int16(lvl)
+}
+
+// taken diz que a célula já tem dono: cor fixada por paint/lock. Fundo não
+// entra nela — preencher os pontos vazios de uma célula de um objeto fino
+// engorda a silhueta uma célula inteira, e aí o contorno vira escada.
+func (b *relaxBraille) taken(px, py int) bool {
+	if px < 0 || py < 0 || px >= b.w*2 || py >= b.h*4 {
+		return true // fora do palco: b.set ignoraria de todo jeito
+	}
+	return b.force[(py/4)*b.w+px/2] >= 0
+}
+
+// lock congela a célula na cor que ela tem agora. Diferente de paint, que
+// escolhe a cor: aqui a cor é a que os pontos já votaram. É o que salva traço
+// fino — lâmina, haste — de virar céu quando o fundo enche a mesma célula.
+func (b *relaxBraille) lock(cx, cy int) {
+	if cx < 0 || cy < 0 || cx >= b.w || cy >= b.h {
+		return
+	}
+	i := cy*b.w + cx
+	if b.cnt[i] == 0 || b.force[i] >= 0 {
+		return
+	}
+	if b.vote {
+		b.force[i] = b.dom[i]
+		return
+	}
+	b.force[i] = int16(b.sum[i] / b.cnt[i])
 }
 
 // set acende o subpixel (px, py) com o nível de cor lvl. Ponto já aceso não
@@ -176,6 +235,126 @@ func (b *relaxBraille) lines(palette []lipgloss.Style) []string {
 		out = append(out, line.String())
 	}
 	return out
+}
+
+// ── Pincel vetorial ───────────────────────────────────────────────────────
+//
+// Desenho por forma, e não por ponto: o pincel recebe coordenadas em qualquer
+// escala e um "tom", e quem resolve o que tom significa é o dono do put — o
+// mesmo desenho serve de símbolo aceso, de fantasma de borrão e de partícula.
+//
+// ORDEM IMPORTA em tudo que passa por aqui: o Braille não sobrescreve ponto
+// aceso, então detalhe que fica por cima é desenhado ANTES do corpo.
+
+type relaxPen struct {
+	put  func(x, y float64, tone int)
+	step float64 // um subponto, em unidades normalizadas
+}
+
+func (p relaxPen) dot(cx, cy, r float64, tone int) {
+	for y := cy - r; y <= cy+r; y += p.step {
+		for x := cx - r; x <= cx+r; x += p.step {
+			if dx, dy := x-cx, y-cy; dx*dx+dy*dy <= r*r {
+				p.put(x, y, tone)
+			}
+		}
+	}
+}
+
+// disc é o dot com volume: luz de cima à esquerda. Fruta e moeda chapadas
+// pareciam adesivo; o degrau de um tom já resolve numa forma deste tamanho.
+func (p relaxPen) disc(cx, cy, r float64, tone int) {
+	for y := cy - r; y <= cy+r; y += p.step {
+		for x := cx - r; x <= cx+r; x += p.step {
+			dx, dy := (x-cx)/r, (y-cy)/r
+			d := dx*dx + dy*dy
+			if d > 1 {
+				continue
+			}
+			t := tone
+			switch {
+			case dx+dy < -0.45 && d < 0.72:
+				t++
+			case dx+dy > 0.80:
+				t--
+			}
+			p.put(x, y, t)
+		}
+	}
+}
+
+func (p relaxPen) ellipse(cx, cy, rx, ry float64, tone int) {
+	if rx <= 0 || ry <= 0 {
+		return
+	}
+	for y := cy - ry; y <= cy+ry; y += p.step {
+		for x := cx - rx; x <= cx+rx; x += p.step {
+			dx, dy := (x-cx)/rx, (y-cy)/ry
+			if dx*dx+dy*dy <= 1 {
+				p.put(x, y, tone)
+			}
+		}
+	}
+}
+
+func (p relaxPen) rect(x0, y0, x1, y1 float64, tone int) {
+	for y := y0; y <= y1; y += p.step {
+		for x := x0; x <= x1; x += p.step {
+			p.put(x, y, tone)
+		}
+	}
+}
+
+func (p relaxPen) stroke(x0, y0, x1, y1, th float64, tone int) {
+	n := maxInt(2, int(math.Hypot(x1-x0, y1-y0)/p.step))
+	for i := 0; i <= n; i++ {
+		f := float64(i) / float64(n)
+		p.dot(lerp(x0, x1, f), lerp(y0, y1, f), th/2, tone)
+	}
+}
+
+func (p relaxPen) arc(cx, cy, r, a0, a1, th float64, tone int) {
+	n := maxInt(4, int(math.Abs(a1-a0)*r/p.step))
+	for i := 0; i <= n; i++ {
+		a := lerp(a0, a1, float64(i)/float64(n))
+		p.dot(cx+math.Cos(a)*r, cy+math.Sin(a)*r, th/2, tone)
+	}
+}
+
+// quadFill preenche um quadrilátero já girado, por varredura simples: são
+// dezenas de cartas por quadro, e o preenchimento por linha custa menos que
+// duas chamadas de triângulo do buffer.
+func (p relaxPen) quadFill(q [4][2]float64, tone int) {
+	minY, maxY := q[0][1], q[0][1]
+	minX, maxX := q[0][0], q[0][0]
+	for _, v := range q {
+		minY, maxY = math.Min(minY, v[1]), math.Max(maxY, v[1])
+		minX, maxX = math.Min(minX, v[0]), math.Max(maxX, v[0])
+	}
+	inside := func(x, y float64) bool {
+		sign := 0
+		for i := 0; i < 4; i++ {
+			a, bb := q[i], q[(i+1)%4]
+			d := (bb[0]-a[0])*(y-a[1]) - (bb[1]-a[1])*(x-a[0])
+			s := 1
+			if d < 0 {
+				s = -1
+			}
+			if sign == 0 {
+				sign = s
+			} else if s != sign {
+				return false
+			}
+		}
+		return true
+	}
+	for y := minY; y <= maxY; y += p.step {
+		for x := minX; x <= maxX; x += p.step {
+			if inside(x, y) {
+				p.put(x, y, tone)
+			}
+		}
+	}
 }
 
 // ── Primitivas ────────────────────────────────────────────────────────────────

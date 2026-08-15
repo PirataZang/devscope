@@ -99,6 +99,37 @@ func TestTunnelArgs(t *testing.T) {
 	if named != "tunnel run --url http://localhost:3000 api" {
 		t.Fatalf("named: %q", named)
 	}
+	h2 := strings.Join(tunnelArgs("api", "http://localhost:3000", "http2"), " ")
+	if h2 != "tunnel --protocol http2 --url http://localhost:3000" {
+		t.Fatalf("http2: %q", h2)
+	}
+}
+
+func TestNormalizeMode(t *testing.T) {
+	cases := []struct{ mode, hostname, want string }{
+		{"", "", "quick"},
+		{"", "api.example.com", "named"},
+		{"quick", "", "quick"},
+		{"named", "api.example.com", "named"},
+		{"http2", "", "http2"},
+		{" HTTP2 ", "", "http2"},
+		// Modo desconhecido não pode virar named nem escapar pro tunnelArgs:
+		// vira quick, que é o único que roda sem login e sem hostname.
+		{"grpc", "", "quick"},
+		{"grpc", "api.example.com", "quick"},
+	}
+	for _, c := range cases {
+		if got := NormalizeMode(c.mode, c.hostname); got != c.want {
+			t.Fatalf("NormalizeMode(%q, %q) = %q, queria %q", c.mode, c.hostname, got, c.want)
+		}
+	}
+	// Todo modo da lista tem de sobreviver ao normalize, senão o wizard oferece
+	// um que o agente descarta.
+	for _, m := range Modes {
+		if got := NormalizeMode(m, ""); got != m {
+			t.Fatalf("modo %q do menu vira %q no agente", m, got)
+		}
+	}
 }
 
 func TestSanitizeName(t *testing.T) {

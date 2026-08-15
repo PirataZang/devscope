@@ -115,7 +115,7 @@ func (a *App) renderDockerAddSearchBox() string {
 
 	status := StyleMuted.Render("hub.docker.com  ·  busca pública, sem login")
 	if a.dockerAddLoading {
-		status = StyleAccent.Render("buscando no Docker Hub…")
+		status = StyleAccent.Render(a.spinner() + " buscando no Docker Hub…")
 	}
 
 	lines := dockerAddModalChrome("adicionar serviço ao compose", dockerAddStepSearch, innerW)
@@ -144,7 +144,7 @@ func (a *App) renderDockerAddResultsBox() string {
 
 	moreHint := ""
 	if a.dockerAddLoading {
-		moreHint = "  ·  carregando…"
+		moreHint = "  ·  " + a.spinner() + " carregando…"
 	} else if a.dockerAddHasMore {
 		moreHint = "  ·  ↓ carrega mais"
 	}
@@ -219,7 +219,7 @@ func (a *App) renderDockerAddImageBox(width, height int) string {
 
 	title := "Imagem (ajuste tag se quiser)"
 	if a.dockerAddTagsLoading && a.dockerAddTagsRepo != "" {
-		title = "Imagem · carregando tags…"
+		title = a.spinner() + " Imagem · carregando tags…"
 	} else if n := len(a.dockerAddTags); n > 0 {
 		title = fmt.Sprintf("Imagem · %d tags", n)
 	}
@@ -228,7 +228,7 @@ func (a *App) renderDockerAddImageBox(width, height int) string {
 
 func (a *App) renderDockerAddTagList(width, height int, focused bool) []string {
 	if a.dockerAddTagsLoading && len(a.dockerAddTags) == 0 {
-		return fitExactLines([]string{StyleAccent.Render("buscando tags no Hub…")}, height)
+		return fitExactLines([]string{StyleAccent.Render(a.spinner() + " buscando tags no Hub…")}, height)
 	}
 	if len(a.dockerAddTags) == 0 {
 		return fitExactLines([]string{StyleMuted.Render("(sem tags · digite manualmente)")}, height)
@@ -384,7 +384,7 @@ func (a *App) dockerAddDetailsContent(repo collectors.DockerHubRepo, hasRepo boo
 			lines = append(lines, StyleMuted.Render(w))
 		}
 	} else if a.dockerAddDetailsLoading && a.dockerAddDetailsName == repo.Name {
-		lines = append(lines, StyleAccent.Render("carregando detalhes…"))
+		lines = append(lines, StyleAccent.Render(a.spinner()+" carregando detalhes…"))
 	}
 
 	desc := strings.TrimSpace(repo.Description)

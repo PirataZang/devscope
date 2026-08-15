@@ -79,11 +79,20 @@ func TestCFWizardEditsURLAsText(t *testing.T) {
 		t.Fatalf("backspace: got %q", a.cfNewURL)
 	}
 
+	// space percorre a lista inteira e volta pro começo: se o wizard parar de
+	// oferecer um modo, o usuário não tem como escolher aquele que o agente sabe
+	// rodar.
 	a.cfWizardFocusField(cfWizMode)
-	a.cfNewMode = "quick"
-	_, _ = a.updateCFWizard(tea.KeyMsg{Type: tea.KeySpace}, &p)
-	if a.cfNewMode != "named" {
-		t.Fatalf("space should cycle mode to named, got %q", a.cfNewMode)
+	a.cfNewMode = cfutil.Modes[0]
+	for i := 1; i <= len(cfutil.Modes); i++ {
+		_, _ = a.updateCFWizard(tea.KeyMsg{Type: tea.KeySpace}, &p)
+		want := cfutil.Modes[i%len(cfutil.Modes)]
+		if a.cfNewMode != want {
+			t.Fatalf("space %d: modo %q, queria %q", i, a.cfNewMode, want)
+		}
+	}
+	if len(cfutil.Modes) != 3 || cfutil.Modes[2] != "http2" {
+		t.Fatalf("lista de modos inesperada: %v", cfutil.Modes)
 	}
 
 	view := stripANSI(a.renderCFWizard(&p, 60, 14))

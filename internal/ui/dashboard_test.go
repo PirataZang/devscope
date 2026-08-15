@@ -33,7 +33,7 @@ func TestTableRowNeverExceedsTerminalWidth(t *testing.T) {
 		row := renderTableRow(cols, tableRow{
 			icon: "L", name: "projeto-api",
 			path: "/home/user/projects/projeto-api", branch: "feature/dashboard", ctrs: "12",
-		}, StyleNormal, ptrStatus(core.StatusRunning), false)
+		}, StyleNormal, ptrStatus(core.StatusRunning), false, 0)
 		if strings.Contains(row, "\n") {
 			t.Fatalf("row contains newline at termW=%d", termW)
 		}
@@ -53,15 +53,15 @@ func TestDashboardShowsProjectPath(t *testing.T) {
 	cols := tableColumns(78)
 	row := renderTableRow(cols, tableRow{
 		name: "projeto", path: "/home/user/projeto", branch: "main", ctrs: "6",
-	}, StyleNormal, ptrStatus(core.StatusRunning), false)
+	}, StyleNormal, ptrStatus(core.StatusRunning), false, 0)
 	if !strings.Contains(row, "/home/user/projeto") {
 		t.Fatal("dashboard row should contain project path")
 	}
 }
 
 func TestProjectStatusColors(t *testing.T) {
-	run := renderStatusCell(12, core.StatusRunning, false)
-	stop := renderStatusCell(12, core.StatusStopped, false)
+	run := renderStatusCell(12, core.StatusRunning, false, 0)
+	stop := renderStatusCell(12, core.StatusStopped, false, 0)
 	if run == stop {
 		t.Fatal("running and stopped status should render differently")
 	}

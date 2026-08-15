@@ -4,6 +4,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/devscope/devscope/internal/core"
 )
 
 // ~10 fps (8–12 range). Separate from tickMsg so store/git sync stay at 300ms.
@@ -11,14 +12,14 @@ const animInterval = 100 * time.Millisecond
 
 type animTickMsg struct{}
 
-// Braille spinner — 10 frames.
-var animSpinnerFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+// Braille spinner — bolinhas circulando (8 frames).
+var animSpinnerFrames = []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"}
 
-// Soft pulse for online / healthy dots.
-var animPulseFrames = []string{"●", "◉", "○", "◉"}
+// Pico de energia de baixo pra cima (Braille 2×4), sobe e desce.
+var animPulseFrames = []string{"⣀", "⣤", "⣶", "⣿", "⣿", "⣶", "⣤", "⣀"}
 
-// Arc spinner for "starting" / queued (4 frames, still reads at 10fps).
-var animArcFrames = []string{"◐", "◓", "◑", "◒"}
+// Bolinha na borda da célula — "starting" / queued.
+var animArcFrames = []string{"⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"}
 
 func scheduleAnimTick() tea.Cmd {
 	return tea.Tick(animInterval, func(t time.Time) tea.Msg {
@@ -54,6 +55,12 @@ func animPulse(frame int) string {
 	return animPulseFrames[frame%len(animPulseFrames)]
 }
 
+func animPulseSlow(frame int) string {
+	return animPulse(frame / 3)
+}
+
+const animStoppedGlyph = "⣀"
+
 func animArc(frame int) string {
 	if len(animArcFrames) == 0 {
 		return "●"
@@ -72,11 +79,19 @@ func (a *App) pulse() string {
 	return animPulse(a.animFrame)
 }
 
+func (a *App) livePulse(label string) string {
+	g := a.pulse()
+	if label == "" {
+		return StyleHealthy.Render(g)
+	}
+	return StyleHealthy.Render(g + " " + label)
+}
+
 func (a *App) arc() string {
 	return animArc(a.animFrame)
 }
 
-// loadingText renders "⠋ carregando…" with the current spinner frame.
+// loadingText renders "⣾ carregando…" with the current spinner frame.
 func (a *App) loadingText(label string) string {
 	if label == "" {
 		label = "carregando…"
@@ -105,7 +120,26 @@ func (a *App) needsAnim() bool {
 		a.containerDetailLoading || a.apiLoading || a.dbLoading || a.dbSchemaLoading ||
 		a.k8sLoading || a.swarmLoading || a.routesLoading ||
 		a.ngrokLoading || a.cfLoading || a.sshLoading || a.jenkinsLoading || a.ghaLoading ||
+		(a.ghaOpen && a.ghaHasActiveWork()) ||
 		a.projectLogsLoading || a.projectGitLoading || a.projectDockerLoading {
+		return true
+	}
+	return a.wantsPulseAnim()
+}
+
+func (a *App) wantsPulseAnim() bool {
+	if a.view == ViewDashboard {
+		for _, p := range a.snapshot.Projects {
+			if p.Health == core.HealthHealthy || p.Status == core.StatusRunning || p.Status == core.StatusDegraded {
+				return true
+			}
+		}
+		return false
+	}
+	if p := a.currentProject(); p != nil && (p.Health == core.HealthHealthy || p.Status == core.StatusRunning || p.Status == core.StatusDegraded) {
+		return true
+	}
+	if a.ghaOpen || (a.jenkinsOpen && a.jenkinsInfo.Connected) || a.wsConnected {
 		return true
 	}
 	return false

@@ -308,7 +308,7 @@ func (a *App) renderApiChrome(width int) string {
 
 	meta := StyleMuted.Render("scratchpad")
 	if a.apiLoading {
-		meta = StyleWarning.Render("● enviando…")
+		meta = StyleWarning.Render(a.spinner() + " enviando…")
 	} else if a.apiResponseErr != "" {
 		meta = StyleUnhealthy.Render("● erro")
 	} else if a.apiResponseStatus != "" {
@@ -393,7 +393,7 @@ func (a *App) renderApiRightTitle() string {
 	}
 	meta := ""
 	if a.apiLoading {
-		meta = " · enviando..."
+		meta = " · " + a.spinner() + " enviando..."
 	} else if a.apiResponseErr != "" {
 		meta = " · falha"
 	} else if a.apiResponseStatus != "" {

@@ -584,8 +584,8 @@ func (a *App) renderGitSideColumn(g *core.GitInfo, width, height int) string {
 		theirs := firstNonEmpty(a.gitConflictTheirs, "incoming")
 		actions = renderActionsBox(width, actH,
 			[2]string{"enter/e", "ver conflito"},
-			[2]string{"o", "ours "+truncate(ours, 10)},
-			[2]string{"t", "theirs "+truncate(theirs, 8)},
+			[2]string{"o", "ours " + truncate(ours, 10)},
+			[2]string{"t", "theirs " + truncate(theirs, 8)},
 			[2]string{"b", "ambas"},
 			[2]string{"c", "continue"},
 			[2]string{"x", "abort"},
@@ -998,7 +998,7 @@ func (a *App) renderGitBranchHistoryInspector(p *core.Project, branch string, co
 
 	details := []string{StyleMuted.Render("(nenhum commit)")}
 	if len(commits) == 0 && a.gitBranchLoading {
-		details = []string{StyleMuted.Render("carregando…")}
+		details = []string{a.loadingMuted("carregando…")}
 	} else if len(commits) > 0 && a.gitCommitCursor < len(commits) {
 		c := commits[a.gitCommitCursor]
 		details = []string{
@@ -1457,7 +1457,7 @@ func (a *App) renderGitCommitFilesSidebarLines(height, width int) []string {
 	lines := []string{title}
 
 	if a.gitCommitFilesLoading {
-		lines = append(lines, StyleMuted.Render(truncate("carregando...", width)))
+		lines = append(lines, a.loadingMuted(truncate("carregando...", width)))
 		return fitExactLines(lines, height)
 	}
 	files := a.gitCommitFiles
@@ -1823,7 +1823,7 @@ func (a *App) renderGitCommits(viewBranch string) string {
 	title += StyleMuted.Render(" · " + truncate(viewBranch, maxInt(8, a.gitCommitColWidth()-12)))
 	if a.gitBranchLoading {
 		return fitGitPanelLines(
-			StyleSection.Render(title)+"\n"+StyleMuted.Render("  carregando..."),
+			StyleSection.Render(title)+"\n"+a.loadingMuted("  carregando..."),
 			a.gitPanelInnerLines(),
 		)
 	}

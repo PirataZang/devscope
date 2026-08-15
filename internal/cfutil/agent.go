@@ -327,6 +327,29 @@ func RouteDNS(tunnel, hostname string) error {
 	return nil
 }
 
+// Modes são os modos de túnel, na ordem em que o wizard cicla. Uma lista só
+// porque wizard e agente têm de concordar: com a string solta em cada if, um
+// modo novo aparece no menu e o agente cai no default sem ninguém notar.
+var Modes = []string{"quick", "named", "http2"}
+
+// NormalizeMode devolve um modo válido. Vazio se resolve pelo hostname — quem
+// informou hostname quer named —, e o que não está na lista vira quick.
+func NormalizeMode(mode, hostname string) string {
+	mode = strings.ToLower(strings.TrimSpace(mode))
+	if mode == "" {
+		if strings.TrimSpace(hostname) != "" {
+			return "named"
+		}
+		return "quick"
+	}
+	for _, m := range Modes {
+		if m == mode {
+			return mode
+		}
+	}
+	return "quick"
+}
+
 // StartTunnel expõe um destino local (porta, host:porta ou URL completa) e
 // devolve a URL pública assim que o cloudflared anuncia.
 func StartTunnel(name, target, mode, hostname string) (string, error) {
@@ -338,13 +361,7 @@ func StartTunnel(name, target, mode, hostname string) (string, error) {
 	if name == "" {
 		name = "tunnel"
 	}
-	if mode == "" {
-		if hostname != "" {
-			mode = "named"
-		} else {
-			mode = "quick"
-		}
-	}
+	mode = NormalizeMode(mode, hostname)
 	runMu.Lock()
 	if st, ok := running[name]; ok && st.cmd != nil && st.cmd.Process != nil {
 		runMu.Unlock()
@@ -354,9 +371,6 @@ func StartTunnel(name, target, mode, hostname string) (string, error) {
 
 	if mode == "named" && !LoggedIn() {
 		return "", fmt.Errorf("túnel named exige login (L)")
-	}
-	if mode != "named" {
-		mode = "quick"
 	}
 	cmd := exec.Command("cloudflared", tunnelArgs(name, local, mode)...)
 
@@ -534,10 +548,15 @@ func extractPublicURL(line string) string {
 }
 
 // tunnelArgs monta a chamada do cloudflared: quick usa `tunnel --url <url>`,
-// named usa `tunnel run --url <url> <name>`.
+// named usa `tunnel run --url <url> <name>` e http2 é o quick forçando o
+// transporte — serve pra rede que bloqueia QUIC na UDP 7844, onde o quick fica
+// tentando reconectar sem nunca subir.
 func tunnelArgs(name, url, mode string) []string {
-	if mode == "named" {
+	switch mode {
+	case "named":
 		return []string{"tunnel", "run", "--url", url, name}
+	case "http2":
+		return []string{"tunnel", "--protocol", "http2", "--url", url}
 	}
 	return []string{"tunnel", "--url", url}
 }

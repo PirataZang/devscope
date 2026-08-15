@@ -25,19 +25,19 @@ const (
 	relaxGameLeaves
 	relaxGamePetals
 	relaxGameTree
-	relaxGameAquarium
 	relaxGameFire
 	relaxGameCoffee
 	relaxGameSea
-	relaxGameClouds
-	relaxGameDrop
 	relaxGameBurst
 	relaxGameCity
-	relaxGameRidge
 	relaxGameFox
 	relaxGameFireworks
 	relaxGameTetris
-	relaxGameInvaders
+	relaxGameSword
+	relaxGameHourglass
+	relaxGameChess
+	relaxGameJackpot
+	relaxGameV4
 )
 
 // relaxScene descreve uma cena: rótulo, passo de simulação e render. Tabela em
@@ -132,14 +132,6 @@ var relaxScenes = []relaxScene{
 		},
 		objects: func(a *App) int { return a.relaxTree.clusters },
 	},
-	relaxGameAquarium: {
-		name: "Aquarium", glyph: "❥", subtitle: "peixes indo e vindo sem pressa", color: ColorAccent,
-		step: func(a *App) { stepRelaxAquarium(&a.relaxAq) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxAquariumFrames(&a.relaxAq, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxAq.fish) + len(a.relaxAq.bubbles) },
-	},
 	relaxGameFire: {
 		name: "Campfire", glyph: "▲", subtitle: "uma fogueira queimando devagar", color: ColorDanger,
 		step: func(a *App) { stepRelaxFire(&a.relaxFire) },
@@ -162,22 +154,6 @@ var relaxScenes = []relaxScene{
 			return relaxSeaFrames(&a.relaxSea, w, h, f)
 		},
 	},
-	relaxGameClouds: {
-		name: "Clouds", glyph: "☁", subtitle: "o céu passando, da manhã à noite", color: ColorHighlight,
-		step: func(a *App) { stepRelaxClouds(&a.relaxClouds) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxCloudsFrames(&a.relaxClouds, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxClouds.birds) },
-	},
-	relaxGameDrop: {
-		name: "Raindrop", glyph: "◌", subtitle: "uma gota, e as ondas que ela deixa", color: ColorAccent,
-		step: func(a *App) { stepRelaxDrop(&a.relaxDrop) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxDropFrames(&a.relaxDrop, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxDrop.ripples) + len(a.relaxDrop.spray) },
-	},
 	relaxGameBurst: {
 		name: "Supernova", glyph: "✷", subtitle: "junta energia até não caber mais", color: ColorWarning,
 		step: func(a *App) { stepRelaxBurst(&a.relaxBurst) },
@@ -193,14 +169,6 @@ var relaxScenes = []relaxScene{
 			return relaxCityFrames(&a.relaxCity, w, h, f)
 		},
 		objects: func(a *App) int { return len(a.relaxCity.wins) },
-	},
-	relaxGameRidge: {
-		name: "Mountains", glyph: "▲", subtitle: "nuvens atravessando o vale", color: ColorAccent,
-		step: func(a *App) { stepRelaxRidge(&a.relaxRidge) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxRidgeFrames(&a.relaxRidge, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxRidge.clouds) + len(a.relaxRidge.birds) },
 	},
 	relaxGameFox: {
 		name: "Fox", glyph: "⌁", subtitle: "parada, olhando os vaga-lumes", color: ColorWarning,
@@ -225,13 +193,44 @@ var relaxScenes = []relaxScene{
 			return relaxTetrisFrames(&a.relaxTetris, w, h, f)
 		},
 	},
-	relaxGameInvaders: {
-		name: "Invaders", glyph: "▙", subtitle: "uma partida acontecendo sozinha", color: ColorSuccess,
-		step:   func(a *App) { stepRelaxInvaders(&a.relaxInv) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) { return relaxInvadersFrames(&a.relaxInv, w, h, f) },
-		objects: func(a *App) int {
-			return relaxInvAlive(&a.relaxInv) + len(a.relaxInv.shots) + len(a.relaxInv.parts)
+	relaxGameSword: {
+		name: "Sword", glyph: "†", subtitle: "a espada na pedra, e o vento no capim", color: ColorHighlight,
+		step: func(a *App) { stepRelaxSword(&a.relaxSword) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxSwordFrames(&a.relaxSword, w, h, f)
 		},
+		objects: func(a *App) int { return len(a.relaxSword.leaves) },
+	},
+	relaxGameHourglass: {
+		name: "Hourglass", glyph: "⧗", subtitle: "a areia é estrela, e vira galáxia", color: ColorHighlight,
+		step: func(a *App) { stepRelaxHourglass(&a.relaxHg) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxHourglassFrames(&a.relaxHg, w, h, f)
+		},
+		objects: func(a *App) int { return len(a.relaxHg.stars) },
+	},
+	relaxGameChess: {
+		name: "Chess", glyph: "♛", subtitle: "uma dama torneada, girando", color: ColorWarning,
+		step: func(a *App) { stepRelaxChess(&a.relaxChess) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxChessFrames(&a.relaxChess, w, h, f)
+		},
+	},
+	relaxGameJackpot: {
+		name: "Jackpoint", glyph: "▣", subtitle: "três caixas e a sorte", color: ColorWarning,
+		step: func(a *App) { stepRelaxJackpot(&a.relaxJp) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxJackpotFrames(&a.relaxJp, w, h, f)
+		},
+		objects: func(a *App) int { return len(a.relaxJp.parts) },
+	},
+	relaxGameV4: {
+		name: "V4", glyph: "⋁", subtitle: "quatro pistões, corte ao vivo", color: ColorDanger,
+		step: func(a *App) { stepRelaxV4(&a.relaxV4) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxV4Frames(&a.relaxV4, w, h, f)
+		},
+		objects: func(a *App) int { return len(a.relaxV4.puffs) },
 	},
 }
 
@@ -291,19 +290,19 @@ func (a *App) resetRelaxScenes() {
 	a.relaxTree = relaxTreeState{}
 	a.relaxNeb = relaxNebulaState{}
 	a.relaxBh = relaxBlackHoleState{}
-	a.relaxAq = relaxAquariumState{}
 	a.relaxFire = relaxFireState{}
 	a.relaxCoffee = relaxCoffeeState{}
 	a.relaxSea = relaxSeaState{}
-	a.relaxClouds = relaxCloudState{}
-	a.relaxDrop = relaxDropState{}
 	a.relaxBurst = relaxBurstState{}
 	a.relaxCity = relaxCityState{}
-	a.relaxRidge = relaxRidgeState{}
 	a.relaxFox = relaxFoxState{}
 	a.relaxFw = relaxFireworksState{}
 	a.relaxTetris = relaxTetrisState{}
-	a.relaxInv = relaxInvadersState{}
+	a.relaxSword = relaxSwordState{}
+	a.relaxHg = relaxHourglassState{}
+	a.relaxChess = relaxChessState{}
+	a.relaxJp = relaxJackpotState{}
+	a.relaxV4 = relaxV4State{}
 }
 
 // relaxSceneObjects conta o que está vivo na cena atual (só pro debug).

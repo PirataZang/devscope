@@ -184,7 +184,7 @@ func (a *App) renderNgrokLanding(p *core.Project) string {
 	default:
 		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(a.landingNgrokVer))
 		if agent.Connected {
-			openLines = append(openLines, StyleHealthy.Render("● agente local online (:4040)"))
+			openLines = append(openLines, a.livePulse("agente local online (:4040)"))
 		} else {
 			openLines = append(openLines, StyleMuted.Render("○ agente local offline — start cria o processo"))
 		}
@@ -288,7 +288,7 @@ func (a *App) renderNgrokHeader(p *core.Project, width int) string {
 
 	badge := StyleMuted.Render("○ Offline")
 	if a.ngrokAgent.Connected {
-		badge = StyleHealthy.Render("● Connected")
+		badge = a.livePulse("Connected")
 	}
 	online := 0
 	for _, t := range a.ngrokTunnels {
@@ -352,7 +352,7 @@ func (a *App) renderNgrokOverview(p *core.Project, width, height int) string {
 	sumH := maxInt(8, height*45/100)
 	listH := maxInt(6, height-sumH)
 	lines := []string{
-		StyleMuted.Render("Status     ") + ngrokStatusLabel(a.ngrokAgent.Connected),
+		StyleMuted.Render("Status     ") + ngrokStatusLabel(a.ngrokAgent.Connected, a.animFrame),
 		StyleMuted.Render("Account    ") + StyleMuted.Render("(local agent)"),
 		StyleMuted.Render("Plan       ") + StyleNormal.Render("Free"),
 		StyleMuted.Render("Region     ") + StyleNormal.Render(a.ngrokCfg.Region),
@@ -394,9 +394,9 @@ func (a *App) renderNgrokOverview(p *core.Project, width, height int) string {
 	return lipgloss.JoinHorizontal(lipgloss.Top, center, right)
 }
 
-func ngrokStatusLabel(ok bool) string {
+func ngrokStatusLabel(ok bool, frame int) string {
 	if ok {
-		return StyleHealthy.Render("● Connected")
+		return StyleHealthy.Render(animPulse(frame) + " Connected")
 	}
 	return StyleMuted.Render("○ Offline")
 }

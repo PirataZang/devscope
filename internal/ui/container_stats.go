@@ -42,7 +42,7 @@ func (a *App) renderContainerStatsScreen() string {
 	title := StyleSection.Render(truncate(a.containerDetailName, nameW))
 	status := a.containerDetailStatusBadge()
 	if a.containerDetailStatsLive {
-		status += "  " + StyleHealthy.Render("● live")
+		status += "  " + a.livePulse("live")
 	}
 	header := title + "  " + status
 	tabs := a.renderContainerDetailTabBar(innerW)

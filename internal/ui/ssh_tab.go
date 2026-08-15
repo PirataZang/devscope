@@ -219,7 +219,7 @@ func (a *App) renderSSHLanding(p *core.Project) string {
 	default:
 		openLines = append(openLines, "", StyleMuted.Render("cliente  ")+StyleNormal.Render(firstNonEmpty(a.landingSSHVer, "OpenSSH")))
 		if liveN > 0 {
-			openLines = append(openLines, StyleHealthy.Render(fmt.Sprintf("● %d túnel(is) ativo(s) nesta sessão", liveN)))
+			openLines = append(openLines, a.livePulse(fmt.Sprintf("%d túnel(is) ativo(s) nesta sessão", liveN)))
 		} else {
 			openLines = append(openLines, StyleMuted.Render("○ nenhum túnel ativo — n cria e s inicia"))
 		}

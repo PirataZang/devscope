@@ -266,11 +266,11 @@ func StatusStyle(status string) lipgloss.Style {
 func StatusDot(status string) string {
 	switch status {
 	case "Running", "Healthy", "running":
-		return StyleHealthy.Render("●")
+		return StyleHealthy.Render(animPulse(0))
 	case "Stopped", "stopped", "exited":
-		return StyleUnhealthy.Render("●")
+		return StyleUnhealthy.Render(animStoppedGlyph)
 	case "Degraded", "Unhealthy":
-		return StyleUnhealthy.Render("●")
+		return StyleWarning.Render(animPulseSlow(0))
 	default:
 		return StyleMuted.Render("◌")
 	}

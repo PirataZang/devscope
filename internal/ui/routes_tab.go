@@ -468,7 +468,7 @@ func (a *App) renderRoutesInspector(visible []routeutil.Route, width, height int
 
 	details := []string{StyleMuted.Render("(nenhuma rota)")}
 	if a.routesLoading && len(a.routes) == 0 {
-		details = []string{StyleMuted.Render("carregando…")}
+		details = []string{a.loadingMuted("carregando…")}
 	} else if len(visible) > 0 && a.routesCursor < len(visible) {
 		r := visible[a.routesCursor]
 		access := StyleHealthy.Render("pública")

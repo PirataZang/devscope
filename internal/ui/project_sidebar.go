@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/pkg/version"
 )
@@ -122,7 +123,7 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	}
 	rows = append(rows,
 		StyleMuted.Render(truncate(p.Name, width)),
-		projectStatusStyle(p.Status).Render(statusText(p.Status))+
+		projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame))+
 			StyleMuted.Render("  ")+
 			a.healthDotAnim(p.Health)+" "+healthShort(p.Health),
 	)
@@ -246,11 +247,7 @@ func meterBar(pct float64, width int) string {
 	if pct > 100 {
 		pct = 100
 	}
-	filled := int((pct/100.0)*float64(width) + 0.5)
-	if filled > width {
-		filled = width
-	}
-	bar := strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
+	bar := collectors.BrailleBar(pct/100.0, width)
 	st := StyleMetricCPU
 	switch {
 	case pct >= 80:

@@ -55,7 +55,7 @@ func (a *App) renderGHALanding(p *core.Project) string {
 		)
 	default:
 		openLines = append(openLines, "",
-			StyleHealthy.Render("● READY")+
+			StyleHealthy.Render(a.pulse()+" READY")+
 				StyleMuted.Render(fmt.Sprintf("  %s/%s  ·  %d processos", info.Owner, info.Repo, procs)))
 	}
 
@@ -243,7 +243,7 @@ func (a *App) renderGHAStatusRow(width int) string {
 	case !a.ghaInfo.Authed:
 		badge = StyleWarning.Render("⚠ AUTH REQUIRED")
 	default:
-		badge = StyleHealthy.Render("● READY")
+		badge = a.livePulse("READY")
 	}
 	repo := "—"
 	if owner != "" {
@@ -574,7 +574,7 @@ func (a *App) renderGHARecentRunsPanel(width, height int) string {
 		dot := StyleMuted.Render("●")
 		switch {
 		case r.Conclusion == "success":
-			dot = StyleHealthy.Render("●")
+			dot = a.livePulse("")
 		case r.Conclusion == "failure":
 			dot = StyleUnhealthy.Render("●")
 		case r.Status == "in_progress" || r.Status == "queued":

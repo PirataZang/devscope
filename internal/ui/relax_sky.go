@@ -72,11 +72,14 @@ type relaxSkyState struct {
 	bandY     float64
 	dust      []relaxSkyPt
 
-	// Horizonte: três harmônicas de fase sorteada e algumas coníferas na
-	// crista. É o que faz a cena virar céu noturno em vez de espaço aberto.
-	ridge  [3]float64
-	ridgeH float64
-	trees  []relaxSkyPt
+	// Horizonte: duas cristas de fase sorteada, a de trás mais alta e mais
+	// clara, com algumas coníferas na da frente. É o que faz a cena virar céu
+	// noturno em vez de espaço aberto.
+	ridge     [3]float64
+	ridgeH    float64
+	ridgeFar  [3]float64
+	ridgeFarH float64
+	trees     []relaxSkyPt
 
 	aurora  bool
 	auroraP [3]float64
@@ -97,7 +100,7 @@ func relaxSkyNewCycle(st *relaxSkyState) {
 	st.bandY = 330 + rand.Float64()*300
 	st.dust = st.dust[:0]
 	rift := -10 + rand.Float64()*20 // a fenda escura não fica no meio da faixa
-	for i := 0; i < 460; i++ {
+	for i := 0; i < 640; i++ {
 		x := rand.Float64() * 1000
 		off := rand.NormFloat64() * 95
 		if off > rift-9 && off < rift+22 {
@@ -112,14 +115,16 @@ func relaxSkyNewCycle(st *relaxSkyState) {
 
 	st.ridge = [3]float64{rand.Float64() * 6.28, rand.Float64() * 6.28, rand.Float64() * 6.28}
 	st.ridgeH = 892 + rand.Float64()*40
+	st.ridgeFar = [3]float64{rand.Float64() * 6.28, rand.Float64() * 6.28, rand.Float64() * 6.28}
+	st.ridgeFarH = 790 + rand.Float64()*36
 	// Aurora: evento de alguns ciclos, não de todos — se aparecesse sempre
 	// deixaria de ser um acontecimento.
 	st.aurora = rand.Intn(3) == 0
 	st.auroraP = [3]float64{rand.Float64() * 6.28, rand.Float64() * 6.28, rand.Float64() * 6.28}
 
 	st.trees = st.trees[:0]
-	for i, n := 0, 2+rand.Intn(3); i < n; i++ {
-		st.trees = append(st.trees, relaxSkyPt{x: 80 + rand.Float64()*840, y: 4 + rand.Float64()*3.4})
+	for i, n := 0, 4+rand.Intn(5); i < n; i++ {
+		st.trees = append(st.trees, relaxSkyPt{x: 60 + rand.Float64()*880, y: 2.6 + rand.Float64()*4.8})
 	}
 
 	// Aglomerados: a maioria das estrelas nasce perto de um punhado de centros,
@@ -129,7 +134,7 @@ func relaxSkyNewCycle(st *relaxSkyState) {
 	for i := range centers {
 		centers[i] = relaxSkyPt{x: float64(60 + rand.Intn(880)), y: float64(80 + rand.Intn(840))}
 	}
-	total := 34 + rand.Intn(16)
+	total := 96 + rand.Intn(44)
 	for i := 0; i < total; i++ {
 		var x, y int
 		if rand.Intn(10) < 4 {
@@ -176,6 +181,12 @@ func relaxSkyNewCycle(st *relaxSkyState) {
 			base:  0.16 + 0.16*float64(layer) + rand.Float64()*0.22,
 			phase: rand.Float64() * 2 * math.Pi,
 			speed: (0.012 + rand.Float64()*0.05) / float64(layer+1),
+		}
+		// Uma em cada nove é de primeira grandeza: é ela que vira cruz de
+		// cinco pontos no render e dá os poucos brilhos fortes do céu. Sem
+		// esse degrau o campo inteiro fica no mesmo cinza.
+		if rand.Intn(9) == 0 {
+			s.base = 0.74 + rand.Float64()*0.22
 		}
 		// Nem toda estrela pisca: algumas ficam quase estáticas o ciclo inteiro.
 		switch r := rand.Intn(10); {
@@ -403,10 +414,12 @@ const (
 	relaxSkyCrestL  = relaxSkyGroundL + 1
 	relaxSkyCometL  = relaxSkyCrestL + 1
 	relaxSkyLineL   = relaxSkyCometL + 1
+	relaxSkyFarL    = relaxSkyLineL + 1
+	relaxSkyFarCrst = relaxSkyFarL + 1
 )
 
 var relaxSkyRamp2 = func() []relaxColor {
-	out := make([]relaxColor, relaxSkyLineL+1)
+	out := make([]relaxColor, relaxSkyFarCrst+1)
 	for i, stops := range relaxSkyStops {
 		copy(out[i*5:], relaxRamp(stops, 5))
 	}
@@ -415,6 +428,8 @@ var relaxSkyRamp2 = func() []relaxColor {
 	out[relaxSkyCrestL] = "#1C2430"
 	out[relaxSkyCometL] = "#F2F6FF"
 	out[relaxSkyLineL] = "#2E3A55"
+	out[relaxSkyFarL] = "#151D2B"
+	out[relaxSkyFarCrst] = "#28344C"
 	return out
 }()
 
@@ -434,16 +449,28 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 	fade := st.fade() * gfade
 
 	// Horizonte primeiro: relaxBraille não sobrescreve, então o morro apaga
-	// naturalmente tudo o que ficaria atrás dele.
-	top := relaxSkyRidge(st, sw, sh)
+	// naturalmente tudo o que ficaria atrás dele. E a crista da FRENTE vem
+	// antes da de trás pelo mesmo motivo — a de trás só pinta o que sobrou,
+	// que é justamente o recorte que separa as duas.
+	near := relaxSkyRidge(st, sw, sh)
+	far := relaxSkyRidgeLine(st.ridgeFar, st.ridgeFarH, 82, 8, 4242, sw, sh)
+	top := make([]int, sw)
 	for x := 0; x < sw; x++ {
-		for y := top[x]; y < sh; y++ {
+		for y := near[x]; y < sh; y++ {
 			lvl := relaxSkyGroundL
-			if y < top[x]+2 {
+			if y < near[x]+2 {
 				lvl = relaxSkyCrestL
 			}
 			b.set(x, y, lvl)
 		}
+		for y := far[x]; y < sh; y++ {
+			lvl := relaxSkyFarL
+			if y < far[x]+2 {
+				lvl = relaxSkyFarCrst
+			}
+			b.set(x, y, lvl)
+		}
+		top[x] = minInt(near[x], far[x])
 	}
 
 	if st.aurora {
@@ -453,7 +480,7 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 	// Poeira da Via Láctea.
 	for i, p := range st.dust {
 		x, y := int(p.x*float64(sw-1)/1000), int(p.y*float64(sh-1)/1000)
-		lum := (0.16 + 0.10*math.Sin(float64(st.t)*0.02+float64(i))) * fade
+		lum := (0.19 + 0.11*math.Sin(float64(st.t)*0.02+float64(i))) * fade
 		if lum <= relaxHalftone(x, y)*0.42 {
 			continue
 		}
@@ -490,6 +517,11 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 			b.set(x, y-1, lvl)
 			b.set(x, y+1, lvl)
 		}
+		if lum > 0.92 {
+			for _, d := range [4][2]int{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}} {
+				b.set(x+d[0], y+d[1], relaxSkyLevel(lum-0.35, s.tint))
+			}
+		}
 	}
 
 	for _, c := range st.comets {
@@ -512,25 +544,38 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 	return b.lines(relaxStyles(relaxSkyRamp2, gfade)), StyleMuted.Render(relaxSkyStatus(st))
 }
 
-// relaxSkyRidge devolve a altura do horizonte por coluna de subpixel: três
-// harmônicas de fase sorteada, com as coníferas recortadas por cima.
-func relaxSkyRidge(st *relaxSkyState, sw, sh int) []int {
+// relaxSkyRidgeLine devolve a altura de uma crista por coluna de subpixel: três
+// harmônicas de fase sorteada mais duas oitavas de ruído. As harmônicas dão a
+// forma da serra; o ruído é o que a impede de parecer o que ela é, um seno —
+// rocha tem lasca, quebra e ombro fora do compasso.
+func relaxSkyRidgeLine(ph [3]float64, baseH, amp, rough float64, seed, sw, sh int) []int {
 	top := make([]int, sw)
 	for x := 0; x < sw; x++ {
 		fx := float64(x) / float64(maxInt(1, sw-1)) * 1000
-		pm := st.ridgeH + 52*math.Sin(fx*0.0062+st.ridge[0]) +
-			30*math.Sin(fx*0.0131+st.ridge[1]) + 14*math.Sin(fx*0.0270+st.ridge[2])
+		pm := baseH + amp*(0.54*math.Sin(fx*0.0062+ph[0])+
+			0.31*math.Sin(fx*0.0131+ph[1])+0.15*math.Sin(fx*0.0270+ph[2]))
+		pm += rough * (0.68*relaxNoise(fx*0.055, seed) + 0.32*relaxNoise(fx*0.16, seed+1))
 		top[x] = maxInt(2, minInt(sh-1, int(pm*float64(sh-1)/1000+0.5)))
 	}
+	return top
+}
+
+// relaxSkyRidge é a crista da frente, com as coníferas recortadas por cima.
+func relaxSkyRidge(st *relaxSkyState, sw, sh int) []int {
+	top := relaxSkyRidgeLine(st.ridge, st.ridgeH, 96, 11, 77, sw, sh)
 	for _, t := range st.trees {
 		cx := int(t.x * float64(sw-1) / 1000)
 		if cx < 0 || cx >= sw {
 			continue
 		}
-		hgt := int(t.y * 6.5) // coníferas altas e estreitas, não morrinhos
+		// Altura em fração do palco, não em subponto fixo: em subponto a mesma
+		// árvore ocupava uma faixa do céu no terminal baixo e um arbusto no
+		// alto. E a base cresce devagar (r/6) — conífera é agulha, o cone
+		// gordo que estava aqui lia como morro, não como mato na crista.
+		hgt := maxInt(3, int(t.y*float64(sh)/40))
 		base := top[cx]
 		for r := 0; r < hgt; r++ {
-			half := r/3 + 1
+			half := r/6 + 1
 			for dx := -half; dx <= half; dx++ {
 				if x := cx + dx; x >= 0 && x < sw {
 					top[x] = minInt(top[x], base-(hgt-1-r))

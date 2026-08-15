@@ -586,7 +586,7 @@ func FormatGHAJobsText(jobs []GHAJob) string {
 	return FormatGHATimelineText(jobs)
 }
 
-// FormatGHATimelineText renders queued→jobs→steps with a simple duration bar.
+// FormatGHATimelineText renders queued→jobs→steps with a Braille duration bar.
 func FormatGHATimelineText(jobs []GHAJob) string {
 	if len(jobs) == 0 {
 		return "nenhum job neste run"
@@ -673,6 +673,41 @@ func ghaFmtDur(sec float64) string {
 	return fmt.Sprintf("%dm%02ds", m, s)
 }
 
+// 8 pontos por célula, coluna esquerda depois direita — o fill pontilhado do docker pull.
+var brailleBarDots = [...]rune{'⠀', '⠁', '⠃', '⠇', '⡇', '⡏', '⡟', '⡿', '⣿'}
+
+// BrailleBar fills width cells; frac is 0..1.
+func BrailleBar(frac float64, width int) string {
+	if width <= 0 {
+		return ""
+	}
+	if frac < 0 {
+		frac = 0
+	}
+	if frac > 1 {
+		frac = 1
+	}
+	dots := int(frac*float64(width*8) + 0.5)
+	if frac > 0 && dots < 1 {
+		dots = 1
+	}
+	if dots > width*8 {
+		dots = width * 8
+	}
+	var b strings.Builder
+	for i := 0; i < width; i++ {
+		n := dots - i*8
+		if n > 8 {
+			n = 8
+		}
+		if n < 0 {
+			n = 0
+		}
+		b.WriteRune(brailleBarDots[n])
+	}
+	return b.String()
+}
+
 func ghaBar(sec, maxSec float64, width int) string {
 	if width < 4 {
 		width = 4
@@ -680,17 +715,11 @@ func ghaBar(sec, maxSec float64, width int) string {
 	if maxSec <= 0 {
 		maxSec = 1
 	}
-	filled := 0
+	frac := 0.0
 	if sec > 0 {
-		filled = int(sec/maxSec*float64(width) + 0.5)
-		if filled < 1 {
-			filled = 1
-		}
-		if filled > width {
-			filled = width
-		}
+		frac = sec / maxSec
 	}
-	return "[" + strings.Repeat("█", filled) + strings.Repeat("░", width-filled) + "]"
+	return "[" + BrailleBar(frac, width) + "]"
 }
 
 func truncateRunes(s string, n int) string {
@@ -767,14 +796,9 @@ func FormatGHAFailHeatmap(buckets []GHAFailBucket, width int) string {
 	}
 	parts := make([]string, 0, len(buckets))
 	for _, b := range buckets {
-		barW := 6
-		filled := b.Fails * barW / max
-		if filled < 1 {
-			filled = 1
-		}
 		parts = append(parts, fmt.Sprintf("%s %s%d",
 			truncateRunes(b.Process, maxIntGHA(6, width/len(buckets)-4)),
-			strings.Repeat("▓", filled)+strings.Repeat("░", barW-filled),
+			BrailleBar(float64(b.Fails)/float64(max), 6),
 			b.Fails))
 	}
 	return strings.Join(parts, "  ")

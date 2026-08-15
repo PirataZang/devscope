@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"math"
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
@@ -161,22 +163,17 @@ func TestRelaxCubeScramblesAndSolvesForReal(t *testing.T) {
 	}
 }
 
-func TestRelaxCatCycleVisitsAllPhases(t *testing.T) {
+func TestRelaxCatSleepsAndFlicksTail(t *testing.T) {
 	st := relaxCatState{}
-	seen := map[relaxCatPhase]int{}
-	sleepDur, zWhileAwake := 0, 0
-	for i := 0; i < 1200; i++ {
+	flicks := 0
+	for i := 0; i < 800; i++ {
+		was := st.tailFlick
 		stepRelaxCat(&st)
-		seen[st.phase]++
-		if st.phase == catSleeping && st.t == 1 && st.dur > 0 {
-			sleepDur = st.dur
+		if st.phase != catSleeping {
+			t.Fatalf("fase=%d, só dorme", st.phase)
 		}
-		if st.phase == catGrooming && st.t > 30 {
-			for _, z := range st.zzz {
-				if z.glyph != "♪" { // ♪ é o ronrom, esse é pra acontecer acordado
-					zWhileAwake++ // Z sobrando muito depois de acordar
-				}
-			}
+		if was == 0 && st.tailFlick > 0 {
+			flicks++
 		}
 		if len(st.zzz) > 8 {
 			t.Fatalf("Zzz acumulando: %d", len(st.zzz))
@@ -192,20 +189,116 @@ func TestRelaxCatCycleVisitsAllPhases(t *testing.T) {
 			}
 		}
 	}
-	for _, p := range []relaxCatPhase{catSleeping, catWaking, catStretching, catYawning, catGrooming, catSettling} {
-		if seen[p] == 0 {
-			t.Fatalf("fase %d nunca aconteceu no ciclo", p)
+	if flicks < 8 {
+		t.Fatalf("cauda quase não mexeu: %d flicks em 80s", flicks)
+	}
+}
+
+func TestRelaxFoxTailBendsAndPlays(t *testing.T) {
+	st := relaxFoxState{}
+	stepRelaxFox(&st)
+	const w, h = 90, 26
+	// Primeira célula de bicho varrendo de cima: é a ponta da cauda, que é a
+	// única parte do sprite que sai do lugar.
+	tip := func() int {
+		b := newRelaxBrailleVote(w, h)
+		relaxFoxScene(&st, b)
+		for i := 0; i < w*h; i++ {
+			if l := int(b.dom[i]); b.cnt[i] > 0 && l >= relaxFxFur && l < relaxFxFly {
+				return i
+			}
+		}
+		return -1
+	}
+	seen := map[int]bool{}
+	plays := 0
+	for i := 0; i < 900; i++ {
+		was := st.play
+		stepRelaxFox(&st)
+		if was == 0 && st.play > 0 {
+			plays++
+		}
+		if i%7 == 0 {
+			seen[tip()] = true
 		}
 	}
-	if sleepDur < 250 || sleepDur > 350 {
-		t.Fatalf("sono fora de 25–35s: %d frames", sleepDur)
+	if len(seen) < 3 {
+		t.Fatalf("a cauda não dobrou: %d posições de ponta", len(seen))
 	}
-	if zWhileAwake > 0 {
-		t.Fatalf("Zzz continuou nascendo com o gato acordado (%d frames)", zWhileAwake)
+	if plays < 2 {
+		t.Fatalf("ela não brincou com o capim: %d tapas em 90s", plays)
 	}
-	// Dormindo tem de ser a maior parte do ciclo.
-	if seen[catSleeping] < 600 {
-		t.Fatalf("gato dormiu de menos: %d frames de 1200", seen[catSleeping])
+}
+
+func TestRelaxCatBreathesOnlyOnTheFlank(t *testing.T) {
+	const w, h = 80, 22
+	st := relaxCatState{}
+	stepRelaxCat(&st)
+	top := func(phase float64) []int {
+		st.breath = phase
+		b := newRelaxBrailleVote(w, h)
+		relaxCatDraw(&st, b, w, h)
+		out := make([]int, w)
+		for x := 0; x < w; x++ {
+			out[x] = -1
+			for y := 0; y < h; y++ {
+				if b.cnt[y*w+x] > 0 && b.over[y*w+x] == "" {
+					out[x] = y
+					break
+				}
+			}
+		}
+		return out
+	}
+	in, ex := top(math.Pi/2), top(3*math.Pi/2)
+	// Cabeça e orelhas ficam onde estão: o gato inteiro subindo lê como falha
+	// de render, não como respiração.
+	for x := 0; x < w/4; x++ {
+		if in[x] != ex[x] {
+			t.Fatalf("a cabeça mexeu na coluna %d: %d contra %d", x, in[x], ex[x])
+		}
+	}
+	moved := 0
+	for x := w / 2; x < w; x++ {
+		if in[x] >= 0 && ex[x] >= 0 && in[x] != ex[x] {
+			moved++
+		}
+	}
+	if moved < 6 {
+		t.Fatalf("o lombo não respirou: %d colunas mexeram", moved)
+	}
+}
+
+func TestRelaxCatTailSeamSeparatesWithoutEatingTheBody(t *testing.T) {
+	// A curva sai do fim da pata e chega na cauda: nas duas pontas ela existe.
+	for _, x := range []float64{46, 66, 87} {
+		hit := false
+		for y := 55.0; y < 80; y += 0.25 {
+			if relaxCatTailSeam(x, y) < relaxCatTailSeamW {
+				hit = true
+				break
+			}
+		}
+		if !hit {
+			t.Fatalf("a curva não passa por x=%.0f", x)
+		}
+	}
+	// E é só uma curva: fora da faixa dela o gato fica inteiro. Cabeça, dorso,
+	// peito e anca não podem ter buraco.
+	for _, p := range [][2]float64{{40, 62}, {60, 30}, {115, 45}, {25, 74}, {100, 70}} {
+		if d := relaxCatTailSeam(p[0], p[1]); d < relaxCatTailSeamW {
+			t.Fatalf("a curva comeu (%.0f,%.0f): distância %.2f", p[0], p[1], d)
+		}
+	}
+	// Fina: numa coluna ela apaga um par de pontos, não uma faixa.
+	n := 0
+	for y := 55.0; y < 80; y += 0.5 {
+		if relaxCatTailSeam(66, y) < relaxCatTailSeamW {
+			n++
+		}
+	}
+	if n > 6 {
+		t.Fatalf("curva grossa demais: %d amostras de meio ponto na coluna", n)
 	}
 }
 
@@ -449,7 +542,25 @@ func TestRelaxSeaWavesAndMoonPath(t *testing.T) {
 	}
 }
 
-func TestRelaxFoxStillAndFliesMove(t *testing.T) {
+func TestRelaxFoxSpriteCapsAndShrinks(t *testing.T) {
+	big := relaxFoxAt(relaxFxMaxW*3, relaxFxMaxH*3)
+	if big.w > relaxFxMaxW || big.h > relaxFxMaxH {
+		t.Fatalf("raposa passou do teto: %dx%d", big.w, big.h)
+	}
+	small := relaxFoxAt(relaxFxMaxW/2, relaxFxMaxH/2)
+	if small.w >= big.w || small.h >= big.h {
+		t.Fatalf("raposa não encolheu com o palco: %dx%d contra %dx%d", small.w, small.h, big.w, big.h)
+	}
+	// Proporção mantida nos dois: raposa esticada é outro bicho.
+	for _, sp := range []*relaxFoxSprite{big, small} {
+		want := float64(relaxFoxDotW) / float64(relaxFoxDotH) * 2
+		if got := float64(sp.w) / float64(sp.h); math.Abs(got-want) > 0.15 {
+			t.Fatalf("proporção torta em %dx%d: %.2f contra %.2f", sp.w, sp.h, got, want)
+		}
+	}
+}
+
+func TestRelaxFoxBodyStillAndFliesMove(t *testing.T) {
 	st := relaxFoxState{}
 	stepRelaxFox(&st)
 	if len(st.flies) == 0 {
@@ -473,9 +584,6 @@ func TestRelaxFoxStillAndFliesMove(t *testing.T) {
 			if !strings.Contains(plain, "⣿") || status == "" {
 				t.Fatalf("raposa vazia no passo %d", i)
 			}
-			if strings.Contains(status, "rabo") {
-				t.Fatalf("rabo ainda anima: %q", status)
-			}
 		}
 	}
 	if !moved || !lit {
@@ -483,56 +591,14 @@ func TestRelaxFoxStillAndFliesMove(t *testing.T) {
 	}
 }
 
-func TestRelaxInvadersPlaysWaves(t *testing.T) {
-	st := relaxInvadersState{}
-	for i := 0; i < 4000; i++ {
-		stepRelaxInvaders(&st)
-		if st.shipX < 0 || st.shipX > float64(st.sw) {
-			t.Fatalf("nave fora do campo: %.1f de %d", st.shipX, st.sw)
-		}
-		if len(st.shots) > 12 || len(st.parts) > 120 || len(st.aliens) > 40 {
-			t.Fatalf("entidades acumulando: shots=%d parts=%d aliens=%d", len(st.shots), len(st.parts), len(st.aliens))
-		}
-		relaxInvadersFrames(&st, 80, 22, 1)
-	}
-	// Os escudos têm de sofrer: se nada os corrói, a colisão com bomba parou.
-	solid := 0
-	for _, bk := range st.bunkers {
-		for _, r := range bk.rows {
-			solid += bitsOn(r)
-		}
-	}
-	full := 0
-	for _, r := range relaxInvBunkerArt.rows {
-		full += bitsOn(r) * len(st.bunkers)
-	}
-	if solid >= full {
-		t.Fatalf("escudos intactos depois de 4000 passos: %d de %d pixels", solid, full)
-	}
-	if st.wave < 2 {
-		t.Fatalf("nenhuma onda nova em ~6min: wave=%d", st.wave)
-	}
-	if st.score == 0 {
-		t.Fatal("a nave nunca acertou um alien")
-	}
-}
-
-func bitsOn(v uint32) int {
-	n := 0
-	for ; v != 0; v &= v - 1 {
-		n++
-	}
-	return n
-}
-
 func TestRelaxExitStopsLoopAndFreesState(t *testing.T) {
 	a := &App{width: 120, height: 40, view: ViewDashboard}
 	a.openRelax()
-	a.relaxGame = relaxGameInvaders
+	a.relaxGame = relaxGameFox
 	for i := 0; i < 200; i++ {
 		a.stepRelax()
 	}
-	if len(a.relaxInv.aliens) == 0 {
+	if len(a.relaxFox.flies) == 0 {
 		t.Fatal("cena não chegou a rodar")
 	}
 	if cmd := a.kickAnim(); cmd == nil {
@@ -540,7 +606,7 @@ func TestRelaxExitStopsLoopAndFreesState(t *testing.T) {
 	}
 
 	a.closeRelax()
-	if a.relaxInv.inited || a.relaxCat.inited || a.relaxSky.inited || a.relaxGalaxy.inited ||
+	if a.relaxFox.inited || a.relaxCat.inited || a.relaxSky.inited || a.relaxGalaxy.inited ||
 		a.relaxLeaves.inited || a.relaxTetris.inited {
 		t.Fatal("estado das cenas continuou vivo depois de sair")
 	}
@@ -553,5 +619,228 @@ func TestRelaxExitStopsLoopAndFreesState(t *testing.T) {
 		t.Fatal("loop de animação continuou ligado fora do Relax")
 	} else if cmd != nil {
 		t.Fatal("tick fora do Relax reagendou o loop sem necessidade")
+	}
+}
+
+// A rajada é a cena inteira: o capim anda junto, para, e fica ~3s parado sem
+// sair do lugar — folha que não volta ao ponto de origem faz o campo derivar.
+func TestRelaxSwordGustsThenRests(t *testing.T) {
+	st := relaxSwordState{}
+	stepRelaxSword(&st)
+	frame := func() string {
+		art, _ := relaxSwordFrames(&st, 60, 20, 1)
+		return strings.Join(art, "\n")
+	}
+	for st.phase != relaxSwGustTicks+5 { // bem no meio do silêncio
+		stepRelaxSword(&st)
+	}
+	rest, moved := frame(), false
+	for i := 0; i < relaxSwCycle; i++ {
+		stepRelaxSword(&st)
+		if frame() != rest {
+			moved = true
+		}
+	}
+	if !moved {
+		t.Fatal("o capim não se mexeu em um ciclo inteiro")
+	}
+	if frame() != rest {
+		t.Fatal("o campo não voltou ao mesmo lugar depois da rajada")
+	}
+
+	// O silêncio entre rajadas: ~3s no passo de 100ms da simulação.
+	streak, best := 0, 0
+	for i := 0; i < relaxSwCycle*2; i++ {
+		stepRelaxSword(&st)
+		if st.gust != 0 {
+			streak = 0
+			continue
+		}
+		if streak++; streak > best {
+			best = streak
+		}
+	}
+	if best < relaxSwRestTicks || best > relaxSwRestTicks+2 {
+		t.Fatalf("silêncio de %d passos, esperava ~%d", best, relaxSwRestTicks)
+	}
+}
+
+// A ampulheta não pode vazar: em qualquer fase a estrela tem de estar dentro do
+// vidro. O disco de baixo é o caso apertado — ele cresce até quase encostar na
+// parede, e um raio a mais o faz atravessar o desenho.
+func TestRelaxHourglassKeepsStarsInsideTheGlass(t *testing.T) {
+	st := relaxHourglassState{}
+	stepRelaxHourglass(&st)
+	seen, flipped := [3]bool{}, false
+	for i := 0; i < 900; i++ {
+		stepRelaxHourglass(&st)
+		if st.flipT > 0 {
+			flipped = true
+		}
+		for _, s := range st.stars {
+			x, y := relaxHgPos(&st, s)
+			if math.Abs(y) > 1.001 {
+				t.Fatalf("estrela passou da tampa: y=%.3f fase=%d", y, s.phase)
+			}
+			if lim := relaxHgHalf(y); math.Abs(x) > lim+0.02 {
+				t.Fatalf("estrela atravessou o vidro: |x|=%.3f > %.3f em y=%.3f fase=%d",
+					math.Abs(x), lim, y, s.phase)
+			}
+			seen[s.phase] = true
+		}
+	}
+	for p, ok := range seen {
+		if !ok {
+			t.Fatalf("fase %d nunca aconteceu em 90s de simulação", p)
+		}
+	}
+	if !flipped {
+		t.Fatal("a ampulheta não virou depois de esvaziar")
+	}
+}
+
+// A dama é sólido de revolução: girar no próprio eixo só muda o desenho por
+// causa da canelura e das contas. Se este teste passar a falhar, é sinal de que
+// as duas sumiram e a peça virou um poste parado.
+func TestRelaxChessSpinIsVisible(t *testing.T) {
+	draw := func(spin float64) string {
+		st := relaxChessState{inited: true, spin: spin, nod: 0.30}
+		art, status := relaxChessFrames(&st, 70, 24, 1)
+		if status == "" {
+			t.Fatal("quadro sem legenda")
+		}
+		for _, l := range art {
+			if lipgloss.Width(l) > 70 {
+				t.Fatalf("a peça estourou o palco: %d colunas", lipgloss.Width(l))
+			}
+		}
+		return stripANSI(strings.Join(art, "\n"))
+	}
+	// Meia canelura de diferença: o suficiente pra trocar vale por crista.
+	a, b := draw(0.4), draw(0.4+math.Pi/relaxChFlutes)
+	if a == b {
+		t.Fatal("meia canelura de giro não mudou nada no desenho")
+	}
+	if strings.TrimSpace(a) == "" {
+		t.Fatal("a peça não apareceu")
+	}
+}
+
+// A tabela de probabilidade do Jackpoint tem de valer de verdade: trinca perto
+// de 1/10 e J J J em 1/30. Se alguém mexer nos pesos sem refazer a conta, é
+// aqui que aparece — e não na sensação de quem está olhando a cena.
+func TestRelaxJackpotOddsAreReal(t *testing.T) {
+	rng := rand.New(rand.NewSource(20260814))
+	const n = 300000
+	wantTriple := 0.0
+	for _, p := range relaxJpTriple {
+		wantTriple += p
+	}
+	triple, jack := 0, 0
+	for i := 0; i < n; i++ {
+		r := relaxJpSpin(rng)
+		if r[0] != r[1] || r[1] != r[2] {
+			continue
+		}
+		triple++
+		if r[0] == jpJack {
+			jack++
+		}
+	}
+	if got := float64(triple) / n; math.Abs(got-wantTriple) > 0.006 {
+		t.Fatalf("trinca em %.4f, tabela promete %.4f", got, wantTriple)
+	}
+	if got := float64(jack) / n; math.Abs(got-1.0/30) > 0.004 {
+		t.Fatalf("J J J em %.4f, esperado %.4f", got, 1.0/30)
+	}
+}
+
+// O rolo não pode mentir: ele para exatamente no símbolo que o sorteio deu, os
+// três param em momentos diferentes, e a máquina passa por todas as fases sem
+// acumular partícula.
+func TestRelaxJackpotReelsLandOnTheDraw(t *testing.T) {
+	st := relaxJackpotState{}
+	stepRelaxJackpot(&st)
+	seen, spins := map[int8]bool{}, 0
+	for i := 0; i < 4000; i++ {
+		was := st.phase
+		stepRelaxJackpot(&st)
+		seen[st.phase] = true
+		if len(st.parts) > 900 {
+			t.Fatalf("partículas acumulando: %d", len(st.parts))
+		}
+		if was != jpPhaseSpin || st.phase != jpPhaseHold {
+			continue
+		}
+		spins++
+		stops := map[int]bool{}
+		for k := range st.reel {
+			pos := int(math.Round(st.reel[k].pos))
+			if sym := int8((pos%jpSymbols + jpSymbols) % jpSymbols); sym != st.result[k] {
+				t.Fatalf("rolo %d parou em %d, sorteio deu %d", k, sym, st.result[k])
+			}
+			stops[st.reel[k].dur] = true
+		}
+		if len(stops) != 3 {
+			t.Fatalf("os três rolos pararam juntos: %v", stops)
+		}
+	}
+	if spins < 5 {
+		t.Fatalf("só %d sorteios em 400s", spins)
+	}
+	for _, p := range []int8{jpPhaseSpin, jpPhaseHold, jpPhaseShow, jpPhaseRest} {
+		if !seen[p] {
+			t.Fatalf("fase %d nunca aconteceu", p)
+		}
+	}
+}
+
+// O V4 tem de ser motor, não animação de motor: o pistão nunca sai do curso que
+// a biela permite, os oito se movem, e cada cilindro queima uma vez a cada DUAS
+// voltas — quatro tempos. Se alguém trocar a conta da biela-manivela por um
+// seno, o curso deixa de bater com os limites e este teste cai.
+func TestRelaxV4IsAFourStrokeEngine(t *testing.T) {
+	st := relaxV4State{}
+	stepRelaxV4(&st)
+	lo, hi := relaxV4Rod-relaxV4Crank, relaxV4Rod+relaxV4Crank
+	var fires [len(st.cyl)]int
+	var minD, maxD [len(st.cyl)]float64
+	for i := range minD {
+		minD[i], maxD[i] = 9, -9
+	}
+	start, stages := st.ang, map[int8]bool{}
+	for i := 0; i < 1200; i++ {
+		before := st.cyl
+		stepRelaxV4(&st)
+		stages[st.stage] = true
+		for k := range st.cyl {
+			d, _, _ := relaxV4Piston(st.cyl[k], st.ang)
+			if d < lo-1e-9 || d > hi+1e-9 {
+				t.Fatalf("pistão %d fora do curso: %.3f não está em [%.3f %.3f]", k, d, lo, hi)
+			}
+			minD[k], maxD[k] = math.Min(minD[k], d), math.Max(maxD[k], d)
+			if st.cyl[k].fire > before[k].fire {
+				fires[k]++
+			}
+		}
+	}
+	turns := (st.ang - start) / (2 * math.Pi)
+	for k := range st.cyl {
+		if maxD[k]-minD[k] < 0.9*(hi-lo) {
+			t.Fatalf("pistão %d mal se mexeu: curso de %.3f", k, maxD[k]-minD[k])
+		}
+		// Uma queima a cada duas voltas, com folga pros passos de arranque em
+		// que ainda não há ignição.
+		if want := turns / 2; float64(fires[k]) < want*0.7 || float64(fires[k]) > want*1.1 {
+			t.Fatalf("cilindro %d queimou %d vezes em %.1f voltas, esperado ~%.1f", k, fires[k], turns, want)
+		}
+	}
+	for _, s := range []int8{v4Crank, v4Catch, v4Idle} {
+		if !stages[s] {
+			t.Fatalf("estágio %d nunca aconteceu", s)
+		}
+	}
+	if len(st.puffs) > 40 {
+		t.Fatalf("escape acumulando: %d baforadas", len(st.puffs))
 	}
 }

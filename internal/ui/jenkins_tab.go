@@ -397,7 +397,7 @@ func (a *App) renderJenkinsHeader(p *core.Project, width int) string {
 
 	badge := StyleMuted.Render("○ Offline")
 	if a.jenkinsInfo.Connected {
-		badge = StyleHealthy.Render("● Connected")
+		badge = a.livePulse("Connected")
 	}
 	ver := a.jenkinsInfo.Version
 	if ver == "" {
@@ -448,7 +448,7 @@ func (a *App) renderJenkinsOverview(p *core.Project, width, height int) string {
 	sumH := maxInt(7, height*32/100)
 	listH := maxInt(5, height-chartH-sumH)
 	lines := []string{
-		StyleMuted.Render("Server     ") + jenkinsStatusLabel(a.jenkinsInfo.Connected),
+		StyleMuted.Render("Server     ") + jenkinsStatusLabel(a.jenkinsInfo.Connected, a.animFrame),
 		StyleMuted.Render("Version    ") + StyleNormal.Render(firstNonEmpty(a.jenkinsInfo.Version, "—")),
 		StyleMuted.Render("Mode       ") + StyleNormal.Render(firstNonEmpty(a.jenkinsInfo.Mode, "—")),
 		StyleMuted.Render("Node       ") + StyleNormal.Render(firstNonEmpty(a.jenkinsInfo.NodeName, "—")),
@@ -466,7 +466,7 @@ func (a *App) renderJenkinsOverview(p *core.Project, width, height int) string {
 		n := minInt(listH-2, len(a.jenkinsBuilds))
 		for i := 0; i < n; i++ {
 			b := a.jenkinsBuilds[i]
-			evLines = append(evLines, jenkinsBuildRow(b, width/2))
+			evLines = append(evLines, jenkinsBuildRow(b, width/2, a.animFrame))
 		}
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
@@ -489,9 +489,9 @@ func (a *App) renderJenkinsOverview(p *core.Project, width, height int) string {
 	return lipgloss.JoinHorizontal(lipgloss.Top, center, right)
 }
 
-func jenkinsStatusLabel(ok bool) string {
+func jenkinsStatusLabel(ok bool, frame int) string {
 	if ok {
-		return StyleHealthy.Render("● Connected")
+		return StyleHealthy.Render(animPulse(frame) + " Connected")
 	}
 	return StyleMuted.Render("○ Offline")
 }
@@ -647,7 +647,7 @@ func (a *App) renderJenkinsJobTable(width, height int) string {
 				truncate(j.Status, 10),
 				j.LastBuild,
 			)
-			lines = append(lines, jenkinsStatusDot(j.Status)+" "+style.Render(truncate(row, width-4)))
+			lines = append(lines, jenkinsStatusDot(j.Status, a.animFrame)+" "+style.Render(truncate(row, width-4)))
 		}
 	}
 	title := "PIPELINES"
@@ -692,7 +692,7 @@ func (a *App) renderJenkinsBuildTable(width, height int) string {
 				jenkinsutil.FormatDuration(b.Duration),
 				jenkinsutil.FormatAgo(b.Timestamp),
 			)
-			lines = append(lines, jenkinsStatusDot(st)+" "+style.Render(truncate(row, width-4)))
+			lines = append(lines, jenkinsStatusDot(st, a.animFrame)+" "+style.Render(truncate(row, width-4)))
 		}
 	}
 	title := "BUILDS"
@@ -996,7 +996,7 @@ func (a *App) renderJenkinsSettings(p *core.Project, width, height int) string {
 	details := []string{
 		StyleMuted.Render("Config  ") + StyleNormal.Render(boolLabel(a.jenkinsCfg.Configured())),
 		StyleMuted.Render("Host    ") + StyleMuted.Render(firstNonEmpty(a.jenkinsCfg.Host(), "—")),
-		jenkinsStatusLabel(a.jenkinsInfo.Connected),
+		jenkinsStatusLabel(a.jenkinsInfo.Connected, a.animFrame),
 	}
 	actions := moduleActionLines(
 		[2]string{"e", "editar"},
@@ -1403,14 +1403,14 @@ func (a *App) saveJenkinsSettings(p *core.Project) tea.Cmd {
 	return a.refreshJenkins(p)
 }
 
-func jenkinsStatusDot(status string) string {
+func jenkinsStatusDot(status string, frame int) string {
 	switch status {
 	case "success":
-		return StyleHealthy.Render("●")
+		return StyleHealthy.Render(animPulse(frame))
 	case "failure":
 		return StyleUnhealthy.Render("●")
 	case "running":
-		return StyleWarning.Render("●")
+		return StyleWarning.Render(animSpinner(frame))
 	case "unstable":
 		return StyleWarning.Render("●")
 	default:
@@ -1431,9 +1431,9 @@ func jenkinsStatusStyled(status string) string {
 	}
 }
 
-func jenkinsBuildRow(b jenkinsutil.Build, maxW int) string {
+func jenkinsBuildRow(b jenkinsutil.Build, maxW int, frame int) string {
 	st := jenkinsutil.BuildStatus(b)
-	return jenkinsStatusDot(st) + " " + StyleMuted.Render(fmt.Sprintf("#%-5d %-8s %s",
+	return jenkinsStatusDot(st, frame) + " " + StyleMuted.Render(fmt.Sprintf("#%-5d %-8s %s",
 		b.Number, truncate(st, 8), jenkinsutil.FormatAgo(b.Timestamp)))
 }
 

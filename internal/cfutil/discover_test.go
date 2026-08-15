@@ -21,6 +21,12 @@ func TestTunnelFromCmdlineToken(t *testing.T) {
 func TestTunnelFromCmdlineNamed(t *testing.T) {
 	args := []string{"cloudflared", "tunnel", "run", "--url", "http://localhost:8080", "my-api"}
 	got := tunnelFromCmdline(7, args)
+	if h2 := tunnelFromCmdline(9, []string{"cloudflared", "tunnel", "--protocol", "http2", "--url", "http://localhost:4321"}); h2.Mode != "http2" || h2.Port != 4321 {
+		t.Fatalf("http2 solto: mode=%q port=%d", h2.Mode, h2.Port)
+	}
+	if h2 := tunnelFromCmdline(10, []string{"cloudflared", "tunnel", "--protocol=http2", "--url=http://localhost:4321"}); h2.Mode != "http2" {
+		t.Fatalf("http2 com =: mode=%q", h2.Mode)
+	}
 	if got.Mode != "named" || got.Name != "my-api" || got.Port != 8080 {
 		t.Fatalf("%+v", got)
 	}

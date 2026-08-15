@@ -129,6 +129,7 @@ func tunnelFromCmdline(pid int, args []string) Tunnel {
 	t := Tunnel{PID: pid, Status: "online", Project: "(sistema)"}
 	hasRun := false
 	hasToken := false
+	protocol := ""
 	var positional []string
 	for i := 0; i < len(args); i++ {
 		a := args[i]
@@ -150,6 +151,11 @@ func tunnelFromCmdline(pid int, args []string) Tunnel {
 			if !strings.Contains(a, "=") && i+1 < len(args) {
 				i++
 			}
+		case a == "--protocol" && i+1 < len(args):
+			protocol = args[i+1]
+			i++
+		case strings.HasPrefix(a, "--protocol="):
+			protocol = strings.TrimPrefix(a, "--protocol=")
 		case a == "run":
 			hasRun = true
 		case strings.HasPrefix(a, "-"):
@@ -175,6 +181,11 @@ func tunnelFromCmdline(pid int, args []string) Tunnel {
 		if len(positional) > 0 {
 			t.Name = sanitizeName(positional[len(positional)-1])
 		}
+	case protocol == "http2":
+		// Quick com transporte forçado: o processo é o mesmo, só o modo muda.
+		// Sem isso um túnel http2 achado no sistema voltava rotulado de quick e
+		// reiniciar por aqui perdia a flag.
+		t.Mode = "http2"
 	default:
 		t.Mode = "quick"
 	}

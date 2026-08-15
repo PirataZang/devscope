@@ -477,7 +477,7 @@ func (a *App) renderDbTablesPane(width, height int) string {
 	viewport := maxInt(1, height-2)
 	lines := make([]string, 0, viewport)
 	if a.dbLoading && len(a.dbTables) == 0 {
-		lines = append(lines, StyleMuted.Render("  carregando…"))
+		lines = append(lines, a.loadingMuted("  carregando…"))
 	} else if len(a.dbTables) == 0 {
 		lines = append(lines, StyleMuted.Render("  (sem tabelas)"))
 	} else if len(vis) == 0 {

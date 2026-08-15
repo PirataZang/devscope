@@ -40,13 +40,21 @@ func TestWsLandingEnterEsc(t *testing.T) {
 		t.Fatalf("landing=%q", landing)
 	}
 	_ = a.openWsClient(&p)
-	if !a.wsOpen || !strings.Contains(a.wsURL, "3000") {
-		t.Fatalf("open url=%q open=%v", a.wsURL, a.wsOpen)
+	if !a.wsOpen || !strings.Contains(a.wsURL, "3000") || a.wsFocus != wsFocusConnections {
+		t.Fatalf("open url=%q open=%v focus=%v", a.wsURL, a.wsOpen, a.wsFocus)
 	}
 	view := stripANSI(a.renderWsTab(&p))
-	for _, want := range []string{"Overview", "MESSAGES", "SEND MESSAGE", "CONNECTIONS", "STATS", "FILTERS", "AÇÕES"} {
+	for _, want := range []string{"Conversa", "MENSAGENS", "SERVIDORES"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("overview missing %q in %q", want, truncate(view, 200))
+		}
+	}
+	if strings.Contains(view, "ENVIAR") {
+		t.Fatalf("overview should not show send box: %q", truncate(view, 200))
+	}
+	for _, hide := range []string{"RESUMO", "MOSTRAR", "AÇÕES", "Visão"} {
+		if strings.Contains(view, hide) {
+			t.Fatalf("overview still shows %q in %q", hide, truncate(view, 200))
 		}
 	}
 	if strings.Contains(view, "2:Send") || strings.Contains(view, "1:Send") {
@@ -117,82 +125,89 @@ func TestWsNewURLKey(t *testing.T) {
 	}
 }
 
-func TestWsSendModeKey(t *testing.T) {
-	p := &core.Project{Path: "/p", Name: "demo"}
-	a := &App{
-		wsOpen:     true,
-		wsSubTab:   wsTabOverview,
-		wsFocus:    wsFocusMessages,
-		wsSendMode: wsSendJSON,
-		wsSend:     "{\n  \"type\": \"ping\"\n}",
-	}
-	view := stripANSI(a.renderWsSendBox(48, 8))
-	if !strings.Contains(view, "m") || !strings.Contains(view, "JSON") {
-		t.Fatalf("send box missing mode hint: %q", view)
-	}
-	if !strings.Contains(view, "type") || !strings.Contains(view, "ping") {
-		t.Fatalf("send box missing message body: %q", view)
-	}
-	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'m'}}, p)
-	if a.wsSendMode != wsSendBinary {
-		t.Fatalf("mode=%v want Binary", a.wsSendMode)
-	}
-	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'m'}}, p)
-	if a.wsSendMode != wsSendText {
-		t.Fatalf("mode=%v want Text", a.wsSendMode)
-	}
-}
-
-func TestWsOverviewKeepsSendBody(t *testing.T) {
-	p := core.Project{Path: "/p", Name: "demo", Ports: []int{3000}}
-	a := &App{
-		width: 120, height: 28,
-		wsOpen: true, wsSubTab: wsTabOverview,
-		wsSend:          "{\n  \"type\": \"ping\"\n}",
-		wsSendMode:      wsSendJSON,
-		wsURL:           "ws://localhost:3000/ws",
-		selectedProject: &p,
-		snapshot:        core.Snapshot{Projects: []core.Project{p}},
-	}
-	view := stripANSI(a.renderWsTab(&p))
-	if !strings.Contains(view, "SEND MESSAGE") || !strings.Contains(view, "ping") {
-		t.Fatalf("overview clipped send body: %q", truncate(view, 400))
-	}
-}
-
-func TestWsMessagesHasSendAndTabToggle(t *testing.T) {
+func TestWsComposeMOpensAndTabChangesType(t *testing.T) {
 	p := core.Project{Path: "/p", Name: "demo"}
 	a := &App{
 		width: 100, height: 30,
-		wsOpen: true, wsSubTab: wsTabMessages, wsFocus: wsFocusMessages,
-		wsSend: `{"type":"ping"}`, wsSendMode: wsSendJSON,
+		wsOpen: true, wsSubTab: wsTabOverview, wsFocus: wsFocusMessages,
+		wsSendMode:      wsSendText,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+	}
+	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'m'}}, &p)
+	if !a.wsComposeOn {
+		t.Fatal("m should open compose")
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("oi")})
+	if a.wsSend != "oi" {
+		t.Fatalf("typed %q", a.wsSend)
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyEnter})
+	if a.wsSend != "oi\n" {
+		t.Fatalf("enter in editor should be newline: %q", a.wsSend)
+	}
+	if !a.wsComposeOn {
+		t.Fatal("enter in editor must not send")
+	}
+	got := stripANSI(a.renderWsCompose())
+	for _, want := range []string{"Nova mensagem", "Texto", "JSON", "Enviar", "Cancelar", "oi"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in %q", want, truncate(got, 300))
+		}
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyTab})
+	if a.wsComposeFocus != wsComposeFocusType {
+		t.Fatalf("tab→tipo focus=%v", a.wsComposeFocus)
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyTab})
+	if a.wsSendMode != wsSendJSON {
+		t.Fatalf("tab should select JSON, mode=%v", a.wsSendMode)
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyTab})
+	if a.wsSendMode != wsSendBinary {
+		t.Fatalf("tab should select Binary, mode=%v", a.wsSendMode)
+	}
+	_, _ = a.updateWsCompose(tea.KeyMsg{Type: tea.KeyTab})
+	if a.wsComposeFocus != wsComposeFocusSend {
+		t.Fatalf("tab→Enviar focus=%v", a.wsComposeFocus)
+	}
+	_, cmd := a.updateWsCompose(tea.KeyMsg{Type: tea.KeyEnter})
+	if a.wsComposeFocus != wsComposeFocusSend {
+		t.Fatalf("Enviar must stay focused, got %v", a.wsComposeFocus)
+	}
+	if !a.wsComposeOn || !a.wsComposePending {
+		t.Fatal("Enviar should keep compose and connect")
+	}
+	if cmd == nil {
+		t.Fatal("expected connect cmd")
+	}
+}
+
+func TestWsMessagesTabTogglesAddress(t *testing.T) {
+	p := core.Project{Path: "/p", Name: "demo"}
+	a := &App{
+		width: 100, height: 30,
+		wsOpen: true, wsSubTab: wsTabOverview, wsFocus: wsFocusMessages,
 		wsFrames:        []wsFrame{{ID: 1, Dir: "in", Kind: "text", Payload: "hello-from-server", Size: 17}},
 		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
 	}
 	view := stripANSI(a.renderWsTab(&p))
-	if !strings.Contains(view, "MESSAGES") || !strings.Contains(view, "SEND MESSAGE") {
-		t.Fatalf("messages tab missing panes: %q", truncate(view, 300))
+	if !strings.Contains(view, "MENSAGENS") || !strings.Contains(view, "SERVIDORES") || !strings.Contains(view, "0:Conversa") {
+		t.Fatalf("conversa=%q", truncate(view, 300))
 	}
-	if !strings.Contains(view, "1:Messages") || strings.Contains(view, ":Send") {
-		t.Fatalf("subtabs=%q", truncate(view, 200))
+	if strings.Contains(view, "ENVIAR") || strings.Contains(view, ":Send") {
+		t.Fatalf("send box should be gone: %q", truncate(view, 200))
 	}
 	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyTab}, &p)
-	if a.wsFocus != wsFocusSend {
-		t.Fatalf("tab→send focus=%v", a.wsFocus)
+	if a.wsFocus != wsFocusConnections {
+		t.Fatalf("tab→endereço focus=%v", a.wsFocus)
 	}
 	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyTab}, &p)
 	if a.wsFocus != wsFocusMessages {
-		t.Fatalf("tab→messages focus=%v", a.wsFocus)
+		t.Fatalf("tab→conversa focus=%v", a.wsFocus)
 	}
-	a.wsFocus = wsFocusMessages
 	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'l'}}, &p)
 	if a.wsMsgHScroll != 4 {
 		t.Fatalf("hscroll=%d", a.wsMsgHScroll)
-	}
-	a.wsFocus = wsFocusSend
-	_, _ = a.handleWsKeys(tea.KeyMsg{Type: tea.KeyDown}, &p)
-	if a.wsSendVScroll != 1 {
-		t.Fatalf("vscroll=%d", a.wsSendVScroll)
 	}
 }
 
@@ -228,13 +243,19 @@ func TestWsAllConnectionsPopup(t *testing.T) {
 		t.Fatalf("entries=%+v", entries)
 	}
 	view := stripANSI(a.renderWsTab(&pA))
-	if !strings.Contains(view, "TODAS AS CONNECTIONS") || !strings.Contains(view, "alpha") {
-		t.Fatalf("popup=%q", truncate(view, 300))
+	if !strings.Contains(view, "SERVIDORES · TODOS") || !strings.Contains(view, "STATE") || !strings.Contains(view, "PROJECT") {
+		t.Fatalf("sidebar all=%q", truncate(view, 400))
+	}
+	if !strings.Contains(view, "alpha") || !strings.Contains(view, "beta") {
+		t.Fatalf("projects missing=%q", truncate(view, 400))
+	}
+	if strings.Contains(view, "TODOS OS ENDEREÇOS") {
+		t.Fatal("A should fill the sidebar, not a popup")
 	}
 	a.wsAllCursor = 1
 	cmd := a.pickWsAllEntry()
-	if a.wsShowAll {
-		t.Fatal("popup should close")
+	if !a.wsShowAll {
+		t.Fatal("all-projects list should stay in the sidebar")
 	}
 	if a.wsURL != "wss://echo.test/" {
 		t.Fatalf("url=%q", a.wsURL)

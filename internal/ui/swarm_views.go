@@ -48,7 +48,7 @@ func (a *App) renderSwarmLanding(p *core.Project) string {
 		openLines = append(openLines, "", StyleUnhealthy.Render(truncate(info.Error, 40)))
 	case info.Active:
 		openLines = append(openLines, "",
-			StyleHealthy.Render("● ACTIVE")+
+			StyleHealthy.Render(a.pulse()+" ACTIVE")+
 				StyleMuted.Render(fmt.Sprintf("  ·  %d mgr  ·  %d nodes", info.Managers, info.Nodes)))
 	default:
 		openLines = append(openLines, "", StyleWarning.Render("○ INACTIVE — i inicia o cluster"))
@@ -202,7 +202,7 @@ func (a *App) renderSwarmStatusRow(width int) string {
 	case a.swarmInfo.State == "degraded":
 		badge = StyleWarning.Render("⚠ DEGRADED")
 	case a.swarmInfo.Active:
-		badge = StyleHealthy.Render("● ACTIVE")
+		badge = a.livePulse("ACTIVE")
 	default:
 		badge = StyleMuted.Render("○ INACTIVE")
 	}
@@ -441,7 +441,7 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 	if len(managers) > 0 {
 		lines = append(lines, StyleMuted.Render("MANAGERS"))
 		for _, n := range managers {
-			dot := StyleHealthy.Render("●")
+			dot := a.livePulse("")
 			if !strings.EqualFold(n.Status, "Ready") {
 				dot = StyleUnhealthy.Render("●")
 			}
@@ -456,7 +456,7 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 	if len(workers) > 0 {
 		lines = append(lines, StyleMuted.Render("WORKERS"))
 		for _, n := range workers {
-			dot := StyleHealthy.Render("●")
+			dot := a.livePulse("")
 			if !strings.EqualFold(n.Status, "Ready") {
 				dot = StyleUnhealthy.Render("○")
 			}
@@ -596,7 +596,7 @@ func (a *App) renderSwarmFormBox() string {
 		title = "JOIN CLUSTER · " + strings.ToUpper(a.swarmFormName)
 		body := a.swarmDetail
 		if body == "" {
-			body = "carregando…"
+			body = a.spinner() + " carregando…"
 		}
 		for _, ln := range strings.Split(body, "\n") {
 			lines = append(lines, StyleMuted.Render(truncate(ln, w-6)))

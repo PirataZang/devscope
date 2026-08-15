@@ -657,7 +657,7 @@ func (a *App) renderK8sTable(width, height int) string {
 
 	if n == 0 {
 		if a.k8sLoading {
-			lines = append(lines, StyleMuted.Render("  carregando..."))
+			lines = append(lines, a.loadingMuted("  carregando..."))
 		} else {
 			lines = append(lines, StyleMuted.Render("  (vazio)"))
 		}
@@ -726,7 +726,7 @@ func (a *App) k8sRowLabel(i int) string {
 	case k8sKindPods:
 		return fmt.Sprintf("%-22s %-16s %-7s %-8s %-12s %-12s %s",
 			truncate(r.Name, 22),
-			truncate(k8sStatusLabel(r.Status), 16),
+			truncate(k8sStatusLabel(r.Status, a.animFrame), 16),
 			truncate(r.Ready, 7),
 			truncate(r.Restarts, 8),
 			truncate(r.Node, 12),
@@ -742,10 +742,10 @@ func (a *App) k8sRowLabel(i int) string {
 	}
 }
 
-func k8sStatusLabel(status string) string {
+func k8sStatusLabel(status string, frame int) string {
 	switch status {
 	case "Running":
-		return "● Running"
+		return animPulse(frame) + " Running"
 	case "Pending":
 		return "● Pending"
 	case "Succeeded", "Completed":

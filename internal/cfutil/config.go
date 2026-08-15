@@ -12,7 +12,7 @@ type TunnelConfig struct {
 	URL       string    `json:"url"`            // destino local: http://localhost:4321
 	Port      int       `json:"port,omitempty"` // derivado da URL (compat)
 	Hostname  string    `json:"hostname,omitempty"`
-	Mode      string    `json:"mode,omitempty"` // quick | named
+	Mode      string    `json:"mode,omitempty"` // quick | named | http2
 	TunnelID  string    `json:"tunnel_id,omitempty"`
 	AutoStart bool      `json:"auto_start,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
@@ -80,13 +80,7 @@ func SaveProject(projectPath string, cfg ProjectConfig) error {
 
 func (c *ProjectConfig) UpsertTunnel(t TunnelConfig) {
 	t.normalize()
-	if t.Mode == "" {
-		if t.Hostname != "" {
-			t.Mode = "named"
-		} else {
-			t.Mode = "quick"
-		}
-	}
+	t.Mode = NormalizeMode(t.Mode, t.Hostname)
 	if t.CreatedAt.IsZero() {
 		t.CreatedAt = time.Now()
 	}

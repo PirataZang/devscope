@@ -151,19 +151,19 @@ type App struct {
 	relaxTree                   relaxTreeState
 	relaxNeb                    relaxNebulaState
 	relaxBh                     relaxBlackHoleState
-	relaxAq                     relaxAquariumState
 	relaxFire                   relaxFireState
 	relaxCoffee                 relaxCoffeeState
 	relaxSea                    relaxSeaState
-	relaxClouds                 relaxCloudState
-	relaxDrop                   relaxDropState
 	relaxBurst                  relaxBurstState
 	relaxCity                   relaxCityState
-	relaxRidge                  relaxRidgeState
 	relaxFox                    relaxFoxState
 	relaxFw                     relaxFireworksState
 	relaxTetris                 relaxTetrisState
-	relaxInv                    relaxInvadersState
+	relaxSword                  relaxSwordState
+	relaxHg                     relaxHourglassState
+	relaxChess                  relaxChessState
+	relaxJp                     relaxJackpotState
+	relaxV4                     relaxV4State
 	relaxEng                    relaxEngine
 	relaxPending                relaxGame
 	relaxPendingOn              bool
@@ -393,6 +393,9 @@ type App struct {
 	routesFilterInput           string
 	routesFilter                string
 	wsOpen                      bool
+	wsComposeOn                 bool
+	wsComposeFocus              wsComposeFocus
+	wsComposePending            bool
 	wsEditing                   bool
 	wsConnected                 bool
 	wsSubTab                    wsSubTab
@@ -702,6 +705,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if a.gitComposeOn {
 			return a.updateGitCompose(msg)
+		}
+		if a.wsComposeOn {
+			return a.updateWsCompose(msg)
 		}
 		if a.dockerAddOn {
 			return a.updateDockerAdd(msg)
@@ -1095,7 +1101,7 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.view == ViewProject && a.tab == TabJWT && a.jwtOpen && a.jwtEditing {
 		return a.updateProject(msg)
 	}
-	if a.view == ViewProject && a.tab == TabWebSocket && a.wsOpen && a.wsEditing {
+	if a.view == ViewProject && a.tab == TabWebSocket && a.wsOpen && (a.wsEditing || a.wsComposeOn) {
 		return a.updateProject(msg)
 	}
 
@@ -1253,6 +1259,7 @@ func (a *App) closeToolClients() {
 		a.wsCloseSession()
 	}
 	a.wsOpen = false
+	a.wsComposeOn = false
 	a.wsEditing = false
 	a.wsShowAll = false
 	a.ngrokOpen = false
@@ -2012,6 +2019,8 @@ func (a *App) View() string {
 		content = a.renderApiSearchPrompt()
 	case a.gitComposeOn:
 		content = a.renderGitCompose()
+	case a.wsComposeOn:
+		content = a.renderWsCompose()
 	case a.dockerAddOn:
 		content = a.renderDockerAdd()
 	case a.gitPromptOn:
@@ -2611,29 +2620,22 @@ Aba Rotas (TOOLS):
   esc          Voltar para a landing / limpar filtro
 
 Aba WebSocket (TOOLS):
-  enter        Abrir Overview (3 colunas)
-  0-3          Overview / Messages / History / Settings
-  1            Messages (lista + send embaixo)
-  n            Nova connection (painel Connections)
-  e            Editar connection / Send / URL
-  x            Deletar connection (focus Connections)
-  c / enter    Conectar selecionada
-  d            Desconectar selecionada
-  A            Ver todas as connections (todos os projetos)
-  r            Reconnect
-  tab          Overview: painéis · Messages: lista ↔ send
-  ←→ / h l     Scroll horizontal (messages e send)
-  ↑↓ / j k     Scroll vertical / navegar frames
-  f            Ciclar filtro (All/Text/JSON/Binary/Errors/In/Out)
-  /            Buscar no payload
-  m            Send: Text → JSON → Binary (no Inspector: Pretty/Raw/Hex)
-  []           Pretty / Raw / Hex no inspector
-  enter        Enviar / conectar / reenviar history
-  ctrl+enter   Enviar na edição
-  ctrl+l       Limpar frames
-  a            Auto reconnect (Settings)
-  u            Porta do projeto
-  esc          Voltar (desconecta) / fechar lista A
+  enter        Abrir a conversa
+  0 / 1        Conversa / Ajustes
+  c            Conectar
+  d            Desligar
+  n            Novo endereço
+  m            Nova mensagem (editor · tab tipo · Enviar)
+  ↑↓           Servidores (esquerda) / conversa
+  enter        Trocar de servidor / conectar
+  n            Novo servidor
+  e            Editar servidor
+  tab          Servidores ↔ conversa
+  /            Buscar no texto
+  f            Filtrar
+  r            Reconectar
+  A            Servidores de todos os projetos (no menu)
+  esc          Voltar (desconecta)
 
 Aba Kubernetes:
   enter        Abrir cliente (pods/deploy/svc/manifests)

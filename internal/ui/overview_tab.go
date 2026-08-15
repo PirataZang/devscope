@@ -69,14 +69,14 @@ func (a *App) renderOverviewContext(p *core.Project, width int) string {
 	if p.Uptime <= 0 {
 		up = formatUptime(a.snapshot.HostMetrics.Uptime)
 	}
-	online := StyleHealthy.Render("● Online")
+	online := a.livePulse("Online")
 	switch {
 	case p.Health == core.HealthUnhealthy:
 		online = StyleUnhealthy.Render("● Offline")
 	case p.Status == core.StatusDegraded:
-		online = StyleWarning.Render("● Degraded")
+		online = StyleWarning.Render(animPulseSlow(a.animFrame) + " Degraded")
 	case p.Status == core.StatusStopped:
-		online = StyleMuted.Render("○ Stopped")
+		online = StyleStopped.Render(animStoppedGlyph + " Stopped")
 	}
 
 	left := StyleMuted.Render("Projeto ") + StyleNormal.Render(p.Name) +
@@ -170,7 +170,7 @@ func (a *App) renderOverviewCenter(p *core.Project, width, height int) string {
 func (a *App) renderOverviewProjectBox(p *core.Project, width, height int) string {
 	lines := []string{
 		StyleMuted.Render("Path     ") + StyleNormal.Render(truncate(p.Path, maxInt(12, width-14))),
-		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusText(p.Status)),
+		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame)),
 		StyleMuted.Render("Health   ") + healthLabel(p.Health),
 	}
 	return renderApiTitledBox("PROJETO", fitExactLines(lines, height-2), width, height, false)
@@ -419,7 +419,7 @@ func (a *App) renderOverviewDetailsBox(p *core.Project, width, height int) strin
 		StyleMuted.Render("Ambiente ") + StyleWarning.Render(env),
 		StyleMuted.Render("Servidor ") + StyleNormal.Render(truncate(host, width-12)),
 		StyleMuted.Render("Path     ") + StyleMuted.Render(truncate(p.Path, width-12)),
-		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusText(p.Status)),
+		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame)),
 		StyleMuted.Render("Health   ") + healthLabel(p.Health),
 		StyleMuted.Render("Scan     ") + StyleMuted.Render(scan),
 	}

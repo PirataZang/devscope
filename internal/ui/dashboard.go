@@ -104,7 +104,7 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 	separator := StyleMuted.Render(strings.Repeat("─", tableW))
 	tableHeader := renderTableRow(cols, tableRow{
 		icon: " ", name: "NAME", branch: "BRANCH", status: "STATUS", ctrs: "CTRS", path: "PATH",
-	}, StyleTableHeader, nil, false)
+	}, StyleTableHeader, nil, false, 0)
 
 	viewport := a.dashboardProjectsViewport()
 	start := a.dashboardScroll
@@ -147,7 +147,7 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 				path:   p.Path,
 				branch: branch,
 				ctrs:   ctrs,
-			}, style, &p.Status, selected))
+			}, style, &p.Status, selected, a.animFrame))
 		}
 	}
 
@@ -274,14 +274,14 @@ func tableColumns(tableW int) tableCols {
 	return c
 }
 
-func renderTableRow(c tableCols, r tableRow, style lipgloss.Style, status *core.ProjectStatus, selected bool) string {
+func renderTableRow(c tableCols, r tableRow, style lipgloss.Style, status *core.ProjectStatus, selected bool, frame int) string {
 	gap := lipgloss.NewStyle().Width(c.gap).Render("")
 	cell := func(width int, text string) string {
 		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
 	}
 	statusCell := func() string {
 		if status != nil {
-			return renderStatusCell(c.status, *status, selected)
+			return renderStatusCell(c.status, *status, selected, frame)
 		}
 		return cell(c.status, r.status)
 	}
@@ -300,12 +300,12 @@ func renderTableRow(c tableCols, r tableRow, style lipgloss.Style, status *core.
 	)
 }
 
-func renderStatusCell(width int, s core.ProjectStatus, selected bool) string {
+func renderStatusCell(width int, s core.ProjectStatus, selected bool, frame int) string {
 	st := projectStatusStyle(s)
 	if selected {
 		st = st.Bold(true)
 	}
-	return st.Width(width).MaxWidth(width).Render(statusText(s))
+	return st.Width(width).MaxWidth(width).Render(statusTextAt(s, frame))
 }
 
 func projectStatusStyle(s core.ProjectStatus) lipgloss.Style {
@@ -322,13 +322,17 @@ func projectStatusStyle(s core.ProjectStatus) lipgloss.Style {
 }
 
 func statusText(s core.ProjectStatus) string {
+	return statusTextAt(s, 0)
+}
+
+func statusTextAt(s core.ProjectStatus, frame int) string {
 	switch s {
 	case core.StatusRunning:
-		return "● Run"
+		return animPulse(frame) + " Run"
 	case core.StatusStopped:
-		return "● Stop"
+		return animStoppedGlyph + " Stop"
 	case core.StatusDegraded:
-		return "● Deg"
+		return animPulseSlow(frame) + " Deg"
 	default:
 		return "◌ ???"
 	}
