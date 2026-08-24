@@ -20,6 +20,7 @@ const (
 	gitSubviewBranch
 	gitSubviewCommit
 	gitSubviewFileDiff
+	gitSubviewGraph
 )
 
 type gitFocus int
@@ -111,6 +112,8 @@ func (a *App) renderGitTab(p *core.Project) string {
 		return a.renderGitCommitDetail(p)
 	case gitSubviewFileDiff:
 		return a.renderGitFileDiff(p)
+	case gitSubviewGraph:
+		return a.renderGitGraph(p)
 	}
 
 	current := a.currentProject()
@@ -604,6 +607,7 @@ func (a *App) renderGitSideColumn(g *core.GitInfo, width, height int) string {
 			[2]string{"b", "filter"},
 			[2]string{"←→", "painéis"},
 			[2]string{"o", "abrir link"},
+			[2]string{"C-g", "graph"},
 		)
 	}
 	used := lipgloss.Height(actions)

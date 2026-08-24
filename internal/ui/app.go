@@ -183,6 +183,11 @@ type App struct {
 	gitDiffSearchInput          string
 	gitDiffSearchQuery          string
 	gitDiffSearchIdx            int
+	gitGraphRows                []collectors.GitGraphRow
+	gitGraphBranchCursor        int
+	gitGraphScroll              int
+	gitGraphFocusGraph          bool
+	gitGraphReachable           map[string]bool
 	containerSubview            containerSubview
 	containerScroll             int
 	containerStatusMsg          string
@@ -208,6 +213,19 @@ type App struct {
 	containerPortLoading        bool
 	containerPortGen            int
 	containerConfirmClosePort   bool
+	imageScope                  imageScope
+	imageContainerRepo          string
+	imageAll                    []core.Image
+	imageCursor                 int
+	imageScroll                 int
+	imageLoading                bool
+	imageGen                    int
+	imageStatusMsg              string
+	imageConfirmRemove          bool
+	imageConfirmCursor          int
+	containerDeps               []collectors.ComposeDependency
+	containerDepsCursor         int
+	containerDepsScroll         int
 	containerDetailTab          containerDetailTab
 	containerDetailID           string
 	containerDetailName         string
@@ -980,6 +998,13 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleContainerPortPreview(msg)
 		return a, nil
 
+	case dockerImagesLoadedMsg:
+		a.handleDockerImagesLoaded(msg)
+		return a, nil
+
+	case dockerImagesRemovedMsg:
+		return a, a.handleDockerImagesRemoved(msg)
+
 	case dockerRefreshedMsg:
 		a.snapshot = a.store.Get()
 		a.restoreContainerCursor(a.containerPreviewID)
@@ -1483,6 +1508,15 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabContainers && a.containerSubview == containerSubviewPorts {
 		return a.handleContainerPortsKeys(msg, p)
 	}
+	if a.tab == TabContainers && a.containerSubview == containerSubviewImages {
+		return a.handleContainerImagesKeys(msg, p)
+	}
+	if a.tab == TabContainers && a.containerSubview == containerSubviewDeps {
+		return a.handleContainerDepsKeys(msg, p)
+	}
+	if a.tab == TabGit && a.gitSubview == gitSubviewGraph {
+		return a.handleGitGraphKeys(msg, p)
+	}
 	if a.tab == TabGit && (a.gitSubview == gitSubviewBranch || a.gitSubview == gitSubviewCommit || a.gitSubview == gitSubviewFileDiff) {
 		return a.handleGitDedicatedKeys(msg, p)
 	}
@@ -1699,6 +1733,22 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				return a, a.startProjectLogsFollow()
 			}
 			return a, nil
+		}
+	case "i":
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			if c, ok := a.selectedContainer(p); ok {
+				if !a.requireDockerContainer(c) {
+					return a, nil
+				}
+				return a, a.openContainerImages(c)
+			}
+		}
+	case "ctrl+g":
+		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
+			return a, a.openContainerDeps(p)
+		}
+		if a.tab == TabGit && a.gitTabReady(p) {
+			return a, a.openGitGraph(p)
 		}
 	case "m":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
