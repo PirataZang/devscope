@@ -20,6 +20,7 @@ const (
 	gitSubviewBranch
 	gitSubviewCommit
 	gitSubviewFileDiff
+	gitSubviewGraph
 )
 
 type gitFocus int
@@ -111,6 +112,8 @@ func (a *App) renderGitTab(p *core.Project) string {
 		return a.renderGitCommitDetail(p)
 	case gitSubviewFileDiff:
 		return a.renderGitFileDiff(p)
+	case gitSubviewGraph:
+		return a.renderGitGraph(p)
 	}
 
 	current := a.currentProject()
@@ -604,6 +607,7 @@ func (a *App) renderGitSideColumn(g *core.GitInfo, width, height int) string {
 			[2]string{"b", "filter"},
 			[2]string{"←→", "painéis"},
 			[2]string{"o", "abrir link"},
+			[2]string{"C-g", "graph"},
 		)
 	}
 	used := lipgloss.Height(actions)
@@ -2414,6 +2418,7 @@ func (a *App) gitWTDiffHScrollBy(delta int) {
 }
 
 func (a *App) openGitCommitDetail(p *core.Project, commit core.GitCommit) tea.Cmd {
+	a.gitCommitReturnTo = a.gitSubview
 	a.gitSubview = gitSubviewCommit
 	a.gitSelectedCommit = commit
 	a.gitCommitFiles = nil
@@ -2690,7 +2695,11 @@ func (a *App) handleGitDedicatedKeys(msg tea.KeyMsg, p *core.Project) (tea.Model
 				a.closeGitCommitFile()
 				return a, nil
 			}
-			a.gitSubview = gitSubviewBranch
+			if a.gitCommitReturnTo == gitSubviewGraph {
+				a.gitSubview = gitSubviewGraph
+			} else {
+				a.gitSubview = gitSubviewBranch
+			}
 			a.gitCommitDiffCache = nil
 			return a, nil
 		}

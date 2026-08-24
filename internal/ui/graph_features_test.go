@@ -158,3 +158,29 @@ func TestHandleGitGraphKeysSkipsConnectorRows(t *testing.T) {
 		t.Fatal("esc should return to the main git subview")
 	}
 }
+
+func TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph(t *testing.T) {
+	p := testProjectWithContainer()
+	a := &App{width: 120, height: 40, selectedProject: p, gitSubview: gitSubviewGraph}
+	a.gitGraphRows = []collectors.GitGraphRow{
+		{Prefix: "* ", Hash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Short: "aaaaaaa", Author: "igor", Date: "2024-01-17", Subject: "first"},
+	}
+
+	if _, cmd := a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEnter}, p); cmd == nil {
+		t.Fatal("enter on a commit row should return a load cmd")
+	}
+	if a.gitSubview != gitSubviewCommit {
+		t.Fatalf("enter should open the commit detail subview, got %d", a.gitSubview)
+	}
+	if a.gitSelectedCommit.Hash != a.gitGraphRows[0].Hash {
+		t.Fatalf("commit detail should target the selected row's hash, got %q", a.gitSelectedCommit.Hash)
+	}
+	if a.gitCommitReturnTo != gitSubviewGraph {
+		t.Fatalf("should remember to return to the graph, got %d", a.gitCommitReturnTo)
+	}
+
+	a.handleGitDedicatedKeys(tea.KeyMsg{Type: tea.KeyEsc}, p)
+	if a.gitSubview != gitSubviewGraph {
+		t.Fatalf("esc from commit detail opened via the graph should return to the graph, got %d", a.gitSubview)
+	}
+}
