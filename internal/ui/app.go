@@ -45,6 +45,7 @@ type App struct {
 	tabCursor                   int
 	gitFocus                    gitFocus
 	gitSubview                  gitSubview
+	gitCommitReturnTo           gitSubview
 	gitBranchCursor             int
 	gitBranchScroll             int
 	gitCommitCursor             int

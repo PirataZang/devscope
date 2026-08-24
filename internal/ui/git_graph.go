@@ -29,7 +29,7 @@ func graphGlyph(r rune) rune {
 	case '*':
 		return '●'
 	case '|':
-		return '│'
+		return '┃' // heavy vertical — thicker stroke than the light │, closer to a solid colored line
 	case '/':
 		return '╱'
 	case '\\':
@@ -57,7 +57,7 @@ func colorizeGraphPrefix(prefix string) string {
 			col++
 			continue
 		}
-		style := lipgloss.NewStyle().Foreground(graphLaneColor(col))
+		style := lipgloss.NewStyle().Foreground(graphLaneColor(col)).Bold(true)
 		b.WriteString(style.Render(string(graphGlyph(r))))
 		col++
 	}
@@ -197,6 +197,15 @@ func (a *App) handleGitGraphKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, te
 		a.gitGraphScroll = minInt(maxInt(0, len(a.gitGraphRows)-1), a.gitGraphScroll+a.gitGraphViewport())
 	case "r":
 		return a, a.openGitGraph(p)
+	case "enter":
+		if row, ok := a.selectedGitGraphRow(); ok {
+			return a, a.openGitCommitDetail(p, core.GitCommit{
+				Hash:    row.Hash,
+				Message: row.Subject,
+				Author:  row.Author,
+				Date:    row.Date,
+			})
+		}
 	}
 	return a, nil
 }
@@ -246,7 +255,10 @@ func (a *App) renderGitGraphList(width, height int) string {
 func (a *App) renderGitGraphListRow(row collectors.GitGraphRow, selected bool, width int) string {
 	prefix := colorizeGraphPrefix(row.Prefix)
 	if row.Hash == "" {
-		return prefix
+		// Connector-only line (merge/branch joins) — needs the same 2-col
+		// gutter as commit rows below, or the lanes visibly step out of
+		// alignment with the dots above/below them.
+		return "  " + prefix
 	}
 
 	subjStyle := StyleNormal

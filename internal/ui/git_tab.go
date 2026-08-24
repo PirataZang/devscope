@@ -2418,6 +2418,7 @@ func (a *App) gitWTDiffHScrollBy(delta int) {
 }
 
 func (a *App) openGitCommitDetail(p *core.Project, commit core.GitCommit) tea.Cmd {
+	a.gitCommitReturnTo = a.gitSubview
 	a.gitSubview = gitSubviewCommit
 	a.gitSelectedCommit = commit
 	a.gitCommitFiles = nil
@@ -2694,7 +2695,11 @@ func (a *App) handleGitDedicatedKeys(msg tea.KeyMsg, p *core.Project) (tea.Model
 				a.closeGitCommitFile()
 				return a, nil
 			}
-			a.gitSubview = gitSubviewBranch
+			if a.gitCommitReturnTo == gitSubviewGraph {
+				a.gitSubview = gitSubviewGraph
+			} else {
+				a.gitSubview = gitSubviewBranch
+			}
 			a.gitCommitDiffCache = nil
 			return a, nil
 		}
