@@ -11,55 +11,53 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
-// graphLanePalette cycles by column so a lane keeps a consistent color as it
-// runs down through history — the same convention gitk/tig/lazygit use.
-var graphLanePalette = []lipgloss.Color{ColorAccent, ColorSuccess, ColorWarning, ColorPink, ColorHighlight, ColorPrimary, ColorDanger}
-
-func graphLaneColor(col int) lipgloss.Color {
-	return graphLanePalette[col%len(graphLanePalette)]
-}
-
-// graphGlyph swaps git's blocky ASCII graph characters for rounder Unicode
-// look-alikes. A terminal is a fixed character grid — it can't draw the
-// smooth bezier curves a GUI graph does — so this is the closest practical
-// upgrade: solid commit dots and cleaner line-drawing glyphs instead of
-// bare `*`, `|`, `/`, `\`.
-func graphGlyph(r rune) rune {
-	switch r {
-	case '*':
+// cellGlyph is the keifu-style rounded-curve mapping — ╭╮╰╯ for branch/merge
+// points instead of the diagonal /\ git's own --graph output uses.
+func cellGlyph(k cellType, isHead bool) rune {
+	switch k {
+	case cellPipe:
+		return '│'
+	case cellCommit:
+		if isHead {
+			return '◉'
+		}
 		return '●'
-	case '|':
-		return '┃' // heavy vertical — thicker stroke than the light │, closer to a solid colored line
-	case '/':
-		return '╱'
-	case '\\':
-		return '╲'
+	case cellBranchRight:
+		return '╭'
+	case cellBranchLeft:
+		return '╮'
+	case cellMergeRight:
+		return '╰'
+	case cellMergeLeft:
+		return '╯'
+	case cellHorizontal:
+		return '─'
+	case cellHorizontalPipe:
+		return '┼'
+	case cellTeeRight:
+		return '├'
+	case cellTeeLeft:
+		return '┤'
+	case cellTeeUp:
+		return '┴'
 	default:
-		return r
+		return ' '
 	}
 }
 
-// graphRowLaneColor is the color of a commit row's own marker column — used
-// to badge its hash the same color as its line in the graph.
-func graphRowLaneColor(prefix string) lipgloss.Color {
-	if idx := strings.IndexRune(prefix, '*'); idx >= 0 {
-		return graphLaneColor(idx)
-	}
-	return ColorAccent
-}
-
-func colorizeGraphPrefix(prefix string) string {
+func renderGraphCells(cells []graphCell, isHead bool) string {
 	var b strings.Builder
-	col := 0
-	for _, r := range prefix {
-		if r == ' ' {
-			b.WriteRune(' ')
-			col++
+	for _, c := range cells {
+		if c.kind == cellEmpty {
+			b.WriteByte(' ')
 			continue
 		}
-		style := lipgloss.NewStyle().Foreground(graphLaneColor(col)).Bold(true)
-		b.WriteString(style.Render(string(graphGlyph(r))))
-		col++
+		color := graphLaneGlyphColor(c.color)
+		if c.kind == cellHorizontalPipe {
+			color = graphLaneGlyphColor(c.pipeColor)
+		}
+		style := lipgloss.NewStyle().Foreground(color).Bold(true)
+		b.WriteString(style.Render(string(cellGlyph(c.kind, isHead))))
 	}
 	return b.String()
 }
@@ -88,12 +86,11 @@ func graphCommitIcon(subject string) string {
 	}
 }
 
-func renderGitGraphRefBadge(refs string) string {
-	first := strings.TrimSpace(strings.SplitN(refs, ",", 2)[0])
-	first = strings.TrimPrefix(first, "HEAD -> ")
-	if first == "" {
+func renderGitGraphRefBadges(refs []string) string {
+	if len(refs) == 0 {
 		return ""
 	}
+	first := refs[0]
 	return lipgloss.NewStyle().Foreground(ColorPink).Bold(true).Render("[" + first + "]")
 }
 
@@ -108,12 +105,10 @@ func (a *App) openGitGraph(p *core.Project) tea.Cmd {
 	a.gitSubview = gitSubviewGraph
 	a.gitGraphCursor = 0
 	a.gitGraphScroll = 0
-	a.gitGraphRows = collectors.GitLogGraph(p.Path, 300)
-	// Land on the first real commit row, not a connector-only line.
-	if a.gitGraphRows != nil && a.gitGraphRows[0].Hash == "" {
-		if i := a.nextGitGraphCommitRow(-1); i >= 0 {
-			a.gitGraphCursor = i
-		}
+	commits := collectors.GitLogDAG(p.Path, 300)
+	a.gitGraphLayout = buildGraphLayout(commits)
+	if i := a.nextGitGraphCommitRow(-1); i >= 0 {
+		a.gitGraphCursor = i
 	}
 	a.gitGraphDetailHash = ""
 	a.gitGraphDetailMsg = ""
@@ -121,20 +116,26 @@ func (a *App) openGitGraph(p *core.Project) tea.Cmd {
 	return a.requestGitGraphDetail(p)
 }
 
-func (a *App) selectedGitGraphRow() (collectors.GitGraphRow, bool) {
-	if a.gitGraphCursor < 0 || a.gitGraphCursor >= len(a.gitGraphRows) {
-		return collectors.GitGraphRow{}, false
+func (a *App) gitGraphNodes() []graphNode {
+	return a.gitGraphLayout.nodes
+}
+
+func (a *App) selectedGitGraphNode() (graphNode, bool) {
+	nodes := a.gitGraphNodes()
+	if a.gitGraphCursor < 0 || a.gitGraphCursor >= len(nodes) {
+		return graphNode{}, false
 	}
-	row := a.gitGraphRows[a.gitGraphCursor]
-	if row.Hash == "" {
-		return collectors.GitGraphRow{}, false
+	n := nodes[a.gitGraphCursor]
+	if n.commit == nil {
+		return graphNode{}, false
 	}
-	return row, true
+	return n, true
 }
 
 func (a *App) nextGitGraphCommitRow(from int) int {
-	for i := from + 1; i < len(a.gitGraphRows); i++ {
-		if a.gitGraphRows[i].Hash != "" {
+	nodes := a.gitGraphNodes()
+	for i := from + 1; i < len(nodes); i++ {
+		if nodes[i].commit != nil {
 			return i
 		}
 	}
@@ -142,8 +143,9 @@ func (a *App) nextGitGraphCommitRow(from int) int {
 }
 
 func (a *App) prevGitGraphCommitRow(from int) int {
+	nodes := a.gitGraphNodes()
 	for i := from - 1; i >= 0; i-- {
-		if a.gitGraphRows[i].Hash != "" {
+		if nodes[i].commit != nil {
 			return i
 		}
 	}
@@ -151,14 +153,14 @@ func (a *App) prevGitGraphCommitRow(from int) int {
 }
 
 func (a *App) requestGitGraphDetail(p *core.Project) tea.Cmd {
-	row, ok := a.selectedGitGraphRow()
+	node, ok := a.selectedGitGraphNode()
 	if !ok {
 		a.gitGraphDetailHash = ""
 		return nil
 	}
 	a.gitGraphDetailGen++
 	gen := a.gitGraphDetailGen
-	hash := row.Hash
+	hash := node.commit.Hash
 	path := p.Path
 	return func() tea.Msg {
 		msg := collectors.CollectCommitFullMessage(path, hash)
@@ -194,16 +196,16 @@ func (a *App) handleGitGraphKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, te
 	case "pgup":
 		a.gitGraphScroll = maxInt(0, a.gitGraphScroll-a.gitGraphViewport())
 	case "pgdown":
-		a.gitGraphScroll = minInt(maxInt(0, len(a.gitGraphRows)-1), a.gitGraphScroll+a.gitGraphViewport())
+		a.gitGraphScroll = minInt(maxInt(0, len(a.gitGraphNodes())-1), a.gitGraphScroll+a.gitGraphViewport())
 	case "r":
 		return a, a.openGitGraph(p)
 	case "enter":
-		if row, ok := a.selectedGitGraphRow(); ok {
+		if node, ok := a.selectedGitGraphNode(); ok {
 			return a, a.openGitCommitDetail(p, core.GitCommit{
-				Hash:    row.Hash,
-				Message: row.Subject,
-				Author:  row.Author,
-				Date:    row.Date,
+				Hash:    node.commit.Hash,
+				Message: node.commit.Subject,
+				Author:  node.commit.Author,
+				Date:    node.commit.Date,
 			})
 		}
 	}
@@ -222,7 +224,7 @@ func (a *App) renderGitGraph(p *core.Project) string {
 	w := maxInt(40, a.width)
 	h := maxInt(8, a.projectPanelHeight())
 
-	if len(a.gitGraphRows) == 0 {
+	if len(a.gitGraphNodes()) == 0 {
 		return renderApiTitledBox("GIT GRAPH", fitExactLines([]string{StyleMuted.Render("Sem commits para desenhar o grafo.")}, h-2), w, h, true)
 	}
 
@@ -240,37 +242,44 @@ func (a *App) renderGitGraph(p *core.Project) string {
 func (a *App) renderGitGraphList(width, height int) string {
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner)
-	rows := a.gitGraphRows
-	a.gitGraphScroll = ensureVisible(a.gitGraphCursor, a.gitGraphScroll, viewport, len(rows))
+	nodes := a.gitGraphNodes()
+	a.gitGraphScroll = ensureVisible(a.gitGraphCursor, a.gitGraphScroll, viewport, len(nodes))
 	start := a.gitGraphScroll
-	end := minInt(start+viewport, len(rows))
+	end := minInt(start+viewport, len(nodes))
 
+	// Every node's cells slice is already padded to (maxLane+1)*2 by the
+	// layout algorithm, so the graph column lines up across every row —
+	// commit or bare connector — with no extra padding needed here.
 	lines := make([]string, 0, viewport)
 	for i := start; i < end; i++ {
-		lines = append(lines, a.renderGitGraphListRow(rows[i], i == a.gitGraphCursor, width-2))
+		lines = append(lines, a.renderGitGraphListRow(nodes[i], i == a.gitGraphCursor, width-2))
 	}
-	return renderApiTitledBox(fmt.Sprintf("COMMITS (%d)", len(rows)), fitExactLines(lines, inner), width, height, true)
+	return renderApiTitledBox(fmt.Sprintf("COMMITS (%d)", len(nodes)), fitExactLines(lines, inner), width, height, true)
 }
 
-func (a *App) renderGitGraphListRow(row collectors.GitGraphRow, selected bool, width int) string {
-	prefix := colorizeGraphPrefix(row.Prefix)
-	if row.Hash == "" {
-		// Connector-only line (merge/branch joins) — needs the same 2-col
-		// gutter as commit rows below, or the lanes visibly step out of
-		// alignment with the dots above/below them.
-		return "  " + prefix
+func (a *App) renderGitGraphListRow(node graphNode, selected bool, width int) string {
+	cursor := "  "
+	if selected {
+		cursor = StyleSelected.Render("▸ ")
 	}
+
+	isHead := node.commit != nil && node.commit.IsHead
+	graph := renderGraphCells(node.cells, isHead)
+	if node.commit == nil {
+		return cursor + graph
+	}
+	c := node.commit
 
 	subjStyle := StyleNormal
 	if selected {
 		subjStyle = StyleSelected
 	}
 
-	left := prefix + " " + graphCommitIcon(row.Subject)
-	if badge := renderGitGraphRefBadge(row.Refs); badge != "" {
+	left := graph + " " + graphCommitIcon(c.Subject)
+	if badge := renderGitGraphRefBadges(c.Refs); badge != "" {
 		left += " " + badge
 	}
-	left += " " + subjStyle.Render(row.Subject)
+	left += " " + subjStyle.Render(c.Subject)
 
 	const hashW, dateW, authorW = 8, 11, 14
 	rightW := hashW + dateW + authorW + 2
@@ -281,47 +290,48 @@ func (a *App) renderGitGraphListRow(row collectors.GitGraphRow, selected bool, w
 		left += strings.Repeat(" ", leftW-lipgloss.Width(left))
 	}
 
-	author := StyleWarning.Render(padRight(truncate(row.Author, authorW-1), authorW))
-	date := StyleAccent.Render(padRight(row.Date, dateW))
-	hash := StyleHealthy.Render(padRight(row.Short, hashW))
+	author := StyleWarning.Render(padRight(truncate(c.Author, authorW-1), authorW))
+	date := StyleAccent.Render(padRight(c.Date, dateW))
+	hash := StyleHealthy.Render(padRight(c.Short, hashW))
 
-	cursor := "  "
-	if selected {
-		cursor = StyleSelected.Render("▸ ")
-	}
 	return cursor + left + " " + author + date + hash
 }
 
 func (a *App) renderGitGraphDetailPane(width, height int) string {
 	inner := maxInt(3, height-2)
-	row, ok := a.selectedGitGraphRow()
+	node, ok := a.selectedGitGraphNode()
 	if !ok {
 		return renderApiTitledBox("COMMIT DETAIL", fitExactLines([]string{StyleMuted.Render("selecione um commit")}, inner), width, height, false)
 	}
+	c := node.commit
 	lines := []string{
-		StyleMuted.Render("Commit  ") + StyleAccent.Render(row.Hash),
-		StyleMuted.Render("Author  ") + StyleWarning.Render(row.Author) + StyleMuted.Render(" <"+row.AuthorEmail+">"),
-		StyleMuted.Render("Date    ") + StyleNormal.Render(row.Date),
+		StyleMuted.Render("Commit  ") + StyleAccent.Render(c.Hash),
+		StyleMuted.Render("Author  ") + StyleWarning.Render(c.Author) + StyleMuted.Render(" <"+c.AuthorEmail+">"),
+		StyleMuted.Render("Date    ") + StyleNormal.Render(c.Date),
 	}
-	if row.Parent != "" {
-		lines = append(lines, StyleMuted.Render("Parent  ")+StyleAccent.Render(row.Parent))
+	if len(c.Parents) > 0 {
+		parent := c.Parents[0]
+		if len(parent) > 8 {
+			parent = parent[:8]
+		}
+		lines = append(lines, StyleMuted.Render("Parent  ")+StyleAccent.Render(parent))
 	}
 	lines = append(lines, "")
-	if a.gitGraphDetailHash == row.Hash && a.gitGraphDetailMsg != "" {
+	if a.gitGraphDetailHash == c.Hash && a.gitGraphDetailMsg != "" {
 		lines = append(lines, wrapText(a.gitGraphDetailMsg, maxInt(20, width-4))...)
 	} else {
-		lines = append(lines, StyleMuted.Render(row.Subject))
+		lines = append(lines, StyleMuted.Render(c.Subject))
 	}
 	return renderApiTitledBox("COMMIT DETAIL", fitExactLines(lines, inner), width, height, false)
 }
 
 func (a *App) renderGitGraphFilesPane(width, height int) string {
 	inner := maxInt(3, height-2)
-	row, ok := a.selectedGitGraphRow()
+	node, ok := a.selectedGitGraphNode()
 	if !ok {
 		return renderApiTitledBox("CHANGED FILES", fitExactLines([]string{StyleMuted.Render("selecione um commit")}, inner), width, height, false)
 	}
-	if a.gitGraphDetailHash != row.Hash {
+	if a.gitGraphDetailHash != node.commit.Hash {
 		return renderApiTitledBox("CHANGED FILES", fitExactLines([]string{a.loadingText("carregando…")}, inner), width, height, false)
 	}
 	if len(a.gitGraphDetailFiles) == 0 {

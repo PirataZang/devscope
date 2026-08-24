@@ -184,7 +184,7 @@ type App struct {
 	gitDiffSearchInput          string
 	gitDiffSearchQuery          string
 	gitDiffSearchIdx            int
-	gitGraphRows                []collectors.GitGraphRow
+	gitGraphLayout              graphLayout
 	gitGraphCursor              int
 	gitGraphScroll              int
 	gitGraphDetailHash          string

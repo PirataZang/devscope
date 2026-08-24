@@ -1,77 +1,86 @@
 package collectors
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 )
 
-// GitGraphRow is one line of `git log --all --graph` output. Prefix keeps
-// git's own ASCII lane layout (the hard graph-layout problem is already
-// solved there); rows with no commit are pure connector lines between
-// merges/branches and have an empty Hash.
-type GitGraphRow struct {
-	Prefix      string
+// DAGCommit is one commit's raw parent relationships and metadata, used to
+// compute the graph layout ourselves (lanes, branch/merge curves) rather
+// than parsing git's own `--graph` ASCII art.
+type DAGCommit struct {
 	Hash        string
 	Short       string
+	Parents     []string // full hashes
 	Author      string
 	AuthorEmail string
 	Date        string
 	Subject     string
-	Refs        string
-	Parent      string // first parent, short form — "" for a root commit
+	Refs        []string // branch/tag names pointing here, "HEAD" included when detached
+	IsHead      bool
 }
 
-const gitGraphFieldSep = "\x1f"
+const dagFieldSep = "\x1f"
 
-var gitGraphLineRe = regexp.MustCompile(`^(.*?)([0-9a-f]{40}` + gitGraphFieldSep + `.*)$`)
-
-// GitLogGraph returns the combined graph of every branch (--all), newest
-// first, capped at limit rows.
-func GitLogGraph(projectPath string, limit int) []GitGraphRow {
+// GitLogDAG returns commits across every branch (--all), topo-ordered so a
+// commit never appears before any of its children — the graph layout
+// algorithm depends on that ordering.
+func GitLogDAG(projectPath string, limit int) []DAGCommit {
 	if limit <= 0 {
 		limit = 300
 	}
-	format := strings.Join([]string{"%H", "%h", "%an", "%ae", "%ad", "%s", "%D", "%P"}, gitGraphFieldSep)
-	out := gitOutput(projectPath, "log", "--all", "--date-order", "--graph", "--date=short",
+	format := strings.Join([]string{"%H", "%h", "%P", "%an", "%ae", "%ad", "%s", "%D"}, dagFieldSep)
+	out := gitOutput(projectPath, "log", "--all", "--topo-order", "--date=short",
 		"--pretty=format:"+format, "-n", strconv.Itoa(limit))
 	if out == "" {
 		return nil
 	}
 
-	var rows []GitGraphRow
+	headRef := strings.TrimSpace(gitOutput(projectPath, "rev-parse", "HEAD"))
+
+	var commits []DAGCommit
 	for _, line := range strings.Split(out, "\n") {
-		m := gitGraphLineRe.FindStringSubmatch(line)
-		if m == nil {
-			rows = append(rows, GitGraphRow{Prefix: line})
-			continue
-		}
-		fields := strings.Split(m[2], gitGraphFieldSep)
-		row := GitGraphRow{Prefix: m[1]}
+		fields := strings.Split(line, dagFieldSep)
 		get := func(i int) string {
 			if i < len(fields) {
 				return fields[i]
 			}
 			return ""
 		}
-		row.Hash = get(0)
-		row.Short = get(1)
-		row.Author = get(2)
-		row.AuthorEmail = get(3)
-		row.Date = get(4)
-		row.Subject = get(5)
-		row.Refs = get(6)
-		if parents := strings.Fields(get(7)); len(parents) > 0 {
-			p := parents[0]
-			if len(p) > 8 {
-				p = p[:8]
-			}
-			row.Parent = p
+		c := DAGCommit{
+			Hash:        get(0),
+			Short:       get(1),
+			Author:      get(3),
+			AuthorEmail: get(4),
+			Date:        get(5),
+			Subject:     get(6),
 		}
-		rows = append(rows, row)
+		if c.Hash == "" {
+			continue
+		}
+		if parents := strings.Fields(get(2)); len(parents) > 0 {
+			c.Parents = parents
+		}
+		c.IsHead = c.Hash == headRef
+		if refs := strings.TrimSpace(get(7)); refs != "" {
+			for _, r := range strings.Split(refs, ",") {
+				r = strings.TrimSpace(r)
+				r = strings.TrimPrefix(r, "HEAD -> ")
+				if r == "HEAD" {
+					continue
+				}
+				if r != "" {
+					c.Refs = append(c.Refs, r)
+				}
+			}
+		}
+		commits = append(commits, c)
 	}
-	return rows
+	return commits
 }
+
+// CollectCommitFileStats is defined below alongside the DAG collector so
+// both live next to the rest of the graph-screen data fetching.
 
 // GitCommitFileStat is one file's line-change count for a commit, from
 // `git show --numstat`.
