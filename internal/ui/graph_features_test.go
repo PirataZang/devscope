@@ -116,35 +116,40 @@ func TestRenderGitGraphDoesNotPanic(t *testing.T) {
 	p := testProjectWithContainer()
 	a := &App{width: 120, height: 40, selectedProject: p}
 	a.gitGraphRows = []collectors.GitGraphRow{
-		{Prefix: "* ", Hash: "aaaa", Short: "aaa", Author: "igor", When: "1h", Subject: "first"},
-		{Prefix: "| ", Hash: "bbbb", Short: "bbb", Author: "igor", When: "2h", Subject: "second", Refs: "main"},
+		{Prefix: "* ", Hash: "aaaa", Short: "aaa", Author: "igor", Date: "2024-01-17", Subject: "first"},
+		{Prefix: "| ", Hash: "bbbb", Short: "bbb", Author: "igor", Date: "2024-01-16", Subject: "second", Refs: "main"},
 		{Prefix: "|/"},
 	}
 	out := a.renderGitGraph(p)
-	if out == "" || !strings.Contains(out, "BRANCHES") || !strings.Contains(out, "COMMITS") {
-		t.Fatalf("expected branches/commits panels, got:\n%s", out)
+	if out == "" || !strings.Contains(out, "COMMITS") || !strings.Contains(out, "CHANGED FILES") {
+		t.Fatalf("expected commits/changed-files panels, got:\n%s", out)
 	}
 
-	a.gitGraphBranchCursor = 1 // "main" (index 0 is the synthetic "Todas")
-	a.gitGraphReachable = map[string]bool{"aaaa": true}
+	a.gitGraphDetailHash = "aaaa"
+	a.gitGraphDetailMsg = "first\n\nlonger body"
+	a.gitGraphDetailFiles = []collectors.GitCommitFileStat{{Path: "main.go", Insertions: 3, Deletions: 1}}
 	out = a.renderGitGraph(p)
-	if out == "" {
-		t.Fatal("empty render with a highlight filter active")
+	if !strings.Contains(out, "main.go") {
+		t.Fatalf("expected changed file to render, got:\n%s", out)
 	}
 }
 
-func TestHandleGitGraphKeysTogglesFocusAndSelection(t *testing.T) {
+func TestHandleGitGraphKeysSkipsConnectorRows(t *testing.T) {
 	p := testProjectWithContainer()
 	a := &App{width: 120, height: 40, selectedProject: p}
-	a.gitGraphRows = []collectors.GitGraphRow{{Prefix: "* ", Hash: "aaaa", Short: "aaa", Subject: "first"}}
-
-	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRight}, p)
-	if !a.gitGraphFocusGraph {
-		t.Fatal("right should focus the graph pane")
+	a.gitGraphRows = []collectors.GitGraphRow{
+		{Prefix: "* ", Hash: "aaaa", Short: "aaa", Subject: "first"},
+		{Prefix: "|/"}, // connector-only, must be skipped by cursor movement
+		{Prefix: "* ", Hash: "bbbb", Short: "bbb", Subject: "second"},
 	}
-	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyLeft}, p)
-	if a.gitGraphFocusGraph {
-		t.Fatal("left should focus the branch list")
+
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyDown}, p)
+	if a.gitGraphCursor != 2 {
+		t.Fatalf("down should land on the next commit row (index 2), got %d", a.gitGraphCursor)
+	}
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyUp}, p)
+	if a.gitGraphCursor != 0 {
+		t.Fatalf("up should land back on the first commit row (index 0), got %d", a.gitGraphCursor)
 	}
 	if _, cmd := a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEsc}, p); cmd != nil {
 		t.Fatal("esc should not return a cmd")
