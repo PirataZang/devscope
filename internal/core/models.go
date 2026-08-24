@@ -117,6 +117,16 @@ type Container struct {
 	ProjectPath string  `json:"project_path,omitempty"`
 }
 
+type Image struct {
+	ID             string `json:"id"`
+	Repository     string `json:"repository"`
+	Tag            string `json:"tag"`
+	Created        string `json:"created"`
+	Size           string `json:"size"`
+	ComposeProject string `json:"compose_project,omitempty"`
+	ComposeService string `json:"compose_service,omitempty"`
+}
+
 type Worker struct {
 	Name    string  `json:"name"`
 	Status  string  `json:"status"`

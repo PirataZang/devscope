@@ -19,6 +19,8 @@ const (
 	containerSubviewDetail
 	containerSubviewShellReturn
 	containerSubviewPorts
+	containerSubviewImages
+	containerSubviewDeps
 )
 
 type containerPortPreviewMsg struct {
@@ -60,6 +62,17 @@ func (a *App) initContainersTab() {
 	a.containerCPUHistory = nil
 	a.containerMemHistory = nil
 	a.containerNetHistory = nil
+	a.imageScope = imageScopeContainer
+	a.imageAll = nil
+	a.imageCursor = 0
+	a.imageScroll = 0
+	a.imageLoading = false
+	a.imageStatusMsg = ""
+	a.imageConfirmRemove = false
+	a.imageConfirmCursor = 0
+	a.containerDeps = nil
+	a.containerDepsCursor = 0
+	a.containerDepsScroll = 0
 	a.resetContainerPortsView()
 }
 
@@ -79,6 +92,10 @@ func (a *App) renderContainersTab(p *core.Project) string {
 		view = a.renderContainerDetail(p)
 	case containerSubviewPorts:
 		view = a.renderContainerPorts(p)
+	case containerSubviewImages:
+		view = a.renderContainerImages(p)
+	case containerSubviewDeps:
+		view = a.renderContainerDeps(p)
 	case containerSubviewShellReturn:
 		view = renderShellReturnMessage(a.containerShellExitErr)
 	default:
@@ -326,6 +343,8 @@ func (a *App) containerActionItems() [][2]string {
 	return [][2]string{
 		{"enter", "portas"},
 		{"m", "detalhe"},
+		{"i", "imagens"},
+		{"C-g", "deps"},
 		{"n", "novo svc"},
 		{"s", "stop"},
 		{"r", "start/rest"},
