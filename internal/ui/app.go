@@ -184,10 +184,12 @@ type App struct {
 	gitDiffSearchQuery          string
 	gitDiffSearchIdx            int
 	gitGraphRows                []collectors.GitGraphRow
-	gitGraphBranchCursor        int
+	gitGraphCursor              int
 	gitGraphScroll              int
-	gitGraphFocusGraph          bool
-	gitGraphReachable           map[string]bool
+	gitGraphDetailHash          string
+	gitGraphDetailMsg           string
+	gitGraphDetailFiles         []collectors.GitCommitFileStat
+	gitGraphDetailGen           int
 	containerSubview            containerSubview
 	containerScroll             int
 	containerStatusMsg          string
@@ -996,6 +998,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case containerPortPreviewMsg:
 		a.handleContainerPortPreview(msg)
+		return a, nil
+
+	case gitGraphDetailMsg:
+		a.handleGitGraphDetail(msg)
 		return a, nil
 
 	case dockerImagesLoadedMsg:
