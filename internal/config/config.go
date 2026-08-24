@@ -104,6 +104,15 @@ func ConfigPath() string {
 	return filepath.Join(home, ".config", "devscope", "config.yaml")
 }
 
+// LogPath returns where background collector errors are logged. These must
+// never go to stdout/stderr while the TUI owns the terminal (alt screen) —
+// raw writes there desync Bubble Tea's renderer and cause stacked/duplicated
+// frames, since it loses track of what it actually painted.
+func LogPath() string {
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, ".config", "devscope", "devscope.log")
+}
+
 func Load(cfgFile string) (*Config, error) {
 	cfg := Default()
 

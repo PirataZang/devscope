@@ -3,8 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/devscope/devscope/internal/collectors"
@@ -13,7 +16,27 @@ import (
 	"github.com/devscope/devscope/internal/ui"
 )
 
+// redirectLogOutput moves the standard logger away from stderr and into a
+// file. Background collectors (docker, scanner, health...) call log.Printf
+// on failure; if that lands on stderr it writes straight onto the terminal
+// the TUI's alt screen is using, outside Bubble Tea's control. Bubble Tea's
+// renderer tracks how many lines it painted to reposition the cursor on the
+// next frame — a stray line from a raw log write throws that count off,
+// which is what causes panels to look stacked/duplicated mid-session.
+func redirectLogOutput() {
+	path := config.LogPath()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err == nil {
+		if f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err == nil {
+			log.SetOutput(f)
+			return
+		}
+	}
+	log.SetOutput(io.Discard)
+}
+
 func Run(cfgFile string, debug bool) error {
+	redirectLogOutput()
+
 	cfg, err := config.Load(cfgFile)
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)

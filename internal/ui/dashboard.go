@@ -342,11 +342,29 @@ func filterNestedProjects(projects []core.Project) []core.Project {
 	if len(projects) < 2 {
 		return projects
 	}
+	projects = dedupProjectsByPath(projects)
 	var result []core.Project
 	for _, p := range projects {
 		if isNestedProject(p.Path, projects) {
 			continue
 		}
+		result = append(result, p)
+	}
+	return result
+}
+
+// dedupProjectsByPath remove entradas com o mesmo path exato (ex: o mesmo
+// projeto encontrado pela varredura normal e de novo via containers Docker
+// parados), mantendo a primeira ocorrencia.
+func dedupProjectsByPath(projects []core.Project) []core.Project {
+	seen := make(map[string]bool, len(projects))
+	result := make([]core.Project, 0, len(projects))
+	for _, p := range projects {
+		key := filepath.Clean(p.Path)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
 		result = append(result, p)
 	}
 	return result

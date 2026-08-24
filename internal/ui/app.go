@@ -673,9 +673,30 @@ func (a *App) Init() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+// syncedApp envolve o App e força uma repintura completa só no resize.
+// bubbletea v1.2.4 tinha bugs conhecidos no renderer incremental (skip de
+// linha inconsistente entre terminais — ver charmbracelet/bubbletea#1232,
+// #1251) que causavam paineis empilhados/duplicados; isso foi corrigido
+// via upgrade de dependência (v1.2.4 -> v1.3.10). A única repintura forçada
+// que ainda vale a pena manter é no WindowSizeMsg: o cálculo de quantas
+// linhas "sobraram" do quadro anterior pode ficar errado bem no frame em
+// que a altura/largura do terminal muda, e um ClearScreen aí é barato
+// (resize já é, por si só, um evento raro e visualmente disruptivo).
+type syncedApp struct {
+	*App
+}
+
+func (s *syncedApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	_, cmd := s.App.Update(msg)
+	if _, ok := msg.(tea.WindowSizeMsg); ok {
+		return s, tea.Batch(cmd, tea.ClearScreen)
+	}
+	return s, cmd
+}
+
 func (a *App) Run() error {
 	defer RestoreTerminalTheme()
-	p := tea.NewProgram(a, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	p := tea.NewProgram(&syncedApp{App: a}, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err := p.Run()
 	return err
 }
