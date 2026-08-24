@@ -112,21 +112,65 @@ func TestRenderContainerDepsBuildsForestAndDoesNotPanic(t *testing.T) {
 	}
 }
 
+// mergeFixtureCommits is a small DAG with a real 2-parent merge — enough to
+// exercise branch/merge cells (╭╮╰╯), not just a straight line of pipes.
+// Newest first, as git log --topo-order would return it:
+//
+//	head   (merge of feature + main-tip)
+//	feat1  (on the feature branch)
+//	main-tip
+//	base   (fork point: both feature and main-tip branch from here)
+func mergeFixtureCommits() []collectors.DAGCommit {
+	return []collectors.DAGCommit{
+		{Hash: "head0000", Short: "head000", Subject: "Merge feature", Parents: []string{"maintip0", "feat1000"}, Author: "igor", Date: "2024-01-18", IsHead: true},
+		{Hash: "feat1000", Short: "feat1000", Subject: "feat: add thing", Parents: []string{"base0000"}, Author: "igor", Date: "2024-01-17"},
+		{Hash: "maintip0", Short: "maintip0", Subject: "main tip commit", Parents: []string{"base0000"}, Author: "igor", Date: "2024-01-16", Refs: []string{"main"}},
+		{Hash: "base0000", Short: "base0000", Subject: "base commit", Author: "igor", Date: "2024-01-15"},
+	}
+}
+
+func TestBuildGraphLayoutRowsShareAUniformWidth(t *testing.T) {
+	layout := buildGraphLayout(mergeFixtureCommits())
+	if len(layout.nodes) == 0 {
+		t.Fatal("expected at least one node")
+	}
+	want := (layout.maxLane + 1) * 2
+	for i, n := range layout.nodes {
+		if len(n.cells) != want {
+			t.Fatalf("node %d: expected %d cells (uniform width), got %d", i, want, len(n.cells))
+		}
+	}
+	// The merge commit itself should show at least one rounded merge glyph,
+	// not a plain straight line — this is the whole point of computing our
+	// own layout instead of reusing git's diagonal /\ output.
+	head := layout.nodes[0]
+	sawCurve := false
+	for _, c := range head.cells {
+		if c.kind == cellMergeLeft || c.kind == cellMergeRight || c.kind == cellBranchLeft || c.kind == cellBranchRight {
+			sawCurve = true
+		}
+	}
+	if !sawCurve {
+		t.Fatalf("expected a rounded branch/merge cell on the merge commit's row, got cells: %+v", head.cells)
+	}
+}
+
 func TestRenderGitGraphDoesNotPanic(t *testing.T) {
 	p := testProjectWithContainer()
 	a := &App{width: 120, height: 40, selectedProject: p}
-	a.gitGraphRows = []collectors.GitGraphRow{
-		{Prefix: "* ", Hash: "aaaa", Short: "aaa", Author: "igor", Date: "2024-01-17", Subject: "first"},
-		{Prefix: "| ", Hash: "bbbb", Short: "bbb", Author: "igor", Date: "2024-01-16", Subject: "second", Refs: "main"},
-		{Prefix: "|/"},
-	}
+	a.gitGraphLayout = buildGraphLayout(mergeFixtureCommits())
+	a.gitGraphCursor = 0
+
 	out := a.renderGitGraph(p)
 	if out == "" || !strings.Contains(out, "COMMITS") || !strings.Contains(out, "CHANGED FILES") {
 		t.Fatalf("expected commits/changed-files panels, got:\n%s", out)
 	}
+	if !strings.Contains(out, "[main]") {
+		t.Fatalf("expected the main branch badge to render, got:\n%s", out)
+	}
 
-	a.gitGraphDetailHash = "aaaa"
-	a.gitGraphDetailMsg = "first\n\nlonger body"
+	a.gitGraphDetailHash = "head0000"
+	a.gitGraphDetailMsg = "Merge feature\n\nlonger body"
 	a.gitGraphDetailFiles = []collectors.GitCommitFileStat{{Path: "main.go", Insertions: 3, Deletions: 1}}
 	out = a.renderGitGraph(p)
 	if !strings.Contains(out, "main.go") {
@@ -137,20 +181,35 @@ func TestRenderGitGraphDoesNotPanic(t *testing.T) {
 func TestHandleGitGraphKeysSkipsConnectorRows(t *testing.T) {
 	p := testProjectWithContainer()
 	a := &App{width: 120, height: 40, selectedProject: p}
-	a.gitGraphRows = []collectors.GitGraphRow{
-		{Prefix: "* ", Hash: "aaaa", Short: "aaa", Subject: "first"},
-		{Prefix: "|/"}, // connector-only, must be skipped by cursor movement
-		{Prefix: "* ", Hash: "bbbb", Short: "bbb", Subject: "second"},
+	// Two commits forking from the same base produces a connector-only fork
+	// row ahead of "base"'s own commit row — cursor movement must skip it.
+	a.gitGraphLayout = buildGraphLayout([]collectors.DAGCommit{
+		{Hash: "c1", Short: "c1", Subject: "c1", Parents: []string{"base"}},
+		{Hash: "c2", Short: "c2", Subject: "c2", Parents: []string{"base"}},
+		{Hash: "base", Short: "base", Subject: "base"},
+	})
+	var connectorRows int
+	for _, n := range a.gitGraphLayout.nodes {
+		if n.commit == nil {
+			connectorRows++
+		}
+	}
+	if connectorRows == 0 {
+		t.Fatal("fixture should produce at least one connector-only fork row")
 	}
 
-	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyDown}, p)
-	if a.gitGraphCursor != 2 {
-		t.Fatalf("down should land on the next commit row (index 2), got %d", a.gitGraphCursor)
+	from := -1
+	for {
+		i := a.nextGitGraphCommitRow(from)
+		if i < 0 {
+			break
+		}
+		a.gitGraphCursor, from = i, i
+		if node, ok := a.selectedGitGraphNode(); !ok || node.commit == nil {
+			t.Fatalf("cursor landed on a non-commit row at index %d", a.gitGraphCursor)
+		}
 	}
-	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyUp}, p)
-	if a.gitGraphCursor != 0 {
-		t.Fatalf("up should land back on the first commit row (index 0), got %d", a.gitGraphCursor)
-	}
+
 	if _, cmd := a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEsc}, p); cmd != nil {
 		t.Fatal("esc should not return a cmd")
 	}
@@ -162,18 +221,18 @@ func TestHandleGitGraphKeysSkipsConnectorRows(t *testing.T) {
 func TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph(t *testing.T) {
 	p := testProjectWithContainer()
 	a := &App{width: 120, height: 40, selectedProject: p, gitSubview: gitSubviewGraph}
-	a.gitGraphRows = []collectors.GitGraphRow{
-		{Prefix: "* ", Hash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Short: "aaaaaaa", Author: "igor", Date: "2024-01-17", Subject: "first"},
-	}
+	a.gitGraphLayout = buildGraphLayout(mergeFixtureCommits())
+	a.gitGraphCursor = 0
 
+	wantHash := a.gitGraphLayout.nodes[0].commit.Hash
 	if _, cmd := a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEnter}, p); cmd == nil {
 		t.Fatal("enter on a commit row should return a load cmd")
 	}
 	if a.gitSubview != gitSubviewCommit {
 		t.Fatalf("enter should open the commit detail subview, got %d", a.gitSubview)
 	}
-	if a.gitSelectedCommit.Hash != a.gitGraphRows[0].Hash {
-		t.Fatalf("commit detail should target the selected row's hash, got %q", a.gitSelectedCommit.Hash)
+	if a.gitSelectedCommit.Hash != wantHash {
+		t.Fatalf("commit detail should target the selected row's hash, got %q want %q", a.gitSelectedCommit.Hash, wantHash)
 	}
 	if a.gitCommitReturnTo != gitSubviewGraph {
 		t.Fatalf("should remember to return to the graph, got %d", a.gitCommitReturnTo)
