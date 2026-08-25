@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -241,5 +242,181 @@ func TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph(t *testing.T) {
 	a.handleGitDedicatedKeys(tea.KeyMsg{Type: tea.KeyEsc}, p)
 	if a.gitSubview != gitSubviewGraph {
 		t.Fatalf("esc from commit detail opened via the graph should return to the graph, got %d", a.gitSubview)
+	}
+}
+
+// graphAppFixture is a graph screen sitting on a real layout with a loaded
+// commit detail, so the pane scroll/focus keys have something to move.
+func graphAppFixture() (*App, *core.Project) {
+	p := testProjectWithContainer()
+	a := &App{width: 120, height: 40, selectedProject: p, gitSubview: gitSubviewGraph}
+	a.gitGraphLayout = buildGraphLayout(mergeFixtureCommits())
+	a.gitGraphCursor = 0
+	a.gitGraphDetailHash = a.gitGraphLayout.nodes[0].commit.Hash
+	a.gitGraphDetailMsg = strings.Repeat("linha bem comprida de mensagem de commit\n", 40)
+	a.gitGraphDetailFiles = []collectors.GitCommitFileStat{
+		{Path: strings.Repeat("dir/", 30) + "arquivo.go", Insertions: 12, Deletions: 3},
+	}
+	return a, p
+}
+
+func TestGitGraphTabCyclesPanesAndScrollsThem(t *testing.T) {
+	a, p := graphAppFixture()
+
+	if a.gitGraphFocus != gitGraphFocusCommits {
+		t.Fatalf("graph should start focused on the commit list, got %d", a.gitGraphFocus)
+	}
+
+	// tab → COMMIT DETAIL: arrows now scroll the pane, not the cursor.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyTab}, p)
+	if a.gitGraphFocus != gitGraphFocusDetail {
+		t.Fatalf("tab should focus the detail pane, got %d", a.gitGraphFocus)
+	}
+	cursorBefore := a.gitGraphCursor
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyDown}, p)
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRight}, p)
+	if a.gitGraphDetailScroll == 0 || a.gitGraphDetailHScroll == 0 {
+		t.Fatalf("detail pane should scroll both axes, got v=%d h=%d", a.gitGraphDetailScroll, a.gitGraphDetailHScroll)
+	}
+	if a.gitGraphCursor != cursorBefore {
+		t.Fatal("scrolling a pane must not move the commit cursor")
+	}
+
+	// tab → CHANGED FILES.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyTab}, p)
+	if a.gitGraphFocus != gitGraphFocusFiles {
+		t.Fatalf("tab should focus the files pane, got %d", a.gitGraphFocus)
+	}
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRight}, p)
+	if a.gitGraphFilesHScroll == 0 {
+		t.Fatal("files pane should scroll sideways")
+	}
+
+	// tab wraps back to the list, where arrows move the cursor again.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyTab}, p)
+	if a.gitGraphFocus != gitGraphFocusCommits {
+		t.Fatalf("tab should wrap back to the commit list, got %d", a.gitGraphFocus)
+	}
+
+	// The render pass clamps offsets to what actually fits.
+	a.gitGraphDetailScroll, a.gitGraphDetailHScroll = 9999, 9999
+	a.gitGraphFilesScroll, a.gitGraphFilesHScroll = 9999, 9999
+	view := a.renderGitGraph(p)
+	if !strings.Contains(stripANSI(view), "COMMIT DETAIL") {
+		t.Fatal("graph view should still draw the detail pane")
+	}
+	if a.gitGraphDetailScroll >= 9999 || a.gitGraphDetailHScroll >= 9999 {
+		t.Fatalf("render should clamp the detail offsets, got v=%d h=%d", a.gitGraphDetailScroll, a.gitGraphDetailHScroll)
+	}
+	// One file line, one short-ish path: nothing to page vertically.
+	if a.gitGraphFilesScroll != 0 {
+		t.Fatalf("a single file row has nowhere to scroll down, got %d", a.gitGraphFilesScroll)
+	}
+	if a.gitGraphFilesHScroll >= 9999 {
+		t.Fatalf("render should clamp the files h-offset, got %d", a.gitGraphFilesHScroll)
+	}
+}
+
+func TestGitGraphBranchPickerFiltersTheGraph(t *testing.T) {
+	a, p := graphAppFixture()
+
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'B'}}, p)
+	if !a.gitGraphBranchPicker {
+		t.Fatal("B should open the branch picker")
+	}
+	if len(a.gitGraphBranchOpts) < 2 || a.gitGraphBranchOpts[0] != gitGraphAllBranches {
+		t.Fatalf("picker should offer 'all' plus the refs drawn in the graph, got %v", a.gitGraphBranchOpts)
+	}
+	if a.gitGraphBranchOpts[1] != "main" {
+		t.Fatalf("the fixture's only ref is main, got %v", a.gitGraphBranchOpts)
+	}
+
+	// Selecting a branch stores the ref; the reload walks only that branch.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyDown}, p)
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEnter}, p)
+	if a.gitGraphBranchPicker {
+		t.Fatal("enter should close the picker")
+	}
+	if a.gitGraphBranchRef != "main" {
+		t.Fatalf("enter should apply the selected branch, got %q", a.gitGraphBranchRef)
+	}
+	if !strings.Contains(stripANSI(a.renderGitGraphList(120, 20)), "main") {
+		t.Fatal("the commits pane title should name the active branch filter")
+	}
+
+	// Back to "all" clears the filter.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'B'}}, p)
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyUp}, p)
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEnter}, p)
+	if a.gitGraphBranchRef != "" {
+		t.Fatalf("picking 'all' should clear the filter, got %q", a.gitGraphBranchRef)
+	}
+}
+
+func TestGitGraphBranchPickerTypingNarrowsTheList(t *testing.T) {
+	a, p := graphAppFixture()
+	a.gitBranches = []core.GitBranch{{Name: "main"}, {Name: "feat/graph"}, {Name: "feat/api"}}
+
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'B'}}, p)
+	if len(a.gitGraphBranchList()) != 4 {
+		t.Fatalf("picker should start with 'all' plus 3 branches, got %v", a.gitGraphBranchList())
+	}
+
+	for _, r := range "api" {
+		a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{r}}, p)
+	}
+	got := a.gitGraphBranchList()
+	if len(got) != 2 || got[1] != "feat/api" {
+		t.Fatalf("typing should narrow to the matching branch, got %v", got)
+	}
+
+	// "ap" also matches gr-ap-h, so backspace widens the list back out.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyBackspace}, p)
+	if len(a.gitGraphBranchList()) != 3 {
+		t.Fatalf("backspace should widen back to both feat branches, got %v", a.gitGraphBranchList())
+	}
+
+	// Enter applies the highlighted entry from the *filtered* list.
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyDown}, p)
+	a.handleGitGraphKeys(tea.KeyMsg{Type: tea.KeyEnter}, p)
+	if a.gitGraphBranchRef != "feat/api" {
+		t.Fatalf("enter should apply the filtered selection, got %q", a.gitGraphBranchRef)
+	}
+}
+
+func TestDockerImageRowColorsProjectMembership(t *testing.T) {
+	p := testProjectWithContainer()
+	a := &App{width: 120, height: 40, selectedProject: p}
+	cols := a.imageColumns()
+
+	mine := core.Image{ID: "aaa", Repository: repoOf(p.Containers[0].Image), Tag: "latest", Created: "1d", Size: "10MB"}
+	mine.Tag = strings.TrimPrefix(p.Containers[0].Image, mine.Repository+":")
+	if !imageBelongsToProject(mine, p) {
+		t.Fatalf("fixture image %s:%s should match the project container", mine.Repository, mine.Tag)
+	}
+	other := core.Image{ID: "bbb", Repository: "alguem/outro", Tag: "latest", Created: "1d", Size: "10MB"}
+
+	dangling := core.Image{ID: "ccc", Repository: "<none>", Tag: "<none>", Created: "1d", Size: "10MB"}
+
+	for _, tc := range []struct {
+		name  string
+		img   core.Image
+		want  lipgloss.TerminalColor
+		glyph string
+	}{
+		{"projeto", mine, StyleAccent.GetForeground(), "●"},
+		{"outros", other, StyleWarning.GetForeground(), "·"},
+		{"dangling", dangling, StyleMuted.GetForeground(), "·"},
+	} {
+		style, glyph := imageOwnerStyle(tc.img, p)
+		if style.GetForeground() != tc.want {
+			t.Fatalf("%s: wrong colour, got %v want %v", tc.name, style.GetForeground(), tc.want)
+		}
+		if glyph != tc.glyph {
+			t.Fatalf("%s: wrong indicator, got %q want %q", tc.name, glyph, tc.glyph)
+		}
+		if !strings.Contains(a.renderImageRow(tc.img, cols, false, p), tc.glyph) {
+			t.Fatalf("%s: row should carry the %q indicator", tc.name, tc.glyph)
+		}
 	}
 }

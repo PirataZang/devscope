@@ -332,7 +332,9 @@ func (a *App) renderImagesHeader(p *core.Project, count int, width int) string {
 	if p != nil && a.imageScope != imageScopeAll {
 		left += StyleMuted.Render("  " + p.Name)
 	}
-	right := StyleMuted.Render(fmt.Sprintf("%d imagem(ns)", count))
+	right := StyleAccent.Render("● projeto") + StyleMuted.Render("  ") +
+		StyleWarning.Render("· outros") + StyleMuted.Render("  ") +
+		StyleMuted.Render(fmt.Sprintf("%d imagem(ns)", count))
 	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
 	if pad < 1 {
 		pad = 1
@@ -411,6 +413,19 @@ func (a *App) renderImagesHeaderRow(cols imageCols) string {
 	)
 }
 
+// imageOwnerStyle is the same colour language the containers list uses:
+// accent = belongs to the current project, warning = someone else's,
+// muted = an untagged leftover nobody claims.
+func imageOwnerStyle(img core.Image, p *core.Project) (lipgloss.Style, string) {
+	if imageBelongsToProject(img, p) {
+		return StyleAccent, "●"
+	}
+	if imageDangling(img) {
+		return StyleMuted, "·"
+	}
+	return StyleWarning, "·"
+}
+
 func (a *App) renderImageRow(img core.Image, cols imageCols, selected bool, p *core.Project) string {
 	style := StyleNormal
 	if selected {
@@ -421,14 +436,13 @@ func (a *App) renderImageRow(img core.Image, cols imageCols, selected bool, p *c
 		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
 	}
 
-	indicatorStyle := StyleMuted
-	indicator := "·"
-	if imageBelongsToProject(img, p) {
-		indicatorStyle = StyleAccent
-		indicator = "●"
-	}
+	refStyle, indicator := imageOwnerStyle(img, p)
+	indicatorStyle := refStyle
 	if selected {
-		indicatorStyle = style
+		indicatorStyle, refStyle = style, style
+	}
+	refCell := func(width int, text string) string {
+		return refStyle.Width(width).MaxWidth(width).Render(truncate(text, width))
 	}
 
 	repo, tag := img.Repository, img.Tag
@@ -440,9 +454,9 @@ func (a *App) renderImageRow(img core.Image, cols imageCols, selected bool, p *c
 		lipgloss.NewStyle().Width(1).Render(""),
 		indicatorStyle.Width(cols.indicator).Render(indicator),
 		gap,
-		cell(cols.repo, repo),
+		refCell(cols.repo, repo),
 		gap,
-		cell(cols.tag, tag),
+		refCell(cols.tag, tag),
 		gap,
 		cell(cols.id, img.ID),
 		gap,
