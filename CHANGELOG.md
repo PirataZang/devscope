@@ -7,7 +7,19 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-08-25
+
 ### Added
+- **Gerenciamento de imagens Docker** (`i` na aba Containers)
+  - Escopo em 3 níveis (`A` alterna): imagem do container selecionado → imagens do projeto (inclui builds antigos sem tag, via label de compose) → todas as imagens do host
+  - Indicador visual de quais imagens pertencem ao projeto atual
+  - `D` abre modal de remoção com 4 opções (remover / remover só sem tags / forçado / forçado só sem tags) e cancelar
+- **Árvore de dependências do Compose** (`Ctrl+G` na aba Containers) — lê `depends_on` do compose (lista ou mapa com `condition`) e desenha em árvore com o status real (running/stopped/não criado) de cada serviço
+- **Git commit graph** (`Ctrl+G` na aba Git)
+  - Layout de lanes calculado internamente a partir do histórico de commits (não reaproveita o `--graph` do git), desenhando curvas arredondadas (`╭╮╰╯`) e junções (`├┤┴`) em vez de diagonais
+  - Cor por lane, ícone por tipo de commit, badges de branch/tag inline na linha do commit
+  - Painéis de detalhe do commit (hash, autor, data, parent, mensagem) e arquivos alterados (+/− por arquivo), carregados sob demanda ao navegar
+  - `Enter` sobre um commit abre a tela de detalhe completa (árvore de arquivos + diff) já existente na aba Git
 - **Resolução de conflitos de Git** na aba Git
   - `p` (pull) detecta divergência e oferece modal **Merge** (`--no-ff`) ou **Rebase**, além de cancelar
   - Modo de conflito (após pull-merge, pull-rebase, `M` ou cherry-pick): lista arquivos em conflito com diff colorido ours (`o`, −) vs theirs (`t`, +)
@@ -68,6 +80,10 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - Parse de portas Docker completo (IP de bind, host→container, tcp/udp)
 - Rodapé de ações da aba Containers com altura dinâmica (não corta a lista)
 - README reescrito e organizado por grupos de módulos
+
+### Fixed
+- **Corrupção visual da TUI** (painéis duplicados/empilhados ao navegar) — causada por logs de erro dos coletores em background (`docker ps`, scanner) vazando direto pro stdout/stderr enquanto o Bubble Tea controlava a tela; logs agora vão para `~/.config/devscope/devscope.log`
+- Atualizado o Bubble Tea (e dependências) para uma versão com correções de renderer relacionadas a duplicação de linha entre terminais
 
 ## [1.4.0] - 2026-08-01
 

@@ -24,14 +24,28 @@ const dagFieldSep = "\x1f"
 
 // GitLogDAG returns commits across every branch (--all), topo-ordered so a
 // commit never appears before any of its children — the graph layout
-// algorithm depends on that ordering.
-func GitLogDAG(projectPath string, limit int) []DAGCommit {
+// algorithm depends on that ordering. Passing refs narrows the walk to those
+// branches instead of --all.
+func GitLogDAG(projectPath string, limit int, refs ...string) []DAGCommit {
 	if limit <= 0 {
 		limit = 300
 	}
 	format := strings.Join([]string{"%H", "%h", "%P", "%an", "%ae", "%ad", "%s", "%D"}, dagFieldSep)
-	out := gitOutput(projectPath, "log", "--all", "--topo-order", "--date=short",
-		"--pretty=format:"+format, "-n", strconv.Itoa(limit))
+	args := []string{"log"}
+	var scope []string
+	for _, r := range refs {
+		// Refs come from git itself; drop anything that could read as a flag.
+		if r != "" && !strings.HasPrefix(r, "-") {
+			scope = append(scope, r)
+		}
+	}
+	if len(scope) == 0 {
+		args = append(args, "--all")
+	} else {
+		args = append(args, scope...)
+	}
+	args = append(args, "--topo-order", "--date=short", "--pretty=format:"+format, "-n", strconv.Itoa(limit))
+	out := gitOutput(projectPath, args...)
 	if out == "" {
 		return nil
 	}

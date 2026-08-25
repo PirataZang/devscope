@@ -191,6 +191,17 @@ type App struct {
 	gitGraphDetailMsg           string
 	gitGraphDetailFiles         []collectors.GitCommitFileStat
 	gitGraphDetailGen           int
+	gitGraphFocus               gitGraphFocus
+	gitGraphDetailScroll        int
+	gitGraphDetailHScroll       int
+	gitGraphFilesScroll         int
+	gitGraphFilesHScroll        int
+	gitGraphBranchRef           string
+	gitGraphBranchPicker        bool
+	gitGraphBranchOpts          []string
+	gitGraphBranchCursor        int
+	gitGraphBranchScroll        int
+	gitGraphBranchFilter        string
 	containerSubview            containerSubview
 	containerScroll             int
 	containerStatusMsg          string
@@ -2802,6 +2813,17 @@ Aba Git:
   p            Pull origin da branch pai
   shift+P / P  Push
   ←/→ or h/l   Alternar foco entre colunas (Branches / Commits)
+  ctrl+g       Abrir o Git Graph (DAG de commits)
+
+Git Graph:
+  tab / S-tab  Alternar painel (Commits · Commit Detail · Changed Files)
+  ↑/↓ or j/k   Mover o cursor (Commits) / rolar o painel focado
+  ←/→ or h/l   Scroll lateral do painel focado (H/L = 10x, home volta ao 0)
+  pgup/pgdown  Rolar uma página no painel focado
+  B            Filtrar por branch — o grafo repercorre só essa branch
+  enter        Abrir o detalhe completo do commit
+  r            Recarregar mantendo o filtro de branch
+  esc          Voltar
 
 Aba Containers:
   n            Novo serviço (Docker Hub ou YAML manual → compose)
@@ -2817,6 +2839,13 @@ Aba Containers:
   d            Remover container (confirmação y/n)
   shift+u      Docker compose up -d
   shift+d      Docker compose down
+
+Imagens do Container (i):
+  ●/verde      Imagem do projeto atual (compose label ou container rodando)
+  ·/amarelo    Imagem de outro projeto  ·  cinza = sem tag (dangling)
+  A            Escopo: container → projeto → todas
+  D            Remover (com/sem force, só a selecionada ou as sem tag)
+  r            Atualizar  ·  esc  Voltar
 
 Portas do Container:
   ↑/↓          Selecionar porta
