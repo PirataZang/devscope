@@ -161,22 +161,7 @@ func MergeTunnels(cfg ProjectConfig, live []Tunnel) []Tunnel {
 
 // CountForeignLive returns live tunnels that are not in this project config.
 func CountForeignLive(cfg ProjectConfig, live []Tunnel) int {
-	owned := map[string]bool{}
-	ports := map[int]bool{}
-	for _, c := range cfg.Tunnels {
-		owned[c.Name] = true
-		if c.Port > 0 {
-			ports[c.Port] = true
-		}
-	}
-	n := 0
-	for _, t := range live {
-		if owned[t.Name] || (t.Port > 0 && ports[t.Port]) {
-			continue
-		}
-		n++
-	}
-	return n
+	return len(ForeignTunnels(cfg, live))
 }
 
 // MergeTunnelsAll lists project tunnels first, then other live system tunnels.

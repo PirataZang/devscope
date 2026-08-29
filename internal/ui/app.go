@@ -15,6 +15,7 @@ import (
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
+	"github.com/devscope/devscope/internal/nginxutil"
 	"github.com/devscope/devscope/internal/routeutil"
 	"github.com/devscope/devscope/internal/sshutil"
 	"github.com/devscope/devscope/internal/wsutil"
@@ -573,6 +574,28 @@ type App struct {
 	jenkinsBuilds               []jenkinsutil.Build
 	jenkinsCfg                  jenkinsutil.ProjectConfig
 	jenkinsInfo                 jenkinsutil.ServerInfo
+	nginxOpen                   bool
+	nginxLoading                bool
+	nginxFocus                  nginxFocus
+	nginxCursor                 int
+	nginxScroll                 int
+	nginxDetailsScroll          int
+	nginxStatus                 string
+	nginxErr                    string
+	nginxConfirmDelete          bool
+	nginxWizard                 bool
+	nginxWizardField            int
+	nginxWizardCursor           int
+	nginxNewName                string
+	nginxNewServerName          string
+	nginxNewTarget              string
+	nginxNewRoot                string
+	nginxNewPortStr             string
+	nginxNewSSL                 bool
+	nginxShowAll                bool
+	nginxForeign                int
+	nginxLayout                 nginxutil.Layout
+	nginxSites                  []nginxutil.Site
 	ghaOpen                     bool
 	ghaLoading                  bool
 	ghaConfirm                  bool
@@ -676,6 +699,10 @@ type App struct {
 	landingK8sManifests int
 	landingJenkinsOK    bool
 	landingJenkins      jenkinsutil.ProjectConfig
+	landingNginxOK      bool
+	landingNginxFound   bool
+	landingNginxDir     string
+	landingNginxCount   int
 }
 
 func NewApp(store *core.StateStore, cfg *config.Config) *App {
@@ -687,6 +714,10 @@ func NewApp(store *core.StateStore, cfg *config.Config) *App {
 		view:     ViewDashboard,
 		tab:      TabGit,
 		now:      time.Now(),
+		// Túneis órfãos (cloudflared filho que sobrevive a um restart do
+		// devscope) ficavam escondidos até apertar "A" — por padrão já mostra
+		// todos, e "A" agora serve pra filtrar só o projeto se quiser.
+		cfShowAll: true,
 	}
 	a.openProjectFromCwd()
 	return a
@@ -961,6 +992,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
+
+	case nginxLoadedMsg, nginxActionMsg:
+		return a.handleNginxMsg(msg)
 
 	case ghaLoadedMsg, ghaActionMsg, ghaDetailMsg, ghaTickMsg, ghaAuthDoneMsg:
 		return a.handleGHAMsg(msg)
@@ -1419,6 +1453,11 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		if !a.landingJenkinsOK {
 			cmds = append(cmds, a.probeToolLanding(TabJenkins, p))
 		}
+	case TabNginx:
+		a.enterNginxTab(p)
+		if !a.landingNginxOK {
+			cmds = append(cmds, a.probeToolLanding(TabNginx, p))
+		}
 	case TabActions:
 		a.enterGHATab(p)
 		if !a.landingGHAOK {
@@ -1487,6 +1526,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	}
 	if tab == TabJenkins {
 		a.jenkinsOpen = false
+	}
+	if tab == TabNginx {
+		a.nginxOpen = false
 	}
 	var cmds []tea.Cmd
 	cmds = append(cmds, a.startProjectLoad(cp.Path))
@@ -1576,6 +1618,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.handleJenkinsKeys(msg, p)
+	}
+	if a.tab == TabNginx && a.nginxOpen {
+		return a.handleNginxKeys(msg, p)
 	}
 
 	switch msg.String() {
@@ -1999,6 +2044,9 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			return a, a.openJenkinsClient(p)
 		}
+		if a.tab == TabNginx && !a.nginxOpen {
+			return a, a.openNginxClient(p)
+		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
 				if !a.requireDockerContainer(c) {
@@ -2199,6 +2247,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.renderJenkinsTab(p)
 	}
+	if a.tab == TabNginx && a.nginxOpen {
+		return a.renderNginxTab(p)
+	}
 	if a.tab == TabActions && a.ghaOpen {
 		return a.renderGHATab(p)
 	}
@@ -2231,7 +2282,8 @@ func (a *App) renderProject() string {
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
 		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen) ||
 		(a.tab == TabCFTunnel && !a.cfOpen) || (a.tab == TabSSH && !a.sshOpen) ||
-		(a.tab == TabJenkins && !a.jenkinsOpen) || (a.tab == TabActions && !a.ghaOpen)
+		(a.tab == TabJenkins && !a.jenkinsOpen) || (a.tab == TabActions && !a.ghaOpen) ||
+		(a.tab == TabNginx && !a.nginxOpen)
 	switch {
 	case moduleDash:
 		content = lipgloss.Place(contentWidth, panelH, lipgloss.Left, lipgloss.Top, content)
@@ -2304,6 +2356,9 @@ func (a *App) renderProject() string {
 	if a.tab == TabJenkins && !a.jenkinsOpen {
 		hints = "enter abrir Jenkins  " + hints
 	}
+	if a.tab == TabNginx && !a.nginxOpen {
+		hints = "enter abrir Nginx  " + hints
+	}
 	if a.tab == TabActions && !a.ghaOpen {
 		hints = "enter abrir Actions  " + hints
 	}
@@ -2348,6 +2403,9 @@ func (a *App) renderProject() string {
 		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			hints = "enter abrir Jenkins  " + hints
+		}
+		if a.tab == TabNginx && !a.nginxOpen {
+			hints = "enter abrir Nginx  " + hints
 		}
 	}
 
@@ -2498,6 +2556,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderSSHLanding(p)
 	case TabJenkins:
 		return a.renderJenkinsLanding(p)
+	case TabNginx:
+		return a.renderNginxLanding(p)
 	case TabActions:
 		return a.renderGHALanding(p)
 	default:

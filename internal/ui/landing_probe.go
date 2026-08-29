@@ -7,6 +7,7 @@ import (
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
+	"github.com/devscope/devscope/internal/nginxutil"
 	"github.com/devscope/devscope/internal/sshutil"
 )
 
@@ -37,6 +38,10 @@ type toolLandingMsg struct {
 	k8sManifests int
 
 	jenkinsCfg jenkinsutil.ProjectConfig
+
+	nginxFound bool
+	nginxDir   string
+	nginxCount int
 }
 
 func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
@@ -79,6 +84,13 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 			msg.k8sManifests = len(collectors.DiscoverProjectManifests(path))
 		case TabJenkins:
 			msg.jenkinsCfg = jenkinsutil.LoadProject(path)
+		case TabNginx:
+			layout, sites, err := nginxutil.Discover(path)
+			msg.nginxFound = err == nil
+			msg.nginxCount = len(sites)
+			if layout.SitesDir != "" {
+				msg.nginxDir = layout.SitesDir
+			}
 		}
 		return msg
 	}
@@ -119,5 +131,10 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 	case TabJenkins:
 		a.landingJenkins = msg.jenkinsCfg
 		a.landingJenkinsOK = true
+	case TabNginx:
+		a.landingNginxFound = msg.nginxFound
+		a.landingNginxDir = msg.nginxDir
+		a.landingNginxCount = msg.nginxCount
+		a.landingNginxOK = true
 	}
 }
