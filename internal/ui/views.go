@@ -38,6 +38,7 @@ const (
 	TabSSH
 	TabJenkins
 	TabActions
+	TabNginx
 )
 
 func (t Tab) String() string {
@@ -80,6 +81,8 @@ func (t Tab) String() string {
 		return "Jenkins"
 	case TabActions:
 		return "GH Actions"
+	case TabNginx:
+		return "Nginx"
 	default:
 		return "Overview"
 	}
@@ -92,5 +95,5 @@ var AllTabs = []Tab{
 	TabActions, TabJenkins,
 	TabSwarm, TabKubernetes,
 	TabNgrok, TabSSH, TabCFTunnel,
-	TabRoutes, TabAPI, TabDatabase, TabWebSocket,
+	TabRoutes, TabNginx, TabAPI, TabDatabase, TabWebSocket,
 }

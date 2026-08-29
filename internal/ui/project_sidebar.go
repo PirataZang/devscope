@@ -213,7 +213,7 @@ func sidebarGroups() []sidebarGroup {
 		{"AUTOMATION", ColorPrimary, []Tab{TabActions, TabJenkins}},
 		{"MANAGER", ColorDocker, []Tab{TabSwarm, TabKubernetes}},
 		{"TUNNEL", ColorSuccess, []Tab{TabNgrok, TabSSH, TabCFTunnel}},
-		{"TOOLS", ColorPink, []Tab{TabRoutes, TabAPI, TabDatabase, TabWebSocket}},
+		{"TOOLS", ColorPink, []Tab{TabRoutes, TabNginx, TabAPI, TabDatabase, TabWebSocket}},
 	}
 }
 
@@ -324,6 +324,8 @@ func tabGlyph(t Tab) string {
 		return "⚙"
 	case TabActions:
 		return "▶"
+	case TabNginx:
+		return "◈"
 	default:
 		return "·"
 	}

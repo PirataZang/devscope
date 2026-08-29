@@ -278,7 +278,7 @@ func (a *App) cfHints() string {
 	if a.cfShowAll {
 		scope = "A projeto"
 	}
-	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  I install  L login  C create  R route  c copy  o open  d delete  " + scope + "  esc"
+	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  K mata órfãos  I install  L login  C create  R route  c copy  o open  d delete  " + scope + "  esc"
 	if a.cfLoading {
 		base = a.spinner() + " carregando…  " + base
 	}
@@ -1011,6 +1011,8 @@ func (a *App) handleCFKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 		return a, a.cfStartSelected(p)
 	case "x":
 		return a, a.cfStopSelected()
+	case "K", "shift+k", "shift+K":
+		return a, a.cfKillForeign()
 	case "r":
 		if a.cfFocus == cfFocusTable && a.cfSubTab == cfTabTunnels {
 			return a, a.cfRestartSelected(p)
@@ -1280,6 +1282,22 @@ func (a *App) cfStopSelected() tea.Cmd {
 			return cfActionMsg{err: err.Error()}
 		}
 		return cfActionMsg{out: "stopped " + t.Name}
+	}
+}
+
+// cfKillForeign encerra de uma vez todo túnel vivo que não é deste projeto —
+// os órfãos que sobram ocupando porta (métricas 20241+) quando o devscope
+// reinicia sem derrubar o cloudflared filho.
+func (a *App) cfKillForeign() tea.Cmd {
+	cfg := a.cfCfg
+	a.cfLoading = true
+	a.cfStatus = "encerrando túneis externos…"
+	return func() tea.Msg {
+		n, err := cfutil.StopForeignTunnels(cfg)
+		if n == 0 && err != nil {
+			return cfActionMsg{err: err.Error()}
+		}
+		return cfActionMsg{out: fmt.Sprintf("%d túnel(is) externo(s) encerrado(s)", n)}
 	}
 }
 

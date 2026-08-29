@@ -39,4 +39,19 @@ func TestIsCloudflaredCmd(t *testing.T) {
 	if isCloudflaredCmd([]string{"cloudflared", "version"}) {
 		t.Fatal("version-only should be false")
 	}
+	if !isCloudflaredCmd([]string{"/opt/cloudflared-linux-amd64", "tunnel", "--url", "http://localhost:1"}) {
+		t.Fatal("release binary baixado sem renomear deveria contar como cloudflared")
+	}
+}
+
+func TestForeignTunnels(t *testing.T) {
+	cfg := ProjectConfig{Tunnels: []TunnelConfig{{Name: "api", Port: 3000}}}
+	live := []Tunnel{
+		{Name: "api", Port: 3000, PID: 1},
+		{Name: "quick-4321", Port: 4321, PID: 2},
+	}
+	foreign := ForeignTunnels(cfg, live)
+	if len(foreign) != 1 || foreign[0].Name != "quick-4321" {
+		t.Fatalf("%+v", foreign)
+	}
 }

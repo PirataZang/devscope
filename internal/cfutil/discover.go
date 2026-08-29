@@ -103,7 +103,9 @@ func isCloudflaredCmd(args []string) bool {
 		return false
 	}
 	base := filepath.Base(args[0])
-	if base != "cloudflared" {
+	// binário baixado direto do GitHub release (cloudflared-linux-amd64 etc.)
+	// sem renomear ainda é cloudflared — só o "cloudflared" exato perdia esses.
+	if base != "cloudflared" && !strings.HasPrefix(base, "cloudflared-") {
 		return false
 	}
 	joined := strings.Join(args, " ")
@@ -370,6 +372,47 @@ func procUptime(pid int) string {
 		sec = 0
 	}
 	return formatUptime(time.Duration(sec * float64(time.Second)))
+}
+
+// ForeignTunnels returns the live tunnels that don't belong to this project
+// (name/port not in cfg) — includes orphans left running after devscope
+// restarts without stopping the cloudflared child, which keep squatting the
+// metrics port range (20241+) and can make new tunnels fail to start.
+func ForeignTunnels(cfg ProjectConfig, live []Tunnel) []Tunnel {
+	owned := map[string]bool{}
+	ports := map[int]bool{}
+	for _, c := range cfg.Tunnels {
+		owned[c.Name] = true
+		if c.Port > 0 {
+			ports[c.Port] = true
+		}
+	}
+	var out []Tunnel
+	for _, t := range live {
+		if owned[t.Name] || (t.Port > 0 && ports[t.Port]) {
+			continue
+		}
+		out = append(out, t)
+	}
+	return out
+}
+
+// StopForeignTunnels kills every live tunnel that isn't this project's in one
+// go, so accumulated orphans can be cleared without stopping them one by one.
+func StopForeignTunnels(cfg ProjectConfig) (int, error) {
+	n := 0
+	var lastErr error
+	for _, t := range ForeignTunnels(cfg, ListLiveTunnels()) {
+		if t.PID <= 0 {
+			continue
+		}
+		if err := StopPID(t.PID); err != nil {
+			lastErr = err
+			continue
+		}
+		n++
+	}
+	return n, lastErr
 }
 
 // StopPID sends interrupt to an external cloudflared process.
