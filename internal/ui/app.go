@@ -14,8 +14,8 @@ import (
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/jenkinsutil"
-	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/nginxutil"
+	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/routeutil"
 	"github.com/devscope/devscope/internal/sshutil"
 	"github.com/devscope/devscope/internal/wsutil"
@@ -592,10 +592,18 @@ type App struct {
 	nginxNewRoot                string
 	nginxNewPortStr             string
 	nginxNewSSL                 bool
+	nginxNewKind                string
+	nginxNewHubDirName          string
+	nginxWizardForHub           bool
 	nginxShowAll                bool
 	nginxForeign                int
 	nginxLayout                 nginxutil.Layout
 	nginxSites                  []nginxutil.Site
+	nginxHub                    *nginxutil.Site
+	nginxIncs                   []nginxutil.Site
+	nginxHubProjectPath         string
+	nginxTopCursor              int
+	nginxTopScroll              int
 	ghaOpen                     bool
 	ghaLoading                  bool
 	ghaConfirm                  bool
@@ -993,7 +1001,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
 
-	case nginxLoadedMsg, nginxActionMsg:
+	case nginxLoadedMsg, nginxActionMsg, nginxIncsLoadedMsg:
 		return a.handleNginxMsg(msg)
 
 	case ghaLoadedMsg, ghaActionMsg, ghaDetailMsg, ghaTickMsg, ghaAuthDoneMsg:

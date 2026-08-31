@@ -14,12 +14,16 @@ import (
 
 const (
 	nginxWizName = iota
+	nginxWizKind
 	nginxWizServerName
 	nginxWizTarget
 	nginxWizRoot
 	nginxWizPort
 	nginxWizSSL
+	nginxWizHubDirName
 )
+
+var nginxKinds = []string{"single", "hub"}
 
 type nginxFocus int
 
@@ -33,6 +37,11 @@ type nginxLoadedMsg struct {
 	sites   []nginxutil.Site
 	foreign int
 	err     string
+}
+
+type nginxIncsLoadedMsg struct {
+	incs []nginxutil.Site
+	err  string
 }
 
 type nginxActionMsg struct {
@@ -56,6 +65,9 @@ func (a *App) openNginxClient(p *core.Project) tea.Cmd {
 	a.nginxStatus = ""
 	a.nginxWizard = false
 	a.nginxConfirmDelete = false
+	a.nginxHub = nil
+	a.nginxIncs = nil
+	a.nginxTopCursor, a.nginxTopScroll = 0, 0
 	if a.nginxNewPortStr == "" {
 		a.nginxNewPortStr = "80"
 	}
@@ -66,6 +78,8 @@ func (a *App) leaveNginxTab() tea.Cmd {
 	a.nginxOpen = false
 	a.nginxWizard = false
 	a.nginxConfirmDelete = false
+	a.nginxHub = nil
+	a.nginxIncs = nil
 	a.tab = TabNginx
 	a.tabCursor = 0
 	return nil
@@ -108,6 +122,23 @@ func (a *App) refreshNginx(p *core.Project) tea.Cmd {
 	}
 }
 
+// refreshNginxIncs recarrega as .inc do hub atualmente aberto (a.nginxHub).
+func (a *App) refreshNginxIncs() tea.Cmd {
+	if a.nginxHub == nil {
+		return nil
+	}
+	hub := *a.nginxHub
+	path := a.nginxHubProjectPath
+	a.nginxLoading = true
+	return func() tea.Msg {
+		incs, err := nginxutil.DiscoverHubIncs(path, hub)
+		if err != nil {
+			return nginxIncsLoadedMsg{err: err.Error()}
+		}
+		return nginxIncsLoadedMsg{incs: incs}
+	}
+}
+
 func (a *App) handleNginxMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m := msg.(type) {
 	case nginxLoadedMsg:
@@ -122,8 +153,20 @@ func (a *App) handleNginxMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.nginxSites = m.sites
 			a.nginxForeign = m.foreign
 		}
-		if a.nginxCursor >= len(a.nginxSites) {
+		if a.nginxHub == nil && a.nginxCursor >= len(a.nginxSites) {
 			a.nginxCursor = maxInt(0, len(a.nginxSites)-1)
+		}
+	case nginxIncsLoadedMsg:
+		a.nginxLoading = false
+		if m.err != "" {
+			a.nginxErr = m.err
+			a.nginxIncs = nil
+		} else {
+			a.nginxErr = ""
+			a.nginxIncs = m.incs
+		}
+		if a.nginxHub != nil && a.nginxCursor >= len(a.nginxIncs) {
+			a.nginxCursor = maxInt(0, len(a.nginxIncs)-1)
 		}
 	case nginxActionMsg:
 		a.nginxLoading = false
@@ -135,6 +178,9 @@ func (a *App) handleNginxMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		a.nginxErr = ""
 		a.nginxStatus = truncate(m.out, 80)
+		if a.nginxHub != nil {
+			return a, a.refreshNginxIncs()
+		}
 		return a, a.refreshNginx(a.currentProject())
 	}
 	return a, nil
@@ -158,7 +204,7 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 	openH := maxInt(7, bodyH*40/100)
 	featH := maxInt(6, bodyH-openH)
 	openLines := []string{
-		StyleMuted.Render("main.conf + sites/*.inc — cadastro de rotas sem editar arquivo na mão"),
+		StyleMuted.Render("main.conf + .conf (single/hub) — cadastro de rotas sem editar arquivo na mão"),
 	}
 	openLines = append(openLines, moduleOpenHint()...)
 	switch {
@@ -166,15 +212,15 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 		openLines = append(openLines, "", StyleMuted.Render("detectando…"))
 	case !found:
 		openLines = append(openLines, "", StyleWarning.Render("nenhuma config de nginx encontrada"))
-		openLines = append(openLines, StyleMuted.Render("crie main.conf/nginx.conf + sites/ na raiz do projeto"))
+		openLines = append(openLines, StyleMuted.Render("crie main.conf/nginx.conf + uma pasta de .conf na raiz do projeto"))
 	default:
-		openLines = append(openLines, "", StyleHealthy.Render(fmt.Sprintf("%d rota(s) em %s", a.landingNginxCount, firstNonEmpty(a.landingNginxDir, "?"))))
+		openLines = append(openLines, "", StyleHealthy.Render(fmt.Sprintf("%d entrada(s) em %s", a.landingNginxCount, firstNonEmpty(a.landingNginxDir, "?"))))
 	}
 	featLines := []string{
 		StyleMuted.Render("detecta main.conf/nginx.conf na raiz do projeto"),
-		StyleMuted.Render("sites/, conf.d/, sites-available/ — o que existir"),
-		StyleMuted.Render("n cria rota nova (proxy_pass ou static root)"),
-		StyleMuted.Render("garante o include no main.conf quando falta"),
+		StyleMuted.Render("pasta de .conf pode ter qualquer nome"),
+		StyleMuted.Render("single = rota direta · hub = pasta de .inc"),
+		StyleMuted.Render("enter num hub abre suas .inc pra criar/deletar"),
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("NGINX", fitExactLines(openLines, openH-2), centerW, openH, true),
@@ -186,7 +232,7 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 	}
 	details := []string{
 		StyleMuted.Render("Detectado ") + StyleNormal.Render(detected),
-		StyleMuted.Render("Rotas     ") + StyleNormal.Render(strconv.Itoa(a.landingNginxCount)),
+		StyleMuted.Render("Entradas  ") + StyleNormal.Render(strconv.Itoa(a.landingNginxCount)),
 	}
 	actions := moduleActionLines(
 		[2]string{"enter", "abrir console"},
@@ -210,7 +256,11 @@ func (a *App) renderNginxTab(p *core.Project) string {
 	}
 	if a.nginxConfirmDelete {
 		t, _ := a.nginxSelected()
-		box := renderTunnelDeleteConfirmBox("NGINX", tabAccentColor(TabNginx), t.Name, t.File, w, h)
+		detail := t.File
+		if t.Kind == nginxutil.KindHub {
+			detail += "  (a pasta " + filepath.Base(t.HubDir) + " e as .inc dela ficam)"
+		}
+		box := renderTunnelDeleteConfirmBox("NGINX", tabAccentColor(TabNginx), t.Name, detail, w, h)
 		view = overlayCentered(view, box, w, h)
 	}
 	return view
@@ -221,13 +271,29 @@ func (a *App) nginxHints() string {
 		return "modal delete  y confirma  n/esc cancela"
 	}
 	if a.nginxWizard {
-		return "modal nova rota  tab campo  space ssl  enter salvar  esc"
+		if a.nginxWizardForHub {
+			return "modal nova rota (.inc)  tab campo  space ssl  enter salvar  esc"
+		}
+		return "modal novo .conf  tab campo  space tipo/ssl  enter salvar  esc"
+	}
+	if a.nginxHub != nil {
+		base := "tab lista/detalhes  n nova .inc  d delete  R rescan  esc volta"
+		if a.nginxLoading {
+			base = a.spinner() + " carregando…  " + base
+		}
+		if a.nginxStatus != "" {
+			return truncate(a.nginxStatus, 72) + "  ·  " + base
+		}
+		if a.nginxErr != "" {
+			return StyleUnhealthy.Render(truncate(a.nginxErr, 60)) + "  ·  " + base
+		}
+		return base
 	}
 	scope := "A todos"
 	if a.nginxShowAll {
 		scope = "A projeto"
 	}
-	base := "tab lista/detalhes  n nova rota  d delete  " + scope + "  R rescan  esc"
+	base := "tab lista/detalhes  enter abre hub  n novo .conf  d delete  " + scope + "  R rescan  esc"
 	if a.nginxLoading {
 		base = a.spinner() + " carregando…  " + base
 	}
@@ -246,15 +312,19 @@ func (a *App) renderNginxHeader(p *core.Project, width int) string {
 	if p != nil {
 		name = p.Name
 	}
-	left := accent.Render("devscope") + StyleMuted.Render(" › nginx") +
-		StyleMuted.Render("  Projeto: ") + StyleNormal.Render(name)
+	left := accent.Render("devscope") + StyleMuted.Render(" › nginx")
+	if a.nginxHub != nil {
+		left += StyleMuted.Render(" › ") + StyleNormal.Render(a.nginxHub.Name)
+	}
+	left += StyleMuted.Render("  Projeto: ") + StyleNormal.Render(name)
+
 	scope := StyleMuted.Render("projeto")
 	if a.nginxShowAll {
 		scope = StyleAccent.Render("TODOS")
 	}
-	right := StyleMuted.Render(fmt.Sprintf("Rotas:%d  ", len(a.nginxSites)))
+	right := StyleMuted.Render(fmt.Sprintf("Confs:%d  ", len(a.nginxSites)))
 	if a.nginxLayout.SitesDir != "" {
-		right += StyleMuted.Render("sites: ") + StyleNormal.Render(filepath.Base(a.nginxLayout.SitesDir)) + "  "
+		right += StyleMuted.Render("pasta: ") + StyleNormal.Render(filepath.Base(a.nginxLayout.SitesDir)) + "  "
 	}
 	right += scope
 	if !a.nginxShowAll && a.nginxForeign > 0 {
@@ -278,15 +348,31 @@ func (a *App) renderNginxView(width, height int) string {
 	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
 }
 
+// nginxCurrentList é a lista relevante pro nível atual: as .conf de nível 1,
+// ou as .inc do hub aberto.
+func (a *App) nginxCurrentList() []nginxutil.Site {
+	if a.nginxHub != nil {
+		return a.nginxIncs
+	}
+	return a.nginxSites
+}
+
 func (a *App) renderNginxTable(width, height int) string {
 	focus := a.nginxFocus == nginxFocusTable
-	n := len(a.nginxSites)
+	topLevel := a.nginxHub == nil
+	list := a.nginxCurrentList()
+	n := len(list)
 	a.nginxScroll = ensureVisible(a.nginxCursor, a.nginxScroll, height-3, n)
 	nameW := maxInt(8, width-34)
-	header := fmt.Sprintf("%-*s %-6s %-10s %s", nameW, "FILE", "SSL", "PROJETO", "SERVER_NAME")
+	var header string
+	if topLevel {
+		header = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, "FILE", "KIND", "SSL", "PROJETO", "SERVER_NAME")
+	} else {
+		header = fmt.Sprintf("%-*s %-6s %s", nameW, "FILE", "SSL", "SERVER_NAME")
+	}
 	lines := []string{StyleMuted.Render(truncate(header, width-2))}
 	if n == 0 {
-		hint := "  (nenhuma rota encontrada — n para criar)"
+		hint := "  (nenhuma entrada encontrada — n para criar)"
 		if a.nginxErr != "" {
 			hint = "  (" + a.nginxErr + ")"
 		}
@@ -295,13 +381,22 @@ func (a *App) renderNginxTable(width, height int) string {
 		start := a.nginxScroll
 		end := minInt(start+height-3, n)
 		for i := start; i < end; i++ {
-			s := a.nginxSites[i]
+			s := list[i]
 			ssl := "—"
 			if s.SSL {
 				ssl = StyleHealthy.Render("sim")
 			}
-			proj := firstNonEmpty(s.Project, "—")
-			row := fmt.Sprintf("%-*s %-6s %-10s %s", nameW, truncate(s.Name, nameW), ssl, truncate(proj, 10), truncate(strings.Join(s.ServerNames, " "), 24))
+			var row string
+			if topLevel {
+				kind := string(s.Kind)
+				if s.Kind == nginxutil.KindHub {
+					kind = StyleAccent.Render("hub")
+				}
+				proj := firstNonEmpty(s.Project, "—")
+				row = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, truncate(s.Name, nameW), kind, ssl, truncate(proj, 10), truncate(strings.Join(s.ServerNames, " "), 24))
+			} else {
+				row = fmt.Sprintf("%-*s %-6s %s", nameW, truncate(s.Name, nameW), ssl, truncate(strings.Join(s.ServerNames, " "), 24))
+			}
 			prefix := "  "
 			style := StyleMuted
 			if i == a.nginxCursor {
@@ -315,7 +410,14 @@ func (a *App) renderNginxTable(width, height int) string {
 			lines = append(lines, style.Render(truncate(prefix+row, width-2)))
 		}
 	}
-	title := fmt.Sprintf("ROTAS (%d)", n)
+	title := fmt.Sprintf("CONFS (%d)", n)
+	if !topLevel {
+		hubName := ""
+		if a.nginxHub != nil {
+			hubName = a.nginxHub.Name
+		}
+		title = fmt.Sprintf("INC · %s (%d)", hubName, n)
+	}
 	if focus {
 		title = "> " + title
 	}
@@ -328,22 +430,34 @@ func (a *App) renderNginxDetailsPane(width, height int) string {
 	var raw []string
 	s, ok := a.nginxSelected()
 	if !ok {
-		raw = []string{StyleMuted.Render("(selecione uma rota na lista)")}
+		raw = []string{StyleMuted.Render("(selecione um item na lista)")}
 	} else {
 		raw = append(raw,
 			StyleNormal.Bold(true).Render(truncate(s.Name, innerW)),
 			"",
 			tunnelDetailKV("Arquivo", s.File),
 			tunnelDetailKV("Projeto", firstNonEmpty(s.Project, "(este)")),
-			tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
-			tunnelDetailKV("Listen", s.Listen),
-			tunnelDetailKV("SSL", boolLabel(s.SSL)),
 		)
-		if s.ProxyPass != "" {
-			raw = append(raw, tunnelDetailKV("ProxyPass", s.ProxyPass))
+		if s.Kind != "" {
+			raw = append(raw, tunnelDetailKV("Kind", string(s.Kind)))
 		}
-		if s.Root != "" {
-			raw = append(raw, tunnelDetailKV("Root", s.Root))
+		if s.Kind == nginxutil.KindHub {
+			raw = append(raw,
+				tunnelDetailKV("Pasta", filepath.Base(s.HubDir)),
+				tunnelDetailKV("Dica", "enter abre as rotas dela"),
+			)
+		} else {
+			raw = append(raw,
+				tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
+				tunnelDetailKV("Listen", s.Listen),
+				tunnelDetailKV("SSL", boolLabel(s.SSL)),
+			)
+			if s.ProxyPass != "" {
+				raw = append(raw, tunnelDetailKV("ProxyPass", s.ProxyPass))
+			}
+			if s.Root != "" {
+				raw = append(raw, tunnelDetailKV("Root", s.Root))
+			}
 		}
 		raw = append(raw, "", StyleMuted.Render("── raw ──"))
 		for _, line := range strings.Split(strings.TrimRight(s.Raw, "\n"), "\n") {
@@ -362,10 +476,20 @@ func (a *App) renderNginxDetailsPane(width, height int) string {
 }
 
 func (a *App) nginxSelected() (nginxutil.Site, bool) {
-	if a.nginxCursor < 0 || a.nginxCursor >= len(a.nginxSites) {
+	list := a.nginxCurrentList()
+	if a.nginxCursor < 0 || a.nginxCursor >= len(list) {
 		return nginxutil.Site{}, false
 	}
-	return a.nginxSites[a.nginxCursor], true
+	return list[a.nginxCursor], true
+}
+
+func (a *App) resolveProjectPath(name string) string {
+	for _, pr := range a.snapshot.Projects {
+		if pr.Name == name {
+			return pr.Path
+		}
+	}
+	return ""
 }
 
 func (a *App) renderNginxWizard(p *core.Project, width, height int) string {
@@ -378,36 +502,59 @@ func (a *App) renderNginxWizard(p *core.Project, width, height int) string {
 	innerW := maxInt(28, boxW-6)
 	accent := tabAccentColor(TabNginx)
 
-	lines := tunnelModalChrome("NGINX", accent, "Nova rota", "server_name + proxy_pass ou root estático", proj, innerW)
-	lines = append(lines, "")
-
-	nameBox := renderApiTitledBox("nome (arquivo)", []string{a.renderNginxWizardFieldValue(a.nginxNewName, nginxWizName)}, innerW, 3, a.nginxWizardField == nginxWizName)
-	snBox := renderApiTitledBox("server_name", []string{a.renderNginxWizardFieldValue(a.nginxNewServerName, nginxWizServerName)}, innerW, 3, a.nginxWizardField == nginxWizServerName)
-	targetBox := renderApiTitledBox("proxy_pass (destino)", []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, nginxWizTarget)}, innerW, 3, a.nginxWizardField == nginxWizTarget)
-	rootBox := renderApiTitledBox("root (se estático — deixe proxy_pass vazio)", []string{a.renderNginxWizardFieldValue(a.nginxNewRoot, nginxWizRoot)}, innerW, 3, a.nginxWizardField == nginxWizRoot)
-	portBox := renderApiTitledBox("porta", []string{a.renderNginxWizardFieldValue(a.nginxNewPortStr, nginxWizPort)}, innerW, 3, a.nginxWizardField == nginxWizPort)
-	sslShown := boolLabel(a.nginxNewSSL)
-	if a.nginxWizardField == nginxWizSSL {
-		sslShown += "  ⟨space⟩"
+	title, subtitle := "Novo .conf", "single = rota direta · hub = pasta de .inc"
+	if a.nginxWizardForHub {
+		hubName := ""
+		if a.nginxHub != nil {
+			hubName = a.nginxHub.Name
+		}
+		title, subtitle = "Nova rota (.inc)", "dentro do hub "+hubName
 	}
-	sslBox := renderApiTitledBox("ssl", []string{a.renderNginxWizardFieldValue(sslShown, nginxWizSSL)}, innerW, 3, a.nginxWizardField == nginxWizSSL)
+	lines := tunnelModalChrome("NGINX", accent, title, subtitle, proj, innerW)
+	lines = append(lines, "")
 
-	lines = append(lines, strings.Split(nameBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(snBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(targetBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(rootBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(portBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(sslBox, "\n")...)
-	lines = append(lines, "",
+	for _, f := range a.nginxWizardFieldsOrder() {
+		box := a.renderNginxWizardFieldBox(f, innerW)
+		lines = append(lines, strings.Split(box, "\n")...)
+		lines = append(lines, "")
+	}
+	lines = append(lines,
 		StyleMuted.Render("preencha proxy_pass OU root — o outro fica vazio"),
-		StyleMuted.Render("tab campo  ·  space toggle ssl  ·  enter salva  ·  esc"),
+		StyleMuted.Render("tab campo  ·  space toggle  ·  enter salva  ·  esc"),
 	)
 	return tunnelModalBox(lines, boxW, boxH, accent)
+}
+
+func (a *App) renderNginxWizardFieldBox(field int, innerW int) string {
+	focused := a.nginxWizardField == field
+	switch field {
+	case nginxWizName:
+		return renderApiTitledBox("nome (arquivo)", []string{a.renderNginxWizardFieldValue(a.nginxNewName, field)}, innerW, 3, focused)
+	case nginxWizKind:
+		shown := a.nginxNewKind
+		if focused {
+			shown += "  ⟨space⟩"
+		}
+		return renderApiTitledBox("tipo (single/hub)", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
+	case nginxWizServerName:
+		return renderApiTitledBox("server_name", []string{a.renderNginxWizardFieldValue(a.nginxNewServerName, field)}, innerW, 3, focused)
+	case nginxWizTarget:
+		return renderApiTitledBox("proxy_pass (destino)", []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, field)}, innerW, 3, focused)
+	case nginxWizRoot:
+		return renderApiTitledBox("root (se estático — deixe proxy_pass vazio)", []string{a.renderNginxWizardFieldValue(a.nginxNewRoot, field)}, innerW, 3, focused)
+	case nginxWizPort:
+		return renderApiTitledBox("porta", []string{a.renderNginxWizardFieldValue(a.nginxNewPortStr, field)}, innerW, 3, focused)
+	case nginxWizSSL:
+		shown := boolLabel(a.nginxNewSSL)
+		if focused {
+			shown += "  ⟨space⟩"
+		}
+		return renderApiTitledBox("ssl", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
+	case nginxWizHubDirName:
+		return renderApiTitledBox("pasta que vai guardar as .inc", []string{a.renderNginxWizardFieldValue(a.nginxNewHubDirName, field)}, innerW, 3, focused)
+	default:
+		return ""
+	}
 }
 
 func (a *App) renderNginxWizardFieldValue(value string, field int) string {
@@ -415,7 +562,7 @@ func (a *App) renderNginxWizardFieldValue(value string, field int) string {
 	if !focused {
 		return StyleNormal.Render(value)
 	}
-	if field == nginxWizSSL {
+	if field == nginxWizSSL || field == nginxWizKind {
 		return StyleSelected.Render(value)
 	}
 	runes := []rune(value)
@@ -430,7 +577,47 @@ func (a *App) renderNginxWizardFieldValue(value string, field int) string {
 	return StyleSelected.Render(shown)
 }
 
-func (a *App) beginNginxWizard() {
+// nginxWizardFieldsOrder devolve os campos ativos, na ordem de tab, de
+// acordo com o que está sendo criado: um .conf de nível 1 (single ou hub,
+// com o campo de tipo) ou uma .inc dentro de um hub (sem campo de tipo).
+func (a *App) nginxWizardFieldsOrder() []int {
+	if a.nginxWizardForHub {
+		return []int{nginxWizName, nginxWizServerName, nginxWizTarget, nginxWizRoot, nginxWizPort, nginxWizSSL}
+	}
+	if a.nginxNewKind == string(nginxutil.KindHub) {
+		return []int{nginxWizName, nginxWizKind, nginxWizHubDirName}
+	}
+	return []int{nginxWizName, nginxWizKind, nginxWizServerName, nginxWizTarget, nginxWizRoot, nginxWizPort, nginxWizSSL}
+}
+
+func (a *App) cycleNginxKind() {
+	for i, k := range nginxKinds {
+		if k == a.nginxNewKind {
+			a.nginxNewKind = nginxKinds[(i+1)%len(nginxKinds)]
+			return
+		}
+	}
+	a.nginxNewKind = nginxKinds[0]
+}
+
+func (a *App) beginNginxConfWizard() {
+	a.nginxNewName = ""
+	a.nginxNewKind = string(nginxutil.KindSingle)
+	a.nginxNewServerName = ""
+	a.nginxNewTarget = ""
+	a.nginxNewRoot = ""
+	a.nginxNewHubDirName = ""
+	if a.nginxNewPortStr == "" {
+		a.nginxNewPortStr = "80"
+	}
+	a.nginxNewSSL = false
+	a.nginxWizardForHub = false
+	a.nginxWizard = true
+	a.nginxWizardField = nginxWizName
+	a.nginxWizardCursor = 0
+}
+
+func (a *App) beginNginxIncWizard() {
 	a.nginxNewName = ""
 	a.nginxNewServerName = ""
 	a.nginxNewTarget = ""
@@ -439,6 +626,7 @@ func (a *App) beginNginxWizard() {
 		a.nginxNewPortStr = "80"
 	}
 	a.nginxNewSSL = false
+	a.nginxWizardForHub = true
 	a.nginxWizard = true
 	a.nginxWizardField = nginxWizName
 	a.nginxWizardCursor = 0
@@ -456,6 +644,8 @@ func (a *App) nginxWizardText() string {
 		return a.nginxNewRoot
 	case nginxWizPort:
 		return a.nginxNewPortStr
+	case nginxWizHubDirName:
+		return a.nginxNewHubDirName
 	default:
 		return ""
 	}
@@ -473,17 +663,28 @@ func (a *App) setNginxWizardText(s string) {
 		a.nginxNewRoot = s
 	case nginxWizPort:
 		a.nginxNewPortStr = s
+	case nginxWizHubDirName:
+		a.nginxNewHubDirName = s
 	}
 }
 
-func (a *App) nginxWizardFocusField(field int) {
-	if field < nginxWizName {
-		field = nginxWizSSL
+// nginxWizardFocusField move o foco delta posições dentro da lista de campos
+// ativos no momento (varia com forHub/Kind — ver nginxWizardFieldsOrder).
+func (a *App) nginxWizardFocusField(delta int) {
+	order := a.nginxWizardFieldsOrder()
+	idx := 0
+	for i, f := range order {
+		if f == a.nginxWizardField {
+			idx = i
+			break
+		}
 	}
-	if field > nginxWizSSL {
-		field = nginxWizName
+	idx = ((idx+delta)%len(order) + len(order)) % len(order)
+	a.nginxWizardField = order[idx]
+	if a.nginxWizardField == nginxWizKind || a.nginxWizardField == nginxWizSSL {
+		a.nginxWizardCursor = 0
+		return
 	}
-	a.nginxWizardField = field
 	a.nginxWizardCursor = len([]rune(a.nginxWizardText()))
 }
 
@@ -503,6 +704,16 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 	}
 	switch msg.String() {
 	case "esc":
+		if a.nginxHub != nil {
+			a.nginxHub = nil
+			a.nginxIncs = nil
+			a.nginxHubProjectPath = ""
+			a.nginxCursor, a.nginxScroll = a.nginxTopCursor, a.nginxTopScroll
+			a.nginxDetailsScroll = 0
+			a.nginxStatus = ""
+			a.nginxErr = ""
+			return a, nil
+		}
 		return a, a.leaveNginxTab()
 	case "tab":
 		a.nginxFocus = (a.nginxFocus + 1) % 2
@@ -510,26 +721,68 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		return a, a.nginxMove(-1)
 	case "down", "j":
 		return a, a.nginxMove(1)
+	case "enter":
+		if a.nginxHub != nil || p == nil {
+			return a, nil
+		}
+		s, ok := a.nginxSelected()
+		if !ok || s.Kind != nginxutil.KindHub {
+			return a, nil
+		}
+		hubPath := p.Path
+		if s.Project != "" {
+			if fp := a.resolveProjectPath(s.Project); fp != "" {
+				hubPath = fp
+			}
+		}
+		hub := s
+		a.nginxTopCursor, a.nginxTopScroll = a.nginxCursor, a.nginxScroll
+		a.nginxHub = &hub
+		a.nginxHubProjectPath = hubPath
+		a.nginxCursor, a.nginxScroll, a.nginxDetailsScroll = 0, 0, 0
+		a.nginxFocus = nginxFocusTable
+		a.nginxStatus, a.nginxErr = "", ""
+		return a, a.refreshNginxIncs()
 	case "n":
-		a.beginNginxWizard()
-	case "d":
-		if s, ok := a.nginxSelected(); ok {
-			if s.Project != "" {
-				a.nginxStatus = "rota de outro projeto — abra " + s.Project + " para editar"
+		if a.nginxHub != nil {
+			if a.nginxHub.Project != "" {
+				a.nginxStatus = "hub de outro projeto — abra " + a.nginxHub.Project + " para editar"
 				return a, nil
 			}
-			a.nginxConfirmDelete = true
-			a.nginxStatus = "delete rota?"
+			a.beginNginxIncWizard()
+		} else {
+			a.beginNginxConfWizard()
 		}
+	case "d":
+		s, ok := a.nginxSelected()
+		if !ok {
+			return a, nil
+		}
+		foreignOwner := s.Project
+		if a.nginxHub != nil {
+			foreignOwner = a.nginxHub.Project
+		}
+		if foreignOwner != "" {
+			a.nginxStatus = "item de outro projeto — abra " + foreignOwner + " para editar"
+			return a, nil
+		}
+		a.nginxConfirmDelete = true
+		a.nginxStatus = "delete?"
 	case "A", "shift+a", "shift+A":
+		if a.nginxHub != nil {
+			return a, nil
+		}
 		a.nginxShowAll = !a.nginxShowAll
 		if a.nginxShowAll {
-			a.nginxStatus = "mostrando rotas de todos os projetos"
+			a.nginxStatus = "mostrando confs de todos os projetos"
 		} else {
-			a.nginxStatus = "filtrando rotas do projeto"
+			a.nginxStatus = "filtrando confs do projeto"
 		}
 		return a, a.refreshNginx(p)
 	case "R", "ctrl+r":
+		if a.nginxHub != nil {
+			return a, a.refreshNginxIncs()
+		}
 		return a, a.refreshNginx(p)
 	}
 	return a, nil
@@ -543,13 +796,14 @@ func (a *App) nginxMove(delta int) tea.Cmd {
 		}
 		return nil
 	}
+	n := len(a.nginxCurrentList())
 	prev := a.nginxCursor
 	a.nginxCursor += delta
 	if a.nginxCursor < 0 {
 		a.nginxCursor = 0
 	}
-	if a.nginxCursor > len(a.nginxSites)-1 {
-		a.nginxCursor = maxInt(0, len(a.nginxSites)-1)
+	if a.nginxCursor > n-1 {
+		a.nginxCursor = maxInt(0, n-1)
 	}
 	if a.nginxCursor != prev {
 		a.nginxDetailsScroll = 0
@@ -563,20 +817,29 @@ func (a *App) updateNginxWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea
 		a.nginxWizard = false
 		return a, nil
 	case "enter":
-		return a, a.nginxCreateSite(p)
+		if a.nginxWizardForHub {
+			return a, a.nginxCreateInc()
+		}
+		return a, a.nginxCreateConf(p)
 	case "tab", "down":
-		a.nginxWizardFocusField(a.nginxWizardField + 1)
+		a.nginxWizardFocusField(1)
 		return a, nil
 	case "shift+tab", "up":
-		a.nginxWizardFocusField(a.nginxWizardField - 1)
+		a.nginxWizardFocusField(-1)
 		return a, nil
-	case " ":
-		if a.nginxWizardField == nginxWizSSL {
-			a.nginxNewSSL = !a.nginxNewSSL
-			return a, nil
-		}
 	}
-	if a.nginxWizardField == nginxWizSSL {
+
+	switch a.nginxWizardField {
+	case nginxWizKind:
+		switch msg.String() {
+		case " ", "left", "right":
+			a.cycleNginxKind()
+		}
+		return a, nil
+	case nginxWizSSL:
+		if msg.String() == " " {
+			a.nginxNewSSL = !a.nginxNewSSL
+		}
 		return a, nil
 	}
 
@@ -625,8 +888,42 @@ func (a *App) updateNginxWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea
 	return a, nil
 }
 
-func (a *App) nginxCreateSite(p *core.Project) tea.Cmd {
+func (a *App) nginxCreateConf(p *core.Project) tea.Cmd {
 	if p == nil {
+		return nil
+	}
+	port, _ := strconv.Atoi(strings.TrimSpace(a.nginxNewPortStr))
+	kind := nginxutil.KindSingle
+	if a.nginxNewKind == string(nginxutil.KindHub) {
+		kind = nginxutil.KindHub
+	}
+	n := nginxutil.NewConf{
+		Name: a.nginxNewName,
+		Kind: kind,
+		NewSite: nginxutil.NewSite{
+			Name:       a.nginxNewName,
+			ServerName: a.nginxNewServerName,
+			Target:     a.nginxNewTarget,
+			Root:       a.nginxNewRoot,
+			Port:       port,
+			SSL:        a.nginxNewSSL,
+		},
+		HubDirName: a.nginxNewHubDirName,
+	}
+	path := p.Path
+	a.nginxWizard = false
+	a.nginxLoading = true
+	return func() tea.Msg {
+		site, err := nginxutil.CreateConf(path, n)
+		if err != nil {
+			return nginxActionMsg{err: err.Error()}
+		}
+		return nginxActionMsg{out: "criado " + site.File}
+	}
+}
+
+func (a *App) nginxCreateInc() tea.Cmd {
+	if a.nginxHub == nil {
 		return nil
 	}
 	port, _ := strconv.Atoi(strings.TrimSpace(a.nginxNewPortStr))
@@ -638,11 +935,12 @@ func (a *App) nginxCreateSite(p *core.Project) tea.Cmd {
 		Port:       port,
 		SSL:        a.nginxNewSSL,
 	}
-	path := p.Path
+	hub := *a.nginxHub
+	path := a.nginxHubProjectPath
 	a.nginxWizard = false
 	a.nginxLoading = true
 	return func() tea.Msg {
-		site, err := nginxutil.CreateSite(path, n)
+		site, err := nginxutil.CreateInc(path, hub, n)
 		if err != nil {
 			return nginxActionMsg{err: err.Error()}
 		}
@@ -653,10 +951,21 @@ func (a *App) nginxCreateSite(p *core.Project) tea.Cmd {
 func (a *App) nginxDeleteSelected(p *core.Project) tea.Cmd {
 	a.nginxConfirmDelete = false
 	s, ok := a.nginxSelected()
-	if !ok || p == nil || s.Project != "" {
+	if !ok {
 		return nil
 	}
-	path := p.Path
+	path := ""
+	switch {
+	case a.nginxHub != nil:
+		if a.nginxHub.Project != "" {
+			return nil
+		}
+		path = a.nginxHubProjectPath
+	case p != nil && s.Project == "":
+		path = p.Path
+	default:
+		return nil
+	}
 	a.nginxLoading = true
 	return func() tea.Msg {
 		if err := nginxutil.DeleteSite(path, s.File); err != nil {

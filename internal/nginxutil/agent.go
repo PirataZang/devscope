@@ -1,10 +1,15 @@
 // Package nginxutil detecta e edita configs de nginx dentro de um projeto
 // devscope: um main.conf/nginx.conf na raiz que inclui uma pasta com um
-// arquivo por rota (.inc ou .conf). A pasta pode ter qualquer nome — não tem
-// lista fixa ("sites", "conf.d" etc): a gente lê o include de verdade no
-// main.conf pra achar ela, e só cai pra uma varredura por conteúdo se não
-// achar include nenhum. Não existe um JSON de config próprio: os .conf/.inc
-// já são a fonte da verdade, igual o tab de git lê o .git direto.
+// arquivo .conf por entrada (single ou hub). A pasta pode ter qualquer nome —
+// não tem lista fixa ("sites", "conf.d" etc): a gente lê o include de
+// verdade no main.conf pra achar ela, e só cai pra uma varredura por
+// conteúdo se não achar include nenhum.
+//
+// Cada .conf de nível 1 é ou "single" (um server{} completo, com proxy_pass
+// ou root) ou "hub" (só um include apontando pra uma pasta com várias .inc —
+// cada .inc é uma rota completa, no mesmo formato de um single). Não existe
+// um JSON de config próprio: os .conf/.inc já são a fonte da verdade, igual
+// o tab de git lê o .git direto.
 package nginxutil
 
 import (
@@ -17,35 +22,46 @@ import (
 	"strings"
 )
 
-// mainConfNames são os nomes mais comuns do arquivo raiz que agrega os sites.
+// mainConfNames são os nomes mais comuns do arquivo raiz que agrega os .conf.
 var mainConfNames = []string{"main.conf", "nginx.conf"}
 
 // skipDirs não entram na varredura por conteúdo — nunca é onde ficam rotas.
 var skipDirs = map[string]bool{".git": true, "node_modules": true, "vendor": true, ".devscope": true}
 
+// Kind identifica o que um .conf de nível 1 é.
+type Kind string
+
+const (
+	KindSingle Kind = "single"
+	KindHub    Kind = "hub"
+)
+
 // Layout é onde a config de nginx deste projeto mora no disco.
 type Layout struct {
 	MainConf string // caminho absoluto, "" se não achou
-	SitesDir string // caminho absoluto, "" se não achou
-	Ext      string // extensão dominante nos arquivos de site (.inc ou .conf)
+	SitesDir string // caminho absoluto da pasta de .conf de nível 1, "" se não achou
+	Ext      string // extensão dos arquivos de nível 1 (normalmente .conf)
 }
 
-// Site é um arquivo de rota já parseado (best-effort, via regex — não é um
-// parser completo da gramática do nginx, só o suficiente pra listar/editar
-// um server{} por arquivo, que é o padrão real desse tipo de setup).
+// Site é um arquivo já parseado (best-effort, via regex — não é um parser
+// completo da gramática do nginx). Pode ser uma entrada de nível 1 (Kind
+// preenchido) ou uma .inc dentro de um hub (Kind vazio).
 type Site struct {
-	File        string   // relativo à raiz do projeto, ex: sites/api.inc
-	Name        string   // nome do arquivo sem extensão
+	File        string // relativo à raiz do projeto
+	Name        string // nome do arquivo sem extensão
+	Kind        Kind   // "single" | "hub" — só em entradas de nível 1
+	HubDir      string // caminho absoluto da pasta de .inc — só quando Kind == KindHub
 	ServerNames []string
 	Listen      string
 	SSL         bool
 	ProxyPass   string
 	Root        string
 	Raw         string
-	Project     string // preenchido pela UI quando o site vem de outro projeto
+	Project     string // preenchido pela UI quando o item vem de outro projeto
 }
 
-// NewSite são os campos preenchidos no modal de criação de rota.
+// NewSite são os campos preenchidos no modal de criação de uma rota (um
+// single de nível 1 ou uma .inc dentro de um hub — mesmo formato pros dois).
 type NewSite struct {
 	Name       string // nome do arquivo (sem extensão)
 	ServerName string // domínio(s), separados por espaço
@@ -55,8 +71,18 @@ type NewSite struct {
 	SSL        bool
 }
 
+// NewConf são os campos do modal de criação de nível 1: nome + kind, e só os
+// campos do kind escolhido (single usa os mesmos de NewSite; hub só usa o
+// nome da pasta que vai guardar as .inc).
+type NewConf struct {
+	Name string
+	Kind Kind
+	NewSite
+	HubDirName string
+}
+
 // Detect é uma checagem barata pra landing screen: o projeto tem cara de
-// nginx? (main.conf/nginx.conf na raiz e/ou pasta de sites com .conf/.inc)
+// nginx? (main.conf/nginx.conf na raiz e/ou pasta de .conf de nível 1)
 func Detect(projectPath string) bool {
 	l, _ := findLayout(projectPath)
 	return l.MainConf != "" || l.SitesDir != ""
@@ -75,7 +101,7 @@ func findLayout(projectPath string) (Layout, error) {
 		l.MainConf = findAnyRootConf(projectPath)
 	}
 	if l.MainConf != "" {
-		l.SitesDir, l.Ext = includedSitesDir(projectPath, l.MainConf)
+		l.SitesDir, l.Ext = includedDir(projectPath, l.MainConf)
 	}
 	if l.SitesDir == "" {
 		l.SitesDir, l.Ext = scanForSitesDir(projectPath)
@@ -108,37 +134,44 @@ func findAnyRootConf(projectPath string) string {
 
 var reInclude = regexp.MustCompile(`(?m)^\s*include\s+([^;]+);`)
 
-// includedSitesDir lê o(s) include do main.conf pra achar a pasta de rotas de
-// verdade, seja qual for o nome dela. Se o include usa o caminho de dentro do
-// container (ex: /etc/nginx/sites/*.inc), tenta também só o nome final da
-// pasta na raiz do projeto — é o que o volume do docker costuma espelhar.
-func includedSitesDir(projectPath, mainConf string) (dir, ext string) {
-	b, err := os.ReadFile(mainConf)
+// includedDir lê o(s) include de um arquivo pra achar a pasta de verdade,
+// seja qual for o nome dela, relativa a baseDir. Se o include usa o caminho
+// de dentro do container (ex: /etc/nginx/sites/*.inc), tenta também só o
+// nome final da pasta — é o que o volume do docker costuma espelhar.
+func includedDir(baseDir, confFile string) (dir, ext string) {
+	b, err := os.ReadFile(confFile)
 	if err != nil {
 		return "", ""
 	}
 	for _, m := range reInclude.FindAllSubmatch(b, -1) {
-		raw := strings.Trim(strings.TrimSpace(string(m[1])), `"'`)
-		globDir := filepath.Dir(raw)
-		if globDir == "." || globDir == "/" || globDir == "" {
-			continue // include de um arquivo específico, não de uma pasta
+		if dir, ext := resolveIncludeDir(baseDir, string(m[1])); dir != "" {
+			return dir, ext
 		}
-		globExt := filepath.Ext(filepath.Base(raw))
-		if globExt == ".*" {
-			globExt = ""
+	}
+	return "", ""
+}
+
+func resolveIncludeDir(baseDir, rawInclude string) (dir, ext string) {
+	raw := strings.Trim(strings.TrimSpace(rawInclude), `"'`)
+	globDir := filepath.Dir(raw)
+	if globDir == "." || globDir == "/" || globDir == "" {
+		return "", "" // include de um arquivo específico, não de uma pasta
+	}
+	globExt := filepath.Ext(filepath.Base(raw))
+	if globExt == ".*" {
+		globExt = ""
+	}
+	for _, full := range []string{filepath.Join(baseDir, globDir), filepath.Join(baseDir, filepath.Base(globDir))} {
+		st, err := os.Stat(full)
+		if err != nil || !st.IsDir() {
+			continue
 		}
-		for _, full := range []string{filepath.Join(projectPath, globDir), filepath.Join(projectPath, filepath.Base(globDir))} {
-			st, err := os.Stat(full)
-			if err != nil || !st.IsDir() {
-				continue
-			}
-			e := globExt
-			if e == "" {
-				entries, _ := os.ReadDir(full)
-				e = firstNonEmpty(dominantExt(entries), ".conf")
-			}
-			return full, e
+		e := globExt
+		if e == "" {
+			entries, _ := os.ReadDir(full)
+			e = firstNonEmpty(dominantExt(entries), ".conf")
 		}
+		return full, e
 	}
 	return "", ""
 }
@@ -207,17 +240,17 @@ func dominantExt(entries []os.DirEntry) string {
 	return best
 }
 
-// Discover acha o layout e parseia cada arquivo de site.
+// Discover acha o layout e parseia cada .conf de nível 1 (single ou hub).
 func Discover(projectPath string) (Layout, []Site, error) {
 	layout, err := findLayout(projectPath)
 	if err != nil {
 		return layout, nil, err
 	}
-	var sites []Site
+	var entries []Site
 	if layout.SitesDir != "" {
-		entries, err := os.ReadDir(layout.SitesDir)
+		des, err := os.ReadDir(layout.SitesDir)
 		if err == nil {
-			for _, e := range entries {
+			for _, e := range des {
 				if e.IsDir() || filepath.Ext(e.Name()) != layout.Ext {
 					continue
 				}
@@ -227,12 +260,38 @@ func Discover(projectPath string) (Layout, []Site, error) {
 					continue
 				}
 				rel, _ := filepath.Rel(projectPath, full)
-				sites = append(sites, parseSite(rel, string(b)))
+				entries = append(entries, parseTopEntry(rel, string(b), layout.SitesDir))
 			}
 		}
 	}
-	sort.Slice(sites, func(i, j int) bool { return sites[i].Name < sites[j].Name })
-	return layout, sites, nil
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Name < entries[j].Name })
+	return layout, entries, nil
+}
+
+// DiscoverHubIncs lista as .inc de dentro da pasta de um hub.
+func DiscoverHubIncs(projectPath string, hub Site) ([]Site, error) {
+	if hub.Kind != KindHub || hub.HubDir == "" {
+		return nil, fmt.Errorf("%s não é um hub", hub.Name)
+	}
+	des, err := os.ReadDir(hub.HubDir)
+	if err != nil {
+		return nil, err
+	}
+	var out []Site
+	for _, e := range des {
+		if e.IsDir() || filepath.Ext(e.Name()) != ".inc" {
+			continue
+		}
+		full := filepath.Join(hub.HubDir, e.Name())
+		b, err := os.ReadFile(full)
+		if err != nil {
+			continue
+		}
+		rel, _ := filepath.Rel(projectPath, full)
+		out = append(out, parseSite(rel, string(b)))
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out, nil
 }
 
 var (
@@ -241,6 +300,23 @@ var (
 	reProxyPass  = regexp.MustCompile(`(?m)^\s*proxy_pass\s+([^;]+);`)
 	reRoot       = regexp.MustCompile(`(?m)^\s*root\s+([^;]+);`)
 )
+
+// parseTopEntry decide se um .conf de nível 1 é hub (só tem um include pra
+// pasta) ou single (tem um server{} de verdade) e parseia de acordo.
+func parseTopEntry(rel, raw, sitesDir string) Site {
+	if m := reInclude.FindStringSubmatch(raw); m != nil {
+		if dir, _ := resolveIncludeDir(sitesDir, m[1]); dir != "" {
+			return Site{
+				File: rel,
+				Name: strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel)),
+				Kind: KindHub, HubDir: dir, Raw: raw,
+			}
+		}
+	}
+	s := parseSite(rel, raw)
+	s.Kind = KindSingle
+	return s
+}
 
 func parseSite(rel, raw string) Site {
 	s := Site{File: rel, Name: strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel)), Raw: raw}
@@ -267,15 +343,85 @@ func parseSite(rel, raw string) Site {
 	return s
 }
 
-// CreateSite escreve um novo arquivo de rota na pasta de sites e garante que
-// o main.conf inclui a pasta.
-func CreateSite(projectPath string, n NewSite) (Site, error) {
+// CreateConf escreve um novo .conf de nível 1 — single (rota completa) ou hub
+// (pasta nova + include apontando pra ela) — e garante que o main.conf
+// inclui a pasta de nível 1.
+func CreateConf(projectPath string, n NewConf) (Site, error) {
 	layout, err := findLayout(projectPath)
 	if err != nil {
 		return Site{}, err
 	}
 	if layout.SitesDir == "" {
-		return Site{}, fmt.Errorf("pasta de rotas não encontrada — crie uma pasta com um .inc/.conf de exemplo e um include apontando pra ela no main.conf")
+		return Site{}, fmt.Errorf("pasta de confs não encontrada — crie um .conf de exemplo e um include no main.conf apontando pra ela")
+	}
+	name := sanitizeName(n.Name)
+	if name == "" {
+		return Site{}, fmt.Errorf("nome vazio")
+	}
+	ext := firstNonEmpty(layout.Ext, ".conf")
+	dest := filepath.Join(layout.SitesDir, name+ext)
+	if _, err := os.Stat(dest); err == nil {
+		return Site{}, fmt.Errorf("%s já existe", name+ext)
+	}
+
+	var content string
+	var site Site
+	if n.Kind == KindHub {
+		hubName := sanitizeName(n.HubDirName)
+		if hubName == "" {
+			return Site{}, fmt.Errorf("nome da pasta vazio")
+		}
+		hubDir := filepath.Join(layout.SitesDir, hubName)
+		if _, err := os.Stat(hubDir); err == nil {
+			return Site{}, fmt.Errorf("pasta %s já existe", hubName)
+		}
+		if err := os.MkdirAll(hubDir, 0o755); err != nil {
+			return Site{}, err
+		}
+		content = fmt.Sprintf("# hub — rotas em %s/*.inc\ninclude %s/*.inc;\n", hubName, hubName)
+		site = Site{Name: name, Kind: KindHub, HubDir: hubDir, Raw: content}
+	} else {
+		if strings.TrimSpace(n.ServerName) == "" {
+			return Site{}, fmt.Errorf("server_name vazio")
+		}
+		if strings.TrimSpace(n.Target) == "" && strings.TrimSpace(n.Root) == "" {
+			return Site{}, fmt.Errorf("informe um destino: proxy_pass ou root")
+		}
+		if n.Port <= 0 {
+			n.Port = 80
+			if n.SSL {
+				n.Port = 443
+			}
+		}
+		content = renderSite(n.NewSite)
+		site = parseSite("", content)
+		site.Name = name
+		site.Kind = KindSingle
+	}
+
+	if err := os.WriteFile(dest, []byte(content), 0o644); err != nil {
+		return Site{}, err
+	}
+	if layout.MainConf != "" {
+		// ponytail: best-effort — se o main.conf já faz include glob da pasta
+		// (o caso comum), não mexe em nada; senão, só acrescenta um include
+		// solto no fim do arquivo, fora de qualquer bloco. Funciona pro
+		// layout descrito (main.conf com include glob), mas em layouts
+		// incomuns pode cair fora do bloco http/server certo — revisar
+		// main.conf à mão nesse caso.
+		_ = ensureInclude(layout.MainConf, layout.SitesDir, ext)
+	}
+	rel, _ := filepath.Rel(projectPath, dest)
+	site.File = rel
+	return site, nil
+}
+
+// CreateInc escreve uma nova rota (.inc) dentro da pasta de um hub. O hub já
+// nasce com o include glob pra pasta, então não precisa mexer em nada além
+// de escrever o arquivo.
+func CreateInc(projectPath string, hub Site, n NewSite) (Site, error) {
+	if hub.Kind != KindHub || hub.HubDir == "" {
+		return Site{}, fmt.Errorf("%s não é um hub", hub.Name)
 	}
 	name := sanitizeName(n.Name)
 	if name == "" {
@@ -293,29 +439,20 @@ func CreateSite(projectPath string, n NewSite) (Site, error) {
 			n.Port = 443
 		}
 	}
-	ext := firstNonEmpty(layout.Ext, ".inc")
-	dest := filepath.Join(layout.SitesDir, name+ext)
+	dest := filepath.Join(hub.HubDir, name+".inc")
 	if _, err := os.Stat(dest); err == nil {
-		return Site{}, fmt.Errorf("%s já existe", name+ext)
+		return Site{}, fmt.Errorf("%s já existe", name+".inc")
 	}
 	content := renderSite(n)
 	if err := os.WriteFile(dest, []byte(content), 0o644); err != nil {
 		return Site{}, err
 	}
-	if layout.MainConf != "" {
-		// ponytail: best-effort — se o main.conf já faz include glob da pasta
-		// (o caso comum), não mexe em nada; senão, só acrescenta um include
-		// solto no fim do arquivo, fora de qualquer bloco. Funciona pro
-		// layout descrito (main.conf com include glob), mas em layouts
-		// incomuns pode cair fora do bloco http/server certo — revisar main.conf
-		// à mão nesse caso.
-		_ = ensureInclude(layout.MainConf, layout.SitesDir, ext)
-	}
 	rel, _ := filepath.Rel(projectPath, dest)
 	return parseSite(rel, content), nil
 }
 
-// DeleteSite remove um arquivo de rota. file é relativo à raiz do projeto.
+// DeleteSite remove um arquivo (.conf de nível 1 ou .inc de um hub). file é
+// relativo à raiz do projeto. Deletar um hub não apaga a pasta das .inc dele.
 func DeleteSite(projectPath, file string) error {
 	full := filepath.Clean(filepath.Join(projectPath, file))
 	root := filepath.Clean(projectPath)
