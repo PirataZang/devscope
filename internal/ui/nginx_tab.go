@@ -21,6 +21,9 @@ const (
 	nginxWizPort
 	nginxWizSSL
 	nginxWizHubDirName
+	nginxWizPath
+	nginxWizLabel
+	nginxWizDist
 )
 
 var nginxKinds = []string{"single", "hub"}
@@ -368,7 +371,7 @@ func (a *App) renderNginxTable(width, height int) string {
 	if topLevel {
 		header = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, "FILE", "KIND", "SSL", "PROJETO", "SERVER_NAME")
 	} else {
-		header = fmt.Sprintf("%-*s %-6s %s", nameW, "FILE", "SSL", "SERVER_NAME")
+		header = fmt.Sprintf("%-*s %-14s %s", nameW, "FILE", "LOCATION", "TARGET")
 	}
 	lines := []string{StyleMuted.Render(truncate(header, width-2))}
 	if n == 0 {
@@ -395,7 +398,8 @@ func (a *App) renderNginxTable(width, height int) string {
 				proj := firstNonEmpty(s.Project, "—")
 				row = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, truncate(s.Name, nameW), kind, ssl, truncate(proj, 10), truncate(strings.Join(s.ServerNames, " "), 24))
 			} else {
-				row = fmt.Sprintf("%-*s %-6s %s", nameW, truncate(s.Name, nameW), ssl, truncate(strings.Join(s.ServerNames, " "), 24))
+				target := firstNonEmpty(s.ProxyPass, s.Root, "—")
+				row = fmt.Sprintf("%-*s %-14s %s", nameW, truncate(s.Name, nameW), truncate(firstNonEmpty(s.Location, "—"), 14), truncate(target, 30))
 			}
 			prefix := "  "
 			style := StyleMuted
@@ -438,16 +442,19 @@ func (a *App) renderNginxDetailsPane(width, height int) string {
 			tunnelDetailKV("Arquivo", s.File),
 			tunnelDetailKV("Projeto", firstNonEmpty(s.Project, "(este)")),
 		)
-		if s.Kind != "" {
-			raw = append(raw, tunnelDetailKV("Kind", string(s.Kind)))
-		}
-		if s.Kind == nginxutil.KindHub {
+		switch s.Kind {
+		case nginxutil.KindHub:
 			raw = append(raw,
+				tunnelDetailKV("Kind", "hub"),
+				tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
+				tunnelDetailKV("Listen", s.Listen),
+				tunnelDetailKV("SSL", boolLabel(s.SSL)),
 				tunnelDetailKV("Pasta", filepath.Base(s.HubDir)),
 				tunnelDetailKV("Dica", "enter abre as rotas dela"),
 			)
-		} else {
+		case nginxutil.KindSingle:
 			raw = append(raw,
+				tunnelDetailKV("Kind", "single"),
 				tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
 				tunnelDetailKV("Listen", s.Listen),
 				tunnelDetailKV("SSL", boolLabel(s.SSL)),
@@ -457,6 +464,14 @@ func (a *App) renderNginxDetailsPane(width, height int) string {
 			}
 			if s.Root != "" {
 				raw = append(raw, tunnelDetailKV("Root", s.Root))
+			}
+		default: // .inc de nível 2 — um location{} dentro de um hub
+			raw = append(raw, tunnelDetailKV("Location", firstNonEmpty(s.Location, "—")))
+			if s.ProxyPass != "" {
+				raw = append(raw, tunnelDetailKV("ProxyPass", s.ProxyPass))
+			}
+			if s.Root != "" {
+				raw = append(raw, tunnelDetailKV("Dist", s.Root))
 			}
 		}
 		raw = append(raw, "", StyleMuted.Render("── raw ──"))
@@ -518,8 +533,12 @@ func (a *App) renderNginxWizard(p *core.Project, width, height int) string {
 		lines = append(lines, strings.Split(box, "\n")...)
 		lines = append(lines, "")
 	}
+	hint := "preencha proxy_pass OU root — o outro fica vazio"
+	if a.nginxWizardForHub {
+		hint = "preencha porta/proxy OU dist — o outro fica vazio"
+	}
 	lines = append(lines,
-		StyleMuted.Render("preencha proxy_pass OU root — o outro fica vazio"),
+		StyleMuted.Render(hint),
 		StyleMuted.Render("tab campo  ·  space toggle  ·  enter salva  ·  esc"),
 	)
 	return tunnelModalBox(lines, boxW, boxH, accent)
@@ -539,7 +558,11 @@ func (a *App) renderNginxWizardFieldBox(field int, innerW int) string {
 	case nginxWizServerName:
 		return renderApiTitledBox("server_name", []string{a.renderNginxWizardFieldValue(a.nginxNewServerName, field)}, innerW, 3, focused)
 	case nginxWizTarget:
-		return renderApiTitledBox("proxy_pass (destino)", []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, field)}, innerW, 3, focused)
+		label := "proxy_pass (destino)"
+		if a.nginxWizardForHub {
+			label = "porta ou proxy_pass (ex: 3000)"
+		}
+		return renderApiTitledBox(label, []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, field)}, innerW, 3, focused)
 	case nginxWizRoot:
 		return renderApiTitledBox("root (se estático — deixe proxy_pass vazio)", []string{a.renderNginxWizardFieldValue(a.nginxNewRoot, field)}, innerW, 3, focused)
 	case nginxWizPort:
@@ -552,6 +575,12 @@ func (a *App) renderNginxWizardFieldBox(field int, innerW int) string {
 		return renderApiTitledBox("ssl", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
 	case nginxWizHubDirName:
 		return renderApiTitledBox("pasta que vai guardar as .inc", []string{a.renderNginxWizardFieldValue(a.nginxNewHubDirName, field)}, innerW, 3, focused)
+	case nginxWizPath:
+		return renderApiTitledBox("path (ex: /portfolio)", []string{a.renderNginxWizardFieldValue(a.nginxNewPath, field)}, innerW, 3, focused)
+	case nginxWizLabel:
+		return renderApiTitledBox("label (comentário — opcional)", []string{a.renderNginxWizardFieldValue(a.nginxNewLabel, field)}, innerW, 3, focused)
+	case nginxWizDist:
+		return renderApiTitledBox("dist (pasta estática — se não for proxy)", []string{a.renderNginxWizardFieldValue(a.nginxNewDist, field)}, innerW, 3, focused)
 	default:
 		return ""
 	}
@@ -578,14 +607,19 @@ func (a *App) renderNginxWizardFieldValue(value string, field int) string {
 }
 
 // nginxWizardFieldsOrder devolve os campos ativos, na ordem de tab, de
-// acordo com o que está sendo criado: um .conf de nível 1 (single ou hub,
-// com o campo de tipo) ou uma .inc dentro de um hub (sem campo de tipo).
+// acordo com o que está sendo criado:
+//   - .inc dentro de um hub: um location{} — path, label opcional e o
+//     destino (porta/proxy ou dist). Não tem server_name/listen/ssl — isso
+//     já é do hub.
+//   - .conf hub de nível 1: um server{} de verdade (server_name/porta/ssl)
+//     mais a pasta que vai guardar as .inc.
+//   - .conf single de nível 1: o server{} completo, com o destino direto.
 func (a *App) nginxWizardFieldsOrder() []int {
 	if a.nginxWizardForHub {
-		return []int{nginxWizName, nginxWizServerName, nginxWizTarget, nginxWizRoot, nginxWizPort, nginxWizSSL}
+		return []int{nginxWizPath, nginxWizLabel, nginxWizTarget, nginxWizDist}
 	}
 	if a.nginxNewKind == string(nginxutil.KindHub) {
-		return []int{nginxWizName, nginxWizKind, nginxWizHubDirName}
+		return []int{nginxWizName, nginxWizKind, nginxWizServerName, nginxWizPort, nginxWizSSL, nginxWizHubDirName}
 	}
 	return []int{nginxWizName, nginxWizKind, nginxWizServerName, nginxWizTarget, nginxWizRoot, nginxWizPort, nginxWizSSL}
 }
@@ -618,17 +652,13 @@ func (a *App) beginNginxConfWizard() {
 }
 
 func (a *App) beginNginxIncWizard() {
-	a.nginxNewName = ""
-	a.nginxNewServerName = ""
+	a.nginxNewPath = ""
+	a.nginxNewLabel = ""
 	a.nginxNewTarget = ""
-	a.nginxNewRoot = ""
-	if a.nginxNewPortStr == "" {
-		a.nginxNewPortStr = "80"
-	}
-	a.nginxNewSSL = false
+	a.nginxNewDist = ""
 	a.nginxWizardForHub = true
 	a.nginxWizard = true
-	a.nginxWizardField = nginxWizName
+	a.nginxWizardField = nginxWizPath
 	a.nginxWizardCursor = 0
 }
 
@@ -646,6 +676,12 @@ func (a *App) nginxWizardText() string {
 		return a.nginxNewPortStr
 	case nginxWizHubDirName:
 		return a.nginxNewHubDirName
+	case nginxWizPath:
+		return a.nginxNewPath
+	case nginxWizLabel:
+		return a.nginxNewLabel
+	case nginxWizDist:
+		return a.nginxNewDist
 	default:
 		return ""
 	}
@@ -665,6 +701,12 @@ func (a *App) setNginxWizardText(s string) {
 		a.nginxNewPortStr = s
 	case nginxWizHubDirName:
 		a.nginxNewHubDirName = s
+	case nginxWizPath:
+		a.nginxNewPath = s
+	case nginxWizLabel:
+		a.nginxNewLabel = s
+	case nginxWizDist:
+		a.nginxNewDist = s
 	}
 }
 
@@ -926,14 +968,11 @@ func (a *App) nginxCreateInc() tea.Cmd {
 	if a.nginxHub == nil {
 		return nil
 	}
-	port, _ := strconv.Atoi(strings.TrimSpace(a.nginxNewPortStr))
-	n := nginxutil.NewSite{
-		Name:       a.nginxNewName,
-		ServerName: a.nginxNewServerName,
-		Target:     a.nginxNewTarget,
-		Root:       a.nginxNewRoot,
-		Port:       port,
-		SSL:        a.nginxNewSSL,
+	n := nginxutil.NewLocation{
+		Path:   a.nginxNewPath,
+		Label:  a.nginxNewLabel,
+		Target: a.nginxNewTarget,
+		Dist:   a.nginxNewDist,
 	}
 	hub := *a.nginxHub
 	path := a.nginxHubProjectPath

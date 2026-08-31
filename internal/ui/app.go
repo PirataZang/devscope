@@ -594,6 +594,9 @@ type App struct {
 	nginxNewSSL                 bool
 	nginxNewKind                string
 	nginxNewHubDirName          string
+	nginxNewPath                string
+	nginxNewLabel               string
+	nginxNewDist                string
 	nginxWizardForHub           bool
 	nginxShowAll                bool
 	nginxForeign                int

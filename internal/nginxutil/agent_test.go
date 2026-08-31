@@ -194,18 +194,26 @@ func TestDiscoverIncludeWithContainerPathFallsBackToBasename(t *testing.T) {
 	}
 }
 
-// TestCreateConfHubThenCreateInc cobre o fluxo novo: cria um .conf hub (só
-// pasta + include), depois cadastra .inc dentro dela, e confere que o hub
-// aparece em Discover como Kind=hub e as incs aparecem via DiscoverHubIncs.
+// TestCreateConfHubThenCreateInc cobre o fluxo novo: cria um .conf hub (um
+// server{} de verdade, com ip/porta, mais a pasta de .inc), depois cadastra
+// .inc (location{}) dentro dela, tanto proxy quanto estático, e confere que
+// o hub aparece em Discover como Kind=hub e as incs aparecem via
+// DiscoverHubIncs.
 func TestCreateConfHubThenCreateInc(t *testing.T) {
 	dir := writeProject(t, "include sites/*.conf;\n")
 
-	hub, err := CreateConf(dir, NewConf{Name: "apihub", Kind: KindHub, HubDirName: "apihub"})
+	hub, err := CreateConf(dir, NewConf{
+		Name: "apihub", Kind: KindHub, HubDirName: "apihub",
+		NewSite: NewSite{ServerName: "178.104.78.64", Port: 80},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if hub.Kind != KindHub || hub.HubDir == "" {
 		t.Fatalf("hub=%+v", hub)
+	}
+	if !strings.Contains(hub.Raw, "listen 80;") || !strings.Contains(hub.Raw, "server_name 178.104.78.64;") {
+		t.Fatalf("hub should be a real server{}: %s", hub.Raw)
 	}
 	if _, err := os.Stat(hub.HubDir); err != nil {
 		t.Fatalf("hub dir not created: %v", err)
@@ -215,15 +223,15 @@ func TestCreateConfHubThenCreateInc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(sites) != 1 || sites[0].Kind != KindHub || sites[0].Name != "apihub" {
+	if len(sites) != 1 || sites[0].Kind != KindHub || sites[0].Name != "apihub" || sites[0].Listen != "80" {
 		t.Fatalf("discovered=%+v", sites)
 	}
 	rediscoveredHub := sites[0]
 
-	if _, err := CreateInc(dir, rediscoveredHub, NewSite{Name: "users", ServerName: "users.api.example.com", Target: "http://127.0.0.1:7001"}); err != nil {
+	if _, err := CreateInc(dir, rediscoveredHub, NewLocation{Path: "/api/users", Target: "7001"}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := CreateInc(dir, rediscoveredHub, NewSite{Name: "orders", ServerName: "orders.api.example.com", Target: "http://127.0.0.1:7002"}); err != nil {
+	if _, err := CreateInc(dir, rediscoveredHub, NewLocation{Path: "/portfolio", Label: "Astro Portfolio", Dist: "/var/www/html/portfolio/dist"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -231,18 +239,22 @@ func TestCreateConfHubThenCreateInc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(incs) != 2 || incs[0].Name != "orders" || incs[1].Name != "users" {
+	if len(incs) != 2 || incs[0].Name != "api-users" || incs[1].Name != "astro-portfolio" {
 		t.Fatalf("incs=%+v", incs)
 	}
-	if incs[1].ProxyPass != "http://127.0.0.1:7001" {
-		t.Fatalf("users inc: %+v", incs[1])
+	api, portfolio := incs[0], incs[1]
+	if portfolio.Location != "/portfolio/" || portfolio.Root != "/var/www/html/portfolio/dist" || portfolio.ProxyPass != "" {
+		t.Fatalf("portfolio inc: %+v", portfolio)
+	}
+	if api.Location != "/api/users/" || api.ProxyPass != "http://127.0.0.1:7001" {
+		t.Fatalf("api inc: %+v", api)
 	}
 
 	// deletar o hub não deve mexer nas incs dele.
 	if err := DeleteSite(dir, hub.File); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(rediscoveredHub.HubDir, "users.inc")); err != nil {
+	if _, err := os.Stat(filepath.Join(rediscoveredHub.HubDir, "api-users.inc")); err != nil {
 		t.Fatalf("deleting the hub pointer should not delete its incs: %v", err)
 	}
 }
@@ -253,7 +265,73 @@ func TestCreateIncRejectsNonHub(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := CreateInc(dir, single, NewSite{Name: "x", ServerName: "x.example.com", Target: "http://y"}); err == nil {
+	if _, err := CreateInc(dir, single, NewLocation{Path: "/x", Target: "http://y"}); err == nil {
 		t.Fatal("expected error: not a hub")
+	}
+}
+
+// TestDiscoverHubWithServerBlockAndSiblingFolder reproduz o setup real que
+// causava a classificação errada: o .conf de nível 1 é um server{} de
+// verdade (listen/server_name) que também inclui uma pasta de .inc — e essa
+// pasta é IRMÃ da pasta de nível 1 (na raiz do projeto), não uma subpasta
+// dela, porque o include usa o caminho de dentro do container.
+func TestDiscoverHubWithServerBlockAndSiblingFolder(t *testing.T) {
+	dir := t.TempDir()
+	confd := filepath.Join(dir, "conf.d")
+	if err := os.MkdirAll(confd, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	main := `server {
+    listen 80;
+
+    server_name 178.104.78.64;
+
+    include /etc/nginx/sites/*.inc;
+}
+`
+	if err := os.WriteFile(filepath.Join(confd, "main.conf"), []byte(main), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sites := filepath.Join(dir, "sites")
+	if err := os.MkdirAll(sites, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	portfolio := `# Astro Portfolio
+#
+location = /portfolio {
+    return 301 /portfolio/;
+}
+
+location ^~ /portfolio/ {
+    alias /var/www/html/portfolio/dist/;
+    index index.html;
+    try_files $uri $uri/ /portfolio/index.html;
+}
+`
+	if err := os.WriteFile(filepath.Join(sites, "portfolio.inc"), []byte(portfolio), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	_, entries, err := Discover(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 1 || entries[0].Kind != KindHub {
+		t.Fatalf("main.conf should be classified as hub, not single: %+v", entries)
+	}
+	hub := entries[0]
+	if hub.HubDir != sites {
+		t.Fatalf("hub dir=%q, want %q (sibling of conf.d)", hub.HubDir, sites)
+	}
+	if len(hub.ServerNames) == 0 || hub.ServerNames[0] != "178.104.78.64" {
+		t.Fatalf("hub should still carry its own server_name: %+v", hub)
+	}
+
+	incs, err := DiscoverHubIncs(dir, hub)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(incs) != 1 || incs[0].Location != "/portfolio/" || incs[0].Root != "/var/www/html/portfolio/dist/" {
+		t.Fatalf("incs=%+v", incs)
 	}
 }

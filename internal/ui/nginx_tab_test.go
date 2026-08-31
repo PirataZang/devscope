@@ -116,6 +116,7 @@ func TestNginxHubDrillDownCreateAndDeleteInc(t *testing.T) {
 	a.beginNginxConfWizard()
 	a.nginxNewName = "apihub"
 	a.nginxNewKind = "hub"
+	a.nginxNewServerName = "178.104.78.64"
 	a.nginxNewHubDirName = "apihub"
 	msg := a.nginxCreateConf(&p)()
 	if am, ok := msg.(nginxActionMsg); !ok || am.err != "" {
@@ -148,9 +149,8 @@ func TestNginxHubDrillDownCreateAndDeleteInc(t *testing.T) {
 	}
 
 	a.beginNginxIncWizard()
-	a.nginxNewName = "users"
-	a.nginxNewServerName = "users.api.example.com"
-	a.nginxNewTarget = "http://127.0.0.1:7001"
+	a.nginxNewPath = "/api/users"
+	a.nginxNewTarget = "7001"
 	msg = a.nginxCreateInc()()
 	if am, ok := msg.(nginxActionMsg); !ok || am.err != "" {
 		t.Fatalf("create inc failed: %+v", msg)
@@ -160,7 +160,7 @@ func TestNginxHubDrillDownCreateAndDeleteInc(t *testing.T) {
 		t.Fatal("expected refreshNginxIncs after creating inc")
 	}
 	a.handleNginxMsg(cmd1())
-	if len(a.nginxIncs) != 1 || a.nginxIncs[0].Name != "users" {
+	if len(a.nginxIncs) != 1 || a.nginxIncs[0].Location != "/api/users/" || a.nginxIncs[0].ProxyPass != "http://127.0.0.1:7001" {
 		t.Fatalf("incs=%+v", a.nginxIncs)
 	}
 

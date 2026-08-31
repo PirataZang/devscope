@@ -6,10 +6,13 @@
 // conteúdo se não achar include nenhum.
 //
 // Cada .conf de nível 1 é ou "single" (um server{} completo, com proxy_pass
-// ou root) ou "hub" (só um include apontando pra uma pasta com várias .inc —
-// cada .inc é uma rota completa, no mesmo formato de um single). Não existe
-// um JSON de config próprio: os .conf/.inc já são a fonte da verdade, igual
-// o tab de git lê o .git direto.
+// ou root — uma rota que fecha sozinha) ou "hub" (um server{} de verdade,
+// com seu próprio listen/server_name, que só inclui uma pasta de .inc). Cada
+// .inc dentro de um hub não é outro server{} — é um ou mais location{} que
+// entram no server{} do hub, o jeito certo de hospedar vários caminhos
+// (/portfolio/, /blog/, ...) sob o mesmo domínio/porta. Não existe um JSON
+// de config próprio: os .conf/.inc já são a fonte da verdade, igual o tab de
+// git lê o .git direto.
 package nginxutil
 
 import (
@@ -19,6 +22,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -45,7 +49,8 @@ type Layout struct {
 
 // Site é um arquivo já parseado (best-effort, via regex — não é um parser
 // completo da gramática do nginx). Pode ser uma entrada de nível 1 (Kind
-// preenchido) ou uma .inc dentro de um hub (Kind vazio).
+// preenchido: single ou hub) ou uma .inc dentro de um hub (Kind vazio — um
+// location{}, não um server{}).
 type Site struct {
 	File        string // relativo à raiz do projeto
 	Name        string // nome do arquivo sem extensão
@@ -54,14 +59,14 @@ type Site struct {
 	ServerNames []string
 	Listen      string
 	SSL         bool
+	Location    string // path do location{} — só em .inc de nível 2
 	ProxyPass   string
-	Root        string
+	Root        string // de "root" ou "alias"
 	Raw         string
 	Project     string // preenchido pela UI quando o item vem de outro projeto
 }
 
-// NewSite são os campos preenchidos no modal de criação de uma rota (um
-// single de nível 1 ou uma .inc dentro de um hub — mesmo formato pros dois).
+// NewSite são os campos de um .conf single de nível 1 — um server{} completo.
 type NewSite struct {
 	Name       string // nome do arquivo (sem extensão)
 	ServerName string // domínio(s), separados por espaço
@@ -72,13 +77,24 @@ type NewSite struct {
 }
 
 // NewConf são os campos do modal de criação de nível 1: nome + kind, e só os
-// campos do kind escolhido (single usa os mesmos de NewSite; hub só usa o
-// nome da pasta que vai guardar as .inc).
+// campos do kind escolhido. single usa os mesmos campos de NewSite. hub usa
+// ServerName/Port/SSL (é um server{} de verdade) mais o nome da pasta que
+// vai guardar as .inc — Target/Root de NewSite não se aplicam a um hub.
 type NewConf struct {
 	Name string
 	Kind Kind
 	NewSite
 	HubDirName string
+}
+
+// NewLocation são os campos de uma .inc dentro de um hub: um location{} (ou
+// par redirect+location, se for pasta estática), não um server{} novo — o
+// domínio/porta já vêm do hub.
+type NewLocation struct {
+	Path   string // ex: /portfolio — normalizado com barra no início e no fim
+	Label  string // comentário opcional no topo do arquivo, ex: "Astro Portfolio"
+	Target string // proxy_pass — porta ("3000") ou URL; se vazio, usa Dist
+	Dist   string // pasta estática (alias) — ex: /var/www/html/portfolio/dist
 }
 
 // Detect é uma checagem barata pra landing screen: o projeto tem cara de
@@ -134,24 +150,29 @@ func findAnyRootConf(projectPath string) string {
 
 var reInclude = regexp.MustCompile(`(?m)^\s*include\s+([^;]+);`)
 
-// includedDir lê o(s) include de um arquivo pra achar a pasta de verdade,
-// seja qual for o nome dela, relativa a baseDir. Se o include usa o caminho
-// de dentro do container (ex: /etc/nginx/sites/*.inc), tenta também só o
-// nome final da pasta — é o que o volume do docker costuma espelhar.
-func includedDir(baseDir, confFile string) (dir, ext string) {
+// includedDir lê o(s) include de um arquivo pra achar a pasta de nível 1 de
+// verdade, seja qual for o nome dela.
+func includedDir(projectPath, confFile string) (dir, ext string) {
 	b, err := os.ReadFile(confFile)
 	if err != nil {
 		return "", ""
 	}
 	for _, m := range reInclude.FindAllSubmatch(b, -1) {
-		if dir, ext := resolveIncludeDir(baseDir, string(m[1])); dir != "" {
+		if dir, ext := resolveIncludeDir([]string{projectPath}, string(m[1]), ".conf"); dir != "" {
 			return dir, ext
 		}
 	}
 	return "", ""
 }
 
-func resolveIncludeDir(baseDir, rawInclude string) (dir, ext string) {
+// resolveIncludeDir tenta achar a pasta de um include em cada uma das bases,
+// nessa ordem — a de um hub, por exemplo, pode estar dentro da pasta de
+// nível 1 (convenção de quem o devscope cria) ou ao lado dela, direto na
+// raiz do projeto (setup feito à mão, main.conf e sites/ irmãos). Se o
+// include usa o caminho de dentro do container (ex: /etc/nginx/sites/*.inc),
+// tenta também só o nome final da pasta — é o que o volume do docker
+// costuma espelhar.
+func resolveIncludeDir(bases []string, rawInclude, defaultExt string) (dir, ext string) {
 	raw := strings.Trim(strings.TrimSpace(rawInclude), `"'`)
 	globDir := filepath.Dir(raw)
 	if globDir == "." || globDir == "/" || globDir == "" {
@@ -161,7 +182,11 @@ func resolveIncludeDir(baseDir, rawInclude string) (dir, ext string) {
 	if globExt == ".*" {
 		globExt = ""
 	}
-	for _, full := range []string{filepath.Join(baseDir, globDir), filepath.Join(baseDir, filepath.Base(globDir))} {
+	var candidates []string
+	for _, base := range bases {
+		candidates = append(candidates, filepath.Join(base, globDir), filepath.Join(base, filepath.Base(globDir)))
+	}
+	for _, full := range candidates {
 		st, err := os.Stat(full)
 		if err != nil || !st.IsDir() {
 			continue
@@ -169,7 +194,7 @@ func resolveIncludeDir(baseDir, rawInclude string) (dir, ext string) {
 		e := globExt
 		if e == "" {
 			entries, _ := os.ReadDir(full)
-			e = firstNonEmpty(dominantExt(entries), ".conf")
+			e = firstNonEmpty(dominantExt(entries), defaultExt)
 		}
 		return full, e
 	}
@@ -260,7 +285,7 @@ func Discover(projectPath string) (Layout, []Site, error) {
 					continue
 				}
 				rel, _ := filepath.Rel(projectPath, full)
-				entries = append(entries, parseTopEntry(rel, string(b), layout.SitesDir))
+				entries = append(entries, parseTopEntry(rel, string(b), projectPath, layout.SitesDir))
 			}
 		}
 	}
@@ -268,7 +293,7 @@ func Discover(projectPath string) (Layout, []Site, error) {
 	return layout, entries, nil
 }
 
-// DiscoverHubIncs lista as .inc de dentro da pasta de um hub.
+// DiscoverHubIncs lista as .inc (location{}) de dentro da pasta de um hub.
 func DiscoverHubIncs(projectPath string, hub Site) ([]Site, error) {
 	if hub.Kind != KindHub || hub.HubDir == "" {
 		return nil, fmt.Errorf("%s não é um hub", hub.Name)
@@ -288,7 +313,7 @@ func DiscoverHubIncs(projectPath string, hub Site) ([]Site, error) {
 			continue
 		}
 		rel, _ := filepath.Rel(projectPath, full)
-		out = append(out, parseSite(rel, string(b)))
+		out = append(out, parseInc(rel, string(b)))
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
 	return out, nil
@@ -299,26 +324,28 @@ var (
 	reListen     = regexp.MustCompile(`(?m)^\s*listen\s+([^;]+);`)
 	reProxyPass  = regexp.MustCompile(`(?m)^\s*proxy_pass\s+([^;]+);`)
 	reRoot       = regexp.MustCompile(`(?m)^\s*root\s+([^;]+);`)
+	reAlias      = regexp.MustCompile(`(?m)^\s*alias\s+([^;]+);`)
+	reLocation   = regexp.MustCompile(`(?m)^\s*location\s+(?:=|~\*|~|\^~)?\s*([^\s{]+)\s*\{`)
 )
 
-// parseTopEntry decide se um .conf de nível 1 é hub (só tem um include pra
-// pasta) ou single (tem um server{} de verdade) e parseia de acordo.
-func parseTopEntry(rel, raw, sitesDir string) Site {
+// parseTopEntry decide se um .conf de nível 1 é hub (tem um include que
+// resolve pra uma pasta de verdade) ou single, e parseia de acordo. Um hub
+// hoje em dia é um server{} de verdade — então tenta o parse de single
+// primeiro (pega server_name/listen/ssl) e só depois checa o include.
+func parseTopEntry(rel, raw, projectPath, sitesDir string) Site {
+	s := parseSingle(rel, raw)
 	if m := reInclude.FindStringSubmatch(raw); m != nil {
-		if dir, _ := resolveIncludeDir(sitesDir, m[1]); dir != "" {
-			return Site{
-				File: rel,
-				Name: strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel)),
-				Kind: KindHub, HubDir: dir, Raw: raw,
-			}
+		if dir, _ := resolveIncludeDir([]string{sitesDir, projectPath}, m[1], ".inc"); dir != "" {
+			s.Kind = KindHub
+			s.HubDir = dir
+			return s
 		}
 	}
-	s := parseSite(rel, raw)
 	s.Kind = KindSingle
 	return s
 }
 
-func parseSite(rel, raw string) Site {
+func parseSingle(rel, raw string) Site {
 	s := Site{File: rel, Name: strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel)), Raw: raw}
 	if m := reServerName.FindStringSubmatch(raw); m != nil {
 		s.ServerNames = strings.Fields(m[1])
@@ -343,9 +370,30 @@ func parseSite(rel, raw string) Site {
 	return s
 }
 
+// parseInc parseia uma .inc de dentro de um hub: um ou mais location{}, não
+// um server{}. Pega o path do location mais específico (o mais longo — o
+// redirect "location = /x" perde pro "location ^~ /x/" de verdade).
+func parseInc(rel, raw string) Site {
+	s := Site{File: rel, Name: strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel)), Raw: raw}
+	for _, m := range reLocation.FindAllStringSubmatch(raw, -1) {
+		if len(m[1]) > len(s.Location) {
+			s.Location = m[1]
+		}
+	}
+	if m := reProxyPass.FindStringSubmatch(raw); m != nil {
+		s.ProxyPass = strings.TrimSpace(m[1])
+	}
+	if m := reRoot.FindStringSubmatch(raw); m != nil {
+		s.Root = strings.TrimSpace(m[1])
+	} else if m := reAlias.FindStringSubmatch(raw); m != nil {
+		s.Root = strings.TrimSpace(m[1])
+	}
+	return s
+}
+
 // CreateConf escreve um novo .conf de nível 1 — single (rota completa) ou hub
-// (pasta nova + include apontando pra ela) — e garante que o main.conf
-// inclui a pasta de nível 1.
+// (server{} + pasta nova de .inc) — e garante que o main.conf inclui a pasta
+// de nível 1.
 func CreateConf(projectPath string, n NewConf) (Site, error) {
 	layout, err := findLayout(projectPath)
 	if err != nil {
@@ -363,6 +411,15 @@ func CreateConf(projectPath string, n NewConf) (Site, error) {
 	if _, err := os.Stat(dest); err == nil {
 		return Site{}, fmt.Errorf("%s já existe", name+ext)
 	}
+	if strings.TrimSpace(n.ServerName) == "" {
+		return Site{}, fmt.Errorf("server_name vazio")
+	}
+	if n.Port <= 0 {
+		n.Port = 80
+		if n.SSL {
+			n.Port = 443
+		}
+	}
 
 	var content string
 	var site Site
@@ -378,26 +435,19 @@ func CreateConf(projectPath string, n NewConf) (Site, error) {
 		if err := os.MkdirAll(hubDir, 0o755); err != nil {
 			return Site{}, err
 		}
-		content = fmt.Sprintf("# hub — rotas em %s/*.inc\ninclude %s/*.inc;\n", hubName, hubName)
-		site = Site{Name: name, Kind: KindHub, HubDir: hubDir, Raw: content}
+		content = renderHub(n, hubName)
+		site = parseSingle("", content)
+		site.Kind = KindHub
+		site.HubDir = hubDir
 	} else {
-		if strings.TrimSpace(n.ServerName) == "" {
-			return Site{}, fmt.Errorf("server_name vazio")
-		}
 		if strings.TrimSpace(n.Target) == "" && strings.TrimSpace(n.Root) == "" {
 			return Site{}, fmt.Errorf("informe um destino: proxy_pass ou root")
 		}
-		if n.Port <= 0 {
-			n.Port = 80
-			if n.SSL {
-				n.Port = 443
-			}
-		}
 		content = renderSite(n.NewSite)
-		site = parseSite("", content)
-		site.Name = name
+		site = parseSingle("", content)
 		site.Kind = KindSingle
 	}
+	site.Name = name
 
 	if err := os.WriteFile(dest, []byte(content), 0o644); err != nil {
 		return Site{}, err
@@ -416,39 +466,33 @@ func CreateConf(projectPath string, n NewConf) (Site, error) {
 	return site, nil
 }
 
-// CreateInc escreve uma nova rota (.inc) dentro da pasta de um hub. O hub já
-// nasce com o include glob pra pasta, então não precisa mexer em nada além
-// de escrever o arquivo.
-func CreateInc(projectPath string, hub Site, n NewSite) (Site, error) {
+// CreateInc escreve uma nova .inc (location{}) dentro da pasta de um hub. O
+// hub já nasce com o include glob pra pasta, então não precisa mexer em nada
+// além de escrever o arquivo.
+func CreateInc(projectPath string, hub Site, n NewLocation) (Site, error) {
 	if hub.Kind != KindHub || hub.HubDir == "" {
 		return Site{}, fmt.Errorf("%s não é um hub", hub.Name)
 	}
-	name := sanitizeName(n.Name)
+	if strings.TrimSpace(n.Path) == "" {
+		return Site{}, fmt.Errorf("path vazio")
+	}
+	if strings.TrimSpace(n.Target) == "" && strings.TrimSpace(n.Dist) == "" {
+		return Site{}, fmt.Errorf("informe um destino: porta/proxy_pass ou dist")
+	}
+	name := sanitizeName(firstNonEmpty(n.Label, n.Path))
 	if name == "" {
 		return Site{}, fmt.Errorf("nome vazio")
-	}
-	if strings.TrimSpace(n.ServerName) == "" {
-		return Site{}, fmt.Errorf("server_name vazio")
-	}
-	if strings.TrimSpace(n.Target) == "" && strings.TrimSpace(n.Root) == "" {
-		return Site{}, fmt.Errorf("informe um destino: proxy_pass ou root")
-	}
-	if n.Port <= 0 {
-		n.Port = 80
-		if n.SSL {
-			n.Port = 443
-		}
 	}
 	dest := filepath.Join(hub.HubDir, name+".inc")
 	if _, err := os.Stat(dest); err == nil {
 		return Site{}, fmt.Errorf("%s já existe", name+".inc")
 	}
-	content := renderSite(n)
+	content := renderLocation(n)
 	if err := os.WriteFile(dest, []byte(content), 0o644); err != nil {
 		return Site{}, err
 	}
 	rel, _ := filepath.Rel(projectPath, dest)
-	return parseSite(rel, content), nil
+	return parseInc(rel, content), nil
 }
 
 // DeleteSite remove um arquivo (.conf de nível 1 ou .inc de um hub). file é
@@ -490,7 +534,7 @@ func renderSite(n NewSite) string {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-    }`, strings.TrimSpace(n.Target))
+    }`, normalizeTarget(n.Target))
 	} else {
 		body = fmt.Sprintf(`    root %s;
     index index.html;
@@ -499,25 +543,109 @@ func renderSite(n NewSite) string {
         try_files $uri $uri/ =404;
     }`, strings.TrimSpace(n.Root))
 	}
-	ssl := ""
-	if n.SSL {
-		domain := strings.Fields(n.ServerName)
-		host := "example.com"
-		if len(domain) > 0 {
-			host = domain[0]
-		}
-		ssl = fmt.Sprintf(`
-    ssl_certificate     /etc/letsencrypt/live/%s/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/%s/privkey.pem;
-`, host, host)
-	}
 	return fmt.Sprintf(`server {
     listen %s;
     server_name %s;
 %s
 %s
 }
-`, listen, strings.TrimSpace(n.ServerName), ssl, body)
+`, listen, strings.TrimSpace(n.ServerName), sslCertLines(n.SSL, n.ServerName), body)
+}
+
+// renderHub monta o server{} do hub: só o listen/server_name (+ ssl) mais o
+// include pra pasta das .inc — o corpo de verdade vem de lá.
+func renderHub(n NewConf, hubDirName string) string {
+	listen := fmt.Sprintf("%d", n.Port)
+	if n.SSL {
+		listen += " ssl"
+	}
+	return fmt.Sprintf(`server {
+    listen %s;
+    server_name %s;
+%s
+    include %s/*.inc;
+}
+`, listen, strings.TrimSpace(n.ServerName), sslCertLines(n.SSL, n.ServerName), hubDirName)
+}
+
+// renderLocation monta uma .inc: um location{} de proxy, ou o par
+// redirect+location de site estático (canonicaliza a barra final, do jeito
+// que o Astro/Vite/etc esperam no build).
+func renderLocation(n NewLocation) string {
+	path := normalizeLocationPath(n.Path)
+	bare := strings.TrimSuffix(path, "/")
+	header := ""
+	if strings.TrimSpace(n.Label) != "" {
+		header = fmt.Sprintf("# %s\n#\n", strings.TrimSpace(n.Label))
+	}
+	if strings.TrimSpace(n.Target) != "" {
+		return fmt.Sprintf(`%slocation %s {
+    proxy_pass %s;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+`, header, path, normalizeTarget(n.Target))
+	}
+	dist := strings.TrimSpace(n.Dist)
+	return fmt.Sprintf(`%s# %s -> %s
+location = %s {
+    return 301 %s;
+}
+
+location ^~ %s {
+    alias %s;
+    index index.html;
+    try_files $uri $uri/ %sindex.html;
+}
+`, header, bare, path, bare, path, path, dist, path)
+}
+
+func sslCertLines(ssl bool, serverName string) string {
+	if !ssl {
+		return ""
+	}
+	host := "example.com"
+	if domain := strings.Fields(serverName); len(domain) > 0 {
+		host = domain[0]
+	}
+	return fmt.Sprintf(`
+    ssl_certificate     /etc/letsencrypt/live/%s/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/%s/privkey.pem;
+`, host, host)
+}
+
+// normalizeTarget aceita uma porta solta ("3000") ou uma URL/host e devolve
+// o valor pronto pro proxy_pass.
+func normalizeTarget(s string) string {
+	s = strings.TrimSpace(s)
+	if p, err := strconv.Atoi(s); err == nil && p > 0 && p < 65536 {
+		return fmt.Sprintf("http://127.0.0.1:%d", p)
+	}
+	if !strings.Contains(s, "://") {
+		return "http://" + s
+	}
+	return s
+}
+
+// normalizeLocationPath garante barra no início e no fim (ex: "portfolio" ->
+// "/portfolio/") — é o formato que o par redirect+alias espera.
+func normalizeLocationPath(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "/"
+	}
+	if !strings.HasPrefix(s, "/") {
+		s = "/" + s
+	}
+	if !strings.HasSuffix(s, "/") {
+		s += "/"
+	}
+	for strings.Contains(s, "//") {
+		s = strings.ReplaceAll(s, "//", "/")
+	}
+	return s
 }
 
 func sanitizeName(s string) string {

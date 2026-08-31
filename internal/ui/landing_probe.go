@@ -6,8 +6,8 @@ import (
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/jenkinsutil"
-	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/nginxutil"
+	"github.com/devscope/devscope/internal/ngrokutil"
 	"github.com/devscope/devscope/internal/sshutil"
 )
 
