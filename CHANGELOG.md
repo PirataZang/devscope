@@ -7,6 +7,34 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **Aba Nginx (TOOLS)** — cadastro de rotas de nginx direto do projeto, sem editar arquivo na mão
+  - Detecta o `main.conf`/`nginx.conf` e a pasta de nível 1 (`.conf`) lendo o `include` de verdade — funciona com qualquer nome de pasta, com fallback por conteúdo (varredura de subpastas) e por caminho de dentro do container (docker volume montado com outro nome local)
+  - Cada `.conf` de nível 1 é **single** (um `server{}` completo, com `proxy_pass` ou `root`) ou **hub** (um `server{}` de verdade, com seu próprio `listen`/`server_name`/ssl, que só inclui uma pasta de `.inc`)
+  - `Enter` num hub abre as `.inc` dele — cada `.inc` é um `location{}` (ou o par redirect+`alias` pra site estático, com `try_files` no padrão SPA), criado/apagado sem sair do hub
+  - Wizard de criação com campos que mudam pelo tipo: nome + tipo + server_name + porta + ssl + pasta (hub) · nome + server_name + proxy_pass/root + porta + ssl (single) · path + label opcional + porta/proxy_pass ou dist (`.inc` dentro de um hub)
+  - `A` alterna entre ver só as rotas deste projeto ou de todos os projetos abertos no devscope, com a origem marcada por linha
+  - Delete com confirmação; apagar um hub não apaga a pasta nem as `.inc` dela
+- **Cloudflare Tunnel**: limpeza de túneis órfãos
+  - `K` encerra de uma vez todo túnel vivo que não é deste projeto — útil depois de um restart do devscope que deixa o `cloudflared` filho rodando sozinho, ocupando a faixa de porta de métricas (20241+) e travando novos túneis
+  - Túneis de outros projetos/do host aparecem por padrão na lista (antes só apertando `A`); `A` agora serve pra filtrar de volta pra só o projeto atual
+- **Credenciais manuais de banco** (aba Database) — permite informar host/porta/usuário/senha de um banco que não roda em container Docker local do projeto (salvo em `.devscope/database.json`); `collectors/database.go` roda `psql`/`mysql` direto contra o host quando não há container, além do caminho existente via `docker exec`
+
+### Changed
+- `.devscope/` agora é criado por um helper compartilhado (`devscopeutil.EnsureDir`), reaproveitado por `cfutil`, `jenkinsutil`, `ngrokutil`, `sshutil`, `wsutil` e o novo `dbutil`
+- `.gitignore` passa a ignorar `.devscope/` (evita versionar config e credenciais locais do projeto)
+
+### Fixed
+- Detecção de processos `cloudflared` não reconhecia binário de release baixado sem renomear (`cloudflared-linux-amd64`)
+
+## [1.6.3] - 2026-08-25
+
+### Added
+- **Git commit graph**: filtro de branch (`B`, digite pra filtrar a lista), foco alternável entre painéis (commits/detalhe/arquivos) via `tab` com scroll vertical e horizontal independentes, e detalhe de commit mais completo (refs, todos os parents, mensagem completa)
+
+### Changed
+- Linhas de imagem Docker (aba Containers) passam a distinguir 3 estados — pertence a este projeto / outro projeto / dangling — em vez de um indicador binário
+
 ## [1.6.2] - 2026-08-25
 
 ### Added
@@ -272,7 +300,9 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - GoReleaser + GitHub Releases
 - CLI: `devscope`, `scan --json`, `watch`, `version`
 
-[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/PirataZang/devscope/compare/v1.6.2...v1.6.3
+[1.6.2]: https://github.com/PirataZang/devscope/compare/v1.4.0...v1.6.2
 [1.4.0]: https://github.com/PirataZang/devscope/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/PirataZang/devscope/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/PirataZang/devscope/compare/v1.2.0...v1.3.0
