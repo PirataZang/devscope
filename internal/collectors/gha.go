@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/devscope/devscope/internal/devscopeutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -269,7 +270,7 @@ func SaveGHACatalog(projectPath string, c GHACatalog) error {
 		c.Version = 1
 	}
 	path := GHACatalogPath(projectPath)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if _, err := devscopeutil.EnsureDir(projectPath); err != nil {
 		return err
 	}
 	b, err := yaml.Marshal(&c)
@@ -1126,7 +1127,7 @@ func SaveGHANote(projectPath, runID, note, process string) error {
 	if !found {
 		f.Notes = append(f.Notes, GHANote{RunID: runID, Note: note, At: now, Process: process})
 	}
-	if err := os.MkdirAll(filepath.Dir(GHANotesPath(projectPath)), 0o755); err != nil {
+	if _, err := devscopeutil.EnsureDir(projectPath); err != nil {
 		return err
 	}
 	b, err := yaml.Marshal(&f)

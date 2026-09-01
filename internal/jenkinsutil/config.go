@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/devscope/devscope/internal/devscopeutil"
 )
 
 type ProjectConfig struct {
@@ -41,8 +43,7 @@ func SaveProject(projectPath string, cfg ProjectConfig) error {
 		cfg.RefreshSec = 5
 	}
 	cfg.UpdatedAt = time.Now()
-	dir := filepath.Dir(ConfigPath(projectPath))
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if _, err := devscopeutil.EnsureDir(projectPath); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(cfg, "", "  ")

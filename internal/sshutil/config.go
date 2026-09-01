@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/devscope/devscope/internal/devscopeutil"
 )
 
 // Modes: local (-L), remote (-R), dynamic (-D).
@@ -78,8 +80,7 @@ func LoadProject(projectPath, projectName string) ProjectConfig {
 
 func SaveProject(projectPath string, cfg ProjectConfig) error {
 	cfg.UpdatedAt = time.Now()
-	dir := filepath.Dir(ConfigPath(projectPath))
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if _, err := devscopeutil.EnsureDir(projectPath); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(cfg, "", "  ")

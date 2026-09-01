@@ -6,10 +6,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/internal/dbutil"
 )
 
 type DBEngine string
@@ -19,12 +21,18 @@ const (
 	DBEngineMySQL    DBEngine = "mysql"
 )
 
-// DBTarget is a runnable database reachable via docker exec.
+// DBTarget is a runnable database, reachable either via `docker exec`
+// (Container set) or a direct TCP connection using the local psql/mysql
+// client (Host set) — the latter comes from a manually granted credential in
+// .devscope/database.json.
 type DBTarget struct {
 	Label     string
 	Container string
+	Host      string
+	Port      int
 	Engine    DBEngine
 	User      string
+	Password  string // set for manually granted credentials; empty otherwise
 	Database  string
 	Ports     string // host port mapping hint from docker, optional
 }
@@ -95,7 +103,23 @@ func DetectProjectDatabasesLite(p *core.Project) []DBTarget {
 			Ports:     c.Ports,
 		})
 	}
+	for _, cred := range dbutil.LoadProject(p.Path).Credentials {
+		out = append(out, dbTargetFromCredential(cred))
+	}
 	return out
+}
+
+func dbTargetFromCredential(c dbutil.Credential) DBTarget {
+	return DBTarget{
+		Label:     c.Name,
+		Container: c.Container,
+		Host:      c.Host,
+		Port:      c.Port,
+		Engine:    DBEngine(c.Engine),
+		User:      c.User,
+		Password:  c.Password,
+		Database:  c.Database,
+	}
 }
 
 // DetectProjectDatabases enriches Lite with docker exec env (POSTGRES_USER etc.).
@@ -107,7 +131,7 @@ func DetectProjectDatabases(p *core.Project) []DBTarget {
 	}
 	envUser, envDB, _ := readProjectDBEnv(p.Path)
 	for i := range out {
-		if envUser != "" && envDB != "" {
+		if out[i].Container == "" || (envUser != "" && envDB != "") {
 			continue
 		}
 		cu, cd := readContainerDBEnv(out[i].Container, out[i].Engine)
@@ -228,23 +252,31 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-func containerPass(container string, eng DBEngine, projectPath string) string {
+// resolvePass finds the password for t: an explicit manual credential wins,
+// then .env, then (for docker targets only) the container's own env vars.
+func resolvePass(t DBTarget, projectPath string) string {
+	if t.Password != "" {
+		return t.Password
+	}
 	_, _, pass := readProjectDBEnv(projectPath)
 	if pass != "" {
 		return pass
 	}
+	if t.Container == "" {
+		return ""
+	}
 	key := "POSTGRES_PASSWORD"
-	if eng == DBEngineMySQL {
+	if t.Engine == DBEngineMySQL {
 		key = "MYSQL_PASSWORD"
 	}
-	out, err := exec.Command("docker", "exec", container, "printenv", key).CombinedOutput()
+	out, err := exec.Command("docker", "exec", t.Container, "printenv", key).CombinedOutput()
 	if err == nil {
 		if p := strings.TrimSpace(string(out)); p != "" {
 			return p
 		}
 	}
-	if eng == DBEngineMySQL {
-		out, err = exec.Command("docker", "exec", container, "printenv", "MYSQL_ROOT_PASSWORD").CombinedOutput()
+	if t.Engine == DBEngineMySQL {
+		out, err = exec.Command("docker", "exec", t.Container, "printenv", "MYSQL_ROOT_PASSWORD").CombinedOutput()
 		if err == nil {
 			return strings.TrimSpace(string(out))
 		}
@@ -254,29 +286,16 @@ func containerPass(container string, eng DBEngine, projectPath string) string {
 
 // DBListTables returns table names for the target.
 func DBListTables(t DBTarget, projectPath string) ([]string, error) {
-	pass := containerPass(t.Container, t.Engine, projectPath)
-	var cmd *exec.Cmd
+	var sql string
 	switch t.Engine {
 	case DBEnginePostgres:
-		sql := `SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY 1`
-		args := []string{"exec"}
-		if pass != "" {
-			args = append(args, "-e", "PGPASSWORD="+pass)
-		}
-		args = append(args, t.Container, "psql", "-U", t.User, "-d", t.Database, "-Atc", sql)
-		cmd = exec.Command("docker", args...)
+		sql = `SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY 1`
 	case DBEngineMySQL:
-		sql := "SHOW TABLES"
-		args := []string{"exec"}
-		if pass != "" {
-			args = append(args, "-e", "MYSQL_PWD="+pass)
-		}
-		args = append(args, t.Container, "mysql", "-u"+t.User, "-N", "-e", sql, t.Database)
-		cmd = exec.Command("docker", args...)
+		sql = "SHOW TABLES"
 	default:
 		return nil, fmt.Errorf("engine não suportado")
 	}
-	out, err := runDBCmd(cmd)
+	out, err := runDBCmd(dbExecSQL(t, resolvePass(t, projectPath), sql, true))
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +316,7 @@ func DBDescribeTable(t DBTarget, projectPath, table string) (DBTableInfo, error)
 		return DBTableInfo{}, fmt.Errorf("tabela vazia")
 	}
 	info := DBTableInfo{Table: table, Rows: -1}
-	pass := containerPass(t.Container, t.Engine, projectPath)
+	pass := resolvePass(t, projectPath)
 	ident := quoteDBIdent(table, t.Engine)
 
 	var colsSQL, countSQL string
@@ -381,32 +400,71 @@ func quoteDBIdent(name string, eng DBEngine) string {
 	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }
 
+// dbExecSQL builds the psql/mysql invocation for t, either wrapped in
+// `docker exec` (Container set) or run directly against Host via the local
+// client binary (a manually granted credential without a container).
 func dbExecSQL(t DBTarget, pass, sql string, tuplesOnly bool) *exec.Cmd {
-	args := []string{"exec"}
+	var clientArgs []string
 	switch t.Engine {
 	case DBEnginePostgres:
-		if pass != "" {
-			args = append(args, "-e", "PGPASSWORD="+pass)
+		clientArgs = []string{"psql"}
+		if t.Host != "" {
+			clientArgs = append(clientArgs, "-h", t.Host, "-p", strconv.Itoa(firstNonZero(t.Port, 5432)))
 		}
-		args = append(args, t.Container, "psql", "-U", t.User, "-d", t.Database)
+		clientArgs = append(clientArgs, "-U", t.User, "-d", t.Database)
 		if tuplesOnly {
-			args = append(args, "-Atc", sql)
+			clientArgs = append(clientArgs, "-Atc", sql)
 		} else {
-			args = append(args, "-c", sql)
+			clientArgs = append(clientArgs, "-c", sql)
 		}
 	case DBEngineMySQL:
-		if pass != "" {
-			args = append(args, "-e", "MYSQL_PWD="+pass)
+		clientArgs = []string{"mysql"}
+		if t.Host != "" {
+			clientArgs = append(clientArgs, "-h", t.Host, "-P", strconv.Itoa(firstNonZero(t.Port, 3306)))
 		}
-		args = append(args, t.Container, "mysql", "-u"+t.User)
+		clientArgs = append(clientArgs, "-u"+t.User)
 		if tuplesOnly {
-			args = append(args, "-N", "-B")
+			clientArgs = append(clientArgs, "-N", "-B")
 		} else {
-			args = append(args, "-t")
+			clientArgs = append(clientArgs, "-t")
 		}
-		args = append(args, "-e", sql, t.Database)
+		clientArgs = append(clientArgs, "-e", sql, t.Database)
 	}
-	return exec.Command("docker", args...)
+	return dbClientCmd(t, pass, clientArgs)
+}
+
+// dbClientCmd runs clientArgs (binary + flags) either inside t.Container via
+// `docker exec`, or directly on the host when t.Container is empty.
+func dbClientCmd(t DBTarget, pass string, clientArgs []string) *exec.Cmd {
+	var passEnv string
+	if pass != "" {
+		if t.Engine == DBEngineMySQL {
+			passEnv = "MYSQL_PWD=" + pass
+		} else {
+			passEnv = "PGPASSWORD=" + pass
+		}
+	}
+	if t.Container != "" {
+		args := []string{"exec"}
+		if passEnv != "" {
+			args = append(args, "-e", passEnv)
+		}
+		args = append(args, t.Container)
+		args = append(args, clientArgs...)
+		return exec.Command("docker", args...)
+	}
+	cmd := exec.Command(clientArgs[0], clientArgs[1:]...)
+	if passEnv != "" {
+		cmd.Env = append(os.Environ(), passEnv)
+	}
+	return cmd
+}
+
+func firstNonZero(v, def int) int {
+	if v > 0 {
+		return v
+	}
+	return def
 }
 
 // DBQuery runs SQL and returns tabular text (truncated).
@@ -415,27 +473,10 @@ func DBQuery(t DBTarget, projectPath, sql string) (string, error) {
 	if sql == "" {
 		return "", fmt.Errorf("SQL vazio")
 	}
-	pass := containerPass(t.Container, t.Engine, projectPath)
-	var cmd *exec.Cmd
-	switch t.Engine {
-	case DBEnginePostgres:
-		args := []string{"exec"}
-		if pass != "" {
-			args = append(args, "-e", "PGPASSWORD="+pass)
-		}
-		args = append(args, t.Container, "psql", "-U", t.User, "-d", t.Database, "-c", sql)
-		cmd = exec.Command("docker", args...)
-	case DBEngineMySQL:
-		args := []string{"exec"}
-		if pass != "" {
-			args = append(args, "-e", "MYSQL_PWD="+pass)
-		}
-		args = append(args, t.Container, "mysql", "-u"+t.User, "-t", "-e", sql, t.Database)
-		cmd = exec.Command("docker", args...)
-	default:
+	if t.Engine != DBEnginePostgres && t.Engine != DBEngineMySQL {
 		return "", fmt.Errorf("engine não suportado")
 	}
-	out, err := runDBCmd(cmd)
+	out, err := runDBCmd(dbExecSQL(t, resolvePass(t, projectPath), sql, false))
 	if err != nil {
 		return out, err
 	}

@@ -100,6 +100,7 @@ func (a *App) renderDbLanding(p *core.Project) string {
 			StyleMuted.Render("nenhum Postgres/MySQL nos containers"),
 			StyleMuted.Render("suba o compose com um serviço db"),
 			StyleMuted.Render("aceita postgres · timescale · mysql · mariadb"),
+			StyleMuted.Render("ou conceda acesso em .devscope/database.json"),
 		)
 	} else {
 		for _, t := range targets {
@@ -120,6 +121,7 @@ func (a *App) renderDbLanding(p *core.Project) string {
 		StyleMuted.Render("d          schema da tabela"),
 		StyleMuted.Render("e / ctrl+enter  editar / run SQL"),
 		StyleMuted.Render("b          filtrar tabelas"),
+		StyleMuted.Render("config em .devscope/database.json"),
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("DATABASE", fitExactLines(openLines, openH-2), centerW, openH, true),
