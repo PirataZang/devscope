@@ -89,10 +89,25 @@ func TestGHAControlCenterRenders(t *testing.T) {
 		},
 	}
 	got := stripANSI(a.renderGHATab(&p))
-	for _, want := range []string{"GITHUB ACTIONS", "PROCESSES", "RUNS", "USO", "AÇÕES"} {
+	for _, want := range []string{"GITHUB ACTIONS", "PROCESSOS", "RUNS", "USO", "AÇÕES", "CONTEXTO"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
+	}
+	a.ghaKind = ghaKindRuns
+	runs := stripANSI(a.renderGHATab(&p))
+	// STATUS e CONCLUSION viraram uma coluna só, e a tabela ganhou tempo.
+	for _, want := range []string{"RESULTADO", "QUANDO", "DUR", "✓ sucesso"} {
+		if !strings.Contains(runs, want) {
+			t.Fatalf("missing %q in:\n%s", want, runs)
+		}
+	}
+	if strings.Contains(runs, "CONCLUSION") {
+		t.Fatalf("CONCLUSION virou parte de RESULTADO:\n%s", runs)
+	}
+	// A caixa que repetia a tabela principal ao lado dela saiu.
+	if strings.Contains(got, "RUNS RECENTES") {
+		t.Fatalf("RUNS RECENTES duplicava a tabela:\n%s", got)
 	}
 }
 
@@ -117,9 +132,10 @@ func TestGHAUsagePanelAndCard(t *testing.T) {
 			t.Fatalf("usage panel missing %q:\n%s", want, panel)
 		}
 	}
-	title, val, _ := a.ghaUsageCardBits(20)
-	if title != "MIN LEFT" || !strings.Contains(val, "1500m") {
-		t.Fatalf("card title=%q val=%q", title, val)
+	// O card MIN LEFT virou um chip no header — a cota cabe numa expressão.
+	chip := stripANSI(a.ghaUsageChip())
+	if !strings.Contains(chip, "min") {
+		t.Fatalf("usage chip=%q", chip)
 	}
 
 	a.ghaProcName = "android-release"

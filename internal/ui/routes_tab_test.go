@@ -25,9 +25,6 @@ func TestAllTabsIncludesRoutes(t *testing.T) {
 	if TabRoutes.String() != "Rotas" {
 		t.Fatalf("String=%q", TabRoutes.String())
 	}
-	if int(TabRoutes) != 12 {
-		t.Fatalf("TabRoutes index=%d want 12", TabRoutes)
-	}
 }
 
 func TestRoutesLandingEnterAndEsc(t *testing.T) {
@@ -47,7 +44,7 @@ func TestRoutesLandingEnterAndEsc(t *testing.T) {
 		t.Fatalf("landing: tab=%v open=%v", a.tab, a.routesOpen)
 	}
 	landing := stripANSI(a.renderRoutesLanding(&p))
-	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "Rotas") {
+	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "ROTAS") {
 		t.Fatalf("landing: %q", landing)
 	}
 

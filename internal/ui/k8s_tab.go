@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -34,8 +35,9 @@ const (
 type k8sFocus int
 
 const (
-	k8sFocusExplorer k8sFocus = iota
-	k8sFocusTable
+	// k8sFocusExplorer saiu junto com a coluna do explorer; o tipo de recurso
+	// agora se troca por [ e ], que aparecem na régua.
+	k8sFocusTable k8sFocus = iota
 	k8sFocusLogs
 	k8sFocusYAML
 	k8sFocusDetail
@@ -447,7 +449,7 @@ func (a *App) k8sHints() string {
 	if a.k8sFilterOn {
 		return "filter  enter aplicar  esc limpar  ·  " + a.k8sFilter + "█"
 	}
-	base := "? help  n/p ns  b filter  tab painel  enter detail  l logs  y yaml  e edit  c create  d delete  r refresh  esc"
+	base := "0-4 seção  ·  [ ] tipo  ·  n/p namespace  ·  b filtrar  ·  tab painel  ·  enter detalhe  ·  l logs  ·  y yaml  ·  e editar  ·  d excluir  ·  r atualizar  ·  esc"
 	if a.k8sLoading {
 		base = a.spinner() + " carregando…  " + base
 	}
@@ -457,229 +459,392 @@ func (a *App) k8sHints() string {
 	return base
 }
 
+// renderK8sHeader põe contexto › namespace em destaque: rodar kubectl no
+// contexto errado é o acidente clássico, e o aviso de produção fica em vermelho.
 func (a *App) renderK8sHeader(width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabKubernetes)).Bold(true)
-	ctx := a.k8sContext
-	if ctx == "" {
-		ctx = "?"
+	ctx := firstNonEmpty(a.k8sContext, "?")
+	ctxStyle := lipgloss.NewStyle().Foreground(ColorAccent).Bold(true)
+	if k8sContextLooksProd(ctx) {
+		ctxStyle = StyleUnhealthy.Bold(true)
 	}
-	left := accent.Render("devscope") + StyleMuted.Render(" › kubernetes") +
-		StyleMuted.Render("  Context: ") + StyleWarning.Render(truncate(ctx, 24)) +
-		StyleMuted.Render("  Namespace: ") + StyleNormal.Render(a.k8sNamespace)
+	left := accent.Render("⎈ KUBERNETES") + "   " +
+		ctxStyle.Render(truncate(ctx, 34)) +
+		StyleMuted.Render(" › ") +
+		StyleNormal.Bold(true).Render(truncate(firstNonEmpty(a.k8sNamespace, "default"), 20))
+	if k8sContextLooksProd(ctx) {
+		left += StyleUnhealthy.Render("  ⚠ produção")
+	}
 
-	ver := a.k8sVersion
-	if ver == "" {
-		ver = "—"
+	var right []string
+	if a.k8sVersion != "" {
+		right = append(right, StyleMuted.Render(a.k8sVersion))
 	}
-	right := StyleMuted.Render(ver) +
-		StyleMuted.Render(fmt.Sprintf("  nodes:%d", a.k8sNodeCount))
+	if a.k8sNodeCount > 0 {
+		right = append(right, StyleMuted.Render(fmt.Sprintf("%d nós", a.k8sNodeCount)))
+	}
+	if a.k8sLoading {
+		right = append(right, a.loadingMuted("carregando…"))
+	}
 	if a.k8sErr != "" {
-		right += "  " + StyleUnhealthy.Render(truncate(a.k8sErr, 28))
+		right = append(right, StyleUnhealthy.Render(truncate(a.k8sErr, 30)))
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
+	if len(right) == 0 {
+		return truncateVisible(left, width)
 	}
-	return left + strings.Repeat(" ", pad) + right
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
+// k8sContextLooksProd marca contextos que parecem produção. Heurística de
+// nome — é o que se tem sem consultar a API.
+func k8sContextLooksProd(ctx string) bool {
+	c := strings.ToLower(ctx)
+	for _, needle := range []string{"prod", "prd", "live"} {
+		if strings.Contains(c, needle) {
+			return !strings.Contains(c, "nonprod") && !strings.Contains(c, "non-prod")
+		}
+	}
+	return false
+}
+
+// renderK8sSubTabs devolve duas linhas: as seções (teclas 0-4) e os tipos de
+// recurso com contagem. O seletor de tipo era uma coluna de 26 colunas ao lado
+// da tabela — que é justamente quem precisa de largura.
 func (a *App) renderK8sSubTabs(width int) string {
-	names := []string{"Overview", "Workloads", "Networking", "Config", "Events"}
-	var parts []string
+	names := []string{"VISÃO GERAL", "WORKLOADS", "REDE", "CONFIG", "EVENTOS"}
+	parts := make([]string, 0, len(names))
 	for i, n := range names {
-		label := " " + n + " "
+		label := fmt.Sprintf(" %d %s ", i, n)
 		if k8sSubTab(i) == a.k8sSubTab {
 			parts = append(parts, StyleSelected.Render(label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	pad := width - lipgloss.Width(stripANSI(line))
-	if pad < 0 {
-		pad = 0
-	}
-	return line + strings.Repeat(" ", pad)
+	first := padRightVisible(strings.Join(parts, StyleMuted.Render("│")), width)
+	return lipgloss.JoinVertical(lipgloss.Left, first, a.renderK8sKindStrip(width))
 }
 
+// renderK8sKindStrip: a contagem saiu (só o tipo carregado tinha uma, e a caixa
+// logo abaixo já diz "PODS (4)"), o separador virou o mesmo da linha de cima, e
+// o tipo ativo é sublinhado em vez de bloco invertido — dois blocos invertidos
+// empilhados não deixavam claro qual era o atual.
+func (a *App) renderK8sKindStrip(width int) string {
+	kinds := []struct {
+		kind  k8sKind
+		label string
+	}{
+		{k8sKindPods, "PODS"}, {k8sKindDeploys, "DEPLOYMENTS"},
+		{k8sKindServices, "SERVICES"}, {k8sKindManifests, "MANIFESTOS"},
+	}
+	active := lipgloss.NewStyle().Foreground(tabAccentColor(TabKubernetes)).Bold(true).Underline(true)
+	parts := make([]string, 0, len(kinds))
+	for _, item := range kinds {
+		if item.kind == a.k8sKind {
+			parts = append(parts, active.Render(" "+item.label+" "))
+		} else {
+			parts = append(parts, StyleMuted.Render(" "+item.label+" "))
+		}
+	}
+	// Alinha com a régua de seções logo acima (mesmo recuo, mesmo separador).
+	left := strings.Join(parts, StyleMuted.Render("│")) +
+		StyleMuted.Render("   ") + StyleKey.Render("[ ]") + StyleMuted.Render(" troca o tipo")
+
+	var chips []string
+	running, pending, failed := a.k8sPodHealth()
+	if running > 0 {
+		chips = append(chips, StyleHealthy.Render(fmt.Sprintf("● %d", running))+StyleMuted.Render(" running"))
+	}
+	if pending > 0 {
+		chips = append(chips, StyleWarning.Render(fmt.Sprintf("◐ %d", pending))+StyleMuted.Render(" pending"))
+	}
+	if failed > 0 {
+		chips = append(chips, StyleUnhealthy.Render(fmt.Sprintf("✕ %d", failed))+StyleMuted.Render(" com falha"))
+	}
+	if a.k8sFilter != "" {
+		chips = append(chips, StyleWarning.Render("filtro "+truncate(a.k8sFilter, 16)))
+	}
+	joined := strings.Join(chips, "  ") + " "
+	if len(chips) == 0 || lipgloss.Width(left)+lipgloss.Width(joined)+2 > width {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, joined, width)
+}
+
+func (a *App) k8sPodHealth() (running, pending, failed int) {
+	if a.k8sKind != k8sKindPods {
+		return
+	}
+	for _, r := range a.k8sResources {
+		switch r.Status {
+		case "Running", "Succeeded", "Completed":
+			running++
+		case "Pending", "ContainerCreating", "Terminating":
+			pending++
+		default:
+			failed++
+		}
+	}
+	return
+}
+
+// renderK8sOverview: tabela em largura cheia. Antes eram quatro colunas lado a
+// lado (explorer, tabela, detalhe, ações) e sobravam ~70 colunas para a tabela,
+// que é onde o nome do pod precisa caber inteiro.
 func (a *App) renderK8sOverview(width, height int) string {
 	cmdW := actionsCmdWidth(width)
-	inner := width - cmdW
-	leftW := maxInt(22, inner*20/100)
-	if leftW > 32 {
-		leftW = 32
-	}
-	rightW := maxInt(24, inner*26/100)
-	if rightW > 40 {
-		rightW = 40
-	}
-	centerW := maxInt(30, inner-leftW-rightW-2)
+	mainW := maxInt(40, width-cmdW)
 
-	bottomH := maxInt(6, height*32/100)
+	bottomH := maxInt(7, height*34/100)
 	tableH := maxInt(6, height-bottomH)
-	logsW := centerW / 2
-	yamlW := centerW - logsW
 
-	left := a.renderK8sExplorer(leftW, height)
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderK8sTable(centerW, tableH),
+	detailW := maxInt(28, mainW*34/100)
+	rest := maxInt(20, mainW-detailW)
+	logsW := rest / 2
+
+	main := lipgloss.JoinVertical(lipgloss.Left,
+		a.renderK8sTable(mainW, tableH),
 		lipgloss.JoinHorizontal(lipgloss.Top,
+			a.renderK8sDetailPane(detailW, bottomH),
 			a.renderK8sLogsPane(logsW, bottomH),
-			a.renderK8sYAMLPane(yamlW, bottomH),
+			a.renderK8sYAMLPane(rest-logsW, bottomH),
 		),
 	)
-	right := a.renderK8sDetailPane(rightW, height)
-	main := lipgloss.JoinHorizontal(lipgloss.Top, left, center, right)
 	actions := renderActionsBox(cmdW, height,
-		[2]string{"enter", "detail"},
+		[2]string{"enter", "detalhe"},
 		[2]string{"l", "logs"},
 		[2]string{"y", "yaml"},
-		[2]string{"e", "edit"},
-		[2]string{"c", "create"},
-		[2]string{"d", "delete"},
+		[2]string{"e", "editar"},
+		[2]string{"c", "criar"},
+		[2]string{"d", "excluir"},
 		[2]string{"n/p", "namespace"},
-		[2]string{"b", "filter"},
-		[2]string{"r", "refresh"},
+		[2]string{"b", "filtrar"},
+		[2]string{"r", "atualizar"},
 		[2]string{"tab", "painel"},
 	)
 	return lipgloss.JoinHorizontal(lipgloss.Top, main, actions)
 }
 
-func (a *App) renderK8sExplorer(width, height int) string {
-	statsH := maxInt(7, height*28/100)
-	treeH := maxInt(8, height-statsH)
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderK8sTree(width, treeH),
-		a.renderK8sQuickStats(width, statsH),
-	)
-}
-
-func (a *App) renderK8sTree(width, height int) string {
-	focus := a.k8sFocus == k8sFocusExplorer && !a.k8sEditing
-	kinds := []struct {
-		kind  k8sKind
-		label string
-		group string
-	}{
-		{k8sKindPods, "Pods", "Workloads"},
-		{k8sKindDeploys, "Deployments", "Workloads"},
-		{k8sKindServices, "Services", "Networking"},
-		{k8sKindManifests, "Manifests", "Config"},
-	}
-	lines := make([]string, 0, height-2)
-	lastGroup := ""
-	for _, item := range kinds {
-		if item.group != lastGroup {
-			lines = append(lines, StyleSection.Render("  "+item.group))
-			lastGroup = item.group
-		}
-		count := "—"
-		switch item.kind {
-		case k8sKindPods:
-			count = fmt.Sprintf("%d", len(a.k8sResources))
-			if a.k8sKind != k8sKindPods {
-				count = "·"
-			}
-		case k8sKindDeploys:
-			if a.k8sKind == k8sKindDeploys {
-				count = fmt.Sprintf("%d", len(a.k8sResources))
-			} else {
-				count = "·"
-			}
-		case k8sKindServices:
-			if a.k8sKind == k8sKindServices {
-				count = fmt.Sprintf("%d", len(a.k8sResources))
-			} else {
-				count = "·"
-			}
-		case k8sKindManifests:
-			count = fmt.Sprintf("%d", len(a.k8sManifests))
-		}
-		mark := "  "
-		style := StyleMuted
-		if item.kind == a.k8sKind {
-			mark = "▸ "
-			if focus {
-				style = StyleSelected
-			} else {
-				style = StyleNormal
-			}
-		}
-		lines = append(lines, style.Render(fmt.Sprintf("%s%-14s %s", mark, item.label, count)))
-	}
-	title := "CLUSTER EXPLORER"
-	if focus {
-		title = "> CLUSTER EXPLORER"
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
-}
-
-func (a *App) renderK8sQuickStats(width, height int) string {
-	running, pending, failed, total := 0, 0, 0, 0
-	if a.k8sKind == k8sKindPods {
-		total = len(a.k8sResources)
-		for _, r := range a.k8sResources {
-			switch r.Status {
-			case "Running":
-				running++
-			case "Pending":
-				pending++
-			case "Failed", "CrashLoopBackOff", "Error":
-				failed++
-			}
-		}
-	} else {
-		total = a.k8sListLen()
-	}
-	lines := []string{
-		StyleNormal.Render(fmt.Sprintf("  total     %d", total)),
-		StyleHealthy.Render(fmt.Sprintf("  running   %d", running)),
-		StyleWarning.Render(fmt.Sprintf("  pending   %d", pending)),
-		StyleUnhealthy.Render(fmt.Sprintf("  failed    %d", failed)),
-		StyleMuted.Render(fmt.Sprintf("  manifests %d", len(a.k8sManifests))),
-		StyleMuted.Render(fmt.Sprintf("  nodes     %d", a.k8sNodeCount)),
-	}
-	if a.k8sFilter != "" {
-		lines = append(lines, StyleWarning.Render("  filter  "+truncate(a.k8sFilter, width-12)))
-	}
-	return renderApiTitledBox("QUICK STATS", fitExactLines(lines, height-2), width, height, false)
-}
-
 func (a *App) renderK8sTable(width, height int) string {
 	focus := a.k8sFocus == k8sFocusTable && !a.k8sEditing
 	n := a.k8sListLen()
-	title := a.k8sTableTitle(n)
-	a.k8sScroll = ensureVisible(a.k8sCursor, a.k8sScroll, height-3, n)
+	inner := maxInt(20, width-2)
+	viewport := maxInt(1, height-4)
+	a.k8sScroll = ensureVisible(a.k8sCursor, a.k8sScroll, viewport, n)
 
-	header := a.k8sTableHeader()
-	lines := make([]string, 0, height-2)
-	lines = append(lines, StyleMuted.Render(truncate(header, width-2)))
-
+	lines := []string{
+		"  " + a.k8sTableHeader(inner-2),
+		StyleMuted.Render(strings.Repeat("─", inner)),
+	}
 	if n == 0 {
 		if a.k8sLoading {
-			lines = append(lines, a.loadingMuted("  carregando..."))
+			lines = append(lines, "", "  "+a.loadingMuted("consultando o cluster…"))
 		} else {
-			lines = append(lines, StyleMuted.Render("  (vazio)"))
+			lines = append(lines, "", "  "+StyleMuted.Render("nada em ")+
+				StyleNormal.Render(firstNonEmpty(a.k8sNamespace, "default"))+
+				StyleMuted.Render(" — ")+StyleKey.Render("n/p")+StyleMuted.Render(" troca de namespace"))
 		}
 	} else {
-		start := a.k8sScroll
-		end := minInt(start+height-3, n)
-		for i := start; i < end; i++ {
-			label := a.k8sRowLabel(i)
-			prefix := "  "
-			style := StyleMuted
-			if i == a.k8sCursor {
-				prefix = "▸ "
-				if focus {
-					style = StyleSelected
-				} else {
-					style = StyleNormal
-				}
-			}
-			lines = append(lines, style.Render(truncate(prefix+label, width-2)))
+		for i := a.k8sScroll; i < minInt(a.k8sScroll+viewport, n); i++ {
+			lines = append(lines, a.renderK8sRow(i, inner-2, i == a.k8sCursor, focus))
 		}
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return renderApiTitledBox(a.k8sTableTitle(n), fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
+}
+
+type k8sCols struct{ dot, name, status, ready, restarts, node, ip, age int }
+
+func (a *App) k8sColumns(width int) k8sCols {
+	w := maxInt(30, width)
+	switch a.k8sKind {
+	case k8sKindPods:
+		c := k8sCols{dot: 1, status: 18, ready: 6, restarts: 9, age: 5}
+		c.node = minInt(20, maxInt(0, w*14/100))
+		c.ip = minInt(15, maxInt(0, w*10/100))
+		if w < 96 {
+			c.ip = 0
+		}
+		if w < 80 {
+			c.node = 0
+		}
+		used := c.dot + c.status + c.ready + c.restarts + c.node + c.ip + c.age
+		gaps := 5 // 6 colunas fixas → 5 separadores
+		if c.node > 0 {
+			gaps++
+		}
+		if c.ip > 0 {
+			gaps++
+		}
+		// Nome de pod raramente passa de ~44; a sobra vale mais no nó e no IP,
+		// que são o que se cruza quando um nó está com problema.
+		c.name = maxInt(16, w-used-gaps)
+		if extra := c.name - 44; extra > 0 {
+			c.name = 44
+			if c.node > 0 {
+				grow := minInt(extra, 12)
+				c.node += grow
+				extra -= grow
+			}
+			if c.ip > 0 && extra > 0 {
+				c.ip += minInt(extra, 4)
+			}
+		}
+		return c
+	case k8sKindDeploys:
+		c := k8sCols{dot: 1, ready: 10, age: 6}
+		c.name = maxInt(16, w-c.dot-c.ready-c.age-3)
+		return c
+	case k8sKindServices:
+		c := k8sCols{dot: 1, status: 14, ip: 18, age: 6}
+		c.name = maxInt(16, w-c.dot-c.status-c.ip-c.age-4)
+		return c
+	default:
+		return k8sCols{name: w}
+	}
+}
+
+func (a *App) k8sTableHeader(width int) string {
+	c := a.k8sColumns(width)
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padRight(truncate(t, n), n))
+	}
+	rcell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padLeft(truncate(t, n), n))
+	}
+	switch a.k8sKind {
+	case k8sKindPods:
+		return joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name), cell("ESTADO", c.status),
+			rcell("READY", c.ready), rcell("RESTARTS", c.restarts), cell("NÓ", c.node),
+			cell("IP", c.ip), rcell("IDADE", c.age))
+	case k8sKindDeploys:
+		return joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
+			rcell("READY", c.ready), rcell("IDADE", c.age))
+	case k8sKindServices:
+		return joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name), cell("TIPO", c.status),
+			cell("CLUSTER-IP", c.ip), rcell("IDADE", c.age))
+	default:
+		return head.Render("ARQUIVO")
+	}
+}
+
+func (a *App) renderK8sRow(i, width int, cursor, focus bool) string {
+	sel := cursor && focus
+	c := a.k8sColumns(width)
+
+	if a.k8sKind == k8sKindManifests {
+		items := a.k8sFilteredManifests()
+		if i < 0 || i >= len(items) {
+			return ""
+		}
+		row := renderCells(sel, []dashCell{{text: items[i], width: c.name, style: StyleNormal}})
+		return k8sRowPrefix(cursor, sel) + row
+	}
+
+	items := a.k8sFilteredResources()
+	if i < 0 || i >= len(items) {
+		return ""
+	}
+	r := items[i]
+	glyph, dotStyle := k8sStatusDot(r.Status, a.animFrame)
+
+	var cells []dashCell
+	switch a.k8sKind {
+	case k8sKindPods:
+		cells = []dashCell{
+			{text: glyph, width: c.dot, style: dotStyle},
+			{text: r.Name, width: c.name, style: StyleNormal.Bold(true)},
+			{text: r.Status, width: c.status, style: dotStyle},
+			{text: r.Ready, width: c.ready, style: k8sReadyStyle(r.Ready), right: true},
+			{text: r.Restarts, width: c.restarts, style: k8sRestartStyle(r.Restarts), right: true},
+			{text: firstNonEmpty(r.Node, emDash), width: c.node, style: StyleMuted},
+			{text: firstNonEmpty(r.IP, emDash), width: c.ip, style: StyleMuted},
+			{text: r.Age, width: c.age, style: StyleMuted, right: true},
+		}
+	case k8sKindDeploys:
+		cells = []dashCell{
+			{text: glyph, width: c.dot, style: dotStyle},
+			{text: r.Name, width: c.name, style: StyleNormal.Bold(true)},
+			{text: r.Ready, width: c.ready, style: k8sReadyStyle(r.Ready), right: true},
+			{text: r.Age, width: c.age, style: StyleMuted, right: true},
+		}
+	case k8sKindServices:
+		cells = []dashCell{
+			{text: glyph, width: c.dot, style: dotStyle},
+			{text: r.Name, width: c.name, style: StyleNormal.Bold(true)},
+			{text: r.Status, width: c.status, style: StyleMuted},
+			{text: firstNonEmpty(r.IP, emDash), width: c.ip, style: StyleMuted},
+			{text: r.Age, width: c.age, style: StyleMuted, right: true},
+		}
+	}
+	return k8sRowPrefix(cursor, sel) + renderCells(sel, cells)
+}
+
+func k8sRowPrefix(cursor, sel bool) string {
+	if sel {
+		return StyleKey.Render("▌") + lipgloss.NewStyle().Background(ColorSelBg).Render(" ")
+	}
+	if cursor {
+		return StyleKey.Render("▌") + " "
+	}
+	return "  "
+}
+
+// k8sStatusDot: CrashLoopBackOff e ImagePullBackOff são o motivo de abrir a
+// tela — não podem depender de caber numa coluna truncada.
+func k8sStatusDot(status string, frame int) (string, lipgloss.Style) {
+	switch status {
+	case "Running", "Succeeded", "Completed", "Active", "Bound":
+		return pulseGlyph(pulseOK, frame), StyleHealthy
+	case "Pending", "ContainerCreating", "PodInitializing", "Terminating":
+		return pulseGlyph(pulseWarn, frame), StyleWarning
+	case "":
+		return pulseGlyph(pulseIdle, frame), StyleMuted
+	default:
+		return pulseGlyph(pulseBad, frame), StyleUnhealthy
+	}
+}
+
+// k8sReadyStyle lê "1/1" vs "0/1": um pod pronto pela metade não está no ar.
+func k8sReadyStyle(ready string) lipgloss.Style {
+	parts := strings.SplitN(strings.TrimSpace(ready), "/", 2)
+	if len(parts) != 2 {
+		return StyleMuted
+	}
+	have, _ := strconv.Atoi(parts[0])
+	want, _ := strconv.Atoi(parts[1])
+	switch {
+	case want == 0:
+		return StyleMuted
+	case have == 0:
+		return StyleUnhealthy
+	case have < want:
+		return StyleWarning
+	default:
+		return StyleHealthy
+	}
+}
+
+// k8sRestartStyle: contagem de restarts é o sintoma mais barato de instabilidade.
+func k8sRestartStyle(restarts string) lipgloss.Style {
+	n, err := strconv.Atoi(strings.Fields(strings.TrimSpace(restarts))[0])
+	if err != nil {
+		return StyleMuted
+	}
+	switch {
+	case n >= 5:
+		return StyleUnhealthy
+	case n > 0:
+		return StyleWarning
+	default:
+		return StyleMuted
+	}
 }
 
 func (a *App) k8sTableTitle(n int) string {
@@ -695,57 +860,10 @@ func (a *App) k8sTableTitle(n int) string {
 	}
 }
 
-func (a *App) k8sTableHeader() string {
-	switch a.k8sKind {
-	case k8sKindPods:
-		return fmt.Sprintf("%-22s %-16s %-7s %-8s %-12s %-12s %s",
-			"NAME", "STATUS", "READY", "RESTARTS", "NODE", "IP", "AGE")
-	case k8sKindDeploys:
-		return fmt.Sprintf("%-28s %-10s %s", "NAME", "READY", "AGE")
-	case k8sKindServices:
-		return fmt.Sprintf("%-24s %-12s %-16s %s", "NAME", "TYPE", "CLUSTER-IP", "AGE")
-	default:
-		return "FILE"
-	}
-}
-
-func (a *App) k8sRowLabel(i int) string {
-	if a.k8sKind == k8sKindManifests {
-		items := a.k8sFilteredManifests()
-		if i < 0 || i >= len(items) {
-			return ""
-		}
-		return filepath.Base(items[i])
-	}
-	items := a.k8sFilteredResources()
-	if i < 0 || i >= len(items) {
-		return ""
-	}
-	r := items[i]
-	switch a.k8sKind {
-	case k8sKindPods:
-		return fmt.Sprintf("%-22s %-16s %-7s %-8s %-12s %-12s %s",
-			truncate(r.Name, 22),
-			truncate(k8sStatusLabel(r.Status, a.animFrame), 16),
-			truncate(r.Ready, 7),
-			truncate(r.Restarts, 8),
-			truncate(r.Node, 12),
-			truncate(r.IP, 12),
-			r.Age,
-		)
-	case k8sKindDeploys:
-		return fmt.Sprintf("%-28s %-10s %s", truncate(r.Name, 28), r.Ready, r.Age)
-	case k8sKindServices:
-		return fmt.Sprintf("%-24s %-12s %-16s %s", truncate(r.Name, 24), r.Status, truncate(r.IP, 16), r.Age)
-	default:
-		return r.Name
-	}
-}
-
 func k8sStatusLabel(status string, frame int) string {
 	switch status {
 	case "Running":
-		return animPulse(frame) + " Running"
+		return pulseGlyph(pulseOK, frame) + " Running"
 	case "Pending":
 		return "● Pending"
 	case "Succeeded", "Completed":
@@ -960,17 +1078,17 @@ func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 
 	switch msg.String() {
 	case "esc":
-		if a.k8sFocus != k8sFocusTable && a.k8sFocus != k8sFocusExplorer {
+		if a.k8sFocus != k8sFocusTable {
 			a.k8sFocus = k8sFocusTable
 			a.k8sPane = k8sPaneList
 			return a, nil
 		}
 		return a, a.leaveK8sTab()
 	case "tab":
-		a.k8sFocus = (a.k8sFocus + 1) % 5
+		a.k8sFocus = (a.k8sFocus + 1) % 4
 		return a, nil
 	case "shift+tab":
-		a.k8sFocus = (a.k8sFocus + 4) % 5
+		a.k8sFocus = (a.k8sFocus + 3) % 4
 		return a, nil
 	case "0":
 		a.k8sSubTab = k8sTabOverview
@@ -983,17 +1101,9 @@ func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 	case "4":
 		return a, a.k8sSetSubTab(k8sTabEvents, p)
 	case "[":
-		a.k8sKind = k8sKind((int(a.k8sKind) + 3) % 4)
-		a.k8sCursor = 0
-		a.k8sScroll = 0
-		a.syncK8sSubTabFromKind()
-		return a, a.refreshK8s(p)
+		return a, a.k8sShiftKind(-1)
 	case "]":
-		a.k8sKind = k8sKind((int(a.k8sKind) + 1) % 4)
-		a.k8sCursor = 0
-		a.k8sScroll = 0
-		a.syncK8sSubTabFromKind()
-		return a, a.refreshK8s(p)
+		return a, a.k8sShiftKind(1)
 	case "n":
 		return a, a.k8sCycleNamespace(1)
 	case "N", "p", "P":
@@ -1012,9 +1122,6 @@ func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 	case "pgdown":
 		a.k8sScrollPane(10)
 	case "enter":
-		if a.k8sFocus == k8sFocusExplorer {
-			return a, a.refreshK8s(p)
-		}
 		return a, a.k8sShowDetail()
 	case "y":
 		return a, a.k8sLoadYAML()
@@ -1043,9 +1150,9 @@ func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 	case "-":
 		return a, a.k8sScale(-1)
 	case "left", "h":
-		a.k8sFocus = k8sFocusExplorer
+		return a, a.k8sShiftKind(-1)
 	case "right":
-		a.k8sFocus = k8sFocusTable
+		return a, a.k8sShiftKind(1)
 	}
 	return a, nil
 }
@@ -1116,23 +1223,17 @@ func (a *App) syncK8sSubTabFromKind() {
 	}
 }
 
+// k8sShiftKind percorre os tipos em ciclo — [ e ] na régua, ← → na tabela.
+func (a *App) k8sShiftKind(delta int) tea.Cmd {
+	a.k8sKind = k8sKind((int(a.k8sKind) + delta + 4) % 4)
+	a.k8sCursor = 0
+	a.k8sScroll = 0
+	a.syncK8sSubTabFromKind()
+	return a.refreshK8s(a.currentProject())
+}
+
 func (a *App) k8sMove(delta int) tea.Cmd {
 	switch a.k8sFocus {
-	case k8sFocusExplorer:
-		next := int(a.k8sKind) + delta
-		if next < 0 {
-			next = 0
-		}
-		if next > 3 {
-			next = 3
-		}
-		if k8sKind(next) != a.k8sKind {
-			a.k8sKind = k8sKind(next)
-			a.k8sCursor = 0
-			a.k8sScroll = 0
-			a.syncK8sSubTabFromKind()
-			return a.refreshK8s(a.currentProject())
-		}
 	case k8sFocusLogs:
 		a.k8sLogsScroll += delta
 		if a.k8sLogsScroll < 0 {

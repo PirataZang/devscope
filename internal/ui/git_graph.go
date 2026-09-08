@@ -65,19 +65,21 @@ func renderGraphCells(cells []graphCell, isHead bool) string {
 
 // graphCommitIcon picks a small marker from common conventional-commit
 // keywords — purely cosmetic, falls back to a plain bullet.
+// graphCommitIcon: só glifos de 1 coluna. Emoji mede 2 colunas nas libs e 1 na
+// maioria dos terminais, e desalinhava a grade inteira do grafo.
 func graphCommitIcon(subject string) string {
 	s := strings.ToLower(subject)
 	switch {
 	case strings.HasPrefix(s, "merge"):
-		return StyleAccent.Render("🔀")
+		return StyleAccent.Render("⑂")
 	case strings.Contains(s, "security"):
-		return StyleUnhealthy.Render("🔒")
+		return StyleUnhealthy.Render("⚿")
 	case strings.HasPrefix(s, "fix") || strings.Contains(s, "bug"):
 		return StyleWarning.Render("⚠")
 	case strings.HasPrefix(s, "feat") || strings.HasPrefix(s, "add"):
 		return StyleHealthy.Render("✚")
 	case strings.HasPrefix(s, "docs") || strings.HasPrefix(s, "doc"):
-		return StyleMuted.Render("📄")
+		return StyleMuted.Render("≡")
 	case strings.HasPrefix(s, "chore") || strings.HasPrefix(s, "refactor"):
 		return StyleMuted.Render("⚙")
 	case strings.HasPrefix(s, "test"):
@@ -582,7 +584,9 @@ func (a *App) renderGitGraphListRow(node graphNode, selected bool, width int) st
 	left += " " + subjStyle.Render(c.Subject)
 
 	const hashW, dateW, authorW = 8, 11, 14
-	rightW := hashW + dateW + authorW + 2
+	// +3: os 2 do prefixo de cursor e 1 do separador antes do autor. Sem isso
+	// a linha estourava a caixa em 1 coluna e o hash saía com reticências.
+	rightW := hashW + dateW + authorW + 3
 	leftW := maxInt(10, width-rightW)
 	if lipgloss.Width(left) > leftW {
 		left = ansi.Truncate(left, leftW, "…")

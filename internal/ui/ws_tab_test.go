@@ -44,7 +44,7 @@ func TestWsLandingEnterEsc(t *testing.T) {
 		t.Fatalf("open url=%q open=%v focus=%v", a.wsURL, a.wsOpen, a.wsFocus)
 	}
 	view := stripANSI(a.renderWsTab(&p))
-	for _, want := range []string{"Conversa", "MENSAGENS", "SERVIDORES"} {
+	for _, want := range []string{"CONVERSA", "MENSAGENS", "SERVIDORES"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("overview missing %q in %q", want, truncate(view, 200))
 		}
@@ -191,7 +191,7 @@ func TestWsMessagesTabTogglesAddress(t *testing.T) {
 		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
 	}
 	view := stripANSI(a.renderWsTab(&p))
-	if !strings.Contains(view, "MENSAGENS") || !strings.Contains(view, "SERVIDORES") || !strings.Contains(view, "0:Conversa") {
+	if !strings.Contains(view, "MENSAGENS") || !strings.Contains(view, "SERVIDORES") || !strings.Contains(view, "1 CONVERSA") {
 		t.Fatalf("conversa=%q", truncate(view, 300))
 	}
 	if strings.Contains(view, "ENVIAR") || strings.Contains(view, ":Send") {

@@ -109,19 +109,43 @@ func TestSwarmControlCenterRenders(t *testing.T) {
 		},
 	}
 	got := stripANSI(a.renderSwarmTab(&p))
-	for _, want := range []string{"DOCKER SWARM", "CLUSTER", "SERVICES", "NODES", "AÇÕES"} {
+	for _, want := range []string{"DOCKER SWARM", "SERVIÇOS", "NÓS", "AÇÕES", "RÉPLICAS"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
+	}
+	// Os seis cards de um dígito viraram contadores na régua de tipos.
+	if strings.Contains(got, "┌─MANAGERS") || strings.Contains(got, "┌─WORKERS") {
+		t.Fatalf("cards antigos ainda presentes:\n%s", got)
+	}
+}
+
+// Réplicas incompletas são o que se procura numa lista de serviços do swarm.
+func TestSwarmReplicaStyleFlagsIncomplete(t *testing.T) {
+	// Compara a cor, não o render: em teste o lipgloss não emite ANSI.
+	full := swarmReplicaStyle("3/3").GetForeground()
+	partial := swarmReplicaStyle("1/2").GetForeground()
+	none := swarmReplicaStyle("0/2").GetForeground()
+	if full == partial || partial == none || full == none {
+		t.Fatalf("3/3, 1/2 e 0/2 devem ler diferente: %v %v %v", full, partial, none)
+	}
+	if r, w := swarmReplicaCounts("1/2"); r != 1 || w != 2 {
+		t.Fatalf("counts=%d/%d", r, w)
 	}
 }
 
 func TestSwarmKindTabsShowAll(t *testing.T) {
 	a := &App{swarmKind: swarmKindNodes}
 	got := stripANSI(a.renderSwarmKindTabs(120))
-	for _, want := range []string{"SERVICES", "NODES", "TASKS", "STACKS", "NETWORKS", "SECRETS", "CONFIGS", "EVENTS"} {
+	for _, want := range []string{"SERVIÇOS", "NÓS", "TAREFAS", "STACKS", "REDES", "SECRETS", "CONFIGS", "EVENTOS"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing tab %q in %q", want, got)
+		}
+	}
+	// As teclas 1-8 existem no handler e agora aparecem na régua.
+	for _, key := range []string{"1 ", "8 "} {
+		if !strings.Contains(got, key) {
+			t.Fatalf("tecla %q não aparece: %q", key, got)
 		}
 	}
 }

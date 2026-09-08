@@ -38,15 +38,22 @@ func TestTunnelStatusBadgeAnim(t *testing.T) {
 	}
 	a := stripANSI(tunnelStatusBadge("starting", 0))
 	b := stripANSI(tunnelStatusBadge("starting", 3))
-	if a == b || !strings.Contains(a, "starting") {
-		t.Fatalf("starting should animate: %q vs %q", a, b)
+	if a == b || !strings.Contains(a, "subindo") {
+		t.Fatalf("subindo deve animar: %q vs %q", a, b)
+	}
+	// Padrão do projeto: todo status é Braille animado, inclusive online.
+	if stripANSI(tunnelStatusBadge("online", 0)) == stripANSI(tunnelStatusBadge("online", 6)) {
+		t.Fatal("online deve animar entre quadros")
 	}
 }
 
 func TestGHALiveBadgeAnim(t *testing.T) {
 	run := stripANSI(ghaLiveBadge("running", 0))
-	if !strings.Contains(run, "running") {
+	if !strings.Contains(run, "rodando") {
 		t.Fatalf("%q", run)
+	}
+	if stripANSI(ghaLiveBadge("failure", 0)) == run {
+		t.Fatal("falha e rodando devem ler diferente")
 	}
 	a := &App{animFrame: 2}
 	got := stripANSI(a.loadingText("Carregando…"))

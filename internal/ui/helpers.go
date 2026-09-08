@@ -41,6 +41,28 @@ func padRight(s string, width int) string {
 	return s + strings.Repeat(" ", width-n)
 }
 
+// joinNonEmpty junta células de cabeçalho ignorando as de largura zero. Um
+// strings.Join direto ainda insere o separador da coluna que não existe, e a
+// linha estoura a caixa por 1 coluna em tela estreita.
+func joinNonEmpty(sep string, parts ...string) string {
+	out := parts[:0]
+	for _, p := range parts {
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return strings.Join(out, sep)
+}
+
+// padLeft alinha à direita numa largura fixa (colunas numéricas).
+func padLeft(s string, width int) string {
+	n := runewidth.StringWidth(s)
+	if n >= width {
+		return runewidth.Truncate(s, width, "…")
+	}
+	return strings.Repeat(" ", width-n) + s
+}
+
 func truncate(s string, max int) string {
 	if max <= 0 {
 		return ""
@@ -62,6 +84,13 @@ func sliceColumns(s string, start, width int) string {
 	if start == 0 {
 		return padRight(truncate(s, width), width)
 	}
+	// Rolado de lado, a linha continua para a direita como continuava antes: sem
+	// a reticência não dá para saber se o fim da tela é o fim da linha.
+	budget := width
+	more := runewidth.StringWidth(s) > start+width
+	if more && width > 1 {
+		budget = width - 1
+	}
 	var b strings.Builder
 	col := 0
 	for _, r := range s {
@@ -75,13 +104,17 @@ func sliceColumns(s string, start, width int) string {
 			col += w
 			continue
 		}
-		if runewidth.StringWidth(b.String())+w > width {
+		if runewidth.StringWidth(b.String())+w > budget {
 			break
 		}
 		b.WriteRune(r)
 		col += w
 	}
-	return padRight(b.String(), width)
+	out := b.String()
+	if more && width > 1 {
+		out += "…"
+	}
+	return padRight(out, width)
 }
 
 func absInt(v int) int {
@@ -269,35 +302,12 @@ func formatUptime(d time.Duration) string {
 	hours := int(d.Hours()) % 24
 	mins := int(d.Minutes()) % 60
 	if days > 0 {
-		return fmt.Sprintf("%dd %dh %dm", days, hours, mins)
+		return fmt.Sprintf("%dd %dh", days, hours)
 	}
 	if hours > 0 {
 		return fmt.Sprintf("%dh %dm", hours, mins)
 	}
 	return fmt.Sprintf("%dm", mins)
-}
-
-func frameworkIcon(name string) string {
-	switch strings.ToLower(name) {
-	case "go":
-		return StyleIconGo.Render("◆")
-	case "docker":
-		return StyleIconDocker.Render("🐳")
-	case "vue":
-		return StyleIconVue.Render("V")
-	case "laravel":
-		return StyleIconLaravel.Render("L")
-	case "node", "nestjs", "next.js", "react", "nuxt.js":
-		return StyleIconNode.Render("⬡")
-	case "php":
-		return StyleIconPHP.Render("P")
-	case "python", "django":
-		return StyleIconPython.Render("Py")
-	case "rust":
-		return StyleIconRust.Render("R")
-	default:
-		return StyleIconDefault.Render("•")
-	}
 }
 
 func renderMetricPills(m core.HostMetrics) string {
@@ -322,29 +332,6 @@ func metricUsageStyle(pct float64) lipgloss.Style {
 
 func renderKeybind(keys, desc string) string {
 	return StyleKey.Render(keys) + " " + StyleKeyDesc.Render(desc)
-}
-
-func frameworkIconPlain(name string) string {
-	switch strings.ToLower(name) {
-	case "go":
-		return "◆"
-	case "docker":
-		return "◆"
-	case "vue":
-		return "V"
-	case "laravel":
-		return "L"
-	case "node", "nestjs", "next.js", "react", "nuxt.js":
-		return "⬡"
-	case "php":
-		return "P"
-	case "python", "django":
-		return "Y"
-	case "rust":
-		return "R"
-	default:
-		return "•"
-	}
 }
 
 // tunnelCmdWidth keeps the tunnel-table call sites; same as actionsCmdWidth.

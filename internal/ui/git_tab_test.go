@@ -6,7 +6,10 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/mattn/go-runewidth"
 )
 
 func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
@@ -50,13 +53,30 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 	}
 	got := stripANSI(a.renderGitTab(&project))
 	for _, want := range []string{
-		"BRANCHES", "COMMITS", "MODIFIED FILES", "COMMAND LOG",
-		"ACTIVITY", "STASHES", "REMOTES", "AÇÕES",
-		"DES-2834", "stash@{0}", "origin",
+		"BRANCHES", "COMMITS", "ALTERAÇÕES", "LOG DE COMANDOS",
+		"STASHES", "DES-2834", "stash@{0}",
+		"github.com/org/repo", // o remoto vive no cabeçalho agora
+		// comandos por extenso na barra larga, no lugar da coluna AÇÕES
+		"commit", "checkout", "cherry-pick",
 	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("git main missing %q in:\n%s", want, got)
 		}
+	}
+	// ACTIVITY mostrava o mesmo que o LOG DE COMANDOS logo abaixo; a coluna
+	// AÇÕES e a caixa REMOTOS viraram barra de comandos e cabeçalho.
+	for _, gone := range []string{"ACTIVITY", "┌─AÇÕES", "┌─REMOTOS"} {
+		if strings.Contains(got, gone) {
+			t.Fatalf("sobra do layout antigo %q:\n%s", gone, got)
+		}
+	}
+	// lazygit saiu do produto.
+	if strings.Contains(strings.ToLower(got), "lazygit") {
+		t.Fatalf("lazygit não deveria mais aparecer:\n%s", got)
+	}
+	// Os seis cards de um valor cada viraram uma linha de contadores.
+	if strings.Contains(got, "┌─AHEAD/BEHIND") || strings.Contains(got, "┌─UNTRACKED") {
+		t.Fatalf("cards antigos ainda presentes:\n%s", got)
 	}
 	if strings.Contains(got, "DIFF ·") || strings.Contains(got, "\nDIFF\n") {
 		t.Fatal("main git view should not show inline DIFF panel")
@@ -79,7 +99,7 @@ func TestRenderGitCommandLogShowsOutput(t *testing.T) {
 		},
 	}
 	got := stripANSI(a.renderGitCommandLog(60, 10))
-	if !strings.Contains(got, "COMMAND LOG") || !strings.Contains(got, "git push") || !strings.Contains(got, "https://github.com") {
+	if !strings.Contains(got, "LOG DE COMANDOS") || !strings.Contains(got, "git push") || !strings.Contains(got, "https://github.com") {
 		t.Fatalf("%q", got)
 	}
 }
@@ -240,19 +260,19 @@ func TestOpenGitFileDiffAllowsScroll(t *testing.T) {
 	}
 	diff := "diff --git a/src/Hero.astro b/src/Hero.astro\n@@ -1,2 +1,2 @@\n-old line that is quite long " + strings.Repeat("x", 80) + "\n+new line that is also long " + strings.Repeat("y", 80) + "\n"
 	a := &App{
-		width:           80,
-		height:          24,
-		view:            ViewProject,
-		tab:             TabGit,
-		gitSubview:      gitSubviewMain,
+		width:             80,
+		height:            24,
+		view:              ViewProject,
+		tab:               TabGit,
+		gitSubview:        gitSubviewMain,
 		gitFocus:          gitFocusFiles,
 		gitViewBranch:     "main",
 		gitFileCursor:     0,
 		gitFileTreeCursor: 1, // file under ▾ src
-		selectedProject: &project,
-		snapshot:        core.Snapshot{Projects: []core.Project{project}},
-		gitWTDiff:       diff,
-		gitWTDiffFile:   "src/Hero.astro",
+		selectedProject:   &project,
+		snapshot:          core.Snapshot{Projects: []core.Project{project}},
+		gitWTDiff:         diff,
+		gitWTDiffFile:     "src/Hero.astro",
 	}
 	cmd := a.openGitFileDiff(&project)
 	if cmd != nil {
@@ -620,11 +640,11 @@ func TestCommitFileChangeCounts(t *testing.T) {
 func TestGitCommitDetailShowsFileStats(t *testing.T) {
 	project := core.Project{Path: "/tmp/repo", Name: "repo", Git: &core.GitInfo{IsRepo: true}}
 	a := &App{
-		width:  100,
-		height: 30,
-		view:   ViewProject,
-		tab:    TabGit,
-		gitSubview: gitSubviewCommit,
+		width:             100,
+		height:            30,
+		view:              ViewProject,
+		tab:               TabGit,
+		gitSubview:        gitSubviewCommit,
 		gitSelectedCommit: core.GitCommit{Hash: "abc1234", Message: "stats", Author: "dev", Date: "now"},
 		gitCommitFiles: []core.GitCommitFileChange{
 			{Status: "A", Path: "a.go"},
@@ -716,7 +736,7 @@ func TestSwitchGitCommitFileUsesCache(t *testing.T) {
 			{Status: "M", Path: "b.go"},
 		},
 		gitCommitFileCursor: 0,
-		gitCommitFileOpen:    true,
+		gitCommitFileOpen:   true,
 		gitCommitDiffCache: map[string]string{
 			"a.go": "diff a",
 			"b.go": "diff b",
@@ -820,3 +840,130 @@ func TestGitNewBranchPromptIsModal(t *testing.T) {
 		}
 	}
 }
+
+// A linha do grafo tem que caber na caixa: o prefixo de cursor não entrava na
+// conta e cortava o hash, que é justamente o que se copia.
+func TestGitGraphRowFitsBox(t *testing.T) {
+	a := &App{width: 120, height: 40, gitGraphCursor: 0}
+	a.gitGraphLayout = buildGraphLayout([]collectors.DAGCommit{
+		{Hash: "h1", Short: "7d6fb1a", Parents: []string{"h2"}, Author: "Igor",
+			Date: "3h", Subject: "feat(checkout): adiciona retorno do pix",
+			Refs: []string{"HEAD", "feature/pix-v2"}, IsHead: true},
+		{Hash: "h2", Short: "a1b2c3d", Author: "Ana", Date: "1d", Subject: "merge: traz main"},
+	})
+	for _, w := range []int{80, 100, 120, 160} {
+		for _, sel := range []bool{false, true} {
+			row := a.renderGitGraphListRow(a.gitGraphNodes()[0], sel, w-2)
+			if got := lipgloss.Width(row); got > w-2 {
+				t.Fatalf("largura %d > %d (sel=%v)", got, w-2, sel)
+			}
+		}
+		full := stripANSI(a.renderGitGraphListRow(a.gitGraphNodes()[0], false, w-2))
+		if !strings.Contains(full, "7d6fb1a") {
+			t.Fatalf("hash cortado em %d: %q", w, full)
+		}
+	}
+}
+
+// Emoji mede 2 colunas nas libs e 1 na maioria dos terminais — desalinha a
+// grade inteira do grafo.
+func TestGraphCommitIconsAreSingleWidth(t *testing.T) {
+	for _, subject := range []string{
+		"merge branch main", "security: bump dep", "fix: timeout", "feat: pix",
+		"docs: readme", "chore: bump", "test: cobertura", "qualquer coisa",
+	} {
+		icon := stripANSI(graphCommitIcon(subject))
+		if w := runewidth.StringWidth(icon); w != 1 {
+			t.Fatalf("ícone de %q mede %d colunas: %q", subject, w, icon)
+		}
+	}
+}
+
+// O cabeçalho tem que dizer se dá para dar push — é a pergunta que se faz ao
+// abrir a tela.
+// Remote (url do origin) e Remotes (lista) nem sempre vêm os dois; o cabeçalho
+// precisa achar o remoto em qualquer um dos dois.
+func TestGitHeaderFindsRemoteInEitherField(t *testing.T) {
+	only := &core.GitInfo{Remotes: []core.GitRemote{{Name: "origin", URL: "git@github.com:org/repo.git"}}}
+	if got := gitPrimaryRemote(only); got != "git@github.com:org/repo.git" {
+		t.Fatalf("só a lista: %q", got)
+	}
+	both := &core.GitInfo{Remote: "https://x/y.git", Remotes: []core.GitRemote{{Name: "origin", URL: "git@z:a/b.git"}}}
+	if got := gitPrimaryRemote(both); got != "https://x/y.git" {
+		t.Fatalf("Remote tem precedência: %q", got)
+	}
+	if gitPrimaryRemote(&core.GitInfo{}) != "" {
+		t.Fatal("sem remoto deve devolver vazio")
+	}
+}
+
+func TestGitHeaderShowsSyncState(t *testing.T) {
+	cases := []struct {
+		ahead, behind int
+		want          string
+	}{
+		{2, 0, "p/ enviar"},
+		{0, 3, "p/ trazer"},
+		{2, 3, "divergiu"},
+		{0, 0, "em dia"},
+	}
+	for _, c := range cases {
+		g := &core.GitInfo{IsRepo: true, Branch: "feat/x", Ahead: c.ahead, Behind: c.behind, Remote: "git@h:o/r.git"}
+		if got := stripANSI(gitBranchChip(g)); !strings.Contains(got, c.want) {
+			t.Fatalf("↑%d ↓%d deveria dizer %q: %q", c.ahead, c.behind, c.want, got)
+		}
+	}
+}
+
+// Prefixo "WIP on <branch>:" se repete em todo stash e come a largura da
+// mensagem, que é o que distingue um do outro.
+func TestGitStashSubjectStripsWipPrefix(t *testing.T) {
+	if got := gitStashSubject("WIP on DES-2886: ajustes do modal"); got != "ajustes do modal" {
+		t.Fatalf("got %q", got)
+	}
+	if got := gitStashSubject("On main: correção"); got != "correção" {
+		t.Fatalf("got %q", got)
+	}
+	if got := gitStashSubject("mensagem própria"); got != "mensagem própria" {
+		t.Fatalf("mensagem sem prefixo deve passar intacta: %q", got)
+	}
+}
+
+// As larguras das colunas vinham de a.width (terminal inteiro) enquanto os
+// painéis recebiam a largura sem a sidebar — as contas divergiam e o texto era
+// truncado duas vezes.
+func TestGitColumnWidthsFollowPanelNotTerminal(t *testing.T) {
+	a := &App{width: 200}
+	if a.gitBranchColWidth() == 20 {
+		t.Fatal("fixture inválida")
+	}
+	a.gitBranchColOverride, a.gitCommitColOverride = 20, 40
+	if a.gitBranchColWidth() != 20 || a.gitCommitColWidth() != 40 {
+		t.Fatal("durante o render das colunas vale a largura do painel")
+	}
+	a.gitBranchColOverride, a.gitCommitColOverride = 0, 0
+	if a.gitBranchColWidth() == 20 {
+		t.Fatal("fora do render volta a derivar do terminal")
+	}
+}
+
+// A barra estreita não pode esconder comando: quebra em duas linhas.
+func TestGitCommandBarWrapsInsteadOfHiding(t *testing.T) {
+	g := &core.GitInfo{IsRepo: true, Branch: "x", StashCount: 2}
+	narrow := stripANSI(a58().renderGitCommandBar(g, 58))
+	if !strings.Contains(narrow, "\n") {
+		t.Fatalf("deveria quebrar em duas linhas: %q", narrow)
+	}
+	for _, want := range []string{"commit", "checkout", "pull"} {
+		if !strings.Contains(narrow, want) {
+			t.Fatalf("comando %q sumiu da barra estreita: %q", want, narrow)
+		}
+	}
+	for _, line := range strings.Split(narrow, "\n") {
+		if lipgloss.Width(line) > 58 {
+			t.Fatalf("linha estourou 58: %q", line)
+		}
+	}
+}
+
+func a58() *App { return &App{width: 58, height: 40} }

@@ -142,23 +142,11 @@ func (a *App) ghaStatusForProcess(name, file string) ghaProcLive {
 	return live
 }
 
-func ghaLiveBadge(label string, frame int) string {
-	switch label {
-	case "running":
-		return StyleWarning.Render(animSpinner(frame) + " running")
-	case "queued":
-		return StyleWarning.Render(animArc(frame) + " queued")
-	case "triggered":
-		return StyleAccent.Render(animSpinner(frame) + " triggered")
-	case "success":
-		return StyleHealthy.Render(animPulse(frame) + " success")
-	case "failure":
-		return StyleUnhealthy.Render("● failure")
-	case "cancelled":
-		return StyleMuted.Render("○ stopped")
-	default:
-		return StyleMuted.Render("○ idle")
-	}
+// ghaLiveBadge é o mesmo vocabulário das tabelas do control center: glifo
+// sólido + palavra. O pulso em Braille ("⣀ success") some em fonte pequena.
+func ghaLiveBadge(label string, _ int) string {
+	glyph, text, st := ghaProcResult(ghaProcLive{Label: label})
+	return st.Render(glyph + " " + text)
 }
 
 func (a *App) ghaLoadProcessDetail() tea.Cmd {

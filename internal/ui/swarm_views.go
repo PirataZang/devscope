@@ -2,8 +2,8 @@ package ui
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/collectors"
@@ -149,10 +149,8 @@ func (a *App) swarmConfirmOpts() deleteConfirmOpts {
 
 func (a *App) renderSwarmCluster(p *core.Project, w, h int) string {
 	header := a.renderSwarmHeader(w, p)
-	status := a.renderSwarmStatusRow(w)
-	cards := a.renderSwarmCards(w)
 	tabs := a.renderSwarmKindTabs(w)
-	chromeH := lipgloss.Height(header) + lipgloss.Height(status) + lipgloss.Height(cards) + lipgloss.Height(tabs) + 2
+	chromeH := lipgloss.Height(header) + lipgloss.Height(tabs) + 2
 	bodyH := maxInt(8, h-chromeH-2)
 
 	rightW := maxInt(22, w*24/100)
@@ -170,121 +168,196 @@ func (a *App) renderSwarmCluster(p *core.Project, w, h int) string {
 	body := lipgloss.JoinHorizontal(lipgloss.Top, center, right)
 
 	hints := a.swarmHints()
-	return lipgloss.JoinVertical(lipgloss.Left, header, status, cards, tabs, body, a.renderStatusBar(hints))
+	return lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, a.renderStatusBar(hints))
 }
 
+// renderSwarmHeader concentra o que estava espalhado entre header, linha de
+// status e os seis cards — os três repetiam as mesmas contagens.
 func (a *App) renderSwarmHeader(width int, p *core.Project) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabSwarm)).Bold(true)
-	proj := "project"
+	left := accent.Render("⬡ DOCKER SWARM")
 	if p != nil && p.Name != "" {
-		proj = p.Name
-	} else if a.swarmProject != "" {
-		proj = a.swarmProject
+		left += StyleMuted.Render("   " + truncate(p.Name, 24))
 	}
-	left := accent.Render("DOCKER SWARM") + StyleMuted.Render(" › CLUSTER") +
-		StyleMuted.Render("  ·  ") + StyleNormal.Render(truncate(proj, 20))
-	right := StyleMuted.Render(time.Now().Format("15:04:05"))
+	left += "   " + a.swarmStateChip()
+
+	var right []string
+	info := a.swarmInfo
+	if info.Active {
+		right = append(right, StyleMuted.Render(fmt.Sprintf("%d manager · %d worker", info.Managers, info.Workers)))
+	}
+	if info.EngineVersion != "" {
+		right = append(right, StyleMuted.Render("engine "+info.EngineVersion))
+	}
 	if a.swarmLoading {
-		right = a.loadingMuted("Loading…")
+		right = append(right, a.loadingMuted("carregando…"))
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
-func (a *App) renderSwarmStatusRow(width int) string {
-	var badge string
+func (a *App) swarmStateChip() string {
+	info := a.swarmInfo
 	switch {
-	case a.swarmInfo.State == "unavailable" || (!collectors.SwarmAvailable() && a.swarmErr != ""):
-		badge = StyleUnhealthy.Render("✕ UNAVAILABLE")
-	case a.swarmInfo.State == "degraded":
-		badge = StyleWarning.Render("⚠ DEGRADED")
-	case a.swarmInfo.Active:
-		badge = a.livePulse("ACTIVE")
+	case !info.Active && info.Error != "":
+		return StyleUnhealthy.Render("✕ " + truncate(info.Error, 34))
+	case !info.Active:
+		return StyleWarning.Render("○ swarm inativo · i inicia")
+	case a.swarmNodesDown() > 0:
+		return StyleWarning.Render(fmt.Sprintf("◐ %d nó(s) fora", a.swarmNodesDown()))
 	default:
-		badge = StyleMuted.Render("○ INACTIVE")
+		return StyleHealthy.Render("● cluster ativo")
 	}
-	meta := StyleMuted.Render(fmt.Sprintf("  %d mgr  %d workers  cluster %s",
-		a.swarmInfo.Managers, a.swarmInfo.Workers, truncate(firstNonEmpty(a.swarmInfo.ClusterID, "—"), 12)))
-	if a.swarmInfo.EngineVersion != "" {
-		meta += StyleMuted.Render("  engine " + a.swarmInfo.EngineVersion)
-	}
-	line := badge + meta
-	if a.swarmErr != "" {
-		line += StyleMuted.Render("  ") + StyleUnhealthy.Render(truncate(a.swarmErr, 28))
-	}
-	return truncate(line, width)
 }
 
-func (a *App) renderSwarmCards(width int) string {
-	boxW := maxInt(10, width/6)
-	cards := []struct {
-		title, value string
-		style        lipgloss.Style
-	}{
-		{"MANAGERS", fmt.Sprintf("%d", a.swarmInfo.Managers), StyleAccent},
-		{"WORKERS", fmt.Sprintf("%d", a.swarmInfo.Workers), StyleNormal},
-		{"SERVICES", fmt.Sprintf("%d", len(a.swarmServices)), StyleAccent},
-		{"TASKS", fmt.Sprintf("%d", len(a.swarmTasks)), StyleNormal},
-		{"NETWORKS", fmt.Sprintf("%d", len(a.swarmNetworks)), StyleMuted},
-		{"STACKS", fmt.Sprintf("%d", len(a.swarmStacks)), StyleMuted},
+func (a *App) swarmNodesDown() int {
+	n := 0
+	for _, node := range a.swarmNodes {
+		if !strings.EqualFold(node.Status, "Ready") {
+			n++
+		}
 	}
-	parts := make([]string, 0, len(cards))
-	for _, c := range cards {
-		val := c.style.Render(truncate(c.value, boxW-4))
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
-	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return n
 }
 
+// renderSwarmKindTabs mostra as teclas 1-8 (existem no handler) e a contagem de
+// cada tipo — que antes eram seis caixas de 3 linhas para exibir um dígito.
 func (a *App) renderSwarmKindTabs(width int) string {
 	kinds := []swarmKind{
 		swarmKindServices, swarmKindNodes, swarmKindTasks, swarmKindStacks,
 		swarmKindNetworks, swarmKindSecrets, swarmKindConfigs, swarmKindEvents,
 	}
-	labels := make([]string, len(kinds))
-	for i, k := range kinds {
-		labels[i] = strings.ToUpper(k.String())
-	}
-	// Compact labels if full names don't fit the terminal width.
-	fullW := 0
-	for _, lab := range labels {
-		fullW += len(lab) + 3 // spaces + separator
-	}
-	if width > 0 && fullW > width {
-		short := []string{"SVC", "NODES", "TASKS", "STACKS", "NETS", "SECR", "CFGS", "EVTS"}
-		copy(labels, short)
-	}
 	parts := make([]string, 0, len(kinds))
 	for i, k := range kinds {
-		label := " " + labels[i] + " "
+		name := strings.ToUpper(swarmKindLabel(k))
+		label := fmt.Sprintf(" %d %s ", i+1, name)
+		if n := a.swarmCountFor(k); n > 0 {
+			label = fmt.Sprintf(" %d %s %d ", i+1, name, n)
+		}
 		if k == a.swarmKind {
 			parts = append(parts, StyleSelected.Render(label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	pad := width - lipgloss.Width(stripANSI(line))
-	if pad < 0 {
-		pad = 0
+	left := strings.Join(parts, StyleMuted.Render("│"))
+
+	ok, degraded, down := a.swarmServiceHealth()
+	var chips []string
+	if ok > 0 {
+		chips = append(chips, StyleHealthy.Render(fmt.Sprintf("● %d", ok))+StyleMuted.Render(" ok"))
 	}
-	return line + strings.Repeat(" ", pad)
+	if degraded > 0 {
+		chips = append(chips, StyleWarning.Render(fmt.Sprintf("◐ %d", degraded))+StyleMuted.Render(" incompleto"))
+	}
+	if down > 0 {
+		chips = append(chips, StyleUnhealthy.Render(fmt.Sprintf("○ %d", down))+StyleMuted.Render(" parado"))
+	}
+	joined := strings.Join(chips, "  ") + " "
+	// Sem espaço para os dois, a régua de tipos ganha — é a navegação.
+	if len(chips) == 0 || lipgloss.Width(left)+lipgloss.Width(joined)+2 > width {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, joined, width)
+}
+
+func swarmKindLabel(k swarmKind) string {
+	switch k {
+	case swarmKindServices:
+		return "Serviços"
+	case swarmKindNodes:
+		return "Nós"
+	case swarmKindTasks:
+		return "Tarefas"
+	case swarmKindStacks:
+		return "Stacks"
+	case swarmKindNetworks:
+		return "Redes"
+	case swarmKindSecrets:
+		return "Secrets"
+	case swarmKindConfigs:
+		return "Configs"
+	case swarmKindEvents:
+		return "Eventos"
+	}
+	return "Serviços"
+}
+
+func (a *App) swarmCountFor(k swarmKind) int {
+	switch k {
+	case swarmKindServices:
+		return len(a.swarmServices)
+	case swarmKindNodes:
+		return len(a.swarmNodes)
+	case swarmKindTasks:
+		return len(a.swarmTasks)
+	case swarmKindStacks:
+		return len(a.swarmStacks)
+	case swarmKindNetworks:
+		return len(a.swarmNetworks)
+	case swarmKindSecrets:
+		return len(a.swarmSecrets)
+	case swarmKindConfigs:
+		return len(a.swarmConfigs)
+	case swarmKindEvents:
+		return len(a.swarmEvents)
+	}
+	return 0
+}
+
+// swarmServiceHealth lê "3/3" vs "1/2" vs "0/2" — é o que se procura numa lista
+// de serviços do swarm.
+func (a *App) swarmServiceHealth() (ok, degraded, down int) {
+	for _, s := range a.swarmServices {
+		running, want := swarmReplicaCounts(s.Replicas)
+		switch {
+		case want > 0 && running == 0:
+			down++
+		case want > 0 && running < want:
+			degraded++
+		default:
+			ok++
+		}
+	}
+	return
+}
+
+func swarmReplicaCounts(replicas string) (running, want int) {
+	parts := strings.SplitN(strings.TrimSpace(replicas), "/", 2)
+	if len(parts) != 2 {
+		return 0, 0
+	}
+	running, _ = strconv.Atoi(strings.TrimSpace(parts[0]))
+	want, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
+	return
+}
+
+func swarmReplicaStyle(replicas string) lipgloss.Style {
+	running, want := swarmReplicaCounts(replicas)
+	switch {
+	case want == 0:
+		return StyleMuted
+	case running == 0:
+		return StyleUnhealthy
+	case running < want:
+		return StyleWarning
+	default:
+		return StyleHealthy
+	}
 }
 
 func (a *App) renderSwarmTable(width, height int) string {
-	title := strings.ToUpper(a.swarmKind.String())
+	title := strings.ToUpper(swarmKindLabel(a.swarmKind))
 	n := a.swarmRowCount()
 	if n > 0 {
 		title = fmt.Sprintf("%s (%d)", title, n)
 	}
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2)
+	inner2 := maxInt(8, width-2)
 	lines := []string{
-		StyleTableHeader.Render(truncate(a.swarmTableHeader(), width-4)),
-		StyleMuted.Render(strings.Repeat("─", maxInt(8, width-6))),
+		a.swarmTableHeader(inner2),
+		StyleMuted.Render(strings.Repeat("─", inner2)),
 	}
 	if n == 0 {
 		msg := "nenhum item"
@@ -298,40 +371,73 @@ func (a *App) renderSwarmTable(width, height int) string {
 	start := a.swarmScroll
 	end := minInt(start+viewport, n)
 	for i := start; i < end; i++ {
-		lines = append(lines, a.renderSwarmRow(i, width-4, i == a.swarmCursor && a.swarmFocus == 0))
+		lines = append(lines, a.renderSwarmRow(i, inner2, i == a.swarmCursor && a.swarmFocus == 0))
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 0)
 }
 
-func (a *App) swarmTableHeader() string {
+// swarmCols distribui as colunas pela largura útil. Antes o cabeçalho era uma
+// string fixa e as linhas usavam %-Ns próprios — os dois discordavam.
+type swarmCols struct{ mark, a, b, c, d, e int }
+
+func (a *App) swarmColumns(width int) swarmCols {
+	w := maxInt(30, width)
+	switch a.swarmKind {
+	case swarmKindServices:
+		c := swarmCols{mark: 1, a: minInt(24, maxInt(10, w*20/100)), c: 10, d: 8}
+		c.b = minInt(28, maxInt(10, w*22/100))
+		c.e = maxInt(8, w-c.mark-c.a-c.b-c.c-c.d-5)
+		return c
+	case swarmKindNodes:
+		c := swarmCols{a: minInt(20, maxInt(10, w*18/100)), b: 9, c: 8, d: 10}
+		c.e = maxInt(8, w-c.a-c.b-c.c-c.d-4)
+		return c
+	case swarmKindTasks:
+		c := swarmCols{a: minInt(24, maxInt(10, w*20/100)), b: minInt(18, maxInt(8, w*14/100)), c: 12, d: 9}
+		c.e = maxInt(10, w-c.a-c.b-c.c-c.d-4)
+		return c
+	default:
+		c := swarmCols{a: minInt(30, maxInt(12, w*26/100)), b: 12}
+		c.c = maxInt(10, w-c.a-c.b-2)
+		return c
+	}
+}
+
+func (a *App) swarmTableHeader(width int) string {
+	c := a.swarmColumns(width)
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padRight(truncate(t, n), n))
+	}
 	switch a.swarmKind {
 	case swarmKindNodes:
-		return "HOSTNAME          ROLE      STATUS   AVAIL     ENGINE"
+		return joinNonEmpty(" ", cell("HOSTNAME", c.a), cell("PAPEL", c.b), cell("ESTADO", c.c),
+			cell("DISPONIBIL.", c.d), cell("ENDEREÇO", c.e))
 	case swarmKindServices:
-		return "NAME                 IMAGE                    MODE        REPLICAS  STATUS   PORTS"
+		return joinNonEmpty(" ", cell("", c.mark), cell("SERVIÇO", c.a), cell("IMAGEM", c.b),
+			cell("MODO", c.c), cell("RÉPLICAS", c.d), cell("PORTAS", c.e))
 	case swarmKindTasks:
-		return "TASK                 SERVICE        NODE         DESIRED   CURRENT"
+		return joinNonEmpty(" ", cell("TAREFA", c.a), cell("SERVIÇO", c.b), cell("NÓ", c.c),
+			cell("DESEJADO", c.d), cell("ESTADO ATUAL", c.e))
 	case swarmKindStacks:
-		return "STACK                SERVICES   ORCHESTRATOR"
+		return joinNonEmpty(" ", cell("STACK", c.a), cell("SERVIÇOS", c.b), cell("ORQUESTRADOR", c.c))
 	case swarmKindNetworks:
-		return "NETWORK              DRIVER     SCOPE"
-	case swarmKindSecrets:
-		return "NAME                            CREATED"
-	case swarmKindConfigs:
-		return "NAME                            CREATED"
+		return joinNonEmpty(" ", cell("REDE", c.a), cell("DRIVER", c.b), cell("ESCOPO", c.c))
+	case swarmKindSecrets, swarmKindConfigs:
+		return joinNonEmpty(" ", cell("NOME", c.a), cell("CRIADO", c.b+c.c))
 	case swarmKindEvents:
-		return "TIME                 TYPE       ACTION              RESOURCE"
+		return joinNonEmpty(" ", cell("QUANDO", c.a), cell("TIPO", c.b), cell("O QUE ACONTECEU", c.c))
 	}
 	return ""
 }
 
 func (a *App) renderSwarmRow(i, width int, selected bool) string {
-	style := StyleNormal
-	if selected {
-		style = StyleSelected
-	}
-	projMark := ""
-	var text string
+	c := a.swarmColumns(width)
+	var cells []dashCell
+
 	switch a.swarmKind {
 	case swarmKindNodes:
 		n := a.swarmNodes[i]
@@ -339,44 +445,118 @@ func (a *App) renderSwarmRow(i, width int, selected bool) string {
 		if strings.EqualFold(n.Manager, "Leader") {
 			role = "LEADER"
 		}
-		st := n.Status
-		text = fmt.Sprintf("%-16s  %-8s  %-7s  %-8s  %s",
-			truncate(n.Hostname, 16), truncate(role, 8), truncate(st, 7), truncate(n.Availability, 8), truncate(n.Engine, 8))
+		glyph, st := swarmNodeDot(n, a.animFrame)
+		cells = []dashCell{
+			{text: glyph + " " + n.Hostname, width: c.a, style: st},
+			{text: role, width: c.b, style: swarmRoleStyle(role)},
+			{text: n.Status, width: c.c, style: st},
+			{text: n.Availability, width: c.d, style: swarmAvailStyle(n.Availability)},
+			{text: firstNonEmpty(n.Addr, n.Engine, emDash), width: c.e, style: StyleMuted},
+		}
 	case swarmKindServices:
 		s := a.swarmServices[i]
+		mark := " "
 		if collectors.SwarmBelongsToProject(s.Name, a.swarmProject) {
-			projMark = "·"
+			mark = "▸" // pertence a este projeto
 		}
-		st := collectors.SwarmServiceStatus(s.Replicas)
-		text = fmt.Sprintf("%s%-18s  %-22s  %-10s  %-8s  %-7s  %s",
-			projMark, truncate(s.Name, 18), truncate(s.Image, 22), truncate(s.Mode, 10),
-			truncate(s.Replicas, 8), truncate(st, 7), truncate(s.Ports, 16))
+		cells = []dashCell{
+			{text: mark, width: c.mark, style: StyleAccent},
+			{text: s.Name, width: c.a, style: StyleNormal.Bold(true)},
+			{text: elideLeft(s.Image, maxInt(1, c.b)), width: c.b, style: StyleMuted},
+			{text: s.Mode, width: c.c, style: StyleMuted},
+			{text: s.Replicas, width: c.d, style: swarmReplicaStyle(s.Replicas)},
+			{text: firstNonEmpty(s.Ports, emDash), width: c.e, style: lipgloss.NewStyle().Foreground(ColorAccent)},
+		}
 	case swarmKindTasks:
 		t := a.swarmTasks[i]
-		text = fmt.Sprintf("%-18s  %-12s  %-12s  %-8s  %s",
-			truncate(t.Name, 18), truncate(t.Service, 12), truncate(t.Node, 12),
-			truncate(t.DesiredState, 8), truncate(t.CurrentState, 16))
-	case swarmKindStacks:
-		s := a.swarmStacks[i]
-		if collectors.SwarmBelongsToProject(s.Name, a.swarmProject) {
-			projMark = "·"
+		// O erro da tarefa é a razão de olhar a aba; era coletado e nunca exibido.
+		current := t.CurrentState
+		curStyle := StyleMuted
+		if t.Error != "" {
+			current = t.Error
+			curStyle = StyleUnhealthy
+		} else if swarmStateFailed(t.CurrentState) {
+			curStyle = StyleUnhealthy
 		}
-		text = fmt.Sprintf("%s%-20s  %-9d  %s", projMark, truncate(s.Name, 20), s.Services, truncate(s.Orchestr, 12))
+		cells = []dashCell{
+			{text: t.Name, width: c.a, style: StyleNormal},
+			{text: t.Service, width: c.b, style: StyleMuted},
+			{text: t.Node, width: c.c, style: StyleMuted},
+			{text: t.DesiredState, width: c.d, style: StyleMuted},
+			{text: current, width: c.e, style: curStyle},
+		}
+	case swarmKindStacks:
+		st := a.swarmStacks[i]
+		mark := ""
+		if collectors.SwarmBelongsToProject(st.Name, a.swarmProject) {
+			mark = "▸ "
+		}
+		cells = []dashCell{
+			{text: mark + st.Name, width: c.a, style: StyleNormal.Bold(true)},
+			{text: fmt.Sprintf("%d", st.Services), width: c.b, style: StyleMuted},
+			{text: st.Orchestr, width: c.c, style: StyleMuted},
+		}
 	case swarmKindNetworks:
 		n := a.swarmNetworks[i]
-		text = fmt.Sprintf("%-18s  %-9s  %s", truncate(n.Name, 18), truncate(n.Driver, 9), truncate(n.Scope, 8))
+		cells = []dashCell{
+			{text: n.Name, width: c.a, style: StyleNormal},
+			{text: n.Driver, width: c.b, style: StyleMuted},
+			{text: n.Scope, width: c.c, style: StyleMuted},
+		}
 	case swarmKindSecrets:
-		s := a.swarmSecrets[i]
-		text = fmt.Sprintf("%-28s  %s", truncate(s.Name, 28), truncate(s.CreatedAt, 20))
+		sec := a.swarmSecrets[i]
+		cells = []dashCell{
+			{text: sec.Name, width: c.a, style: StyleNormal},
+			{text: sec.CreatedAt, width: c.b + c.c, style: StyleMuted},
+		}
 	case swarmKindConfigs:
-		c := a.swarmConfigs[i]
-		text = fmt.Sprintf("%-28s  %s", truncate(c.Name, 28), truncate(c.CreatedAt, 20))
+		cfg := a.swarmConfigs[i]
+		cells = []dashCell{
+			{text: cfg.Name, width: c.a, style: StyleNormal},
+			{text: cfg.CreatedAt, width: c.b + c.c, style: StyleMuted},
+		}
 	case swarmKindEvents:
 		e := a.swarmEvents[i]
-		text = fmt.Sprintf("%-18s  %-9s  %-18s  %s",
-			truncate(e.Time, 18), truncate(e.Type, 9), truncate(e.Action, 18), truncate(e.Resource, 20))
+		cells = []dashCell{
+			{text: e.Time, width: c.a, style: StyleMuted},
+			{text: e.Type, width: c.b, style: StyleMuted},
+			{text: strings.TrimSpace(e.Action + "  " + e.Resource), width: c.c, style: StyleNormal},
+		}
 	}
-	return style.Width(width).MaxWidth(width).Render(truncate(text, width))
+	return renderCells(selected, cells)
+}
+
+func swarmNodeDot(n collectors.SwarmNode, frame int) (string, lipgloss.Style) {
+	switch {
+	case strings.EqualFold(n.Status, "Ready") && strings.EqualFold(n.Availability, "Active"):
+		return pulseGlyph(pulseOK, frame), StyleHealthy
+	case strings.EqualFold(n.Status, "Ready"):
+		return pulseGlyph(pulseWarn, frame), StyleWarning
+	default:
+		return pulseGlyph(pulseBad, frame), StyleUnhealthy
+	}
+}
+
+func swarmRoleStyle(role string) lipgloss.Style {
+	if role == "LEADER" || role == "MANAGER" {
+		return lipgloss.NewStyle().Foreground(ColorAccent)
+	}
+	return StyleMuted
+}
+
+// swarmAvailStyle: Drain e Pause tiram o nó do escalonamento — some com as
+// réplicas sem o serviço parecer quebrado.
+func swarmAvailStyle(avail string) lipgloss.Style {
+	if strings.EqualFold(avail, "Active") {
+		return StyleMuted
+	}
+	return StyleWarning
+}
+
+func swarmStateFailed(state string) bool {
+	s := strings.ToLower(state)
+	return strings.Contains(s, "fail") || strings.Contains(s, "reject") ||
+		strings.Contains(s, "orphan") || strings.Contains(s, "shutdown")
 }
 
 func (a *App) renderSwarmSummary(width, height int) string {
@@ -426,7 +606,7 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 			online++
 		}
 	}
-	title := fmt.Sprintf("NODES %d/%d ONLINE", online, len(a.swarmNodes))
+	title := fmt.Sprintf("NÓS %d/%d PRONTOS", online, len(a.swarmNodes))
 	inner := maxInt(2, height-2)
 	lines := []string{}
 	managers := []collectors.SwarmNode{}
@@ -441,9 +621,9 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 	if len(managers) > 0 {
 		lines = append(lines, StyleMuted.Render("MANAGERS"))
 		for _, n := range managers {
-			dot := a.livePulse("")
+			dot := a.swarmNodeDotStyled(n)
 			if !strings.EqualFold(n.Status, "Ready") {
-				dot = StyleUnhealthy.Render("●")
+				dot = StyleUnhealthy.Render(pulseGlyph(pulseBad, a.animFrame))
 			}
 			role := n.Manager
 			if role == "" {
@@ -456,9 +636,9 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 	if len(workers) > 0 {
 		lines = append(lines, StyleMuted.Render("WORKERS"))
 		for _, n := range workers {
-			dot := a.livePulse("")
+			dot := a.swarmNodeDotStyled(n)
 			if !strings.EqualFold(n.Status, "Ready") {
-				dot = StyleUnhealthy.Render("○")
+				dot = StyleUnhealthy.Render(pulseGlyph(pulseBad, a.animFrame))
 			}
 			lines = append(lines, dot+" "+StyleNormal.Render(truncate(n.Hostname, width-8)))
 			lines = append(lines, StyleMuted.Render("  "+truncate(n.Status+" · "+n.Availability, width-6)))
@@ -675,4 +855,9 @@ func (a *App) renderSwarmDetailBox(termW, termH int) string {
 		title = strings.ToUpper(a.swarmKind.String()) + " · " + name
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, inner), w, h, true)
+}
+
+func (a *App) swarmNodeDotStyled(n collectors.SwarmNode) string {
+	glyph, st := swarmNodeDot(n, a.animFrame)
+	return st.Render(glyph)
 }

@@ -37,7 +37,12 @@ type App struct {
 	helpOn     bool
 	helpScroll int
 
-	themeOn       bool
+	themeOn bool
+
+	// Histórico das métricas do host para as sparklines do dashboard.
+	hostCPUHist   sparkHistory
+	hostRAMHist   sparkHistory
+	hostDiskHist  sparkHistory
 	themeCursor   int
 	themePrevious string // restore on esc
 
@@ -57,6 +62,8 @@ type App struct {
 	gitWTDiffScroll             int
 	gitWTDiffHScroll            int
 	gitListViewportOverride     int
+	gitBranchColOverride        int
+	gitCommitColOverride        int
 	gitViewBranch               string
 	gitWTDiff                   string
 	gitWTDiffFile               string
@@ -205,6 +212,7 @@ type App struct {
 	gitGraphBranchFilter        string
 	containerSubview            containerSubview
 	containerScroll             int
+	containerTableWidth         int
 	containerStatusMsg          string
 	containerActions            map[string]string
 	containerShellExitErr       string
@@ -482,6 +490,9 @@ type App struct {
 	ngrokNewPortStr             string
 	ngrokNewName                string
 	ngrokNewProto               string
+	ngrokNewDomain              string
+	ngrokNewRegion              string
+	ngrokNewAuto                bool
 	ngrokWizardField            int // 0 name, 1 port, 2 proto
 	ngrokWizardCursor           int
 	ngrokStatus                 string
@@ -576,10 +587,11 @@ type App struct {
 	jenkinsInfo                 jenkinsutil.ServerInfo
 	nginxOpen                   bool
 	nginxLoading                bool
-	nginxFocus                  nginxFocus
+	nginxView                   nginxView
 	nginxCursor                 int
 	nginxScroll                 int
-	nginxDetailsScroll          int
+	nginxFileScroll             int
+	nginxFileHScroll            int
 	nginxStatus                 string
 	nginxErr                    string
 	nginxConfirmDelete          bool
@@ -894,6 +906,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		a.snapshot = a.store.Get()
 		a.now = time.Now()
+		a.sampleHostMetrics()
 		var cmds []tea.Cmd
 		cmds = append(cmds, tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }))
 		if cmd := a.kickAnim(); cmd != nil {
@@ -1032,13 +1045,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		a.deployConfirm = false
 		a.snapshot = a.store.Get()
-		return a, nil
-
-	case lazyGitDoneMsg:
-		a.snapshot = a.store.Get()
-		if msg.err != nil {
-			a.statusMsg = "lazygit: " + msg.err.Error()
-		}
 		return a, nil
 
 	case containerActionDoneMsg:
@@ -1224,7 +1230,10 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.helpScroll = 0
 		return a, nil
 
-	case msg.String() == "T":
+	// Só no dashboard: como atalho global, T maiúsculo era engolido em todo
+	// campo de texto que não estivesse na lista de exceções acima (wizards de
+	// túnel, formulários do GH Actions, mensagem de commit…).
+	case msg.String() == "T" && a.view == ViewDashboard:
 		a.openThemePicker()
 		return a, nil
 
@@ -1677,7 +1686,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, nil
 	case "L":
 		if a.tab == TabActions && !a.ghaOpen {
-			// Login gh na landing do Actions (não conflictar com lazygit).
 			a.ghaPath = p.Path
 			if p.Git != nil {
 				a.ghaRemote = p.Git.Remote
@@ -1690,7 +1698,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			}
 			return a, a.ghaBeginLogin()
 		}
-		return a, a.openLazyGit(p.Path)
 	case "!":
 		if a.tab == TabActions && !a.ghaOpen {
 			return a, a.openGHAClient(p)
@@ -1834,10 +1841,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			}
 			return a, nil
 		}
-		a.closeToolClients()
-		a.tab = TabMetrics
-		a.tabCursor = 0
-		return a, nil
 	case "c":
 		if a.gitTabReady(p) {
 			a.startGitCompose(p)
@@ -1963,7 +1966,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if cmd := a.tabNav(-1, p); cmd != nil {
 			return a, cmd
 		}
-		if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+		if a.tab == TabOverview || a.tab == TabLogs {
 			if a.projectContentScroll > 0 {
 				a.projectContentScroll--
 			}
@@ -1977,7 +1980,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if cmd := a.tabNav(1, p); cmd != nil {
 			return a, cmd
 		}
-		if a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs {
+		if a.tab == TabOverview || a.tab == TabLogs {
 			a.projectContentScroll++
 			return a, nil
 		}
@@ -1988,10 +1991,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "h", "H":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
 			return a, a.gitFocusPrev()
-		} else if a.tab != TabContainers || a.containerSubview != containerSubviewDetail {
-			a.closeToolClients()
-			a.tab = TabHealth
-			a.tabCursor = 0
 		}
 	case "right":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
@@ -2285,7 +2284,7 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	moduleDash := a.tab == TabOverview || a.tab == TabHealth || a.tab == TabLogs || a.tab == TabMetrics ||
+	moduleDash := a.tab == TabOverview || a.tab == TabLogs ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
@@ -2322,14 +2321,10 @@ func (a *App) renderProject() string {
 		case containerSubviewPorts:
 			hints = "↑↓ porta  enter preview  o browser  x fechar  esc back  " + hints
 		default:
-			hints = "↑↓ lista  enter portas  m detalhe  v só docker  / buscar  e shell  s/r/S-R/p/d  " + hints
+			// Os comandos do módulo estão na barra larga da própria tela; aqui
+			// fica só a navegação entre módulos.
+			hints = "↑↓ lista  ·  " + hints
 		}
-	}
-	if a.tab == TabHealth {
-		hints = "Status · probes/portas/SSL  ↑↓ scroll  " + hints
-	}
-	if a.tab == TabMetrics {
-		hints = "Metrics · CPU/RAM containers  " + hints
 	}
 	if a.tab == TabAPI && !a.apiOpen {
 		hints = "enter abrir API  " + hints
@@ -2537,10 +2532,6 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderGitTab(p)
 	case TabContainers:
 		return a.renderContainersTab(p)
-	case TabMetrics:
-		return a.renderMetricsTab(p)
-	case TabHealth:
-		return a.renderHealthTab(p)
 	case TabLogs:
 		return a.renderLogsTab(p)
 	case TabAPI:
@@ -2749,7 +2740,7 @@ func getHelpText() string {
   ctrl+p       Filtro fuzzy de projetos (só na lista)
   ctrl+t       Relax — animações de terminal (↑↓ troca o game)
   ?            Alternar exibição de ajuda
-  T            Escolher theme (modal)
+  T            Escolher tema (só na tela inicial de projetos)
   q            Sair do DevScope
 
 Dashboard:
@@ -2764,7 +2755,6 @@ Abas de Projeto:
   shift+tab    Módulo anterior
   h            Ir para Status (probes / portas / SSL)
   l            Ir para Containers (logs no detalhe)
-  L            Abrir LazyGit no projeto
   D            Executar Deploy script (confirmação y/n)
   shift+u      Docker compose up -d
   shift+d      Docker compose down

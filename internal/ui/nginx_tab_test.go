@@ -74,7 +74,7 @@ func TestNginxLandingAndOpen(t *testing.T) {
 		t.Fatalf("sites: %+v", a.nginxSites)
 	}
 	view := stripANSI(a.renderNginxTab(&p))
-	for _, want := range []string{"devscope", "nginx", "CONFS", "DETALHES", "api"} {
+	for _, want := range []string{"NGINX", "1 ROTAS", "2 ARQUIVO", "api", "127.0.0.1:3000"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}

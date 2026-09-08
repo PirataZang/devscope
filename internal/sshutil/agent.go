@@ -253,6 +253,12 @@ func RecentLogs(name string, limit int) []string {
 	return append([]string(nil), st.logLines[start:]...)
 }
 
+// TunnelArgs é o comando que StartTunnel roda, exposto para o preview da tela.
+func TunnelArgs(cfg TunnelConfig) []string {
+	cfg.normalize()
+	return tunnelArgs(cfg)
+}
+
 func tunnelArgs(cfg TunnelConfig) []string {
 	args := []string{
 		"-N",

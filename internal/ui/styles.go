@@ -51,9 +51,9 @@ var (
 			Foreground(ColorPrimary).
 			MarginBottom(1)
 
+	// Sem borda: o dashboard ocupa a tela inteira. As caixas aninhadas que
+	// existiam aqui só empilhavam moldura em cima de moldura.
 	StyleDashboard = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(ColorBorder).
 			Padding(1, 2)
 
 	StyleInnerPanel = lipgloss.NewStyle().

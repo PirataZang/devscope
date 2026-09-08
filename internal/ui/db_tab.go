@@ -333,144 +333,126 @@ func parseDBResultRows(out string) int {
 	return 0
 }
 
+// renderDbTab: sem sub-abas — tabelas, schema, SQL e resultado convivem na
+// mesma tela — então a régua numerada sai; no lugar fica a régua de
+// contadores (§5), que substitui os cinco cards de um número cada e a linha
+// de filtro que existiam antes. A coluna vertical "AÇÕES" também saiu: os
+// atalhos vão na barra de comandos, presa embaixo (§2.3).
 func (a *App) renderDbTab(p *core.Project) string {
 	w := a.screenWidth()
 	h := a.screenHeight()
 	a.syncDbTableCursor()
 
 	header := a.renderDbHeader(p, w)
-	cards := a.renderDbCards(w)
-	filterLine := a.renderDbFilterLine(w)
-	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + lipgloss.Height(filterLine) + 2
-	bodyH := maxInt(10, h-chromeH-2)
+	status := a.renderDbStatusLine(w)
+	cmdBar := a.renderDbCommandBar(w)
+	bodyH := maxInt(10, h-lipgloss.Height(header)-lipgloss.Height(status)-lipgloss.Height(cmdBar))
 
 	topH := maxInt(6, bodyH*42/100)
 	sqlH := maxInt(4, bodyH*22/100)
 	resultH := maxInt(5, bodyH-topH-sqlH)
 
-	cmdW := actionsCmdWidth(w)
-	mainW := maxInt(40, w-cmdW)
-	leftW := maxInt(22, mainW*28/100)
+	leftW := maxInt(22, w*28/100)
 	if leftW > 36 {
 		leftW = 36
 	}
-	schemaW := maxInt(24, mainW-leftW-1)
+	schemaW := maxInt(24, w-leftW-1)
 	tables := a.renderDbTablesPane(leftW, topH)
 	schema := a.renderDbSchemaPane(schemaW, topH)
 	top := lipgloss.JoinHorizontal(lipgloss.Top, tables, schema)
-	query := a.renderDbQueryPane(mainW, sqlH)
-	result := a.renderDbResultPane(mainW, resultH)
-	main := lipgloss.JoinVertical(lipgloss.Left, top, query, result)
-	actions := renderActionsBox(cmdW, lipgloss.Height(main),
-		[2]string{"enter", "preview"},
-		[2]string{"d", "schema"},
-		[2]string{"e", "SQL"},
-		[2]string{"^↵", "run"},
-		[2]string{"b", "filtro"},
-		[2]string{"[]", "banco"},
-		[2]string{"tab", "painel"},
-		[2]string{"↑↓", "navegar"},
-		[2]string{"esc", "sair"},
-	)
+	query := a.renderDbQueryPane(w, sqlH)
+	result := a.renderDbResultPane(w, resultH)
+	body := lipgloss.JoinVertical(lipgloss.Left, top, query, result)
 
-	hints := "↑↓ tabelas  enter preview  d schema  e SQL  ctrl+enter run  b filtro  [] banco  esc"
-	if a.dbPane == dbPaneResult && !a.dbEditing {
-		hints = "↑↓ scroll  ←→ lateral  tab painel  esc"
+	stack := lipgloss.JoinVertical(lipgloss.Left, header, status, body)
+	if fill := h - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
 	}
-	if a.dbEditing {
-		hints = "editando SQL  ctrl+enter run  esc sair"
-	}
-	if a.dbFilterOn {
-		hints = "filtro de tabelas  enter aplicar  esc limpar"
-	}
-	if a.dbLoading {
-		hints = a.spinner() + " carregando…  " + hints
-	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		header, cards, filterLine,
-		lipgloss.JoinHorizontal(lipgloss.Top, main, actions),
-		a.renderStatusBar(hints),
-	)
+	return clampRenderedHeight(lipgloss.JoinVertical(lipgloss.Left, stack, cmdBar), h)
 }
 
 func (a *App) renderDbHeader(p *core.Project, width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabDatabase)).Bold(true)
-	left := accent.Render("devscope") + StyleMuted.Render(" › database")
-	if p != nil {
-		left += StyleMuted.Render("  ") + StyleNormal.Render(truncate(p.Name, 24))
+	left := accent.Render("▦ DATABASE")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   ") + StyleNormal.Bold(true).Render(truncate(p.Name, 24))
 	}
 	t, ok := a.currentDbTarget()
-	right := StyleMuted.Render("nenhum target")
+	var right []string
 	if ok {
-		right = accent.Render(string(t.Engine)) + StyleMuted.Render(" · "+truncate(t.User+"@"+t.Database, 28))
+		target := accent.Render(string(t.Engine)) + StyleMuted.Render(" · "+truncate(t.User+"@"+t.Database, 28))
 		if len(a.dbTargets) > 1 {
-			right += StyleMuted.Render(fmt.Sprintf("  [%d/%d]", a.dbTargetIdx+1, len(a.dbTargets)))
+			target += StyleMuted.Render(fmt.Sprintf("  [%d/%d]", a.dbTargetIdx+1, len(a.dbTargets)))
 		}
+		right = append(right, target)
+	} else {
+		right = append(right, StyleMuted.Render("nenhum target"))
+	}
+	if a.dbLoading {
+		right = append(right, a.loadingMuted("carregando…"))
+	}
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
+}
+
+// renderDbStatusLine substitui os cards e a linha de filtro por uma régua só.
+func (a *App) renderDbStatusLine(width int) string {
+	if a.dbFilterOn {
+		left := StyleKey.Render("filtrar ") + StyleSelected.Render(a.dbFilterInput+"▌")
+		return joinWithSpacer(left, StyleMuted.Render("nome da tabela"), width)
 	}
 	if a.dbErr != "" {
-		right = StyleUnhealthy.Render(truncate(a.dbErr, 36))
+		return padRightVisible(truncateVisible(StyleUnhealthy.Render(a.dbErr), width), width)
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
-}
-
-func (a *App) renderDbCards(width int) string {
-	t, ok := a.currentDbTarget()
-	eng := "—"
-	target := "—"
-	if ok {
-		eng = string(t.Engine)
-		target = t.Label
-	}
-	rowsEst := "—"
-	if a.dbSchema.Rows >= 0 {
-		rowsEst = fmt.Sprintf("~%d", a.dbSchema.Rows)
-	} else if a.dbResultRows > 0 {
-		rowsEst = fmt.Sprintf("%d", a.dbResultRows)
-	}
-	colsN := "—"
-	if n := len(a.dbSchema.Columns); n > 0 {
-		colsN = fmt.Sprintf("%d", n)
-	}
-	boxW := maxInt(12, width/5)
-	cards := []struct{ title, value string }{
-		{"ENGINE", eng},
-		{"TABLES", fmt.Sprintf("%d", len(a.dbTables))},
-		{"TARGET", target},
-		{"COLS", colsN},
-		{"ROWS", rowsEst},
-	}
-	parts := make([]string, 0, len(cards))
-	for _, c := range cards {
-		val := StyleNormal.Render(truncate(c.value, boxW-4))
-		switch c.title {
-		case "ENGINE":
-			val = StyleHealthy.Render(truncate(c.value, boxW-4))
-		case "TABLES":
-			val = StyleWarning.Render(truncate(c.value, boxW-4))
-		}
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
-	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
-}
-
-func (a *App) renderDbFilterLine(width int) string {
-	if a.dbFilterOn {
-		return StyleKey.Render("filter ") + StyleSelected.Render(a.dbFilterInput+"▌")
-	}
+	vis := a.filteredDbTables()
+	countLbl := fmt.Sprintf("%d tabelas", len(a.dbTables))
 	if q := strings.TrimSpace(a.dbFilter); q != "" {
-		vis := len(a.filteredDbTables())
-		return StyleMuted.Render("filter: ") + StyleNormal.Render(q) +
-			StyleMuted.Render(fmt.Sprintf("  (%d/%d)  b editar · esc limpar", vis, len(a.dbTables)))
+		countLbl = fmt.Sprintf("%d/%d tabelas · \"%s\"", len(vis), len(a.dbTables), q)
 	}
-	sel, _ := a.selectedDbTable()
-	if sel == "" {
-		sel = "—"
+	parts := []string{StyleHealthy.Render(countLbl)}
+	if sel, ok := a.selectedDbTable(); ok {
+		parts = append(parts, StyleNormal.Render(sel))
+		if n := len(a.dbSchema.Columns); n > 0 {
+			parts = append(parts, StyleMuted.Render(fmt.Sprintf("%d cols", n)))
+		}
+		if a.dbSchema.Rows >= 0 {
+			parts = append(parts, StyleMuted.Render(fmt.Sprintf("~%d rows", a.dbSchema.Rows)))
+		}
 	}
-	return StyleMuted.Render(truncate("tabela: "+sel+"  ·  b filtrar  ·  d schema  ·  enter preview", maxInt(20, width-2)))
+	if a.dbResultRows > 0 {
+		parts = append(parts, StyleMuted.Render(fmt.Sprintf("resultado: %d linhas", a.dbResultRows)))
+	}
+	left := strings.Join(parts, StyleMuted.Render("  ·  "))
+	return padRightVisible(truncateVisible(left, width), width)
+}
+
+func (a *App) renderDbCommandBar(width int) string {
+	if a.dbFilterOn {
+		return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2,
+			[2]string{"enter", "aplicar"}, [2]string{"esc", "limpar"}))
+	}
+	if a.dbEditing {
+		return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2,
+			[2]string{"ctrl+enter", "rodar sql"}, [2]string{"esc", "sair do editor"}))
+	}
+	items := [][2]string{{"↑↓", "navegar"}, {"tab", "painel"}}
+	switch a.dbPane {
+	case dbPaneResult:
+		items = append(items, [2]string{"←→", "lateral"})
+	default:
+		items = append(items,
+			[2]string{"enter", "preview"},
+			[2]string{"d", "schema"},
+			[2]string{"e", "editar sql"},
+			[2]string{"ctrl+enter", "rodar"},
+			[2]string{"b", "filtrar"},
+		)
+	}
+	if len(a.dbTargets) > 1 {
+		items = append(items, [2]string{"[]", "trocar banco"})
+	}
+	items = append(items, [2]string{"r", "atualizar"}, [2]string{"esc", "voltar"})
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
 
 func (a *App) renderDbTablesPane(width, height int) string {

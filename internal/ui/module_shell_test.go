@@ -61,21 +61,21 @@ func TestWatchTabsFollowModuleShell(t *testing.T) {
 		},
 	}
 	a := &App{
-		width: 120, height: 40, tab: TabHealth,
+		width: 120, height: 40, tab: TabAPI,
 		selectedProject: &p,
 		snapshot:        core.Snapshot{Projects: []core.Project{p}},
 	}
 	for name, view := range map[string]string{
-		"health":  stripANSI(a.renderHealthTab(&p)),
-		"logs":    stripANSI(a.renderLogsTab(&p)),
-		"metrics": stripANSI(a.renderMetricsTab(&p)),
-		"api":     stripANSI(a.renderApiLanding(&p)),
-		"db":      stripANSI(a.renderDbLanding(&p)),
-		"json":    stripANSI(a.renderJsonLanding(&p)),
-		"jwt":     stripANSI(a.renderJwtLanding(&p)),
-		"routes":  stripANSI(a.renderRoutesLanding(&p)),
+		"logs":   stripANSI(a.renderLogsTab(&p)),
+		"api":    stripANSI(a.renderApiLanding(&p)),
+		"db":     stripANSI(a.renderDbLanding(&p)),
+		"json":   stripANSI(a.renderJsonLanding(&p)),
+		"jwt":    stripANSI(a.renderJwtLanding(&p)),
+		"routes": stripANSI(a.renderRoutesLanding(&p)),
 	} {
-		for _, want := range []string{"Projeto", "DETALHES", "AÇÕES"} {
+		// A barra de topo identifica módulo + projeto aberto; "Projeto X
+		// Ambiente Y Servidor Z" saiu porque a sidebar já mostra tudo isso.
+		for _, want := range []string{"/p", "Running", "DETALHES", "AÇÕES"} {
 			if !strings.Contains(view, want) {
 				t.Fatalf("%s missing %q in:\n%s", name, want, view)
 			}

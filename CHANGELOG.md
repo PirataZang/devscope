@@ -53,7 +53,6 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - Modo de conflito (após pull-merge, pull-rebase, `M` ou cherry-pick): lista arquivos em conflito com diff colorido ours (`o`, −) vs theirs (`t`, +)
   - Resolver por arquivo com `o` (ours) / `t` (theirs) / `b` (manter ambos os lados) ou editar manualmente
   - `c` continue / `x` abort da operação em andamento (merge/rebase/cherry-pick)
-  - `L` (LazyGit) continua disponível como via de escape
 - **Aba Relax (`Ctrl+T`)** — animações de terminal para descansar a cabeça; nada roda de fato aqui
   - Novas cenas: **Tetris**, **Sword**, **Hourglass**, **Chess**, **Jackpot** e **V4** (motor a pistões)
   - Motor de renderização em Braille compartilhado entre as cenas

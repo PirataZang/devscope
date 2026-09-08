@@ -260,6 +260,10 @@ func (a *App) renderRoutesLanding(p *core.Project) string {
 	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
 }
 
+// renderRoutesTab: sem sub-abas — só existe uma visão (tabela + inspector) —
+// então a régua numerada do padrão de módulo (§2.2) sai; a linha que ficaria
+// no lugar dela vira a régua de contadores (§5), fundida com o status do
+// filtro, no lugar dos cinco cards de um número cada que existiam antes.
 func (a *App) renderRoutesTab(p *core.Project) string {
 	w := a.screenWidth()
 	h := a.screenHeight()
@@ -269,11 +273,9 @@ func (a *App) renderRoutesTab(p *core.Project) string {
 	}
 
 	header := a.renderRoutesHeader(p, w)
-	cards := a.renderRoutesCards(w)
-	filterLine := a.renderRoutesFilterLine(w)
-
-	chromeH := lipgloss.Height(header) + lipgloss.Height(cards) + lipgloss.Height(filterLine) + 2
-	bodyH := maxInt(8, h-chromeH-2)
+	status := a.renderRoutesStatusLine(w)
+	cmdBar := a.renderRoutesCommandBar(w)
+	bodyH := maxInt(8, h-lipgloss.Height(header)-lipgloss.Height(status)-lipgloss.Height(cmdBar))
 
 	rightW := maxInt(24, w*28/100)
 	if rightW > 40 {
@@ -284,97 +286,77 @@ func (a *App) renderRoutesTab(p *core.Project) string {
 	detail := a.renderRoutesInspector(visible, rightW, bodyH)
 	body := lipgloss.JoinHorizontal(lipgloss.Top, list, detail)
 
-	hints := "↑↓ navegar  b filtrar  enter → API  r rescan  esc"
-	if a.routesLoading {
-		hints = "scanning…  esc"
-	} else if a.routesFilterOn {
-		hints = "filtro: path · auth · source · file  enter aplicar  esc limpar"
+	stack := lipgloss.JoinVertical(lipgloss.Left, header, status, body)
+	if fill := h - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
 	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		header, cards, filterLine, body,
-		a.renderStatusBar(hints),
-	)
+	return clampRenderedHeight(lipgloss.JoinVertical(lipgloss.Left, stack, cmdBar), h)
 }
 
 func (a *App) renderRoutesHeader(p *core.Project, width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabRoutes)).Bold(true)
-	left := accent.Render("devscope") + StyleMuted.Render(" › rotas")
-	if p != nil {
-		left += StyleMuted.Render("  ") + StyleNormal.Render(truncate(p.Name, 28))
+	left := accent.Render("◈ ROTAS")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   ") + StyleNormal.Bold(true).Render(truncate(p.Name, 24))
 	}
-	right := StyleMuted.Render(a.routesStatus)
-	if a.routesErr != "" {
-		right = StyleUnhealthy.Render(truncate(a.routesErr, 36))
-	} else if a.routesLoading {
-		right = StyleMuted.Render("escaneando…")
+	var right []string
+	if a.routesLoading {
+		right = append(right, a.loadingMuted("escaneando…"))
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
-func (a *App) renderRoutesCards(width int) string {
+// renderRoutesStatusLine substitui os cards (um por número) e a linha de
+// filtro separada: uma régua só, contadores por `·` (§5).
+func (a *App) renderRoutesStatusLine(width int) string {
+	if a.routesFilterOn {
+		left := StyleKey.Render("filtrar ") + StyleSelected.Render(a.routesFilterInput+"▌")
+		right := StyleMuted.Render("auth · public · path · source")
+		return joinWithSpacer(left, right, width)
+	}
+	if a.routesLoading && len(a.routes) == 0 {
+		return padRightVisible(truncateVisible(a.loadingMuted("escaneando OpenAPI e código…"), width), width)
+	}
+	if a.routesErr != "" {
+		return padRightVisible(truncateVisible(StyleUnhealthy.Render(a.routesErr), width), width)
+	}
+	return padRightVisible(truncateVisible(a.routesCountersLine(), width), width)
+}
+
+// routesCountersLine reaproveita a.routesStatus (stack detectada + contagem +
+// filtro, já mantidos por handleRoutesLoaded/refreshRoutesStatusFilter) e só
+// acrescenta a distribuição por método.
+func (a *App) routesCountersLine() string {
+	base := a.routesStatus
+	if base == "" {
+		base = a.routesCountLabel()
+	}
+	if len(a.routes) == 0 {
+		return StyleMuted.Render(base)
+	}
 	byMethod := map[string]int{}
-	sources := map[string]int{}
-	authN := 0
 	for _, r := range a.routes {
 		byMethod[r.Method]++
-		sources[r.Source]++
-		if r.Auth {
-			authN++
-		}
 	}
-	topSrc := "—"
-	topN := 0
-	for s, n := range sources {
-		if s == "" {
-			s = "?"
-		}
-		if n > topN {
-			topN = n
-			topSrc = s
-		}
-	}
-	meth := fmt.Sprintf("G%d P%d U%d D%d",
-		byMethod["GET"], byMethod["POST"], byMethod["PUT"]+byMethod["PATCH"], byMethod["DELETE"])
-	vis := len(a.filteredRoutes())
-	boxW := maxInt(12, width/5)
-	cards := []struct {
-		title, value string
-		warn         bool
-	}{
-		{"TOTAL", fmt.Sprintf("%d", len(a.routes)), false},
-		{"VISÍVEIS", fmt.Sprintf("%d", vis), false},
-		{"AUTH", fmt.Sprintf("%d", authN), authN > 0},
-		{"MÉTODOS", meth, false},
-		{"FONTE", topSrc, false},
-	}
-	parts := make([]string, 0, len(cards))
-	for _, c := range cards {
-		val := StyleNormal.Render(truncate(c.value, boxW-4))
-		if c.title == "AUTH" && c.warn {
-			val = StyleWarning.Render(truncate(c.value, boxW-4))
-		}
-		if c.title == "TOTAL" {
-			val = StyleHealthy.Render(truncate(c.value, boxW-4))
-		}
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
-	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	meth := StyleMuted.Render(fmt.Sprintf("G%d P%d U%d D%d",
+		byMethod["GET"], byMethod["POST"], byMethod["PUT"]+byMethod["PATCH"], byMethod["DELETE"]))
+	return StyleHealthy.Render(base) + StyleMuted.Render("  ·  ") + meth
 }
 
-func (a *App) renderRoutesFilterLine(width int) string {
-	if a.routesFilterOn {
-		return StyleKey.Render("filter ") + StyleSelected.Render(a.routesFilterInput+"▌") +
-			StyleMuted.Render("  (auth · public · path · source)")
+func (a *App) renderRoutesCommandBar(width int) string {
+	items := [][2]string{
+		{"↑↓", "navegar"},
+		{"b", "filtrar"},
+		{"enter", "abrir na api"},
+		{"r", "rescan"},
 	}
-	if q := strings.TrimSpace(a.routesFilter); q != "" {
-		return StyleMuted.Render("filter: ") + StyleNormal.Render(q) +
-			StyleMuted.Render("  (b editar · esc limpar)")
+	if a.routesFilter != "" || a.routesFilterOn {
+		items = append(items, [2]string{"esc", "limpar filtro"})
+	} else {
+		items = append(items, [2]string{"esc", "voltar"})
 	}
-	return StyleMuted.Render(truncate("b filtrar · tip: \"auth\" mostra só privadas", maxInt(20, width-2)))
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
 
 func (a *App) renderRoutesTable(visible []routeutil.Route, width, height int) string {
@@ -462,9 +444,8 @@ func (a *App) renderRoutesTableLine(r routeutil.Route, idx, width int) string {
 }
 
 func (a *App) renderRoutesInspector(visible []routeutil.Route, width, height int) string {
-	detH := maxInt(8, height*55/100)
-	actH := maxInt(5, height*22/100)
-	statH := maxInt(4, height-detH-actH)
+	detH := maxInt(9, height*62/100)
+	statH := maxInt(5, height-detH)
 
 	details := []string{StyleMuted.Render("(nenhuma rota)")}
 	if a.routesLoading && len(a.routes) == 0 {
@@ -497,18 +478,10 @@ func (a *App) renderRoutesInspector(visible []routeutil.Route, width, height int
 		}
 	}
 
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir na API"},
-		[2]string{"b", "filtrar"},
-		[2]string{"r", "reescanear"},
-		[2]string{"esc", "voltar"},
-	)
-
 	statLines := a.routesSourceStats(width)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		renderApiTitledBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
 		renderApiTitledBox("FONTES", fitExactLines(statLines, statH-2), width, statH, false),
 	)
 }

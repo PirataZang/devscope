@@ -4,7 +4,6 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/devscope/devscope/internal/core"
 )
 
 // ~10 fps (8–12 range). Separate from tickMsg so store/git sync stay at 300ms.
@@ -17,6 +16,64 @@ var animSpinnerFrames = []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯"
 
 // Pico de energia de baixo pra cima (Braille 2×4), sobe e desce.
 var animPulseFrames = []string{"⣀", "⣤", "⣶", "⣿", "⣿", "⣶", "⣤", "⣀"}
+
+// ─── vocabulário de status ──────────────────────────────────────────────────
+//
+// Todo status e todo loading do app usam Braille animado: a coluna sobe e
+// desce. A ALTURA que a onda alcança diz o estado — cheia = saudável, meia =
+// degradado, rasteira = parado — e a cor confirma. Assim o glifo continua
+// distinguível num screenshot parado, onde só o movimento não ajudaria.
+
+type pulseLevel int
+
+const (
+	pulseOK pulseLevel = iota
+	pulseWarn
+	pulseBad
+	pulseIdle
+)
+
+var (
+	// As quatro famílias são disjuntas de propósito: em QUALQUER quadro dá para
+	// dizer o estado só pelo glifo, sem depender da cor. Isso importa em
+	// screenshot parado e em terminal sem cor.
+	//
+	// Saudável: coluna dupla, respira entre a metade e o topo — nunca encosta
+	// na base, que é território de "parado". 8 quadros ≈ 0,8 s por respiração.
+	pulseFramesOK = []string{"⣤", "⣦", "⣶", "⣷", "⣿", "⣷", "⣶", "⣦"}
+	// Degradado: só a coluna da esquerda — metade do sinal, e mais rápido.
+	pulseFramesWarn = []string{"⡀", "⡄", "⡆", "⡇", "⡆", "⡄"}
+	// Parado: reta na base com um tremor. Sem energia, mas não congelado.
+	pulseFramesBad = []string{"⣀", "⣀", "⣀", "⣄", "⣀", "⣀"}
+	// Sem status: fraquinha lá embaixo.
+	pulseFramesIdle = []string{"⠄", "⠆", "⠄", "⠀"}
+)
+
+func pulseFrames(level pulseLevel) []string {
+	switch level {
+	case pulseWarn:
+		return pulseFramesWarn
+	case pulseBad:
+		return pulseFramesBad
+	case pulseIdle:
+		return pulseFramesIdle
+	default:
+		return pulseFramesOK
+	}
+}
+
+// pulseGlyph é o glifo de status do app inteiro. Use sempre este — nada de
+// ●/○/◐ soltos, para o vocabulário não divergir entre telas.
+func pulseGlyph(level pulseLevel, frame int) string {
+	frames := pulseFrames(level)
+	if len(frames) == 0 {
+		return "⣀"
+	}
+	if frame < 0 {
+		frame = -frame
+	}
+	return frames[frame%len(frames)]
+}
 
 // Bolinha na borda da célula — "starting" / queued.
 var animArcFrames = []string{"⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"}
@@ -127,16 +184,14 @@ func (a *App) needsAnim() bool {
 	return a.wantsPulseAnim()
 }
 
+// wantsPulseAnim: agora TODO status pulsa — parado treme na base, sem status
+// pisca fraquinho —, então basta existir algo com estado na tela. Custa um
+// redraw a 10 fps, que é o modo normal do app sempre que há algo no ar.
 func (a *App) wantsPulseAnim() bool {
 	if a.view == ViewDashboard {
-		for _, p := range a.snapshot.Projects {
-			if p.Health == core.HealthHealthy || p.Status == core.StatusRunning || p.Status == core.StatusDegraded {
-				return true
-			}
-		}
-		return false
+		return len(a.snapshot.Projects) > 0
 	}
-	if p := a.currentProject(); p != nil && (p.Health == core.HealthHealthy || p.Status == core.StatusRunning || p.Status == core.StatusDegraded) {
+	if a.currentProject() != nil {
 		return true
 	}
 	if a.ghaOpen || (a.jenkinsOpen && a.jenkinsInfo.Connected) || a.wsConnected {

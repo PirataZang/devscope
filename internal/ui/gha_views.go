@@ -11,85 +11,80 @@ import (
 	"github.com/devscope/devscope/internal/core"
 )
 
+// renderGHALanding: uma caixa com dado real no lugar das duas de documentação
+// ("POR PROJETO") e do rail DETALHES que só mostrava "CLI …  Auth …  Procs …".
 func (a *App) renderGHALanding(p *core.Project) string {
 	w, h := a.moduleSize()
 	info := a.landingGHA
-	procs := a.landingGHAProcs
 
-	status := "…"
+	status := "detectando…"
 	if a.landingGHAOK {
-		status = "offline"
 		switch {
 		case !info.Available:
-			status = "no-gh"
-		case info.Error != "" && !info.Authed:
-			status = "auth"
-		case info.Authed:
-			status = "ready"
+			status = "gh não instalado"
+		case !info.Authed:
+			status = "sem login"
+		default:
+			status = "pronto"
 		}
 	}
-
 	ctx := a.renderModuleContext(p, w, "ACTIONS", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
+	bodyH := maxInt(8, h-lipgloss.Height(ctx))
 	rightW := a.moduleRightWidth(w)
 	centerW := maxInt(36, w-rightW-1)
-	openH := maxInt(7, bodyH*42/100)
-	featH := maxInt(6, bodyH-openH)
 
-	openLines := []string{
-		StyleMuted.Render("processes · runs · workflows · logs"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingGHAOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !info.Available:
-		openLines = append(openLines, "",
-			StyleUnhealthy.Render("⚠ GitHub CLI (gh) não instalado"),
-			StyleMuted.Render("sudo apt install gh  ·  depois L login"),
-		)
-	case !info.Authed:
-		openLines = append(openLines, "",
-			StyleWarning.Render("⚠ gh sem autenticação"),
-			StyleMuted.Render("pressione L para gh auth login"),
-		)
-	default:
-		openLines = append(openLines, "",
-			StyleHealthy.Render(a.pulse()+" READY")+
-				StyleMuted.Render(fmt.Sprintf("  %s/%s  ·  %d processos", info.Owner, info.Repo, procs)))
+	lines := a.ghaLandingLines(centerW-2, info)
+	boxH := minInt(bodyH, len(lines)+2)
+	center := renderApiTitledBox("GITHUB ACTIONS", lines, centerW, boxH, true)
+	if hint := bodyH - boxH; hint > 1 && a.landingGHAOK && info.Authed {
+		center = lipgloss.JoinVertical(lipgloss.Left, center, "",
+			"  "+StyleNormal.Render("pressione ")+StyleKey.Render("enter")+
+				StyleNormal.Render(" para abrir o control center"))
 	}
 
-	featLines := []string{
-		StyleMuted.Render("1 arquivo por processo em .github/workflows/"),
-		StyleMuted.Render("catálogo central: .devscope/actions.yaml"),
-		StyleMuted.Render("c criar  ·  d deletar  ·  t trigger  ·  L login"),
-	}
-
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("GITHUB ACTIONS", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("POR PROJETO", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, authLabel, procsLabel := "…", "…", "…"
-	if a.landingGHAOK {
-		cliLabel, authLabel = boolLabel(info.Available), boolLabel(info.Authed)
-		procsLabel = fmt.Sprintf("%d", procs)
-	}
-	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Auth    ") + StyleMuted.Render(authLabel),
-		StyleMuted.Render("Procs   ") + StyleNormal.Render(procsLabel),
-	}
-	if info.Owner != "" {
-		details = append(details, StyleMuted.Render("Repo    ")+StyleMuted.Render(truncate(info.Owner+"/"+info.Repo, 22)))
-	}
-	actions := moduleActionLines(
+	right := renderActionsBox(rightW, bodyH,
 		[2]string{"enter", "control center"},
 		[2]string{"L", "login gh"},
 		[2]string{"!", "aviso setup"},
 		[2]string{"esc", "voltar"},
 	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
 	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+}
+
+func (a *App) ghaLandingLines(width int, info collectors.GHAInfo) []string {
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 13)) }
+	if !a.landingGHAOK {
+		return []string{label("Ambiente") + a.loadingText("detectando gh e repositório…")}
+	}
+	if !info.Available {
+		return []string{
+			StyleUnhealthy.Render("✕ GitHub CLI (gh) não encontrado"),
+			"",
+			StyleMuted.Render("sudo apt install gh"),
+			StyleMuted.Render("depois ") + StyleKey.Render("L") + StyleMuted.Render(" para gh auth login"),
+		}
+	}
+
+	lines := []string{
+		label("Repositório") + StyleNormal.Render(firstNonEmpty(truncate(info.Owner+"/"+info.Repo, width-13), emDash)),
+		label("CLI") + StyleHealthy.Render("● gh instalado"),
+	}
+	if info.Authed {
+		lines = append(lines, label("Conta")+StyleHealthy.Render("● autenticado"))
+	} else {
+		lines = append(lines,
+			label("Conta")+StyleWarning.Render("⚠ sem login"),
+			label("")+StyleMuted.Render("pressione ")+StyleKey.Render("L")+StyleMuted.Render(" para gh auth login"))
+	}
+	lines = append(lines,
+		label("Processos")+StyleNormal.Render(fmt.Sprintf("%d", a.landingGHAProcs))+
+			StyleMuted.Render("  em .devscope/actions.yaml"),
+		label("Workflows")+StyleMuted.Render(".github/workflows/"),
+	)
+	if info.Error != "" && !info.Authed {
+		lines = append(lines, "", StyleMuted.Render(truncate(info.Error, width)))
+	}
+	return lines
 }
 
 func (a *App) renderGHATab(p *core.Project) string {
@@ -181,12 +176,112 @@ func (a *App) ghaConfirmOpts() deleteConfirmOpts {
 	return opts
 }
 
+// ─── vocabulário de resultado ───────────────────────────────────────────────
+
+// ghaResult traduz o par (status, conclusion) da API num chip só. A tabela
+// tinha duas colunas — STATUS e CONCLUSION — em string crua: "in_progr…" + "-".
+func ghaResult(status, conclusion string) (glyph, label string, st lipgloss.Style) {
+	switch {
+	case status == "in_progress":
+		return "●", "rodando", StyleWarning
+	case status == "queued", status == "waiting", status == "pending":
+		return "◌", "na fila", StyleMuted
+	}
+	switch conclusion {
+	case "success":
+		return "✓", "sucesso", StyleHealthy
+	case "failure", "startup_failure":
+		return "✕", "falha", StyleUnhealthy
+	case "timed_out":
+		return "✕", "timeout", StyleUnhealthy
+	case "cancelled":
+		return "⊘", "cancelado", StyleMuted
+	case "skipped":
+		return "⊘", "pulado", StyleMuted
+	case "action_required":
+		return "⚠", "ação req.", StyleWarning
+	case "neutral":
+		return "·", "neutro", StyleMuted
+	case "":
+		return "◌", firstNonEmpty(status, "—"), StyleMuted
+	default:
+		return "·", conclusion, StyleMuted
+	}
+}
+
+// ghaResultCell devolve o chip pintado, com largura visual exata — o badge
+// antigo tinha comprimento variável e desalinhava a tabela de processos.
+func ghaResultCell(status, conclusion string, width int) string {
+	glyph, label, st := ghaResult(status, conclusion)
+	return st.Render(padRight(truncate(glyph+" "+label, width), width))
+}
+
+func ghaParseTime(vals ...string) time.Time {
+	for _, v := range vals {
+		if v == "" {
+			continue
+		}
+		if t, err := time.Parse(time.RFC3339, v); err == nil {
+			return t
+		}
+		if t, err := time.Parse(time.RFC3339Nano, v); err == nil {
+			return t
+		}
+	}
+	return time.Time{}
+}
+
+// ghaRunWhen: há quanto tempo o run começou. A tabela não tinha nenhuma coluna
+// de tempo — é a primeira coisa que se procura num CI.
+func ghaRunWhen(r collectors.GHARun) string {
+	t := ghaParseTime(r.StartedAt, r.CreatedAt)
+	if t.IsZero() {
+		return emDash
+	}
+	return relTime(t)
+}
+
+// ghaRunDuration: quanto o run levou (ou leva, se ainda está rodando).
+func ghaRunDuration(r collectors.GHARun) string {
+	start := ghaParseTime(r.StartedAt, r.CreatedAt)
+	if start.IsZero() {
+		return emDash
+	}
+	end := ghaParseTime(r.UpdatedAt)
+	if ghaRunIsActive(r) || end.IsZero() || end.Before(start) {
+		end = time.Now()
+	}
+	d := end.Sub(start)
+	switch {
+	case d < time.Minute:
+		return fmt.Sprintf("%ds", int(d.Seconds()))
+	case d < time.Hour:
+		return fmt.Sprintf("%dm", int(d.Minutes()))
+	default:
+		return fmt.Sprintf("%dh%02d", int(d.Hours()), int(d.Minutes())%60)
+	}
+}
+
+func (a *App) ghaCounters() (running, ok, fail, other int) {
+	for _, r := range a.ghaRuns {
+		switch {
+		case ghaRunIsActive(r):
+			running++
+		case r.Conclusion == "success":
+			ok++
+		case r.Conclusion == "failure" || r.Conclusion == "timed_out" || r.Conclusion == "startup_failure":
+			fail++
+		case r.Conclusion == "cancelled" || r.Conclusion == "skipped":
+			other++
+		}
+	}
+	return
+}
+
 func (a *App) renderGHACluster(p *core.Project, w, h int) string {
 	header := a.renderGHAHeader(w, p)
-	status := a.renderGHAStatusRow(w)
-	cards := a.renderGHACards(w)
 	tabs := a.renderGHAKindTabs(w)
-	chromeH := lipgloss.Height(header) + lipgloss.Height(status) + lipgloss.Height(cards) + lipgloss.Height(tabs) + 2
+	chromeH := lipgloss.Height(header) + lipgloss.Height(tabs) + 2
 	bodyH := maxInt(8, h-chromeH-2)
 
 	rightW := maxInt(22, w*24/100)
@@ -194,13 +289,16 @@ func (a *App) renderGHACluster(p *core.Project, w, h int) string {
 		rightW = 34
 	}
 	mainW := maxInt(40, w-rightW)
-	// RESUMO ganha mais espaço quando está em foco (leitura do YAML).
-	tablePct := 50
-	if a.ghaFocus == ghaFocusResumo {
-		tablePct = 38
+	// RESUMO só toma espaço quando tem YAML para mostrar; em foco, toma mais.
+	detailH := 3
+	if strings.TrimSpace(a.ghaDetail) != "" || strings.TrimSpace(a.ghaStatus) != "" {
+		pct := 50
+		if a.ghaFocus == ghaFocusResumo {
+			pct = 62
+		}
+		detailH = maxInt(5, bodyH*pct/100)
 	}
-	tableH := maxInt(6, bodyH*tablePct/100)
-	detailH := maxInt(5, bodyH-tableH)
+	tableH := maxInt(6, bodyH-detailH)
 
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		a.renderGHATable(mainW, tableH),
@@ -208,134 +306,111 @@ func (a *App) renderGHACluster(p *core.Project, w, h int) string {
 	)
 	right := a.renderGHARightRail(rightW, bodyH)
 	body := lipgloss.JoinHorizontal(lipgloss.Top, center, right)
-	return lipgloss.JoinVertical(lipgloss.Left, header, status, cards, tabs, body, a.renderStatusBar(a.ghaHints()))
+	return lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, a.renderStatusBar(a.ghaHints()))
 }
 
+// renderGHAHeader agora carrega tudo que ficava espalhado entre o header, a
+// linha de status e o card MIN LEFT — os três repetiam repo e contagens.
 func (a *App) renderGHAHeader(width int, p *core.Project) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabActions)).Bold(true)
-	proj := "project"
-	if p != nil && p.Name != "" {
-		proj = p.Name
+	left := accent.Render("▶ GITHUB ACTIONS")
+
+	owner, repoName := a.ghaResolveOwnerRepo()
+	if owner != "" {
+		left += StyleMuted.Render("   " + truncate(owner+"/"+repoName, 30))
+	} else if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 24))
 	}
-	left := accent.Render("GITHUB ACTIONS") + StyleMuted.Render(" › PROJECT") +
-		StyleMuted.Render("  ·  ") + StyleNormal.Render(truncate(proj, 20))
-	right := StyleMuted.Render(time.Now().Format("15:04:05"))
+	left += "   " + a.ghaConnChip()
+
+	var right []string
 	if a.ghaLoading {
-		right = a.loadingMuted("Loading…")
+		right = append(right, a.loadingMuted("carregando…"))
 	} else if a.ghaOpen {
-		right = StyleMuted.Render(fmt.Sprintf("auto %ds  %s", int(a.ghaTickInterval()/time.Second), time.Now().Format("15:04:05")))
+		right = append(right, StyleMuted.Render(fmt.Sprintf("⟳ auto %ds", int(a.ghaTickInterval()/time.Second))))
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
+	if chip := a.ghaUsageChip(); chip != "" {
+		right = append(right, chip)
 	}
-	return left + strings.Repeat(" ", pad) + right
+	right = append(right, StyleMuted.Render(time.Now().Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("   ")), width)
 }
 
-func (a *App) renderGHAStatusRow(width int) string {
-	owner, repoName := a.ghaResolveOwnerRepo()
-	var badge string
+func (a *App) ghaConnChip() string {
+	owner, _ := a.ghaResolveOwnerRepo()
 	switch {
 	case !a.ghaInfo.Available && owner != "":
-		badge = StyleWarning.Render("⚠ NO GH CLI")
+		return StyleWarning.Render("⚠ sem gh cli")
 	case !a.ghaInfo.Available:
-		badge = StyleUnhealthy.Render("✕ NO GH CLI")
+		return StyleUnhealthy.Render("✕ sem gh cli")
 	case !a.ghaInfo.Authed:
-		badge = StyleWarning.Render("⚠ AUTH REQUIRED")
+		return StyleWarning.Render("⚠ falta login")
 	default:
-		badge = a.livePulse("READY")
+		return StyleHealthy.Render("● pronto")
 	}
-	repo := "—"
-	if owner != "" {
-		repo = owner + "/" + repoName
-	}
-	meta := StyleMuted.Render("  "+truncate(repo, 28)) +
-		StyleMuted.Render(fmt.Sprintf("  %d processes  %d runs", len(a.ghaProcesses), len(a.ghaRuns)))
-	line := badge + meta
-	if a.ghaErr != "" && owner == "" {
-		line += StyleMuted.Render("  ") + StyleUnhealthy.Render(truncate(a.ghaErr, 24))
-	} else if a.ghaErr != "" && !a.ghaInfo.Available {
-		line += StyleMuted.Render("  ") + StyleMuted.Render("o abre no browser")
-	}
-	return truncate(line, width)
 }
 
-func (a *App) renderGHACards(width int) string {
-	n := 6
-	boxW := maxInt(12, width/n)
-	success, fail, running := 0, 0, 0
-	for _, r := range a.ghaRuns {
-		switch {
-		case r.Status == "in_progress" || r.Status == "queued":
-			running++
-		case r.Conclusion == "success":
-			success++
-		case r.Conclusion == "failure" || r.Conclusion == "cancelled":
-			fail++
-		}
+// ghaUsageChip resume a cota da conta numa expressão só, no lugar do card
+// MIN LEFT que gastava 3 linhas × 24 colunas para exibir "580m".
+func (a *App) ghaUsageChip() string {
+	if !a.ghaBilling.OK || a.ghaBilling.Included <= 0 {
+		return ""
 	}
-	heat := collectors.FormatGHAFailHeatmap(collectors.GHAFailHeatmap(a.ghaRuns, 20), boxW)
-	usageTitle, usageVal, usageStyle := a.ghaUsageCardBits(boxW - 4)
-	cards := []struct {
-		title, value string
-		style        lipgloss.Style
-	}{
-		{"PROCESSES", fmt.Sprintf("%d", len(a.ghaProcesses)), StyleAccent},
-		{"RUNS", fmt.Sprintf("%d", len(a.ghaRuns)), StyleMuted},
-		{"OK/FAIL", fmt.Sprintf("%d / %d", success, fail), StyleHealthy},
-		{"ACTIVE", fmt.Sprintf("%d", running), StyleWarning},
-		{"FAIL/WEEK", heat, StyleUnhealthy},
-		{usageTitle, usageVal, usageStyle},
+	st := StyleHealthy
+	switch rem := a.ghaBilling.Remaining; {
+	case rem < a.ghaBilling.Included*0.10:
+		st = StyleUnhealthy
+	case rem < a.ghaBilling.Included*0.25:
+		st = StyleWarning
 	}
-	parts := make([]string, 0, len(cards))
-	for _, c := range cards {
-		val := c.style.Render(truncate(c.value, boxW-4))
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
+	chip := st.Render(fmt.Sprintf("%.0f", a.ghaBilling.Used)) +
+		StyleMuted.Render(fmt.Sprintf("/%.0f min", a.ghaBilling.Included))
+	if a.ghaBilling.DaysLeft > 0 {
+		chip += StyleMuted.Render(fmt.Sprintf(" · %dd", a.ghaBilling.DaysLeft))
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return chip
 }
 
-func (a *App) ghaUsageCardBits(maxW int) (title, value string, style lipgloss.Style) {
-	style = StyleHealthy
-	proj := collectors.GHAMinutesFromRuns(a.ghaRuns)
-	if a.ghaBilling.OK {
-		title = "MIN LEFT"
-		rem := a.ghaBilling.Remaining
-		if rem < a.ghaBilling.Included*0.15 {
-			style = StyleUnhealthy
-		} else if rem < a.ghaBilling.Included*0.35 {
-			style = StyleWarning
-		}
-		barW := maxInt(6, minInt(10, maxW-8))
-		value = fmt.Sprintf("%s %s",
-			meterBar(a.ghaBilling.Used*100/a.ghaBilling.Included, barW),
-			fmt.Sprintf("%.0fm", rem),
-		)
-		return title, value, style
-	}
-	title = "USO ~"
-	style = StyleNormal
-	value = collectors.FormatGHAMinutes(proj) + " proj"
-	return title, value, style
-}
-
+// renderGHAKindTabs mostra as teclas que trocam de aba (1/2/3 existem no
+// handler) e à direita os contadores que antes eram seis caixas de 3 linhas.
 func (a *App) renderGHAKindTabs(width int) string {
-	kinds := []ghaKind{ghaKindProcesses, ghaKindRuns, ghaKindWorkflows}
-	parts := make([]string, 0, len(kinds))
-	for _, k := range kinds {
-		label := " " + strings.ToUpper(k.String()) + " "
+	counts := map[ghaKind]int{
+		ghaKindProcesses: len(a.ghaProcesses),
+		ghaKindRuns:      len(a.ghaRuns),
+		ghaKindWorkflows: len(a.ghaWorkflows),
+	}
+	keys := map[ghaKind]string{ghaKindProcesses: "1", ghaKindRuns: "2", ghaKindWorkflows: "3"}
+
+	parts := make([]string, 0, 3)
+	for _, k := range []ghaKind{ghaKindProcesses, ghaKindRuns, ghaKindWorkflows} {
+		label := fmt.Sprintf(" %s %s %d ", keys[k], strings.ToUpper(k.String()), counts[k])
 		if k == a.ghaKind {
 			parts = append(parts, StyleSelected.Render(label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	pad := width - lipgloss.Width(stripANSI(line))
-	if pad < 0 {
-		pad = 0
+	left := strings.Join(parts, StyleMuted.Render("│"))
+
+	running, ok, fail, other := a.ghaCounters()
+	var chips []string
+	add := func(st lipgloss.Style, glyph, label string, n int) {
+		if n > 0 {
+			chips = append(chips, st.Render(fmt.Sprintf("%s %d", glyph, n))+StyleMuted.Render(" "+label))
+		}
 	}
-	return line + strings.Repeat(" ", pad)
+	add(StyleWarning, "●", "rodando", running)
+	add(StyleHealthy, "✓", "ok", ok)
+	add(StyleUnhealthy, "✕", "falha", fail)
+	if other == 1 {
+		add(StyleMuted, "⊘", "cancelado", other)
+	} else {
+		add(StyleMuted, "⊘", "cancelados", other)
+	}
+	if len(chips) == 0 {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, strings.Join(chips, "  ")+" ", width)
 }
 
 func (a *App) renderGHATable(width, height int) string {
@@ -353,9 +428,10 @@ func (a *App) renderGHATable(width, height int) string {
 	}
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2)
+	inner4 := maxInt(8, width-2)
 	lines := []string{
-		StyleTableHeader.Render(truncate(a.ghaTableHeader(), width-4)),
-		StyleMuted.Render(strings.Repeat("─", maxInt(8, width-6))),
+		a.ghaTableHeader(inner4),
+		StyleMuted.Render(strings.Repeat("─", inner4)),
 	}
 	if n == 0 {
 		msg := "nenhum item"
@@ -370,41 +446,84 @@ func (a *App) renderGHATable(width, height int) string {
 	}
 	a.ghaScroll = ensureVisible(a.ghaCursor, a.ghaScroll, viewport, n)
 	for i := a.ghaScroll; i < minInt(a.ghaScroll+viewport, n); i++ {
-		lines = append(lines, a.renderGHARow(i, width-4, i == a.ghaCursor && a.ghaFocus == ghaFocusTable))
+		lines = append(lines, a.renderGHARow(i, inner4, i == a.ghaCursor && a.ghaFocus == ghaFocusTable))
 	}
 	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusTable)
 }
 
-func (a *App) ghaTableHeader() string {
+// ghaCols distribui as colunas da tabela pela largura útil. Antes o cabeçalho
+// era uma string fixa e as linhas usavam %-Ns próprios — os dois discordavam.
+type ghaCols struct {
+	mark, result, name, file, event, branch, when, dur, path, title int
+}
+
+func (a *App) ghaColumns(width int) ghaCols {
+	w := maxInt(30, width)
 	switch a.ghaKind {
 	case ghaKindProcesses:
-		return "STATUS      NAME              FILE                         EVENT"
-	case ghaKindRuns:
-		return "M  STATUS     CONCLUSION  WORKFLOW        BRANCH      TITLE"
+		c := ghaCols{result: 11, name: minInt(22, maxInt(10, w*22/100)),
+			file: minInt(26, maxInt(10, w*20/100)), event: 14}
+		c.title = maxInt(0, w-c.result-c.name-c.file-c.event-4)
+		if c.title < 12 {
+			c.title = 0 // não cabe descrição legível: devolve o espaço ao arquivo
+			c.file = maxInt(10, w-c.result-c.name-c.event-3)
+		}
+		return c
 	case ghaKindWorkflows:
-		return "NAME                      STATE      PATH"
+		c := ghaCols{name: minInt(28, maxInt(12, w*26/100)), event: 12}
+		c.path = maxInt(12, w-c.name-c.event-2)
+		return c
+	default: // runs
+		c := ghaCols{mark: 2, result: 11, name: minInt(16, maxInt(8, w*13/100)),
+			branch: minInt(20, maxInt(8, w*15/100)), when: 6, dur: 6}
+		c.title = maxInt(10, w-c.mark-c.result-c.name-c.branch-c.when-c.dur-6)
+		return c
 	}
-	return ""
+}
+
+func (a *App) ghaTableHeader(width int) string {
+	c := a.ghaColumns(width)
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padRight(truncate(t, n), n))
+	}
+	switch a.ghaKind {
+	case ghaKindProcesses:
+		return joinNonEmpty(" ", cell("RESULTADO", c.result), cell("NOME", c.name),
+			cell("ARQUIVO", c.file), cell("DESCRIÇÃO", c.title), cell("EVENTO", c.event))
+	case ghaKindWorkflows:
+		return joinNonEmpty(" ", cell("NOME", c.name), cell("ESTADO", c.event),
+			cell("CAMINHO", c.path))
+	default:
+		return joinNonEmpty(" ", cell("", c.mark), cell("RESULTADO", c.result),
+			cell("WORKFLOW", c.name), cell("BRANCH", c.branch), cell("TÍTULO", c.title),
+			head.Render(padLeft("QUANDO", c.when)), head.Render(padLeft("DUR", c.dur)))
+	}
 }
 
 func (a *App) renderGHARow(i, width int, selected bool) string {
-	style := StyleNormal
-	if selected {
-		style = StyleSelected
-	}
+	c := a.ghaColumns(width)
+	plain := func(t string, n int) string { return padRight(truncate(t, n), n) }
+
+	var cells []string
+	var resultCell string
 	switch a.ghaKind {
 	case ghaKindProcesses:
 		p := a.ghaProcesses[i]
 		live := a.ghaStatusForProcess(p.Name, p.File)
-		rest := fmt.Sprintf(" %-16s  %-26s  %s",
-			truncate(p.Name, 16), truncate(p.File, 26), truncate(firstNonEmpty(live.Event, "-"), 16))
-		if selected {
-			text := fmt.Sprintf("%-10s %-16s  %-26s  %s",
-				truncate(live.Label, 10), truncate(p.Name, 16), truncate(p.File, 26), truncate(firstNonEmpty(live.Event, "-"), 16))
-			return style.Width(width).MaxWidth(width).Render(truncate(text, width))
-		}
-		return padRight(ghaLiveBadge(live.Label, a.animFrame)+StyleNormal.Render(rest), width)
-	case ghaKindRuns:
+		glyph, label, st := ghaProcResult(live)
+		resultCell = st.Render(padRight(truncate(glyph+" "+label, c.result), c.result))
+		cells = []string{plain(p.Name, c.name), plain(p.File, c.file),
+			plain(firstNonEmpty(p.Description, live.Title, emDash), c.title),
+			plain(firstNonEmpty(live.Event, emDash), c.event)}
+	case ghaKindWorkflows:
+		w := a.ghaWorkflows[i]
+		cells = []string{plain(w.Name, c.name), plain(ghaWorkflowState(w.State), c.event),
+			plain(w.Path, c.path)}
+	default:
 		runs := a.ghaFilteredRuns()
 		if i < 0 || i >= len(runs) {
 			return ""
@@ -414,20 +533,111 @@ func (a *App) renderGHARow(i, width int, selected bool) string {
 		if a.ghaRunMarked != nil && a.ghaRunMarked[r.ID] {
 			mark = "✓"
 		}
-		note := ""
 		if a.ghaNotes != nil && a.ghaNotes[r.ID] != "" {
-			note = "!"
+			mark += "!"
 		}
-		text := fmt.Sprintf("%s%s %-9s  %-10s  %-14s  %-10s  %s",
-			mark, note, truncate(r.Status, 9), truncate(firstNonEmpty(r.Conclusion, "-"), 10),
-			truncate(r.Workflow, 14), truncate(r.Branch, 10), truncate(firstNonEmpty(r.DisplayTitle, r.Name), 24))
-		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
-	case ghaKindWorkflows:
-		w := a.ghaWorkflows[i]
-		text := fmt.Sprintf("%-24s  %-8s  %s", truncate(w.Name, 24), truncate(w.State, 8), truncate(w.Path, 36))
-		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
+		resultCell = ghaResultCell(r.Status, r.Conclusion, c.result)
+		cells = []string{plain(mark, c.mark), "", plain(r.Workflow, c.name),
+			plain(r.Branch, c.branch), plain(firstNonEmpty(r.DisplayTitle, r.Name), c.title),
+			padLeft(ghaRunWhen(r), c.when), padLeft(ghaRunDuration(r), c.dur)}
+		cells[1] = "\x00" // marca a posição do chip de resultado
+	}
+
+	if a.ghaKind == ghaKindProcesses {
+		cells = append([]string{"\x00"}, cells...)
+	}
+
+	// Selecionada: um fundo só na linha inteira, senão o realce fica serrilhado.
+	out := make([]string, 0, len(cells))
+	for _, cell := range cells {
+		if cell == "\x00" {
+			if selected {
+				glyph, label, _ := ghaResultFor(a, i)
+				out = append(out, StyleSelected.Render(padRight(truncate(glyph+" "+label, c.result), c.result)))
+			} else {
+				out = append(out, resultCell)
+			}
+			continue
+		}
+		if selected {
+			out = append(out, StyleSelected.Render(cell))
+		} else {
+			out = append(out, StyleNormal.Render(cell))
+		}
+	}
+	sep := " "
+	if selected {
+		sep = StyleSelected.Render(" ")
+	}
+	row := strings.Join(out, sep)
+	if selected {
+		return row + StyleSelected.Render(strings.Repeat(" ", maxInt(0, width-lipgloss.Width(row))))
+	}
+	return padRightVisible(row, width)
+}
+
+// ghaResultFor devolve o par (status, conclusion) da linha i já traduzido.
+func ghaResultFor(a *App, i int) (string, string, lipgloss.Style) {
+	if a.ghaKind == ghaKindProcesses {
+		if i < len(a.ghaProcesses) {
+			p := a.ghaProcesses[i]
+			return ghaProcResult(a.ghaStatusForProcess(p.Name, p.File))
+		}
+		return ghaResult("", "")
+	}
+	runs := a.ghaFilteredRuns()
+	if i < len(runs) {
+		return ghaResult(runs[i].Status, runs[i].Conclusion)
+	}
+	return ghaResult("", "")
+}
+
+// ghaProcResult traduz o rótulo já resolvido do processo. "idle" virava
+// "◌ —" ao passar pelo caminho genérico.
+func ghaProcResult(live ghaProcLive) (string, string, lipgloss.Style) {
+	switch live.Label {
+	case "idle", "":
+		return "◌", "ocioso", StyleMuted
+	case "triggered":
+		return "●", "disparado", StyleAccent
+	case "running":
+		return ghaResult("in_progress", "")
+	case "queued":
+		return ghaResult("queued", "")
+	case "success", "failure", "cancelled":
+		return ghaResult("completed", live.Label)
+	}
+	return ghaResult(live.Status, ghaProcConclusion(live))
+}
+
+// ghaProcConclusion: o rótulo do processo já vem resolvido; converte de volta
+// para o par que ghaResult entende.
+func ghaProcConclusion(live ghaProcLive) string {
+	if live.Conclusion != "" {
+		return live.Conclusion
+	}
+	switch live.Label {
+	case "success", "failure", "cancelled":
+		return live.Label
 	}
 	return ""
+}
+
+func ghaWorkflowState(state string) string {
+	switch state {
+	case "active":
+		return "ativo"
+	case "disabled_manually":
+		return "desativado"
+	case "disabled_inactivity":
+		return "inativo"
+	case "disabled_fork":
+		return "fork"
+	case "":
+		return emDash
+	default:
+		return state
+	}
 }
 
 func (a *App) renderGHASummary(width, height int) string {
@@ -442,7 +652,10 @@ func (a *App) renderGHASummary(width, height int) string {
 		body = a.ghaStatus
 	}
 	if strings.TrimSpace(body) == "" {
-		body = "tab → resumo  ·  enter foca aqui  ·  ↑↓ scroll no YAML"
+		// Sem YAML a caixa encolhe para uma linha em vez de ficar oca.
+		return renderApiTitledBox(title,
+			[]string{StyleMuted.Render("enter foca aqui  ·  ↑↓ rola o YAML do processo")},
+			width, 3, a.ghaFocus == ghaFocusResumo)
 	}
 	raw := strings.Split(body, "\n")
 	viewport := maxInt(1, inner)
@@ -467,24 +680,40 @@ func (a *App) renderGHASummary(width, height int) string {
 	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, focused)
 }
 
+// renderGHARightRail: CONTEXTO + USO + AÇÕES. A caixa RUNS RECENTES saiu —
+// repetia, coluna ao lado, a mesma lista da tabela principal.
 func (a *App) renderGHARightRail(width, height int) string {
-	repoH := maxInt(5, height*22/100)
-	usageH := maxInt(8, height*34/100)
-	runsH := maxInt(4, height*22/100)
-	actH := maxInt(5, height-repoH-usageH-runsH)
+	ctx := a.ghaContextLines(width - 2)
+	ctxH := len(ctx) + 2
+	usageH := maxInt(8, (height-ctxH)*55/100)
+	actH := maxInt(5, height-ctxH-usageH)
 	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderGHARepoPanel(width, repoH),
+		renderApiTitledBox("CONTEXTO", ctx, width, ctxH, false),
 		a.renderGHAUsagePanel(width, usageH),
-		a.renderGHARecentRunsPanel(width, runsH),
 		a.renderGHAActionsPanel(width, actH),
 	)
+}
+
+// ghaContextLines põe rótulo e valor na mesma linha — antes cada par gastava
+// duas, e "Repository" aparecia sem valor.
+func (a *App) ghaContextLines(width int) []string {
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 10)) }
+	valW := maxInt(8, width-10)
+	lines := []string{
+		label("Catálogo") + StyleNormal.Render(elideLeft(".devscope/actions.yaml", valW)),
+		label("Workflows") + StyleNormal.Render(elideLeft(".github/workflows/", valW)),
+	}
+	if a.ghaInfo.Owner != "" {
+		lines = append(lines, label("Repo")+StyleNormal.Render(elideLeft(a.ghaInfo.Owner+"/"+a.ghaInfo.Repo, valW)))
+	}
+	return lines
 }
 
 func (a *App) renderGHAUsagePanel(width, height int) string {
 	inner := maxInt(3, height-2)
 	barW := maxInt(8, minInt(18, width-8))
-	projMin := collectors.GHAMinutesFromRuns(a.ghaRuns)
-	lines := []string{}
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 10)) }
+	var lines []string
 
 	if a.ghaBilling.OK {
 		pct := 0.0
@@ -492,100 +721,63 @@ func (a *App) renderGHAUsagePanel(width, height int) string {
 			pct = a.ghaBilling.Used * 100 / a.ghaBilling.Included
 		}
 		lines = append(lines,
-			StyleMuted.Render("Conta ")+StyleNormal.Render(a.ghaBilling.Source),
-			meterBar(pct, barW)+StyleMuted.Render(fmt.Sprintf(" %.0f%%", pct)),
-			StyleMuted.Render("Restante ")+StyleHealthy.Render(fmt.Sprintf("%.0fm", a.ghaBilling.Remaining))+
-				StyleMuted.Render(fmt.Sprintf(" / %.0fm", a.ghaBilling.Included)),
-			StyleMuted.Render("Usado   ")+StyleWarning.Render(fmt.Sprintf("%.0fm", a.ghaBilling.Used)),
+			barSolid(pct, barW)+StyleMuted.Render(fmt.Sprintf("  %.0f%%", pct)),
+			label("Restante")+StyleHealthy.Render(fmt.Sprintf("%.0fm", a.ghaBilling.Remaining))+
+				StyleMuted.Render(fmt.Sprintf(" de %.0fm", a.ghaBilling.Included)),
+			label("Usado")+StyleWarning.Render(fmt.Sprintf("%.0fm", a.ghaBilling.Used)),
+			label("Conta")+StyleMuted.Render(a.ghaBilling.Source),
 		)
 		if a.ghaBilling.DaysLeft > 0 {
-			lines = append(lines, StyleMuted.Render("Ciclo    ")+StyleNormal.Render(fmt.Sprintf("%dd", a.ghaBilling.DaysLeft)))
+			lines = append(lines, label("Ciclo")+StyleNormal.Render(fmt.Sprintf("fecha em %dd", a.ghaBilling.DaysLeft)))
 		}
 	} else {
-		lines = append(lines,
-			StyleMuted.Render("Cota conta indisponível"),
-			StyleMuted.Render("(billing API / permissão)"),
-		)
+		lines = append(lines, StyleMuted.Render("cota da conta indisponível"))
 		if a.ghaBilling.Error != "" {
 			lines = append(lines, StyleMuted.Render(truncate(a.ghaBilling.Error, width-4)))
 		}
 	}
 
+	projMin := collectors.GHAMinutesFromRuns(a.ghaRuns)
 	lines = append(lines, "",
-		StyleMuted.Render("Projeto  ")+StyleAccent.Render(collectors.FormatGHAMinutes(projMin))+
-			StyleMuted.Render("  (runs)"),
-	)
+		label("Projeto")+StyleAccent.Render(collectors.FormatGHAMinutes(projMin)))
 
-	// Per-process breakdown from catalog + run estimates.
-	type row struct {
-		name string
-		min  float64
+	// Minutos e falhas por processo na mesma linha — o card FAIL/WEEK mostrava
+	// isso como barra Braille ilegível.
+	fails := map[string]int{}
+	for _, b := range collectors.GHAFailHeatmap(a.ghaRuns, 40) {
+		fails[b.Process] = b.Fails
 	}
-	rows := make([]row, 0, len(a.ghaProcesses))
+	type row struct {
+		name  string
+		min   float64
+		fails int
+	}
+	var rows []row
 	if len(a.ghaProcesses) > 0 {
 		for _, p := range a.ghaProcesses {
-			m := collectors.GHAMinutesFromRuns(a.ghaRunsForProcess(p.Name, p.File))
-			rows = append(rows, row{name: p.Name, min: m})
+			rows = append(rows, row{p.Name, collectors.GHAMinutesFromRuns(a.ghaRunsForProcess(p.Name, p.File)), fails[p.Name]})
 		}
 	} else {
 		for _, b := range collectors.GHABillingEstimate(a.ghaRuns, 40) {
-			rows = append(rows, row{name: b.Workflow, min: b.Minutes})
+			rows = append(rows, row{b.Workflow, b.Minutes, fails[b.Workflow]})
 		}
 	}
 	if len(rows) == 0 {
 		lines = append(lines, StyleMuted.Render("Processos (sem dados)"))
 	} else {
 		lines = append(lines, StyleMuted.Render("Por processo"))
-		maxShow := minInt(len(rows), maxInt(2, inner-len(lines)-1))
-		for i := 0; i < maxShow; i++ {
+		nameW := maxInt(6, width-18)
+		for i := 0; i < minInt(len(rows), maxInt(2, inner-len(lines))); i++ {
 			r := rows[i]
-			lines = append(lines, StyleMuted.Render("· ")+
-				StyleNormal.Render(truncate(r.name, maxInt(6, width-12)))+
-				StyleMuted.Render(" ")+
-				StyleWarning.Render(collectors.FormatGHAMinutes(r.min)))
+			line := StyleMuted.Render("· ") + StyleNormal.Render(padRight(truncate(r.name, nameW), nameW)) +
+				StyleWarning.Render(padLeft(collectors.FormatGHAMinutes(r.min), 7))
+			if r.fails > 0 {
+				line += StyleUnhealthy.Render(fmt.Sprintf(" ✕%d", r.fails))
+			}
+			lines = append(lines, line)
 		}
 	}
 	return renderApiTitledBox("USO", fitExactLines(lines, inner), width, height, false)
-}
-
-func (a *App) renderGHARepoPanel(width, height int) string {
-	inner := maxInt(2, height-2)
-	lines := []string{
-		StyleMuted.Render("Catalog"),
-		StyleNormal.Render(truncate(".devscope/actions.yaml", width-4)),
-		StyleMuted.Render("Workflows dir"),
-		StyleNormal.Render(truncate(".github/workflows/", width-4)),
-	}
-	if a.ghaInfo.Owner != "" {
-		lines = append(lines,
-			StyleMuted.Render("Repository"),
-			StyleNormal.Render(truncate(a.ghaInfo.Owner+"/"+a.ghaInfo.Repo, width-4)),
-		)
-	}
-	return renderApiTitledBox("PROJETO", fitExactLines(lines, inner), width, height, false)
-}
-
-func (a *App) renderGHARecentRunsPanel(width, height int) string {
-	inner := maxInt(2, height-2)
-	lines := []string{}
-	limit := minInt(10, len(a.ghaRuns))
-	for i := 0; i < limit; i++ {
-		r := a.ghaRuns[i]
-		dot := StyleMuted.Render("●")
-		switch {
-		case r.Conclusion == "success":
-			dot = a.livePulse("")
-		case r.Conclusion == "failure":
-			dot = StyleUnhealthy.Render("●")
-		case r.Status == "in_progress" || r.Status == "queued":
-			dot = StyleWarning.Render("●")
-		}
-		lines = append(lines, dot+" "+StyleMuted.Render(truncate(r.Workflow+"  "+firstNonEmpty(r.Conclusion, r.Status), width-6)))
-	}
-	if len(lines) == 0 {
-		lines = append(lines, StyleMuted.Render("sem runs recentes"))
-	}
-	return renderApiTitledBox("RUNS RECENTES", fitExactLines(lines, inner), width, height, false)
 }
 
 func (a *App) renderGHAActionsPanel(width, height int) string {

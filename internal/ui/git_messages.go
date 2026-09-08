@@ -836,7 +836,7 @@ func (a *App) gitCherryPickCopy(p *core.Project) {
 	a.gitCherryPickActive = true
 	a.gitCherryPickSourceBranch = a.gitViewBranch
 	a.clearGitCommitSelection()
-	a.gitStatusMsg = fmt.Sprintf("🍒 %d commit(s) copiados de %s — vá à branch destino e shift+v", len(hashes), a.gitCherryPickSourceBranch)
+	a.gitStatusMsg = fmt.Sprintf("⊕ %d commit(s) copiados de %s — vá à branch destino e shift+v", len(hashes), a.gitCherryPickSourceBranch)
 }
 
 func (a *App) toggleGitCommitSelection(p *core.Project) {
@@ -927,8 +927,6 @@ func (a *App) updateGitConflict(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, a.gitConflictContinue(p)
 	case "x", "X":
 		return a, a.gitConflictAbort(p)
-	case "L", "shift+l", "shift+L":
-		return a, a.openLazyGit(p.Path)
 	case "esc":
 		a.gitStatusMsg = a.conflictStatusMsg(a.gitConflictKind)
 	}

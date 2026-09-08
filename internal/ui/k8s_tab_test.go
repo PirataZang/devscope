@@ -23,9 +23,6 @@ func TestAllTabsIncludesKubernetes(t *testing.T) {
 	if TabKubernetes.String() != "Kubernetes" {
 		t.Fatalf("String=%q", TabKubernetes.String())
 	}
-	if int(TabKubernetes) != 3 || int(TabSwarm) != 4 || int(TabDatabase) != 9 || int(TabJSON) != 10 {
-		t.Fatalf("tab indices shifted unexpectedly: k8s=%d swarm=%d db=%d json=%d", TabKubernetes, TabSwarm, TabDatabase, TabJSON)
-	}
 }
 
 func TestK8sLandingEnterAndEsc(t *testing.T) {
@@ -123,11 +120,92 @@ func TestK8sOverviewLayout(t *testing.T) {
 	}
 	view := stripANSI(a.renderK8sTab(&core.Project{Name: "demo", Path: "/p"}))
 	for _, want := range []string{
-		"devscope", "kubernetes", "CLUSTER EXPLORER", "PODS", "POD LOGS", "YAML", "DETAILS", "QUICK STATS", "RELATION",
+		"KUBERNETES", "kind-dev", "default", "PODS", "POD LOGS", "YAML", "DETAILS", "RELATION",
+		"NOME", "ESTADO", "RESTARTS", "frontend-1",
 	} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("overview missing %q in:\n%s", want, view)
 		}
+	}
+	// O seletor de tipo virou régua horizontal; a coluna comia 26 col da tabela.
+	for _, gone := range []string{"CLUSTER EXPLORER", "QUICK STATS"} {
+		if strings.Contains(view, gone) {
+			t.Fatalf("sobra do layout antigo %q:\n%s", gone, view)
+		}
+	}
+}
+
+// A coluna do explorer saiu, então o foco não pode mais parar nela — e o tipo
+// de recurso precisa continuar alcançável só pelo teclado.
+func TestK8sKindStaysReachableWithoutExplorer(t *testing.T) {
+	a := &App{width: 120, height: 40, k8sOpen: true, k8sNamespace: "default", k8sKind: k8sKindPods}
+
+	// tab percorre só painéis que existem na tela
+	seen := map[k8sFocus]bool{}
+	for i := 0; i < 8; i++ {
+		seen[a.k8sFocus] = true
+		a.k8sFocus = (a.k8sFocus + 1) % 4
+	}
+	for f := range seen {
+		if f > k8sFocusDetail {
+			t.Fatalf("foco %v não tem painel", f)
+		}
+	}
+
+	a.k8sShiftKind(1)
+	if a.k8sKind != k8sKindDeploys {
+		t.Fatalf("] deve avançar o tipo, got %v", a.k8sKind)
+	}
+	a.k8sShiftKind(-1)
+	if a.k8sKind != k8sKindPods {
+		t.Fatalf("[ deve voltar o tipo, got %v", a.k8sKind)
+	}
+	a.k8sShiftKind(-1)
+	if a.k8sKind != k8sKindManifests {
+		t.Fatalf("ciclo deve dar a volta, got %v", a.k8sKind)
+	}
+
+	// A régua anuncia a tecla e não repete a contagem que a caixa já mostra.
+	strip := stripANSI(a.renderK8sKindStrip(120))
+	if !strings.Contains(strip, "[ ]") {
+		t.Fatalf("régua deve mostrar a tecla que troca o tipo: %q", strip)
+	}
+	if strings.Contains(strip, "PODS 0") {
+		t.Fatalf("contagem duplica o título da caixa: %q", strip)
+	}
+}
+
+// Rodar kubectl no contexto errado é o acidente clássico — a tela marca prod.
+func TestK8sProdContextIsFlagged(t *testing.T) {
+	for _, ctx := range []string{"gke_acme_sa-east1_prod", "prd-cluster", "acme-live"} {
+		if !k8sContextLooksProd(ctx) {
+			t.Fatalf("%q deveria ser marcado como produção", ctx)
+		}
+	}
+	for _, ctx := range []string{"kind-dev", "minikube", "acme-nonprod", "staging"} {
+		if k8sContextLooksProd(ctx) {
+			t.Fatalf("%q não é produção", ctx)
+		}
+	}
+	a := &App{width: 120, height: 40, k8sOpen: true, k8sContext: "gke_acme_prod", k8sNamespace: "default"}
+	if !strings.Contains(stripANSI(a.renderK8sHeader(120)), "produção") {
+		t.Fatal("header deve avisar quando o contexto é produção")
+	}
+}
+
+// Restarts e ready são o sintoma mais barato de instabilidade.
+func TestK8sReadyAndRestartStyles(t *testing.T) {
+	if k8sReadyStyle("1/1").GetForeground() == k8sReadyStyle("0/1").GetForeground() {
+		t.Fatal("1/1 e 0/1 devem ler diferente")
+	}
+	zero := k8sRestartStyle("0").GetForeground()
+	few := k8sRestartStyle("2").GetForeground()
+	many := k8sRestartStyle("7").GetForeground()
+	if zero == few || few == many || zero == many {
+		t.Fatalf("0, 2 e 7 restarts devem ler diferente: %v %v %v", zero, few, many)
+	}
+	if _, st := k8sStatusDot("CrashLoopBackOff", 0); st.GetForeground() == StyleHealthy.GetForeground() {
+		t.Fatal("CrashLoopBackOff não pode ler como saudável")
 	}
 }
 

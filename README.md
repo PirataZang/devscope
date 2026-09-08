@@ -103,7 +103,7 @@ Dentro de cada projeto, os módulos ficam organizados por grupo:
 
 | Grupo | Módulos |
 |---|---|
-| **WATCH** | Visão Geral · Metrics · Status |
+| **PROJETO** | Visão Geral |
 | **SCOPE** | Git · Containers |
 | **AUTOMATION** | GH Actions · Jenkins |
 | **MANAGER** | Swarm · Kubernetes |
@@ -499,6 +499,7 @@ Bubble Tea UI <── Snapshot Imutável <── Coletores (Docker, PM2, Git, He
 ```
 
 Para detalhes técnicos, consulte [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Para o padrão visual e de interação das telas, [docs/DESIGN.md](docs/DESIGN.md).
 
 ---
 

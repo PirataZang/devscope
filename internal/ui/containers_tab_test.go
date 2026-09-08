@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/mattn/go-runewidth"
 )
 
 func TestRestoreContainerCursorKeepsShowAllSelection(t *testing.T) {
@@ -65,17 +67,17 @@ func TestContainerRestartAlwaysIndicator(t *testing.T) {
 		t.Fatal("always detector")
 	}
 	got := stripANSI(a.renderContainerList(&p))
-	if !strings.Contains(got, "∞always") {
-		t.Fatalf("STATE should show ∞always:\n%s", truncate(got, 400))
-	}
+	// A política de reinício mora no nome; a coluna ESTADO passou a mostrar o
+	// estado do container, que é outra coisa.
 	if !strings.Contains(got, "∞ web") {
 		t.Fatalf("missing always marker on web name:\n%s", truncate(got, 400))
 	}
 	if strings.Contains(got, "∞ db") {
 		t.Fatal("db should not show always marker")
 	}
-	if !strings.Contains(got, "S-R") || !strings.Contains(strings.ToLower(got), "always") {
-		t.Fatalf("AÇÕES should list S-R always:\n%s", truncate(got, 400))
+	// A barra de comandos larga precisa continuar oferecendo a troca de política.
+	if !strings.Contains(got, "S-R") || !strings.Contains(strings.ToLower(got), "reinício") {
+		t.Fatalf("barra de comandos deve listar S-R reinício:\n%s", truncate(got, 600))
 	}
 }
 
@@ -203,8 +205,8 @@ func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
 	a := &App{
 		width: 120, height: 40,
 		view: ViewProject, tab: TabContainers, containerSubview: containerSubviewList,
-		selectedProject: &p,
-		snapshot:        core.Snapshot{Projects: []core.Project{p}},
+		selectedProject:    &p,
+		snapshot:           core.Snapshot{Projects: []core.Project{p}},
 		containerPreviewID: "c1",
 		// \r + ANSI + tab are what smash JoinHorizontal in real docker logs.
 		containerPreviewLogs: "boot\r\x1b[31mERR\x1b[0m\tCould not find 'bundler'\nReady to run Vite...",
@@ -221,8 +223,12 @@ func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
 	if strings.Contains(plain, "\r") || strings.Contains(plain, "\t") {
 		t.Fatal("control chars must be sanitized before render")
 	}
-	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "PORTAS") || !strings.Contains(plain, "AÇÕES") {
+	// AÇÕES saiu do rodapé: virou barra larga de comandos no fim da tela.
+	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "PORTAS") {
 		t.Fatalf("bottom panels missing:\n%s", truncate(plain, 300))
+	}
+	if strings.Contains(plain, "AÇÕES") {
+		t.Fatalf("AÇÕES não deveria mais ocupar coluna no rodapé:\n%s", truncate(plain, 300))
 	}
 }
 
@@ -331,7 +337,7 @@ func TestContainerShowAllIncludesProjectColumn(t *testing.T) {
 		snapshot:         core.Snapshot{Projects: []core.Project{p1, p2}},
 	}
 	got := stripANSI(a.renderContainerList(&p1))
-	for _, want := range []string{"TODOS + ÓRFÃOS", "PROJECT", "alpha-app", "beta-app", "one-web", "two-db"} {
+	for _, want := range []string{"todos os projetos", "PROJETO", "alpha-app", "beta-app", "one-web", "two-db"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, truncate(got, 400))
 		}
@@ -349,5 +355,129 @@ func TestContainerShowAllIncludesProjectColumn(t *testing.T) {
 	}
 	if strings.Contains(only, "PROJECT") {
 		t.Fatal("project column only in show-all mode")
+	}
+}
+
+// O docker devolve o tempo em meia dúzia de formatos; a coluna tem 9 colunas.
+func TestContainerUptimeLabelParsesDockerStatuses(t *testing.T) {
+	cases := map[string]string{
+		"Up 2 days":                     "2d",
+		"Up 2 days (healthy)":           "2d",
+		"Up 34 minutes (unhealthy)":     "34min",
+		"Exited (0) 3 hours ago":        "3h",
+		"Restarting (1) 12 seconds ago": "12s",
+		"Up About a minute":             "1min",
+		"":                              emDash,
+	}
+	for status, want := range cases {
+		if got := containerUptimeLabel(core.Container{Status: status}); got != want {
+			t.Fatalf("%q → %q, queria %q", status, got, want)
+		}
+	}
+}
+
+// A contagem comparava o texto do Status ("Up 2 days") com "running" e por
+// isso dizia sempre "0 no ar".
+func TestContainerCountsUseState(t *testing.T) {
+	list := []core.Container{
+		{Name: "a", State: "running", Status: "Up 2 days"},
+		{Name: "b", State: "running", Status: "Up 2 days", Health: "unhealthy"},
+		{Name: "c", State: "restarting", Status: "Restarting (1) 3 seconds ago"},
+		{Name: "d", State: "exited", Status: "Exited (0) 1 hour ago"},
+		{Name: "e", State: "paused", Status: "Paused"},
+	}
+	running, restarting, unhealthy, stopped, paused := containerCounts(list)
+	if running != 1 || restarting != 1 || unhealthy != 1 || stopped != 1 || paused != 1 {
+		t.Fatalf("run=%d rest=%d unh=%d stop=%d paus=%d", running, restarting, unhealthy, stopped, paused)
+	}
+}
+
+// Cada estado precisa de palavra E cor próprias: só o pulso não distingue
+// exited de paused, nem created de exited.
+func TestContainerStateVisualIsDistinctPerState(t *testing.T) {
+	a := &App{animFrame: 3}
+	cases := []struct {
+		c     core.Container
+		label string
+	}{
+		{core.Container{State: "running", Status: "Up 2 days"}, "running"},
+		{core.Container{State: "running", Status: "Up 2 days", Health: "unhealthy"}, "unhealthy"},
+		{core.Container{State: "restarting", Status: "Restarting (1) 3 seconds ago"}, "restarting"},
+		{core.Container{State: "paused", Status: "Paused"}, "paused"},
+		{core.Container{State: "created", Status: "Created"}, "created"},
+		{core.Container{State: "exited", Status: "Exited (0) 1 hour ago"}, "exited"},
+	}
+	seenLabel := map[string]bool{}
+	seenLook := map[string]bool{}
+	for _, tc := range cases {
+		wave, waveStyle, label, style := a.containerStateVisual(tc.c)
+		_ = waveStyle
+		if label != tc.label {
+			t.Fatalf("%q → %q, queria %q", tc.c.State, label, tc.label)
+		}
+		if seenLabel[label] {
+			t.Fatalf("rótulo repetido: %q", label)
+		}
+		seenLabel[label] = true
+		// glifo + cor juntos têm que ser únicos, senão dois estados se confundem
+		look := fmt.Sprintf("%s/%v", wave, style.GetForeground())
+		if seenLook[look] {
+			t.Fatalf("estado %q não se distingue visualmente dos outros: %q", label, look)
+		}
+		seenLook[look] = true
+		// 10 colunas de ponto = 5 caracteres Braille no terminal.
+		if runewidth.StringWidth(wave) != containerWaveWidth {
+			t.Fatalf("faixa de %q ocupa %d caracteres, esperado %d",
+				label, runewidth.StringWidth(wave), containerWaveWidth)
+		}
+	}
+}
+
+// A ação pendente é o retorno do comando que acabou de ser dado — precisa
+// ganhar do estado atual.
+func TestContainerPendingActionWinsOverState(t *testing.T) {
+	a := &App{animFrame: 1, containerActions: map[string]string{"web": "restart"}}
+	_, _, label, _ := a.containerStateVisual(core.Container{Name: "web", State: "running", Status: "Up 2 days"})
+	if label != "restarting" {
+		t.Fatalf("ação pendente deveria vencer: %q", label)
+	}
+	_, _, label, _ = a.containerStateVisual(core.Container{Name: "outro", State: "running", Status: "Up 2 days"})
+	if label != "running" {
+		t.Fatalf("container sem ação pendente: %q", label)
+	}
+}
+
+// Com Shift+A a lista mistura tudo que roda na máquina. O container que não é
+// do projeto aberto precisa de cor diferente — sem isso dá para parar o
+// container errado sem perceber.
+func TestShowAllPaintsForeignProjectDifferently(t *testing.T) {
+	mine := core.Project{Name: "digiliza", Path: "/apps/digiliza"}
+	other := core.Project{Name: "portfolio", Path: "/apps/portfolio"}
+	a := &App{
+		width: 130, height: 34, containerShowAll: true,
+		selectedProject: &mine,
+		snapshot:        core.Snapshot{Projects: []core.Project{mine, other}},
+	}
+
+	own := a.containerProjectStyle(core.Container{Name: "a", ProjectPath: mine.Path})
+	foreign := a.containerProjectStyle(core.Container{Name: "b", ProjectPath: other.Path})
+	orphan := a.containerProjectStyle(core.Container{Name: "c"})
+
+	if own.GetForeground() == foreign.GetForeground() {
+		t.Fatal("container de outro projeto precisa de cor diferente do aberto")
+	}
+	if foreign.GetForeground() != StyleWarning.GetForeground() {
+		t.Fatalf("o de fora deve ser amarelo, got %v", foreign.GetForeground())
+	}
+	if orphan.GetForeground() != StyleWarning.GetForeground() {
+		t.Fatalf("órfão do docker também não é do projeto aberto: %v", orphan.GetForeground())
+	}
+
+	// E o rótulo tem que dizer de quem é, não repetir o projeto aberto.
+	if got := a.containerProjectLabel(core.Container{Name: "b", ProjectPath: other.Path}); got != "portfolio" {
+		t.Fatalf("rótulo do dono: %q", got)
+	}
+	if got := a.containerProjectLabel(core.Container{Name: "c"}); got != "órfão" {
+		t.Fatalf("sem projeto: %q", got)
 	}
 }

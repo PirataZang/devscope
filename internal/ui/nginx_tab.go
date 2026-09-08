@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -27,13 +26,6 @@ const (
 )
 
 var nginxKinds = []string{"single", "hub"}
-
-type nginxFocus int
-
-const (
-	nginxFocusTable nginxFocus = iota
-	nginxFocusDetails
-)
 
 type nginxLoadedMsg struct {
 	layout  nginxutil.Layout
@@ -60,10 +52,10 @@ func (a *App) enterNginxTab(_ *core.Project) {
 
 func (a *App) openNginxClient(p *core.Project) tea.Cmd {
 	a.nginxOpen = true
-	a.nginxFocus = nginxFocusTable
 	a.nginxCursor = 0
 	a.nginxScroll = 0
-	a.nginxDetailsScroll = 0
+	a.nginxView = nginxViewRoutes
+	a.nginxFileScroll, a.nginxFileHScroll = 0, 0
 	a.nginxErr = ""
 	a.nginxStatus = ""
 	a.nginxWizard = false
@@ -243,251 +235,6 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 	)
 	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
 	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
-}
-
-func (a *App) renderNginxTab(p *core.Project) string {
-	w := a.screenWidth()
-	h := a.screenHeight()
-	header := a.renderNginxHeader(p, w)
-	headerH := lipgloss.Height(header)
-	bodyH := maxInt(4, h-headerH-2)
-
-	body := a.renderNginxView(w, bodyH)
-	view := lipgloss.JoinVertical(lipgloss.Left, header, body, a.renderStatusBar(a.nginxHints()))
-	if a.nginxWizard {
-		view = overlayCentered(view, a.renderNginxWizard(p, w, h), w, h)
-	}
-	if a.nginxConfirmDelete {
-		t, _ := a.nginxSelected()
-		detail := t.File
-		if t.Kind == nginxutil.KindHub {
-			detail += "  (a pasta " + filepath.Base(t.HubDir) + " e as .inc dela ficam)"
-		}
-		box := renderTunnelDeleteConfirmBox("NGINX", tabAccentColor(TabNginx), t.Name, detail, w, h)
-		view = overlayCentered(view, box, w, h)
-	}
-	return view
-}
-
-func (a *App) nginxHints() string {
-	if a.nginxConfirmDelete {
-		return "modal delete  y confirma  n/esc cancela"
-	}
-	if a.nginxWizard {
-		if a.nginxWizardForHub {
-			return "modal nova rota (.inc)  tab campo  space ssl  enter salvar  esc"
-		}
-		return "modal novo .conf  tab campo  space tipo/ssl  enter salvar  esc"
-	}
-	if a.nginxHub != nil {
-		base := "tab lista/detalhes  n nova .inc  d delete  R rescan  esc volta"
-		if a.nginxLoading {
-			base = a.spinner() + " carregando…  " + base
-		}
-		if a.nginxStatus != "" {
-			return truncate(a.nginxStatus, 72) + "  ·  " + base
-		}
-		if a.nginxErr != "" {
-			return StyleUnhealthy.Render(truncate(a.nginxErr, 60)) + "  ·  " + base
-		}
-		return base
-	}
-	scope := "A todos"
-	if a.nginxShowAll {
-		scope = "A projeto"
-	}
-	base := "tab lista/detalhes  enter abre hub  n novo .conf  d delete  " + scope + "  R rescan  esc"
-	if a.nginxLoading {
-		base = a.spinner() + " carregando…  " + base
-	}
-	if a.nginxStatus != "" {
-		return truncate(a.nginxStatus, 72) + "  ·  " + base
-	}
-	if a.nginxErr != "" {
-		return StyleUnhealthy.Render(truncate(a.nginxErr, 60)) + "  ·  " + base
-	}
-	return base
-}
-
-func (a *App) renderNginxHeader(p *core.Project, width int) string {
-	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabNginx)).Bold(true)
-	name := "project"
-	if p != nil {
-		name = p.Name
-	}
-	left := accent.Render("devscope") + StyleMuted.Render(" › nginx")
-	if a.nginxHub != nil {
-		left += StyleMuted.Render(" › ") + StyleNormal.Render(a.nginxHub.Name)
-	}
-	left += StyleMuted.Render("  Projeto: ") + StyleNormal.Render(name)
-
-	scope := StyleMuted.Render("projeto")
-	if a.nginxShowAll {
-		scope = StyleAccent.Render("TODOS")
-	}
-	right := StyleMuted.Render(fmt.Sprintf("Confs:%d  ", len(a.nginxSites)))
-	if a.nginxLayout.SitesDir != "" {
-		right += StyleMuted.Render("pasta: ") + StyleNormal.Render(filepath.Base(a.nginxLayout.SitesDir)) + "  "
-	}
-	right += scope
-	if !a.nginxShowAll && a.nginxForeign > 0 {
-		right += StyleMuted.Render(fmt.Sprintf("  (+%d outros · A)", a.nginxForeign))
-	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
-}
-
-func (a *App) renderNginxView(width, height int) string {
-	if height < 6 {
-		height = 6
-	}
-	leftW := maxInt(32, width*45/100)
-	rightW := maxInt(28, width-leftW-1)
-	left := a.renderNginxTable(leftW, height)
-	right := a.renderNginxDetailsPane(rightW, height)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
-}
-
-// nginxCurrentList é a lista relevante pro nível atual: as .conf de nível 1,
-// ou as .inc do hub aberto.
-func (a *App) nginxCurrentList() []nginxutil.Site {
-	if a.nginxHub != nil {
-		return a.nginxIncs
-	}
-	return a.nginxSites
-}
-
-func (a *App) renderNginxTable(width, height int) string {
-	focus := a.nginxFocus == nginxFocusTable
-	topLevel := a.nginxHub == nil
-	list := a.nginxCurrentList()
-	n := len(list)
-	a.nginxScroll = ensureVisible(a.nginxCursor, a.nginxScroll, height-3, n)
-	nameW := maxInt(8, width-34)
-	var header string
-	if topLevel {
-		header = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, "FILE", "KIND", "SSL", "PROJETO", "SERVER_NAME")
-	} else {
-		header = fmt.Sprintf("%-*s %-14s %s", nameW, "FILE", "LOCATION", "TARGET")
-	}
-	lines := []string{StyleMuted.Render(truncate(header, width-2))}
-	if n == 0 {
-		hint := "  (nenhuma entrada encontrada — n para criar)"
-		if a.nginxErr != "" {
-			hint = "  (" + a.nginxErr + ")"
-		}
-		lines = append(lines, StyleMuted.Render(hint))
-	} else {
-		start := a.nginxScroll
-		end := minInt(start+height-3, n)
-		for i := start; i < end; i++ {
-			s := list[i]
-			ssl := "—"
-			if s.SSL {
-				ssl = StyleHealthy.Render("sim")
-			}
-			var row string
-			if topLevel {
-				kind := string(s.Kind)
-				if s.Kind == nginxutil.KindHub {
-					kind = StyleAccent.Render("hub")
-				}
-				proj := firstNonEmpty(s.Project, "—")
-				row = fmt.Sprintf("%-*s %-6s %-6s %-10s %s", nameW, truncate(s.Name, nameW), kind, ssl, truncate(proj, 10), truncate(strings.Join(s.ServerNames, " "), 24))
-			} else {
-				target := firstNonEmpty(s.ProxyPass, s.Root, "—")
-				row = fmt.Sprintf("%-*s %-14s %s", nameW, truncate(s.Name, nameW), truncate(firstNonEmpty(s.Location, "—"), 14), truncate(target, 30))
-			}
-			prefix := "  "
-			style := StyleMuted
-			if i == a.nginxCursor {
-				prefix = "▸ "
-				if focus {
-					style = StyleSelected
-				} else {
-					style = StyleNormal
-				}
-			}
-			lines = append(lines, style.Render(truncate(prefix+row, width-2)))
-		}
-	}
-	title := fmt.Sprintf("CONFS (%d)", n)
-	if !topLevel {
-		hubName := ""
-		if a.nginxHub != nil {
-			hubName = a.nginxHub.Name
-		}
-		title = fmt.Sprintf("INC · %s (%d)", hubName, n)
-	}
-	if focus {
-		title = "> " + title
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
-}
-
-func (a *App) renderNginxDetailsPane(width, height int) string {
-	focus := a.nginxFocus == nginxFocusDetails
-	innerW := maxInt(20, width-2)
-	var raw []string
-	s, ok := a.nginxSelected()
-	if !ok {
-		raw = []string{StyleMuted.Render("(selecione um item na lista)")}
-	} else {
-		raw = append(raw,
-			StyleNormal.Bold(true).Render(truncate(s.Name, innerW)),
-			"",
-			tunnelDetailKV("Arquivo", s.File),
-			tunnelDetailKV("Projeto", firstNonEmpty(s.Project, "(este)")),
-		)
-		switch s.Kind {
-		case nginxutil.KindHub:
-			raw = append(raw,
-				tunnelDetailKV("Kind", "hub"),
-				tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
-				tunnelDetailKV("Listen", s.Listen),
-				tunnelDetailKV("SSL", boolLabel(s.SSL)),
-				tunnelDetailKV("Pasta", filepath.Base(s.HubDir)),
-				tunnelDetailKV("Dica", "enter abre as rotas dela"),
-			)
-		case nginxutil.KindSingle:
-			raw = append(raw,
-				tunnelDetailKV("Kind", "single"),
-				tunnelDetailKV("Server", strings.Join(s.ServerNames, " ")),
-				tunnelDetailKV("Listen", s.Listen),
-				tunnelDetailKV("SSL", boolLabel(s.SSL)),
-			)
-			if s.ProxyPass != "" {
-				raw = append(raw, tunnelDetailKV("ProxyPass", s.ProxyPass))
-			}
-			if s.Root != "" {
-				raw = append(raw, tunnelDetailKV("Root", s.Root))
-			}
-		default: // .inc de nível 2 — um location{} dentro de um hub
-			raw = append(raw, tunnelDetailKV("Location", firstNonEmpty(s.Location, "—")))
-			if s.ProxyPass != "" {
-				raw = append(raw, tunnelDetailKV("ProxyPass", s.ProxyPass))
-			}
-			if s.Root != "" {
-				raw = append(raw, tunnelDetailKV("Dist", s.Root))
-			}
-		}
-		raw = append(raw, "", StyleMuted.Render("── raw ──"))
-		for _, line := range strings.Split(strings.TrimRight(s.Raw, "\n"), "\n") {
-			raw = append(raw, StyleMuted.Render(truncate(line, innerW)))
-		}
-	}
-	a.nginxDetailsScroll = clampScroll(a.nginxDetailsScroll, height-2, len(raw))
-	start := a.nginxDetailsScroll
-	end := minInt(start+height-2, len(raw))
-	lines := raw[start:end]
-	title := "DETALHES"
-	if focus {
-		title = "> DETALHES"
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) nginxSelected() (nginxutil.Site, bool) {
@@ -745,25 +492,42 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		return a.updateNginxWizard(msg, p)
 	}
 	switch msg.String() {
+	case "1", "2":
+		a.nginxSetView(nginxView(msg.String()[0] - '1'))
 	case "esc":
+		if a.nginxView == nginxViewFile {
+			a.nginxSetView(nginxViewRoutes)
+			return a, nil
+		}
 		if a.nginxHub != nil {
 			a.nginxHub = nil
 			a.nginxIncs = nil
 			a.nginxHubProjectPath = ""
 			a.nginxCursor, a.nginxScroll = a.nginxTopCursor, a.nginxTopScroll
-			a.nginxDetailsScroll = 0
+			a.nginxFileScroll, a.nginxFileHScroll = 0, 0
 			a.nginxStatus = ""
 			a.nginxErr = ""
 			return a, nil
 		}
 		return a, a.leaveNginxTab()
-	case "tab":
-		a.nginxFocus = (a.nginxFocus + 1) % 2
 	case "up", "k":
 		return a, a.nginxMove(-1)
 	case "down", "j":
 		return a, a.nginxMove(1)
+	case "pgup", "shift+up":
+		return a, a.nginxMove(-a.nginxFileViewport())
+	case "pgdown", "shift+down":
+		return a, a.nginxMove(a.nginxFileViewport())
+	case "left", "h":
+		a.nginxFileHScrollBy(-8)
+	case "right", "l":
+		a.nginxFileHScrollBy(8)
+	case "0":
+		a.nginxFileHScroll = 0
 	case "enter":
+		if a.nginxView == nginxViewFile {
+			return a, nil
+		}
 		if a.nginxHub != nil || p == nil {
 			return a, nil
 		}
@@ -781,8 +545,8 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		a.nginxTopCursor, a.nginxTopScroll = a.nginxCursor, a.nginxScroll
 		a.nginxHub = &hub
 		a.nginxHubProjectPath = hubPath
-		a.nginxCursor, a.nginxScroll, a.nginxDetailsScroll = 0, 0, 0
-		a.nginxFocus = nginxFocusTable
+		a.nginxCursor, a.nginxScroll = 0, 0
+		a.nginxFileScroll, a.nginxFileHScroll = 0, 0
 		a.nginxStatus, a.nginxErr = "", ""
 		return a, a.refreshNginxIncs()
 	case "n":
@@ -830,27 +594,45 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 	return a, nil
 }
 
+// nginxMove: na aba ROTAS anda o cursor da lista, na aba ARQUIVO rola o texto.
+// A tecla é a mesma; o que ela move é o que está na frente.
 func (a *App) nginxMove(delta int) tea.Cmd {
-	if a.nginxFocus == nginxFocusDetails {
-		a.nginxDetailsScroll += delta
-		if a.nginxDetailsScroll < 0 {
-			a.nginxDetailsScroll = 0
+	if a.nginxView == nginxViewFile {
+		s, ok := a.nginxSelected()
+		if !ok {
+			return nil
 		}
+		a.nginxFileScroll = clampScroll(a.nginxFileScroll+delta,
+			a.nginxFileViewport(), len(nginxFileLines(s)))
 		return nil
 	}
 	n := len(a.nginxCurrentList())
 	prev := a.nginxCursor
-	a.nginxCursor += delta
-	if a.nginxCursor < 0 {
-		a.nginxCursor = 0
-	}
-	if a.nginxCursor > n-1 {
-		a.nginxCursor = maxInt(0, n-1)
-	}
+	a.nginxCursor = clampInt(a.nginxCursor+delta, 0, maxInt(0, n-1))
 	if a.nginxCursor != prev {
-		a.nginxDetailsScroll = 0
+		a.nginxFileScroll, a.nginxFileHScroll = 0, 0
 	}
 	return nil
+}
+
+// nginxSetView troca de aba sem carregar nada: as duas leem o mesmo estado.
+func (a *App) nginxSetView(v nginxView) {
+	if v < 0 || int(v) >= nginxViewTotal || v == a.nginxView {
+		return
+	}
+	a.nginxView = v
+	a.nginxStatus, a.nginxErr = "", ""
+}
+
+func (a *App) nginxFileHScrollBy(delta int) {
+	s, ok := a.nginxSelected()
+	if !ok {
+		return
+	}
+	lines := nginxFileLines(s)
+	textW := maxInt(8, a.screenWidth()-8)
+	a.nginxFileHScroll = clampInt(a.nginxFileHScroll+delta, 0,
+		maxInt(0, nginxMaxLineWidth(lines)-textW))
 }
 
 func (a *App) updateNginxWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {

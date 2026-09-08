@@ -189,8 +189,10 @@ func (c *colorAssigner) assignColorAdvanced(lane int, isForkSibling, useReserved
 	return bestColor
 }
 
-func (c *colorAssigner) assignColor(lane int) int             { return c.assignColorAdvanced(lane, false, false) }
-func (c *colorAssigner) assignForkSiblingColor(lane int) int  { return c.assignColorAdvanced(lane, true, false) }
+func (c *colorAssigner) assignColor(lane int) int { return c.assignColorAdvanced(lane, false, false) }
+func (c *colorAssigner) assignForkSiblingColor(lane int) int {
+	return c.assignColorAdvanced(lane, true, false)
+}
 
 func (c *colorAssigner) assignMainColor(lane int) int {
 	c.ensureCapacity(lane)
@@ -358,10 +360,10 @@ func buildGraphLayout(commits []collectors.DAGCommit) graphLayout {
 		}
 
 		type parentLane struct {
-			hash        string
-			lane        int
-			wasExisting bool
-			color       int
+			hash         string
+			lane         int
+			wasExisting  bool
+			color        int
 			alreadyShown bool
 		}
 		var parentLanes []parentLane

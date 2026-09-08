@@ -40,13 +40,13 @@ func (s ghaRunScope) String() string {
 func (k ghaKind) String() string {
 	switch k {
 	case ghaKindProcesses:
-		return "Processes"
+		return "Processos"
 	case ghaKindRuns:
 		return "Runs"
 	case ghaKindWorkflows:
 		return "Workflows"
 	default:
-		return "Processes"
+		return "Processos"
 	}
 }
 

@@ -164,8 +164,8 @@ func ListHTTPRequests(limit int) ([]Request, error) {
 			Start      string `json:"start"`
 			Duration   int64  `json:"duration"`
 			Request    struct {
-				Method  string            `json:"method"`
-				URI     string            `json:"uri"`
+				Method  string              `json:"method"`
+				URI     string              `json:"uri"`
 				Headers map[string][]string `json:"headers"`
 			} `json:"request"`
 			Response struct {
@@ -214,18 +214,21 @@ func ListHTTPRequests(limit int) ([]Request, error) {
 	return out, nil
 }
 
-func StartTunnel(name string, port int, proto string) error {
-	if port <= 0 {
+// StartTunnel sobe um túnel a partir da config do projeto. Recebe TunnelConfig
+// inteira porque Domain e Region eram gravados em .devscope/ngrok.json e nunca
+// chegavam ao agente — a URL mudava a cada restart e o webhook quebrava.
+func StartTunnel(t TunnelConfig) error {
+	if t.Port <= 0 {
 		return fmt.Errorf("porta inválida")
 	}
-	if proto == "" {
-		proto = "http"
+	if t.Proto == "" {
+		t.Proto = "http"
 	}
-	name = sanitizeName(name)
+	t.Name = sanitizeName(t.Name)
 	if PingAgent().Connected {
-		return startViaAPI(name, port, proto)
+		return startViaAPI(t)
 	}
-	return startProcess(name, port, proto)
+	return startProcess(t)
 }
 
 func StopTunnel(name string) error {
@@ -250,14 +253,27 @@ func StopTunnel(name string) error {
 	return nil
 }
 
-func startViaAPI(name string, port int, proto string) error {
+// agentProto: "https" não é um proto do agente nem subcomando da CLI — quem
+// resolve TLS é o próprio ngrok no proto http.
+func agentProto(proto string) string {
+	if proto == "https" {
+		return "http"
+	}
+	if proto == "" {
+		return "http"
+	}
+	return proto
+}
+
+func startViaAPI(t TunnelConfig) error {
+	proto := agentProto(t.Proto)
 	payload := map[string]any{
-		"name":  name,
-		"addr":  strconv.Itoa(port),
+		"name":  t.Name,
+		"addr":  strconv.Itoa(t.Port),
 		"proto": proto,
 	}
-	if proto == "http" || proto == "https" {
-		payload["proto"] = "http"
+	if d := strings.TrimSpace(t.Domain); d != "" && (proto == "http" || proto == "tls") {
+		payload["domain"] = d
 	}
 	b, _ := json.Marshal(payload)
 	resp, err := http.Post(AgentBase()+"/api/tunnels", "application/json", bytes.NewReader(b))
@@ -272,12 +288,24 @@ func startViaAPI(name string, port int, proto string) error {
 	return nil
 }
 
-func startProcess(name string, port int, proto string) error {
-	args := []string{proto, strconv.Itoa(port), "--log=stdout"}
-	if name != "" {
+// StartArgs é o comando que StartTunnel roda quando o agente está offline.
+// A tela mostra essa mesma linha como preview — o que se vê é o que roda.
+func StartArgs(t TunnelConfig) []string {
+	args := []string{agentProto(t.Proto), strconv.Itoa(t.Port)}
+	if name := sanitizeName(t.Name); name != "" && name != "tunnel" {
 		args = append(args, "--name="+name)
 	}
-	cmd := exec.Command("ngrok", args...)
+	if d := strings.TrimSpace(t.Domain); d != "" {
+		args = append(args, "--domain="+d)
+	}
+	if r := strings.TrimSpace(t.Region); r != "" {
+		args = append(args, "--region="+r)
+	}
+	return args
+}
+
+func startProcess(t TunnelConfig) error {
+	cmd := exec.Command("ngrok", append(StartArgs(t), "--log=stdout")...)
 	if err := cmd.Start(); err != nil {
 		return err
 	}

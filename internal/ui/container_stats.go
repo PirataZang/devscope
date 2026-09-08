@@ -33,94 +33,81 @@ type containerDetailStatsMsg struct {
 	err    string
 }
 
+// renderContainerStatsScreen usa a mesma moldura das abas de texto — antes
+// tinha cabeçalho próprio, moldura arredondada, coluna AÇÕES e um rodapé
+// repetindo os mesmos três atalhos.
 func (a *App) renderContainerStatsScreen() string {
-	height := maxInt(12, a.height-2)
-	panelW := maxInt(40, a.width)
-	innerW := maxInt(36, panelW-2)
-
-	nameW := maxInt(8, innerW/2)
-	title := StyleSection.Render(truncate(a.containerDetailName, nameW))
-	status := a.containerDetailStatusBadge()
-	if a.containerDetailStatsLive {
-		status += "  " + a.livePulse("live")
-	}
-	header := title + "  " + status
-	tabs := a.renderContainerDetailTabBar(innerW)
-
-	bodyH := maxInt(8, height-6)
-	cmdW := actionsCmdWidth(innerW)
-	mainW := maxInt(28, innerW-cmdW)
+	w := maxInt(40, a.width)
+	bodyH := a.containerDetailBodyHeight()
 	var body string
 	if a.containerDetailLoading && len(a.containerDetailCPUHist) == 0 {
-		body = renderApiTitledBox("STATS", fitExactLines([]string{StyleMuted.Render("Coletando métricas do Docker…")}, bodyH-2), mainW, bodyH, true)
+		body = renderApiTitledBox("MÉTRICAS",
+			fitExactLines([]string{a.loadingText("coletando métricas do docker…")}, bodyH-2),
+			w, bodyH, true)
 	} else {
-		body = a.renderContainerStatsDashboard(mainW, bodyH)
+		body = a.renderContainerStatsDashboard(w, bodyH)
 	}
-	body = lipgloss.JoinHorizontal(lipgloss.Top, body, renderActionsBox(cmdW, bodyH,
-		[2]string{"r", "refresh"},
-		[2]string{"←→", "abas"},
-		[2]string{"esc", "lista"},
-	))
-
-	footer := StyleMuted.Render(truncate("r refresh  ↔ abas  esc lista  ·  poll 2s", innerW))
-	content := lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, footer)
-	panel := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(tabAccentColor(TabContainers)).
-		Width(panelW).
-		MaxWidth(panelW).
-		Render(content)
-	panel = clampRenderedHeight(panel, height)
-	statusBar := truncate(a.renderStatusBar("container · Stats"), panelW)
-	return lipgloss.JoinVertical(lipgloss.Left, panel, statusBar)
+	return a.renderContainerDetailChrome(body)
 }
 
 func (a *App) renderContainerStatsDashboard(width, height int) string {
 	s := a.containerDetailStats
-	bannerH := 0
-	var banner string
-	if s.Raw == "" || (s.CPU == 0 && s.MemPct == 0 && s.PIDs == 0 && len(a.containerDetailCPUHist) <= 1) {
-		bannerH = 3
-		banner = renderApiTitledBox("STATUS", fitExactLines([]string{
+	rows := []string{a.renderContainerStatsStrip(width, s)}
+	remain := height - 1
+	if s.CPU == 0 && s.MemPct == 0 && s.PIDs == 0 && len(a.containerDetailCPUHist) <= 1 {
+		rows = append(rows, renderApiTitledBox("STATUS", fitExactLines([]string{
 			StyleWarning.Render("sem amostra útil — container parado ou docker stats indisponível"),
-			StyleMuted.Render("mantenha a aba aberta com o container running · r refresh"),
-		}, 2), width, bannerH, false)
+			StyleMuted.Render("mantenha a aba aberta com o container running · r recarrega"),
+		}, 2), width, 4, false))
+		remain -= 4
 	}
-	remain := height - bannerH
-	cardH := maxInt(5, remain*22/100)
-	chartH := maxInt(8, remain*42/100)
-	bottomH := maxInt(6, remain-cardH-chartH)
-
-	cards := a.renderContainerStatsCards(width, cardH, s)
-	charts := a.renderContainerStatsCharts(width, chartH, s)
-	details := a.renderContainerStatsDetails(width, bottomH, s)
-	if bannerH > 0 {
-		return lipgloss.JoinVertical(lipgloss.Left, banner, cards, charts, details)
-	}
-	return lipgloss.JoinVertical(lipgloss.Left, cards, charts, details)
+	rows = append(rows, a.renderContainerStatsCharts(width, maxInt(10, remain), s))
+	return lipgloss.JoinVertical(lipgloss.Left, rows...)
 }
 
-func (a *App) renderContainerStatsCards(width, height int, s dockerStatsSample) string {
-	n := 4
-	gap := 1
-	cw := (width - gap*(n-1)) / n
-	if cw < 14 {
-		cw = maxInt(12, (width-(n-1)*gap)/n)
+// renderContainerStatsStrip: os quatro cards de um número viraram uma régua.
+// A altura que eles comiam volta para o histórico, que é o que se olha.
+func (a *App) renderContainerStatsStrip(width int, s dockerStatsSample) string {
+	cpu := statsLoadStyle(s.CPU, 50, 80)
+	mem := statsLoadStyle(s.MemPct, 60, 85)
+	cells := []string{
+		StyleMuted.Render("CPU ") + cpu.Render(fmt.Sprintf("%6.2f%%", s.CPU)) + " " + meterBar(clampPct(s.CPU), 8),
+		StyleMuted.Render("MEM ") + mem.Render(fmt.Sprintf("%6.2f%%", s.MemPct)) + " " + meterBar(clampPct(s.MemPct), 8),
+		StyleMuted.Render("REDE ") + StyleNormal.Render(formatNetKB(s.NetRX+s.NetTX)),
+		StyleMuted.Render("BLOCO ") + StyleNormal.Render(formatNetKB(s.BlkR+s.BlkW)),
+		StyleMuted.Render("PIDS ") + StyleNormal.Render(strconv.Itoa(s.PIDs)),
 	}
-	netTotal := s.NetRX + s.NetTX
-	blkTotal := s.BlkR + s.BlkW
-	cards := []string{
-		renderStatsCard("CPU", fmt.Sprintf("%.2f%%", s.CPU), meterBar(clampPct(s.CPU), cw-4), StyleAccent, cw, height),
-		renderStatsCard("MEMÓRIA", fmt.Sprintf("%.2f%%", s.MemPct), meterBar(clampPct(s.MemPct), cw-4), StyleHealthy, cw, height),
-		renderStatsCard("REDE", formatNetKB(netTotal), StyleMuted.Render(truncate(s.NetLabel, cw-4)), StyleWarning, cw, height),
-		renderStatsCard("BLOCK I/O", formatNetKB(blkTotal), StyleMuted.Render(truncate(s.BlkLabel, cw-4)), StyleUnhealthy, cw, height),
+	left := strings.Join(cells, StyleMuted.Render("  ·  "))
+
+	right := StyleMuted.Render(fmt.Sprintf("%d amostras · janela ~%ds",
+		len(a.containerDetailCPUHist), len(a.containerDetailCPUHist)*2))
+	return joinWithSpacer(truncateVisible(left, width), right, width)
+}
+
+// statsScaleTop escolhe o teto do gráfico em degraus fixos: assim a escala não
+// dança a cada amostra, mas ainda mostra relevo em container ocioso.
+func statsScaleTop(hist []float64) float64 {
+	switch peak := maxFloats(hist); {
+	case peak <= 10:
+		return 10
+	case peak <= 25:
+		return 25
+	case peak <= 50:
+		return 50
+	default:
+		return 100
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top,
-		cards[0], strings.Repeat(" ", gap),
-		cards[1], strings.Repeat(" ", gap),
-		cards[2], strings.Repeat(" ", gap),
-		cards[3],
-	)
+}
+
+func statsLoadStyle(v, warn, bad float64) lipgloss.Style {
+	switch {
+	case v >= bad:
+		return StyleUnhealthy
+	case v >= warn:
+		return StyleWarning
+	default:
+		return StyleHealthy
+	}
 }
 
 func renderStatsCard(title, value, sub string, valueStyle lipgloss.Style, width, height int) string {
@@ -144,65 +131,66 @@ func clampPct(v float64) float64 {
 func (a *App) renderContainerStatsCharts(width, height int, s dockerStatsSample) string {
 	leftW := width / 2
 	rightW := width - leftW
-	halfH := height * 58 / 100
-	if halfH < 5 {
-		halfH = 5
-	}
-	botH := height - halfH
-	if botH < 4 {
-		botH = 4
-		halfH = height - botH
-	}
+	botH := 8 // 3 séries + identidade + moldura
+	halfH := maxInt(6, height-botH)
+	botH = maxInt(6, height-halfH)
 
-	cpuBox := renderApiTitledBox("CPU %",
-		fitExactLines(statsHistoryLines(a.containerDetailCPUHist, leftW-4, halfH-2, 100, StyleAccent), halfH-2),
+	// Teto fixo em 100 desenhava 4% de CPU como uma linha no fundo de 20 linhas
+	// vazias. O teto acompanha a janela — e vai escrito no título, senão o
+	// gráfico mente sobre a escala.
+	cpuTop := statsScaleTop(a.containerDetailCPUHist)
+	memTop := statsScaleTop(a.containerDetailMemHist)
+	cpuBox := renderApiTitledBox(fmt.Sprintf("CPU %% · 0-%.0f%%", cpuTop),
+		fitExactLines(statsHistoryLines(a.containerDetailCPUHist, leftW-2, halfH-2, cpuTop, StyleAccent), halfH-2),
 		leftW, halfH, false)
-	memBox := renderApiTitledBox("MEM %",
-		fitExactLines(statsHistoryLines(a.containerDetailMemHist, rightW-4, halfH-2, 100, StyleHealthy), halfH-2),
+	memBox := renderApiTitledBox(fmt.Sprintf("MEM %% · 0-%.0f%%", memTop),
+		fitExactLines(statsHistoryLines(a.containerDetailMemHist, rightW-2, halfH-2, memTop, StyleHealthy), halfH-2),
 		rightW, halfH, false)
 	top := lipgloss.JoinHorizontal(lipgloss.Top, cpuBox, memBox)
 
-	netSpark := StyleWarning.Render(renderMetricSparkline(a.containerDetailNetHist, maxInt(8, width-20), 0))
-	blkSpark := StyleUnhealthy.Render(renderMetricSparkline(a.containerDetailBlkHist, maxInt(8, width-20), 0))
-	pidSpark := StyleAccent.Render(renderMetricSparkline(a.containerDetailPIDHist, maxInt(8, width-20), 0))
+	// Série curta espalhada por 120 colunas vira uma linha vazia com um risco no
+	// fim; estreitar a faixa é o que faz o desenho voltar a dizer algo.
+	sparkW := maxInt(12, minInt(48, width/3))
+	label := func(name, spark, detail string) string {
+		return StyleMuted.Render(padRight(name, 5)) + spark + StyleMuted.Render("   ") + detail
+	}
 	botLines := []string{
-		StyleMuted.Render("NET  ") + netSpark,
-		StyleMuted.Render("     ") + StyleMuted.Render(fmt.Sprintf("rx %s  tx %s", formatNetKB(s.NetRX), formatNetKB(s.NetTX))),
-		StyleMuted.Render("BLK  ") + blkSpark,
-		StyleMuted.Render("     ") + StyleMuted.Render(fmt.Sprintf("r %s  w %s", formatNetKB(s.BlkR), formatNetKB(s.BlkW))),
-		StyleMuted.Render("PIDS ") + pidSpark + StyleNormal.Render(fmt.Sprintf("  %d", s.PIDs)),
-		StyleMuted.Render(fmt.Sprintf("amostras %d  · janela ~%ds", len(a.containerDetailCPUHist), len(a.containerDetailCPUHist)*2)),
+		label("NET", StyleWarning.Render(renderMetricSparkline(a.containerDetailNetHist, sparkW, 0)),
+			StyleMuted.Render("rx ")+StyleNormal.Render(formatNetKB(s.NetRX))+
+				StyleMuted.Render("  tx ")+StyleNormal.Render(formatNetKB(s.NetTX))),
+		label("BLK", StyleUnhealthy.Render(renderMetricSparkline(a.containerDetailBlkHist, sparkW, 0)),
+			StyleMuted.Render("leitura ")+StyleNormal.Render(formatNetKB(s.BlkR))+
+				StyleMuted.Render("  escrita ")+StyleNormal.Render(formatNetKB(s.BlkW))),
+		label("PIDS", StyleAccent.Render(renderMetricSparkline(a.containerDetailPIDHist, sparkW, 0)),
+			StyleNormal.Render(strconv.Itoa(s.PIDs))),
+		"",
+		StyleMuted.Render("mem   ") + StyleNormal.Render(firstNonEmpty(s.MemLabel, emDash)) +
+			StyleMuted.Render("   id  ") + StyleNormal.Render(truncate(firstNonEmpty(a.containerDetailID, emDash), 12)),
 	}
 	bottom := renderApiTitledBox("I/O · PROCESSOS", fitExactLines(botLines, botH-2), width, botH, false)
 	return lipgloss.JoinVertical(lipgloss.Left, top, bottom)
 }
 
+// statsHistoryLines: só as barras e o resumo. A sparkline que ficava no topo
+// desenhava a mesma série logo acima do histograma dela.
 func statsHistoryLines(hist []float64, width, rows int, maxHint float64, style lipgloss.Style) []string {
 	if rows < 3 {
 		rows = 3
 	}
-	sparkW := maxInt(8, width)
-	lines := make([]string, 0, rows)
-	lines = append(lines, style.Render(renderMetricSparkline(hist, sparkW, maxHint)))
-	barRows := minInt(rows-2, 7)
-	if barRows < 2 {
-		barRows = 2
-	}
-	lines = append(lines, renderHistoryBarRows(hist, sparkW, barRows, maxHint, style)...)
+	lines := renderHistoryBarRows(hist, maxInt(8, width), rows-1, maxHint, style)
 	cur := 0.0
 	if n := len(hist); n > 0 {
 		cur = hist[n-1]
 	}
-	lines = append(lines, StyleMuted.Render(fmt.Sprintf("now %.2f  avg %.2f  peak %.2f", cur, avgFloats(hist), maxFloats(hist))))
-	return lines
+	return append(lines, StyleMuted.Render(fmt.Sprintf("agora %.2f  ·  média %.2f  ·  pico %.2f",
+		cur, avgFloats(hist), maxFloats(hist))))
 }
 
+// renderHistoryBarRows estica a janela para a largura da caixa: são 40
+// amostras no máximo, e uma coluna por amostra deixava 2/3 do gráfico vazio.
 func renderHistoryBarRows(hist []float64, width, rows int, maxHint float64, style lipgloss.Style) []string {
-	if len(hist) == 0 {
-		return []string{StyleMuted.Render(strings.Repeat("·", minInt(width, 24)))}
-	}
-	if len(hist) > width {
-		hist = hist[len(hist)-width:]
+	if len(hist) == 0 || width <= 0 {
+		return []string{StyleMuted.Render(strings.Repeat("·", minInt(maxInt(width, 1), 24)))}
 	}
 	maxV := maxHint
 	if maxV <= 0 {
@@ -211,62 +199,24 @@ func renderHistoryBarRows(hist []float64, width, rows int, maxHint float64, styl
 			maxV = 1
 		}
 	}
+	cols := make([]float64, width)
+	for c := range cols {
+		cols[c] = hist[c*len(hist)/width] / maxV
+	}
 	out := make([]string, 0, rows)
 	for r := rows - 1; r >= 0; r-- {
 		threshold := float64(r+1) / float64(rows)
 		var b strings.Builder
-		for _, v := range hist {
-			if v/maxV >= threshold-1e-9 {
-				b.WriteString(style.Render("█"))
+		for _, v := range cols {
+			if v >= threshold-1e-9 {
+				b.WriteString("█")
 			} else {
 				b.WriteString(" ")
 			}
 		}
-		out = append(out, b.String())
+		out = append(out, style.Render(b.String()))
 	}
 	return out
-}
-
-func (a *App) renderContainerStatsDetails(width, height int, s dockerStatsSample) string {
-	rightW := maxInt(22, width*28/100)
-	leftW := width - rightW
-	leftLines := []string{
-		StyleMuted.Render("CPU      ") + StyleAccent.Render(fmt.Sprintf("%.2f%%", s.CPU)),
-		StyleMuted.Render("Memory   ") + StyleNormal.Render(firstNonEmpty(s.MemLabel, "—")),
-		StyleMuted.Render("Mem %    ") + StyleHealthy.Render(fmt.Sprintf("%.2f%%", s.MemPct)),
-		StyleMuted.Render("Net I/O  ") + StyleNormal.Render(firstNonEmpty(s.NetLabel, "—")),
-		StyleMuted.Render("Block    ") + StyleNormal.Render(firstNonEmpty(s.BlkLabel, "—")),
-		StyleMuted.Render("PIDs     ") + StyleNormal.Render(strconv.Itoa(s.PIDs)),
-		StyleMuted.Render("Name     ") + StyleMuted.Render(truncate(a.containerDetailName, leftW-12)),
-		StyleMuted.Render("ID       ") + StyleMuted.Render(truncate(a.containerDetailID, 16)),
-	}
-	hints := []string{}
-	switch {
-	case s.CPU >= 80:
-		hints = append(hints, StyleUnhealthy.Render("● CPU alta"))
-	case s.CPU >= 50:
-		hints = append(hints, StyleWarning.Render("● CPU moderada"))
-	default:
-		hints = append(hints, StyleHealthy.Render("● CPU ok"))
-	}
-	switch {
-	case s.MemPct >= 85:
-		hints = append(hints, StyleUnhealthy.Render("● MEM crítica"))
-	case s.MemPct >= 60:
-		hints = append(hints, StyleWarning.Render("● MEM elevada"))
-	default:
-		hints = append(hints, StyleHealthy.Render("● MEM ok"))
-	}
-	rightLines := append(hints, "")
-	rightLines = append(rightLines, moduleActionLines(
-		[2]string{"r", "refresh"},
-		[2]string{"←→", "outras abas"},
-		[2]string{"esc", "lista"},
-	)...)
-
-	left := renderApiTitledBox("DETALHES", fitExactLines(leftLines, height-2), leftW, height, false)
-	right := renderApiTitledBox("SAÚDE", fitExactLines(rightLines, height-2), rightW, height, false)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, right)
 }
 
 func (a *App) startContainerDetailStatsLive() tea.Cmd {

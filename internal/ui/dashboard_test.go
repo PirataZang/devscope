@@ -8,6 +8,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -23,23 +24,97 @@ func TestFilterNestedProjects(t *testing.T) {
 	}
 }
 
-func TestTableRowNeverExceedsTerminalWidth(t *testing.T) {
-	for _, termW := range []int{80, 95, 120, 160} {
+func TestProjectRowNeverExceedsTableWidth(t *testing.T) {
+	p := core.Project{
+		Name: "projeto-api", Path: "/home/user/projects/projeto-api",
+		Status: core.StatusRunning, ContainerCount: 12,
+		Framework: core.FrameworkInfo{Name: "Laravel"},
+		Git:       &core.GitInfo{IsRepo: true, Branch: "feature/dashboard"},
+		Ports:     []int{8080, 5432},
+	}
+	a := &App{}
+	for _, termW := range []int{60, 80, 95, 120, 160, 220} {
 		tableW := safeTableWidth(termW)
-		if tableW > termW {
+		if termW >= 44 && tableW > termW {
 			t.Fatalf("table width %d exceeds terminal %d", tableW, termW)
 		}
 		cols := tableColumns(tableW)
-		row := renderTableRow(cols, tableRow{
-			icon: "L", name: "projeto-api",
-			path: "/home/user/projects/projeto-api", branch: "feature/dashboard", ctrs: "12",
-		}, StyleNormal, ptrStatus(core.StatusRunning), false, 0)
-		if strings.Contains(row, "\n") {
-			t.Fatalf("row contains newline at termW=%d", termW)
+		for _, selected := range []bool{false, true} {
+			row := a.renderProjectRow(cols, p, selected)
+			if strings.Contains(row, "\n") {
+				t.Fatalf("row contains newline at termW=%d", termW)
+			}
+			// 2 da barra de seleção + 1 espaço + 1 da scrollbar.
+			if w := lipgloss.Width(row); w > tableW-1 {
+				t.Fatalf("row width %d leaves no room for scrollbar at tableW=%d", w, tableW)
+			}
 		}
-		if lipgloss.Width(row) > tableW+2 {
-			t.Fatalf("row width %d > tableW %d at termW=%d", lipgloss.Width(row), tableW, termW)
+		if w := lipgloss.Width(renderTableHeader(cols)); w > tableW-1 {
+			t.Fatalf("header width %d > %d at termW=%d", w, tableW-1, termW)
 		}
+	}
+}
+
+// As colunas opcionais entram por faixa de largura, nunca às custas de NOME e
+// CAMINHO.
+func TestTableColumnsScaleWithWidth(t *testing.T) {
+	narrow := tableColumns(safeTableWidth(60))
+	if narrow.ports != 0 {
+		t.Fatalf("60 col: PORTAS não cabe: %+v", narrow)
+	}
+	wide := tableColumns(safeTableWidth(200))
+	if wide.stack == 0 || wide.commit == 0 || wide.ports == 0 {
+		t.Fatalf("200 col: todas as colunas deviam aparecer: %+v", wide)
+	}
+	for _, termW := range []int{60, 80, 100, 120, 160, 200} {
+		c := tableColumns(safeTableWidth(termW))
+		if c.name < 12 || c.path < 14 {
+			t.Fatalf("%d col: NOME/CAMINHO ilegíveis: %+v", termW, c)
+		}
+	}
+}
+
+// O prefixo do caminho se repete em toda linha; a cauda é o que identifica.
+func TestElideLeftKeepsTail(t *testing.T) {
+	got := elideLeft("~/Área de Trabalho/digiliza-checkout", 20)
+	if !strings.HasSuffix(got, "digiliza-checkout") {
+		t.Fatalf("cauda do caminho perdida: %q", got)
+	}
+	if !strings.HasPrefix(got, "…") {
+		t.Fatalf("corte deveria ser pela esquerda: %q", got)
+	}
+	if w := lipgloss.Width(got); w > 20 {
+		t.Fatalf("largura %d > 20: %q", w, got)
+	}
+	if got := elideLeft("curto", 20); got != "curto" {
+		t.Fatalf("não deveria cortar: %q", got)
+	}
+}
+
+func TestScrollbarColumn(t *testing.T) {
+	if got := scrollbarColumn(5, 10, 0, 5); strings.TrimSpace(strings.Join(got, "")) != "" {
+		t.Fatalf("sem overflow não deve desenhar barra: %q", got)
+	}
+	top := scrollbarColumn(100, 10, 0, 10)
+	bottom := scrollbarColumn(100, 10, 90, 10)
+	if stripANSI(top[0]) != "█" {
+		t.Fatalf("no topo o polegar fica na 1ª linha: %q", stripANSI(top[0]))
+	}
+	if stripANSI(bottom[9]) != "█" {
+		t.Fatalf("no fim o polegar fica na última linha: %q", stripANSI(bottom[9]))
+	}
+}
+
+func TestFitKeybindsNeverOverflows(t *testing.T) {
+	items := [][2]string{{"↑↓", "navegar"}, {"ENTER", "git"}, {"c", "containers"}, {"q", "sair"}}
+	for _, w := range []int{10, 20, 40, 80, 200} {
+		got := fitKeybinds(w, items...)
+		if lipgloss.Width(got) > w {
+			t.Fatalf("largura %d > %d: %q", lipgloss.Width(got), w, stripANSI(got))
+		}
+	}
+	if !strings.Contains(stripANSI(fitKeybinds(200, items...)), "containers") {
+		t.Fatal("com espaço de sobra todos os atalhos devem aparecer")
 	}
 }
 
@@ -49,24 +124,113 @@ func TestSafeTableWidthNoForcedMinimum(t *testing.T) {
 	}
 }
 
-func TestDashboardShowsProjectPath(t *testing.T) {
-	cols := tableColumns(78)
-	row := renderTableRow(cols, tableRow{
-		name: "projeto", path: "/home/user/projeto", branch: "main", ctrs: "6",
-	}, StyleNormal, ptrStatus(core.StatusRunning), false, 0)
-	if !strings.Contains(row, "/home/user/projeto") {
-		t.Fatal("dashboard row should contain project path")
+func TestDashboardShowsProjectPathAndStack(t *testing.T) {
+	a := &App{
+		width: 160, height: 46, view: ViewDashboard,
+		snapshot: core.Snapshot{Projects: []core.Project{{
+			Name: "projeto", Path: "/home/user/projeto", Status: core.StatusRunning,
+			Framework: core.FrameworkInfo{Name: "Laravel"}, ContainerCount: 6,
+			Git:   &core.GitInfo{IsRepo: true, Branch: "main"},
+			Ports: []int{8080},
+		}}},
+	}
+	got := stripANSI(a.renderDashboard())
+	for _, want := range []string{"projeto", "/home/user/projeto", "Laravel", "main", ":8080"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("dashboard deve mostrar %q:\n%s", want, got)
+		}
 	}
 }
 
-func TestProjectStatusColors(t *testing.T) {
-	run := renderStatusCell(12, core.StatusRunning, false, 0)
-	stop := renderStatusCell(12, core.StatusStopped, false, 0)
-	if run == stop {
-		t.Fatal("running and stopped status should render differently")
+// O domínio do Nginx é o que se digita no navegador — ganha da porta crua.
+func TestEndpointPrefersDomainOverPort(t *testing.T) {
+	p := core.Project{Ports: []int{8080}, Domains: []core.Domain{{Host: "app.local"}, {Host: "api.local"}}}
+	if got := endpointLabel(p); got != "app.local +1" {
+		t.Fatalf("endpoint: %q", got)
 	}
-	if !strings.Contains(run, "Run") || !strings.Contains(stop, "Stop") {
-		t.Fatal("status labels missing")
+	if got := endpointLabel(core.Project{Ports: []int{3000}}); got != ":3000" {
+		t.Fatalf("sem domínio deve cair na porta: %q", got)
+	}
+	if got := endpointLabel(core.Project{}); got != emDash {
+		t.Fatalf("sem porta nem domínio: %q", got)
+	}
+}
+
+// Todo status do app é Braille animado: a onda sobe e desce, e a ALTURA que
+// alcança distingue os estados mesmo num quadro parado.
+func TestStatusPulseIsAnimatedAndDistinct(t *testing.T) {
+	moved := false
+	for f := 1; f < 12; f++ {
+		if pulseGlyph(pulseOK, f) != pulseGlyph(pulseOK, 0) {
+			moved = true
+			break
+		}
+	}
+	if !moved {
+		t.Fatal("o pulso de OK precisa animar ao longo dos quadros")
+	}
+	// Em NENHUM quadro dois estados podem cair no mesmo glifo: a cor é reforço,
+	// não a única pista (screenshot parado, terminal sem cor).
+	levels := []pulseLevel{pulseOK, pulseWarn, pulseBad, pulseIdle}
+	for f := 0; f < 120; f++ {
+		for i := range levels {
+			for j := i + 1; j < len(levels); j++ {
+				if pulseGlyph(levels[i], f) == pulseGlyph(levels[j], f) {
+					t.Fatalf("quadro %d: níveis %d e %d colidem em %q",
+						f, levels[i], levels[j], pulseGlyph(levels[i], f))
+				}
+			}
+		}
+	}
+	// O topo só é alcançado por quem está saudável.
+	topo := false
+	for f := 0; f < 12; f++ {
+		if pulseGlyph(pulseOK, f) == "⣿" {
+			topo = true
+		}
+		if pulseGlyph(pulseWarn, f) == "⣿" || pulseGlyph(pulseBad, f) == "⣿" {
+			t.Fatalf("só saudável chega ao topo (quadro %d)", f)
+		}
+	}
+	if !topo {
+		t.Fatal("o pulso saudável precisa chegar ao topo")
+	}
+}
+
+func TestProjectStatusDots(t *testing.T) {
+	// Compara nível + cor: em teste o lipgloss não emite ANSI, e no quadro 0
+	// duas ondas podem coincidir de altura — quem separa é a cor.
+	seen := map[string]bool{}
+	for _, st := range []core.ProjectStatus{
+		core.StatusRunning, core.StatusDegraded, core.StatusStopped, core.StatusUnknown,
+	} {
+		level, style := statusLevel(st)
+		key := fmt.Sprintf("%d/%v", level, style.GetForeground())
+		if seen[key] {
+			t.Fatalf("status %q não se distingue dos outros", st)
+		}
+		seen[key] = true
+	}
+}
+
+// Sem projetos a tela precisa dizer o que está acontecendo, não ficar vazia.
+func TestDashboardEmptyStates(t *testing.T) {
+	scanning := &App{
+		width: 120, height: 40, view: ViewDashboard,
+		snapshot: core.Snapshot{ScanPaths: []string{"/home/user/work"}},
+	}
+	got := stripANSI(scanning.renderDashboard())
+	if !strings.Contains(got, "Varrendo projetos") || !strings.Contains(got, "/home/user/work") {
+		t.Fatalf("estado de varredura deve listar os paths:\n%s", got)
+	}
+
+	empty := &App{
+		width: 120, height: 40, view: ViewDashboard, filter: "beta",
+		snapshot: core.Snapshot{Projects: []core.Project{{Name: "alpha", Path: "/p/alpha"}}},
+	}
+	got = stripANSI(empty.renderDashboard())
+	if !strings.Contains(got, "Nenhum projeto para") || !strings.Contains(got, "beta") {
+		t.Fatalf("filtro sem resultado deve explicar como sair:\n%s", got)
 	}
 }
 
@@ -151,8 +315,8 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	plain := stripANSI(got)
 
 	for _, want := range []string{
-		"WATCH", "SCOPE", "AUTOMATION", "MANAGER", "TUNNEL", "TOOLS",
-		"Visão Geral", "Metrics", "Status",
+		"PROJETO", "SCOPE", "AUTOMATION", "MANAGER", "TUNNEL", "TOOLS",
+		"Visão Geral",
 		"Git", "Containers",
 		"GH Actions", "Jenkins",
 		"Swarm", "Kubernetes",
@@ -164,8 +328,11 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 			t.Fatalf("missing %q in sidebar: %q", want, plain)
 		}
 	}
-	if strings.Contains(plain, "Logs") {
-		t.Fatalf("Logs removed from sidebar: %q", plain)
+	// Logs, Metrics e Status saíram do menu — a Visão Geral cobre CPU/RAM e probes.
+	for _, gone := range []string{"Logs", "Metrics", "Status"} {
+		if strings.Contains(plain, gone) {
+			t.Fatalf("%q não deveria estar na sidebar: %q", gone, plain)
+		}
 	}
 	for _, ban := range []string{"RESUMO", "DISK"} {
 		if strings.Contains(plain, ban) {
@@ -266,7 +433,7 @@ func TestProjectViewHidesHostMetricsBar(t *testing.T) {
 		if strings.Contains(got, pills) {
 			t.Fatalf("%dx%d: barra de métricas do host só no dashboard: %q", size.w, size.h, got)
 		}
-		if !strings.Contains(got, "Visão Geral") || !strings.Contains(got, "WATCH") {
+		if !strings.Contains(got, "Visão Geral") || !strings.Contains(got, "PROJETO") {
 			t.Fatalf("%dx%d: sidebar deve continuar", size.w, size.h)
 		}
 	}
@@ -416,8 +583,10 @@ func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
 	if !strings.Contains(got, "STATS · CPU") {
 		t.Fatalf("cpu focus title missing: %s", got)
 	}
-	if !strings.Contains(got, "S-U") || !strings.Contains(got, "compose") {
-		t.Fatalf("actions should list compose shortcuts:\n%s", truncate(got, 400))
+	// Os atalhos saíram do rodapé para a barra larga de comandos.
+	bar := stripANSI(a.renderContainersCommandBar(120))
+	if !strings.Contains(bar, "S-U") || !strings.Contains(bar, "compose") {
+		t.Fatalf("barra deve listar os atalhos de compose:\n%s", bar)
 	}
 }
 
@@ -448,15 +617,15 @@ func TestContainerDetailFillsTerminalHeight(t *testing.T) {
 }
 
 func TestContainerLogLineFitsPanel(t *testing.T) {
-	a := &App{width: 60}
-	line := a.renderContainerDetailLine(
-		containerDetailTabLogs,
+	a := &App{width: 60, containerDetailTab: containerDetailTabLogs}
+	line := a.renderContainerDetailCodeLine(
 		"\x1b[31m"+strings.Repeat("very long log entry ", 20)+"\r\x1b[0m",
+		50, false, false,
 	)
-	if lipgloss.Width(line) > a.width-10 {
+	if lipgloss.Width(line) > 50 {
 		t.Fatalf("log line width %d exceeds panel content", lipgloss.Width(line))
 	}
-	if strings.Contains(line, "\r") || strings.Contains(line, "\x1b[31m") {
+	if strings.ContainsAny(ansi.Strip(line), "\r\x1b") {
 		t.Fatal("terminal control sequences must be removed from logs")
 	}
 }
@@ -467,8 +636,12 @@ func TestCompactContainerDetailTabsFitOneLine(t *testing.T) {
 	if strings.Contains(got, "\n") || lipgloss.Width(got) > 50 {
 		t.Fatalf("tab bar width %d does not fit compact panel", lipgloss.Width(got))
 	}
-	if !strings.Contains(got, "Env") {
+	// A régua é caixa alta, como nas outras telas.
+	if !strings.Contains(got, "ENV") {
 		t.Fatal("active Env tab must remain fully visible")
+	}
+	if !strings.Contains(got, "3 ENV") {
+		t.Fatalf("a aba ativa deve mostrar o número da tecla: %q", got)
 	}
 }
 
@@ -477,8 +650,11 @@ func TestContainerDetailActiveTabNeverTruncated(t *testing.T) {
 		tab := containerDetailTab(i)
 		a := &App{width: 40, containerDetailTab: tab}
 		got := a.renderContainerDetailTabBar(36)
-		if !strings.Contains(got, tab.shortLabel()) {
+		if !strings.Contains(got, strings.ToUpper(tab.shortLabel())) {
 			t.Fatalf("active tab %s was truncated away: %q", tab.shortLabel(), got)
+		}
+		if lipgloss.Width(got) > 36 {
+			t.Fatalf("régua estourou 36 na aba %s: %d", tab.shortLabel(), lipgloss.Width(got))
 		}
 	}
 }
@@ -558,8 +734,17 @@ func TestContainerLogsUseDedicatedFullScreen(t *testing.T) {
 	if strings.Contains(stripANSI(got), "SCOPE") {
 		t.Fatal("dedicated logs screen must not render the project sidebar")
 	}
-	if !strings.Contains(got, "web") || !strings.Contains(got, "▶ Logs") || !strings.Contains(got, "first") {
+	// A régua marca a aba ativa pelo número + caixa alta, não por "▶".
+	if !strings.Contains(got, "web") || !strings.Contains(got, "1 LOGS") || !strings.Contains(got, "first") {
 		t.Fatal("dedicated logs screen is missing its title or content")
+	}
+	// Numeração de linha: é o que permite falar sobre uma linha específica.
+	if !strings.Contains(stripANSI(got), "1 │ first") {
+		t.Fatalf("linhas devem vir numeradas:\n%s", stripANSI(got))
+	}
+	// A coluna AÇÕES virou barra larga no rodapé.
+	if strings.Contains(stripANSI(got), "┌─AÇÕES") {
+		t.Fatalf("coluna AÇÕES não deveria mais roubar largura:\n%s", stripANSI(got))
 	}
 	if lipgloss.Width(got) > a.width+2 {
 		t.Fatalf("logs screen width %d exceeds terminal width %d", lipgloss.Width(got), a.width)
@@ -586,7 +771,7 @@ func TestContainerFilesUseDedicatedFullScreen(t *testing.T) {
 		if strings.Contains(stripANSI(got), "SCOPE") {
 			t.Fatalf("%s screen must not render the project sidebar", tab.shortLabel())
 		}
-		if !strings.Contains(got, "web") || !strings.Contains(got, tab.shortLabel()) || !strings.Contains(got, "services:") {
+		if !strings.Contains(got, "web") || !strings.Contains(got, strings.ToUpper(tab.shortLabel())) || !strings.Contains(got, "services:") {
 			t.Fatalf("%s screen is missing its title or content", tab.shortLabel())
 		}
 	}
@@ -617,13 +802,20 @@ func TestContainerStatsDashboard(t *testing.T) {
 		snapshot:                 core.Snapshot{Projects: []core.Project{project}},
 	}
 	got := stripANSI(a.renderProject())
-	for _, want := range []string{"laradock-workspace-1", "CPU", "MEMÓRIA", "REDE", "BLOCK", "I/O", "SAÚDE", "live", "12.50%"} {
+	for _, want := range []string{
+		"laradock-workspace-1", "2 MÉTRICAS", // moldura padrão: cabeçalho + abas numeradas
+		"CPU", "MEM", "REDE", "BLOCO", "PIDS", "12.50%", // régua, no lugar dos 4 cards
+		"CPU %", "MEM %", "I/O", "ao vivo",
+	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("stats dashboard missing %q in:\n%s", want, got)
 		}
 	}
-	// must not fall back to the old plain-text stats body
-	if strings.Contains(got, "CPU (%):") && !strings.Contains(got, "MEMÓRIA") {
+	// A coluna AÇÕES e o rodapé duplicado saíram: os comandos vêm da barra larga.
+	if strings.Contains(got, "┌─AÇÕES") {
+		t.Fatal("stats screen must use the shared command bar, not an AÇÕES column")
+	}
+	if strings.Contains(got, "CPU (%):") {
 		t.Fatal("renderProject still using old text stats screen")
 	}
 }
@@ -687,10 +879,6 @@ func TestWrapText(t *testing.T) {
 	}
 }
 
-func ptrStatus(s core.ProjectStatus) *core.ProjectStatus {
-	return &s
-}
-
 func TestDashboardHeaderAlwaysShowsMetrics(t *testing.T) {
 	projects := make([]core.Project, 20)
 	for i := range projects {
@@ -727,5 +915,39 @@ func TestDashboardHeaderAlwaysShowsMetrics(t *testing.T) {
 		if !found {
 			t.Fatalf("%dx%d: metrics never found", size.w, size.h)
 		}
+	}
+}
+
+// T abria o seletor de tema no dispatch global, então engolia o T maiúsculo
+// digitado em qualquer formulário fora da lista de exceções.
+func TestThemePickerOnlyOnDashboard(t *testing.T) {
+	tKey := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'T'}}
+
+	dash := &App{width: 120, height: 40, view: ViewDashboard}
+	if _, _ = dash.updateKey(tKey); !dash.themeOn {
+		t.Fatal("T na tela inicial deve abrir o seletor de tema")
+	}
+
+	// Dentro do projeto o T tem que chegar ao campo de texto.
+	p := core.Project{Name: "demo", Path: "/p/demo"}
+	proj := &App{
+		width: 120, height: 40, view: ViewProject, tab: TabNgrok,
+		selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}},
+		ngrokOpen: true, ngrokWizard: true,
+		ngrokWizardField: ngrokWizName, ngrokNewName: "s", ngrokWizardCursor: 1,
+	}
+	_, _ = proj.updateKey(tKey)
+	if proj.themeOn {
+		t.Fatal("T fora da tela inicial não pode abrir o seletor de tema")
+	}
+	if proj.ngrokNewName != "sT" {
+		t.Fatalf("T deve chegar ao campo do formulário, got %q", proj.ngrokNewName)
+	}
+
+	// E o filtro da própria tela inicial também precisa receber o T.
+	filt := &App{width: 120, height: 40, view: ViewDashboard, filterOn: true}
+	_, _ = filt.updateFilter(tKey)
+	if filt.themeOn || filt.filterInput != "T" {
+		t.Fatalf("filtro deve receber o T: on=%v input=%q", filt.themeOn, filt.filterInput)
 	}
 }

@@ -123,9 +123,9 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	}
 	rows = append(rows,
 		StyleMuted.Render(truncate(p.Name, width)),
-		projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame))+
+		projectStatusStyle(p.Status).Render(statusLabel(p.Status, a.animFrame))+
 			StyleMuted.Render("  ")+
-			a.healthDotAnim(p.Health)+" "+healthShort(p.Health),
+			healthChip(p.Health, a.animFrame),
 	)
 	if !a.projectCompact() {
 		if branch := sidebarBranchLine(p, width); branch != "" {
@@ -135,33 +135,17 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	return rows
 }
 
-func healthDot(h core.HealthStatus) string {
-	return healthDotFrame(h, 0)
-}
-
-func (a *App) healthDotAnim(h core.HealthStatus) string {
-	return healthDotFrame(h, a.animFrame)
-}
-
-func healthDotFrame(h core.HealthStatus, frame int) string {
+// healthChip: glifo + rótulo numa cor só. Glifos distintos por estado — cor
+// sozinha não resolve em terminal sem cor nem para quem não distingue.
+func healthChip(h core.HealthStatus, frame int) string {
+	glyph, st := healthGlyph(h, frame)
 	switch h {
 	case core.HealthHealthy:
-		return StyleHealthy.Render(animPulse(frame))
+		return st.Render(glyph + " ok")
 	case core.HealthUnhealthy:
-		return StyleUnhealthy.Render("●")
+		return st.Render(glyph + " falha")
 	default:
-		return StyleMuted.Render("○")
-	}
-}
-
-func healthShort(h core.HealthStatus) string {
-	switch h {
-	case core.HealthHealthy:
-		return StyleHealthy.Render("ok")
-	case core.HealthUnhealthy:
-		return StyleUnhealthy.Render("bad")
-	default:
-		return StyleMuted.Render("n/a")
+		return st.Render(glyph + " n/a")
 	}
 }
 
@@ -208,7 +192,7 @@ type sidebarGroup struct {
 
 func sidebarGroups() []sidebarGroup {
 	return []sidebarGroup{
-		{"WATCH", ColorAccent, []Tab{TabOverview, TabMetrics, TabHealth}},
+		{"PROJETO", ColorAccent, []Tab{TabOverview}},
 		{"SCOPE", ColorWarning, []Tab{TabGit, TabContainers}},
 		{"AUTOMATION", ColorPrimary, []Tab{TabActions, TabJenkins}},
 		{"MANAGER", ColorDocker, []Tab{TabSwarm, TabKubernetes}},
@@ -234,7 +218,11 @@ func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []strin
 	if a.projectTiny() {
 		return []string{StyleMuted.Render("tab · esc")}
 	}
-	return []string{StyleMuted.Render("tab · shift+tab · esc")}
+	// Servidor mora aqui — saiu da barra de topo, onde repetia a cada módulo.
+	return []string{
+		StyleMuted.Render(truncate(moduleHostname(), 22)),
+		StyleMuted.Render("tab · shift+tab · esc"),
+	}
 }
 
 func meterBar(pct float64, width int) string {
@@ -296,12 +284,8 @@ func tabGlyph(t Tab) string {
 		return "⎈"
 	case TabSwarm:
 		return "⬡"
-	case TabHealth:
-		return "✚"
 	case TabLogs:
-		return "☰"
-	case TabMetrics:
-		return "▦"
+		return "≡"
 	case TabAPI:
 		return "↯"
 	case TabDatabase:
@@ -313,7 +297,9 @@ func tabGlyph(t Tab) string {
 	case TabRoutes:
 		return "⇄"
 	case TabWebSocket:
-		return "⚡"
+		// ⚡ e ☰ medem 2 colunas nas libs e 1 na maioria dos terminais — a linha
+		// da sidebar saía 1 coluna curta.
+		return "⇅"
 	case TabNgrok:
 		return "⇪"
 	case TabCFTunnel:

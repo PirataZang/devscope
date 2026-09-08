@@ -41,9 +41,16 @@ func TestSSHLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderSSHTab(&p))
-	for _, want := range []string{"devscope", "ssh", "TUNNELS", "DETALHES", "LOGS", "AÇÕES", "novo túnel", "start"} {
+	for _, want := range []string{"SSH TUNNEL", "TÚNEIS", "DETALHES", "LOGS", "AÇÕES",
+		"novo túnel", "ENCAMINHAMENTO"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
+		}
+	}
+	// Overview/History/Settings viraram TÚNEIS · CONFIG.
+	for _, gone := range []string{"Overview", "Settings", "QUICK STATS"} {
+		if strings.Contains(view, gone) {
+			t.Fatalf("sobra do layout antigo %q:\n%s", gone, view)
 		}
 	}
 }
@@ -87,9 +94,23 @@ func TestSSHWizardCyclesMode(t *testing.T) {
 		t.Fatalf("type digit: got %q", a.sshNewLocalPortStr)
 	}
 
-	view := stripANSI(a.renderSSHWizard(&p, 70, 28))
-	if !strings.Contains(view, "target") || !strings.Contains(view, "digiliza") {
+	view := stripANSI(a.renderSSHWizard(&p, 120, 30))
+	if !strings.Contains(view, "Servidor") || !strings.Contains(view, "digiliza") {
 		t.Fatalf("wizard: %q", view)
+	}
+	// O preview mostra exatamente o comando ssh que vai rodar.
+	args := "ssh " + strings.Join(sshutil.TunnelArgs(a.sshWizardSpec()), " ")
+	if !strings.Contains(view, truncate(args, 110)) && !strings.Contains(view, "-D") {
+		t.Fatalf("preview deve mostrar o comando:\n%s", view)
+	}
+	// -L e -R apontam em direções opostas; a tela precisa dizer qual é qual.
+	for _, mode := range []string{sshutil.ModeLocal, sshutil.ModeRemote} {
+		if sshModeExplain(mode) == "" {
+			t.Fatalf("modo %q sem explicação", mode)
+		}
+	}
+	if sshModeExplain(sshutil.ModeLocal) == sshModeExplain(sshutil.ModeRemote) {
+		t.Fatal("-L e -R não podem ter a mesma explicação")
 	}
 }
 

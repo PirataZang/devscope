@@ -41,13 +41,16 @@ func TestNgrokLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderNgrokTab(&p))
-	for _, want := range []string{"devscope", "ngrok", "TUNNELS", "DETALHES", "LOGS"} {
+	for _, want := range []string{"NGROK", "TÚNEIS", "DETALHES", "LOGS", "URL PÚBLICA"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}
 	}
-	if strings.Contains(view, "NAV") || strings.Contains(view, "QUICK STATS") {
-		t.Fatalf("old layout leftovers:\n%s", view)
+	// As abas Overview/History/Domains/Settings viraram TÚNEIS · REQUESTS · CONFIG.
+	for _, gone := range []string{"NAV", "QUICK STATS", "Overview", "Settings"} {
+		if strings.Contains(view, gone) {
+			t.Fatalf("sobra do layout antigo %q:\n%s", gone, view)
+		}
 	}
 }
 
@@ -93,16 +96,49 @@ func TestNgrokWizardEditsPortAsText(t *testing.T) {
 		t.Fatalf("proto must not accept text: got %q", a.ngrokNewProto)
 	}
 	_, _ = a.updateNgrokWizard(tea.KeyMsg{Type: tea.KeySpace}, &p)
-	if a.ngrokNewProto != "tcp" {
-		t.Fatalf("space should cycle proto to tcp, got %q", a.ngrokNewProto)
+	if a.ngrokNewProto != "https" {
+		t.Fatalf("space deve alternar o proto, got %q", a.ngrokNewProto)
 	}
 
-	view := stripANSI(a.renderNgrokWizard(&p, 60, 12))
-	if !strings.Contains(view, "fixo") || !strings.Contains(view, "digiliza") {
-		t.Fatalf("project should be fixed in wizard: %q", view)
+	// space na porta percorre as portas que o scanner já achou no projeto —
+	// digitar a porta de cabeça era o passo mais chato de criar um túnel.
+	p.Ports = []int{8080, 5173}
+	a.ngrokWizardFocusField(ngrokWizPort)
+	a.ngrokNewPortStr = "8080"
+	_, _ = a.updateNgrokWizard(tea.KeyMsg{Type: tea.KeySpace}, &p)
+	if a.ngrokNewPortStr != "5173" {
+		t.Fatalf("space deve percorrer as portas do projeto, got %q", a.ngrokNewPortStr)
 	}
-	if strings.Contains(view, "+") && strings.Contains(view, "porta") {
-		t.Fatal("old +/- port UI should be gone")
+}
+
+// O domínio reservado é o que mantém a URL entre restarts; ele era gravado no
+// config e nunca chegava ao agente.
+func TestNgrokWizardCarriesDomainAndRegion(t *testing.T) {
+	p := core.Project{Name: "digiliza", Path: t.TempDir(), Ports: []int{8080}}
+	a := &App{
+		width: 120, height: 40, ngrokOpen: true, ngrokWizard: true,
+		ngrokNewName: "api", ngrokNewPortStr: "8080", ngrokNewProto: "http",
+		ngrokNewDomain: "checkout.ngrok.app", ngrokNewRegion: "sa",
+	}
+	spec := a.ngrokWizardSpec()
+	if spec.Domain != "checkout.ngrok.app" || spec.Region != "sa" || spec.Port != 8080 {
+		t.Fatalf("spec=%+v", spec)
+	}
+	args := strings.Join(ngrokutil.StartArgs(spec), " ")
+	for _, want := range []string{"http", "8080", "--domain=checkout.ngrok.app", "--region=sa"} {
+		if !strings.Contains(args, want) {
+			t.Fatalf("comando sem %q: %q", want, args)
+		}
+	}
+	// O preview mostra exatamente o comando que vai rodar.
+	view := stripANSI(a.renderNgrokWizard(&p, 120, 30))
+	if !strings.Contains(view, args) {
+		t.Fatalf("preview deve mostrar o comando %q:\n%s", args, view)
+	}
+	for _, want := range []string{"Domínio", "Região", "Auto-start", "no projeto: 8080"} {
+		if !strings.Contains(view, want) {
+			t.Fatalf("wizard sem %q:\n%s", want, view)
+		}
 	}
 }
 
@@ -131,7 +167,7 @@ func TestNgrokTunnelsViewLayout(t *testing.T) {
 		ngrokCfg: ngrokutil.ProjectConfig{Project: "demo", Region: "us"},
 	}
 	got := stripANSI(a.renderNgrokTunnelsView(&core.Project{Name: "demo"}, 100, 18))
-	for _, want := range []string{"DETALHES", "LOGS", "TUNNELS", "api", "x.ngrok-free.app"} {
+	for _, want := range []string{"DETALHES", "LOGS", "TÚNEIS", "api", "x.ngrok-free.app"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
@@ -147,7 +183,7 @@ func TestNgrokWizardIsModal(t *testing.T) {
 		ngrokNewName: "api", ngrokNewPortStr: "3000", ngrokNewProto: "http",
 	}
 	view := stripANSI(a.renderNgrokTab(&core.Project{Name: "digiliza"}))
-	for _, want := range []string{"NGROK", "Novo túnel", "fixo", "digiliza", "preview", "TUNNELS"} {
+	for _, want := range []string{"NGROK", "Novo túnel", "digiliza", "Domínio", "TÚNEIS"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in wizard modal:\n%s", want, view)
 		}

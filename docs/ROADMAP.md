@@ -75,7 +75,6 @@
 - [x] Help screen (`?`)
 - [x] Deploy detection (`deploy.sh`, Makefile, package.json scripts)
 - [x] Keybinding `D` (deploy) com confirmação
-- [x] Keybinding `L` (LazyGit)
 - [x] Fuzzy finder global (`Ctrl+P`)
 - [x] Confirmação antes de remove container
 - [x] Cache de scan por mtime

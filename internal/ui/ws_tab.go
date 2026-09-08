@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -242,130 +241,150 @@ func (a *App) renderWsLanding(p *core.Project) string {
 
 // --- main render ---
 
+// renderWsTab: cabeçalho, régua de duas abas (CONVERSA/AJUSTES, §2.2), corpo
+// e barra de comandos larga no rodapé (§2.3) — sem a coluna vertical de
+// atalhos que existia antes.
 func (a *App) renderWsTab(p *core.Project) string {
-	w := a.screenWidth()
-	h := a.screenHeight()
-	header := a.renderWsHeader(w)
-	tabs := a.renderWsSubTabs(w)
-	headerH := lipgloss.Height(header) + lipgloss.Height(tabs)
-
-	bodyH := maxInt(10, h-headerH-2)
-	var body string
-	switch a.wsSubTab {
-	case wsTabSettings, wsTabHistory:
-		body = a.renderWsSettings(w, bodyH)
-	default:
-		body = a.renderWsOverview(w, bodyH)
-	}
-
-	hints := a.wsHints()
-	view := lipgloss.JoinVertical(lipgloss.Left, header, tabs, body, a.renderStatusBar(hints))
 	if a.wsComposeOn {
 		return a.renderWsCompose()
 	}
-	return view
-}
+	w := a.screenWidth()
+	h := a.screenHeight()
+	header := a.renderWsHeader(w)
+	ruler := a.renderWsRuler(w)
+	cmdBar := a.renderWsCommandBar(w)
+	bodyH := maxInt(10, h-lipgloss.Height(header)-lipgloss.Height(ruler)-lipgloss.Height(cmdBar))
 
-func (a *App) wsHints() string {
-	if a.wsShowAll {
-		return "↑↓ servidor  enter troca  A este projeto  esc"
-	}
-	if a.wsComposeOn {
-		return "tab tipo  enter no Enviar  esc cancela"
-	}
-	if a.wsEditing {
-		if a.wsFocus == wsFocusConnections {
-			return "editando endereço  enter salva  esc cancela"
-		}
-		return "escrevendo  esc sai"
-	}
-	if a.wsSearchOn {
-		return "buscar no texto  enter aplica  esc limpa"
-	}
-	base := "c conectar  d desligar  m mensagem  esc"
+	var body string
 	if a.wsOnSettings() {
-		base = "c conectar  n novo  e editar  0 conversa  esc"
+		body = a.renderWsSettings(w, bodyH)
+	} else {
+		body = a.renderWsOverview(w, bodyH)
 	}
-	switch a.wsFocus {
-	case wsFocusConnections:
-		base = "↑↓ servidor  enter troca  c liga  n novo  tab conversa  esc"
-	case wsFocusMessages:
-		base = "↑↓ conversa  m mensagem  tab servidores  esc"
+
+	stack := lipgloss.JoinVertical(lipgloss.Left, header, ruler, body)
+	if fill := h - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
 	}
-	if a.wsStatus != "" {
-		return a.wsStatus + "  ·  " + base
-	}
-	return base
+	return clampRenderedHeight(lipgloss.JoinVertical(lipgloss.Left, stack, cmdBar), h)
 }
 
 func (a *App) renderWsHeader(width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabWebSocket)).Bold(true)
-	proj := "ws"
+	left := accent.Render("⇄ WEBSOCKET")
 	if p := a.currentProject(); p != nil && p.Name != "" {
-		proj = p.Name
+		left += StyleMuted.Render("   ") + StyleNormal.Bold(true).Render(truncate(p.Name, 20))
 	}
 	showURL := strings.TrimSpace(a.wsURL)
 	if live := a.liveWsURL(); live != "" {
 		showURL = live
 	}
-	url := truncate(showURL, maxInt(20, width/3))
-	left := accent.Render("devscope") + StyleMuted.Render(" › ") +
-		StyleNormal.Render(proj) + StyleMuted.Render(" › ") + StyleNormal.Render(url)
+	if showURL != "" {
+		left += StyleMuted.Render("  ›  ") + StyleNormal.Render(truncate(showURL, maxInt(16, width/3)))
+	}
 
-	badge := StyleMuted.Render("○ Desconectado")
+	var right []string
 	switch {
 	case a.wsStatus == "connecting…" || a.wsStatus == "connecting":
-		badge = StyleWarning.Render(a.spinner() + " Conectando…")
+		right = append(right, StyleWarning.Render(a.spinner()+" conectando…"))
 	case a.wsConnected:
-		badge = a.livePulse("Conectado")
+		right = append(right, a.livePulse("conectado"))
 	case a.wsErr != "":
-		badge = StyleUnhealthy.Render("● Erro")
+		right = append(right, StyleUnhealthy.Render("● erro: "+truncate(a.wsErr, 24)))
+	default:
+		right = append(right, StyleMuted.Render("○ desconectado"))
 	}
-
-	lat := ""
 	if a.wsLatency > 0 {
-		lat = StyleMuted.Render(fmt.Sprintf("  demora %dms", a.wsLatency.Milliseconds()))
+		right = append(right, StyleMuted.Render(fmt.Sprintf("%dms", a.wsLatency.Milliseconds())))
 	}
-	meta := fmt.Sprintf("%s%s  %s",
-		badge, lat,
-		StyleMuted.Render(fmt.Sprintf("recebeu %d  enviou %d", a.wsStats.RecvFrames, a.wsStats.SentFrames)),
-	)
-	if a.wsErr != "" && !a.wsConnected {
-		meta += "  " + StyleUnhealthy.Render(truncate(a.wsErr, 28))
-	}
-	gap := width - lipgloss.Width(stripANSI(left)) - 2
-	if gap < 1 {
-		gap = 1
-	}
-	return left + strings.Repeat(" ", minInt(2, gap)) + "\n" + meta
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
 func (a *App) wsOnSettings() bool {
 	return a.wsSubTab == wsTabSettings || a.wsSubTab == wsTabHistory
 }
 
-func (a *App) renderWsSubTabs(width int) string {
-	names := []string{"Conversa", "Ajustes"}
+// renderWsRuler: duas abas numeradas (CONVERSA/AJUSTES) à esquerda; recado
+// transitório ou o escopo (filtro, todos os projetos) à direita.
+func (a *App) renderWsRuler(width int) string {
+	names := []string{"CONVERSA", "AJUSTES"}
 	active := 0
 	if a.wsOnSettings() {
 		active = 1
 	}
-	var parts []string
+	parts := make([]string, 0, len(names))
 	for i, n := range names {
-		label := fmt.Sprintf("%d:%s", i, n)
+		label := fmt.Sprintf(" %d %s ", i+1, n)
+		if i == 0 && len(a.wsFrames) > 0 {
+			label = fmt.Sprintf(" %d %s %d ", i+1, n, len(a.filteredWsFrames()))
+		} else if i == 1 && len(a.wsHistory) > 0 {
+			label = fmt.Sprintf(" %d %s %d ", i+1, n, len(a.wsHistory))
+		}
 		if i == active {
-			parts = append(parts, StyleSelected.Render(" "+label+" "))
+			parts = append(parts, StyleSelected.Render(label))
 		} else {
-			parts = append(parts, StyleMuted.Render(" "+label+" "))
+			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	help := StyleMuted.Render(" ?")
-	pad := width - lipgloss.Width(stripANSI(line)) - 2
-	if pad < 1 {
-		pad = 1
+	left := strings.Join(parts, StyleMuted.Render("│"))
+
+	var chips []string
+	if a.wsStatus != "" {
+		chips = append(chips, StyleWarning.Render(truncate(a.wsStatus, 44)))
 	}
-	return line + strings.Repeat(" ", pad) + help
+	if a.wsShowAll {
+		chips = append(chips, StyleAccent.Render("A todos os projetos"))
+	}
+	if a.wsFilter != wsFilterAll {
+		chips = append(chips, StyleMuted.Render("mostrando "+wsFilterLabels[a.wsFilter]))
+	}
+	if len(chips) == 0 {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, strings.Join(chips, "  ")+" ", width)
+}
+
+func (a *App) renderWsCommandBar(width int) string {
+	build := func(items ...[2]string) string {
+		return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
+	}
+	if a.wsShowAll {
+		return build([2]string{"↑↓", "servidor"}, [2]string{"enter", "trocar"},
+			[2]string{"A", "ver só este projeto"}, [2]string{"esc", "voltar"})
+	}
+	if a.wsEditing {
+		if a.wsFocus == wsFocusConnections {
+			return build([2]string{"enter", "salvar endereço"}, [2]string{"esc", "cancelar"})
+		}
+		return build([2]string{"esc", "sair do campo"})
+	}
+	if a.wsSearchOn {
+		return build([2]string{"enter", "aplicar busca"}, [2]string{"esc", "limpar"})
+	}
+	var items [][2]string
+	if a.wsOnSettings() {
+		items = [][2]string{
+			{"c", "conectar"}, {"n", "novo endereço"}, {"e", "editar"},
+			{"a", "auto-reconectar"}, {"u", "trocar porta"},
+		}
+	} else {
+		switch a.wsFocus {
+		case wsFocusConnections:
+			items = [][2]string{
+				{"↑↓", "servidor"}, {"enter", "trocar"}, {"c", "ligar"},
+				{"n", "novo"}, {"e", "editar"}, {"x", "apagar"},
+			}
+		default:
+			items = [][2]string{
+				{"↑↓", "navegar"}, {"m", "mensagem"}, {"f", "filtro"},
+				{"/", "buscar"}, {"d", "desligar"},
+			}
+		}
+	}
+	items = append(items, [2]string{"tab", "painel"}, [2]string{"1-2", "abas"},
+		[2]string{"A", "todos projetos"}, [2]string{"esc", "voltar"})
+	return build(items...)
 }
 
 // --- overview 3-column ---
@@ -379,17 +398,6 @@ func (a *App) renderWsOverview(width, height int) string {
 	return lipgloss.JoinHorizontal(lipgloss.Top,
 		a.renderWsConnections(leftW, height),
 		a.renderWsMessagesTable(rightW, height),
-	)
-}
-
-func (a *App) renderWsLeftColumn(width, height int) string {
-	connH := maxInt(8, height*38/100)
-	statsH := maxInt(6, height*28/100)
-	filtH := maxInt(5, height-connH-statsH)
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderWsConnections(width, connH),
-		a.renderWsStatsBox(width, statsH),
-		a.renderWsFiltersBox(width, filtH),
 	)
 }
 
@@ -550,56 +558,6 @@ func (a *App) wsServerStateCell(e wsAllEntry, selected bool, live string, width 
 	return StyleStopped.Width(width).Render("parado")
 }
 
-func (a *App) renderWsStatsBox(width, height int) string {
-	st := a.wsStats
-	status := "Desconectado"
-	stStyle := StyleMuted
-	if a.wsConnected {
-		status = "Conectado"
-		stStyle = StyleHealthy
-	}
-	up := "—"
-	if a.wsConnected && !a.wsConnectedAt.IsZero() {
-		up = formatDuration(time.Since(a.wsConnectedAt))
-	}
-	kv := []string{
-		stStyle.Render(status),
-		StyleMuted.Render("Há       ") + StyleNormal.Render(up),
-		StyleMuted.Render("Recebeu  ") + StyleNormal.Render(fmt.Sprintf("%d msgs", st.RecvFrames)),
-		StyleMuted.Render("Enviou   ") + StyleNormal.Render(fmt.Sprintf("%d msgs", st.SentFrames)),
-		StyleMuted.Render("Erros    ") + StyleUnhealthy.Render(fmt.Sprintf("%d", st.Errors)),
-	}
-	return renderApiTitledBox("RESUMO", fitExactLines(kv, height-2), width, height, false)
-}
-
-func (a *App) renderWsFiltersBox(width, height int) string {
-	focus := a.wsFocus == wsFocusFilters
-	counts := a.wsFilterCounts()
-	lines := make([]string, 0, len(wsFilterLabels))
-	for i, label := range wsFilterLabels {
-		mark := StyleMuted.Render("[ ] ")
-		if wsFilterKind(i) == a.wsFilter {
-			mark = StyleHealthy.Render("[✓] ")
-		}
-		n := counts[i]
-		line := mark + StyleNormal.Render(label) + StyleMuted.Render(fmt.Sprintf(" (%d)", n))
-		if focus && wsFilterKind(i) == a.wsFilter {
-			line = StyleSelected.Render("▸ ") + line
-		} else {
-			line = "  " + line
-		}
-		lines = append(lines, line)
-	}
-	if q := strings.TrimSpace(a.wsSearch); q != "" {
-		lines = append(lines, StyleMuted.Render("search: "+truncate(q, width-12)))
-	}
-	title := "MOSTRAR"
-	if focus {
-		title = "> MOSTRAR"
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
-}
-
 func (a *App) renderWsMessagesTable(width, height int) string {
 	focus := a.wsFocus == wsFocusMessages
 	viewport := maxInt(1, height-2)
@@ -652,114 +610,6 @@ func (a *App) formatWsFrameRow(f wsFrame, width int) string {
 	payloadW := maxInt(8, width-22)
 	payload = sliceColumns(payload, a.wsMsgHScroll, payloadW)
 	return StyleMuted.Render(tm+"  ") + whoSt.Render(fmt.Sprintf("%-9s", who)) + StyleNormal.Render(payload)
-}
-
-func (a *App) renderWsInspector(width, height int) string {
-	focus := a.wsFocus == wsFocusInspector
-	detH := maxInt(8, height*32/100)
-	payH := maxInt(6, height*40/100)
-	hdrH := maxInt(4, height-detH-payH)
-
-	vis := a.filteredWsFrames()
-	var f *wsFrame
-	if len(vis) > 0 && a.wsFrameCursor >= 0 && a.wsFrameCursor < len(vis) {
-		f = &vis[a.wsFrameCursor]
-	}
-
-	details := []string{StyleMuted.Render("escolha uma mensagem na lista")}
-	payload := []string{StyleMuted.Render("—")}
-	handshake := a.wsConnPlainLines()
-
-	if f != nil {
-		dir := "info"
-		switch f.Dir {
-		case "in":
-			dir = "chegou do servidor"
-		case "out":
-			dir = "você enviou"
-		case "err":
-			dir = "deu erro"
-		}
-		details = []string{
-			StyleMuted.Render("Quando    ") + StyleNormal.Render(f.Time.Format("15:04:05")),
-			StyleMuted.Render("Quem      ") + StyleNormal.Render(dir),
-			StyleMuted.Render("Tipo      ") + StyleNormal.Render(f.Kind),
-			StyleMuted.Render("Tamanho   ") + StyleNormal.Render(humanBytes(f.Size)),
-		}
-		if f.Latency > 0 {
-			details = append(details, StyleMuted.Render("Demora    ")+StyleWarning.Render(fmt.Sprintf("%dms", f.Latency.Milliseconds())))
-		}
-		payload = a.renderWsPayloadLines(f, width-2, payH-2)
-	}
-
-	modes := []string{"Legível", "Cru", "Hex"}
-	var mp []string
-	for i, m := range modes {
-		if wsPayloadMode(i) == a.wsPayloadMode {
-			mp = append(mp, StyleSelected.Render(m))
-		} else {
-			mp = append(mp, StyleMuted.Render(m))
-		}
-	}
-	payTitle := "CONTEÚDO  " + strings.Join(mp, StyleMuted.Render("|"))
-	if focus {
-		payTitle = "> " + payTitle
-	}
-
-	dTitle := "ESTA MENSAGEM"
-	hTitle := "CONEXÃO"
-	if focus {
-		dTitle = "> ESTA MENSAGEM"
-	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox(dTitle, fitExactLines(details, detH-2), width, detH, focus),
-		renderApiTitledBox(payTitle, fitExactLines(payload, payH-2), width, payH, focus),
-		renderApiTitledBox(hTitle, fitExactLines(handshake, hdrH-2), width, hdrH, false),
-	)
-}
-
-func (a *App) wsConnPlainLines() []string {
-	if !a.wsConnected && a.wsInfo.URL == "" {
-		return []string{StyleMuted.Render("aparece depois de conectar")}
-	}
-	url := firstNonEmpty(a.wsInfo.URL, a.wsURL)
-	seguro := "não (ws)"
-	if a.wsInfo.TLS || strings.HasPrefix(url, "wss://") {
-		seguro = "sim (wss)"
-	}
-	estado := "desligado"
-	if a.wsConnected {
-		estado = "ligado"
-	}
-	lines := []string{
-		StyleMuted.Render("Endereço  ") + StyleNormal.Render(truncate(url, 28)),
-		StyleMuted.Render("Estado    ") + StyleNormal.Render(estado),
-		StyleMuted.Render("Seguro    ") + StyleNormal.Render(seguro),
-	}
-	if a.wsInfo.Subprotocol != "" {
-		lines = append(lines, StyleMuted.Render("Acordo    ")+StyleNormal.Render(a.wsInfo.Subprotocol))
-	}
-	return lines
-}
-
-func (a *App) renderWsPayloadLines(f *wsFrame, width, height int) []string {
-	switch a.wsPayloadMode {
-	case wsPayloadHex:
-		h := hex.Dump([]byte(f.Payload))
-		return strings.Split(strings.TrimRight(h, "\n"), "\n")
-	case wsPayloadRaw:
-		return strings.Split(f.Payload, "\n")
-	default:
-		if f.Kind == "json" || json.Valid([]byte(f.Payload)) {
-			var v any
-			if json.Unmarshal([]byte(f.Payload), &v) == nil {
-				if b, err := json.MarshalIndent(v, "", "  "); err == nil {
-					return strings.Split(string(b), "\n")
-				}
-			}
-		}
-		return strings.Split(f.Payload, "\n")
-	}
 }
 
 // --- other subtabs ---
@@ -844,12 +694,12 @@ func (a *App) handleWsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd)
 			return a, nil
 		}
 		return a, a.leaveWsTab()
-	case "0":
+	case "1":
 		a.wsSubTab = wsTabOverview
 		if a.wsFocus != wsFocusSend {
 			a.wsFocus = wsFocusMessages
 		}
-	case "1", "2", "3":
+	case "2":
 		a.wsSubTab = wsTabSettings
 		a.wsFocus = wsFocusConnections
 	case "c":
@@ -1627,33 +1477,6 @@ func (a *App) wsFrameMatchesFilter(f wsFrame) bool {
 	default:
 		return true
 	}
-}
-
-func (a *App) wsFilterCounts() []int {
-	counts := make([]int, len(wsFilterLabels))
-	counts[0] = len(a.wsFrames)
-	for _, f := range a.wsFrames {
-		switch f.Kind {
-		case "text":
-			counts[1]++
-		case "json":
-			counts[2]++
-		case "binary":
-			counts[3]++
-		case "error":
-			counts[4]++
-		}
-		if f.Dir == "err" {
-			counts[4]++
-		}
-		if f.Dir == "in" {
-			counts[5]++
-		}
-		if f.Dir == "out" {
-			counts[6]++
-		}
-	}
-	return counts
 }
 
 func (a *App) syncWsFrameCursor(n int) {

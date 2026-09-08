@@ -238,7 +238,7 @@ func rebuildStyles() {
 	StyleSubtitle = lipgloss.NewStyle().Foreground(ColorSubtext)
 	StyleClock = lipgloss.NewStyle().Foreground(ColorPrimary).Bold(true)
 	StyleTitle = lipgloss.NewStyle().Bold(true).Foreground(ColorPrimary).MarginBottom(1)
-	StyleDashboard = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(ColorBorder).Padding(1, 2)
+	StyleDashboard = lipgloss.NewStyle().Padding(1, 2)
 	StyleInnerPanel = lipgloss.NewStyle().Border(lipgloss.NormalBorder()).BorderForeground(ColorBorder).Padding(0, 1)
 	StyleTableHeader = lipgloss.NewStyle().Bold(true).Foreground(ColorAccent).Background(ColorBgPanel)
 	StyleHeader = lipgloss.NewStyle().Bold(true).Foreground(ColorText).Border(lipgloss.NormalBorder()).BorderForeground(ColorBorder).Padding(0, 1)

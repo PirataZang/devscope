@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -58,17 +59,17 @@ func (t containerDetailTab) shortLabel() string {
 	case containerDetailTabLogs:
 		return "Logs"
 	case containerDetailTabStats:
-		return "Stats"
+		return "Métricas"
 	case containerDetailTabEnv:
 		return "Env"
 	case containerDetailTabConfig:
 		return "Config"
 	case containerDetailTabTop:
-		return "Top"
+		return "Processos"
 	case containerDetailTabCompose:
 		return "Compose"
 	case containerDetailTabFile:
-		return "File"
+		return "Arquivos"
 	default:
 		return "?"
 	}
@@ -82,122 +83,48 @@ func (a *App) renderContainerDetail(p *core.Project) string {
 }
 
 func (a *App) renderContainerTextScreen() string {
-	height := maxInt(12, a.height-2)
-	panelW := maxInt(40, a.width)
-	innerW := maxInt(36, panelW-2)
-	bodyH := maxInt(8, height-6)
-	cmdW := actionsCmdWidth(innerW)
-	mainW := maxInt(28, innerW-cmdW)
-	body := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderContainerDetailRichBody(mainW, bodyH),
-		renderActionsBox(cmdW, bodyH,
-			[2]string{"←→", "abas"},
-			[2]string{"↑↓", "scroll"},
-			[2]string{"/", "buscar"},
-			[2]string{"f", "follow"},
-			[2]string{"p", "pause"},
-			[2]string{"r", "reload"},
-			[2]string{"esc", "voltar"},
-		),
-	)
-	return a.renderContainerDetailChrome(body, bodyH)
+	w := maxInt(40, a.width)
+	// Cabeçalho + régua de abas (2) e barra de comandos (até 2): a coluna
+	// AÇÕES saiu, então o conteúdo fica com a largura inteira.
+	bodyH := a.containerDetailBodyHeight()
+	return a.renderContainerDetailChrome(a.renderContainerDetailRichBody(w, bodyH))
 }
 
+// containerDetailStatusBadge resume o que muda enquanto se lê: modo de
+// acompanhamento, busca e posição. O "[n/7]" saiu — a régua de abas já diz.
 func (a *App) containerDetailStatusBadge() string {
-	parts := []string{
-		StyleMuted.Render(fmt.Sprintf("[%d/%d]", int(a.containerDetailTab)+1, containerDetailTabTotal)),
+	var parts []string
+	if a.containerDetailTab == containerDetailTabStats {
+		// Métricas não tem linhas para rolar nem buscar: "1-1/1" só confundia.
+		if a.containerDetailStatsLive {
+			return a.livePulse("ao vivo")
+		}
+		return StyleMuted.Render("pausado · r recarrega")
 	}
 	if a.containerDetailTab == containerDetailTabLogs {
 		switch {
 		case a.containerDetailFollow && a.containerDetailFollowPaused:
-			parts = append(parts, StyleWarning.Render("PAUSED"))
+			parts = append(parts, StyleWarning.Render("⏸ pausado"))
 		case a.containerDetailFollow:
-			parts = append(parts, StyleHealthy.Render("LIVE"))
+			parts = append(parts, StyleHealthy.Render(pulseGlyph(pulseOK, a.animFrame)+" ao vivo"))
 		}
 	}
 	if a.containerDetailSearchQuery != "" {
 		matches := a.containerDetailSearchMatches()
 		if len(matches) == 0 {
-			parts = append(parts, StyleMuted.Render("/0"))
+			parts = append(parts, StyleWarning.Render("sem ocorrência"))
 		} else {
-			parts = append(parts, StyleAccent.Render(fmt.Sprintf("/%d/%d", a.containerDetailSearchIdx+1, len(matches))))
+			parts = append(parts, StyleAccent.Render(
+				fmt.Sprintf("%d de %d", a.containerDetailSearchIdx+1, len(matches))))
 		}
 	}
 	if a.containerDetailHScroll > 0 {
-		parts = append(parts, StyleMuted.Render(fmt.Sprintf("↔%d", a.containerDetailHScroll)))
+		parts = append(parts, StyleMuted.Render(fmt.Sprintf("↔ %d", a.containerDetailHScroll)))
 	}
-	return strings.Join(parts, "  ")
-}
-
-func (a *App) containerDetailFooter(position string) string {
-	base := "←→ abas  ↑↓/pg scroll  ,/. lateral  / buscar"
-	if a.containerDetailTab == containerDetailTabLogs {
-		base += "  f follow  p pausa  r reload"
+	if pos := a.containerDetailPosition(a.containerDetailViewport()); pos != "" {
+		parts = append(parts, StyleMuted.Render(pos))
 	}
-	if a.containerDetailSearchQuery != "" {
-		base += "  N/P match"
-	}
-	return base + "  " + position + "  esc"
-}
-
-func (a *App) renderContainerDetailBodyLines(viewport, width int) []string {
-	lines := make([]string, 0, viewport)
-	if a.containerDetailLoading {
-		lines = append(lines, StyleMuted.Render("  Carregando "+strings.ToLower(a.containerDetailTab.shortLabel())+"..."))
-		return fitExactLines(lines, viewport)
-	}
-
-	all := a.containerDetailLines()
-	textW := maxInt(8, width-2)
-	a.containerDetailHScroll = clampScroll(a.containerDetailHScroll, textW, a.containerDetailMaxLineWidth())
-	a.containerDetailScroll = clampScroll(a.containerDetailScroll, viewport, len(all))
-	start := a.containerDetailScroll
-	end := minInt(start+viewport, len(all))
-
-	matchSet := a.containerDetailMatchLineSet()
-	current := -1
-	if matches := a.containerDetailSearchMatches(); len(matches) > 0 && a.containerDetailSearchIdx < len(matches) {
-		current = matches[a.containerDetailSearchIdx]
-	}
-
-	for i := start; i < end; i++ {
-		lines = append(lines, a.renderContainerDetailViewLine(all[i], textW, matchSet[i], i == current))
-	}
-	return fitExactLines(lines, viewport)
-}
-
-func (a *App) renderContainerDetailViewLine(line string, width int, matched, current bool) string {
-	line = sanitizeTerminalLine(line)
-	if line == "" {
-		line = " "
-	}
-	display := sliceColumns(line, a.containerDetailHScroll, width)
-
-	if a.containerDetailTab == containerDetailTabEnv {
-		if key, val, ok := strings.Cut(strings.TrimSpace(line), "="); ok {
-			visible := sliceColumns(key+"="+val, a.containerDetailHScroll, width)
-			if current {
-				return StyleDiffMatch.Render(visible)
-			}
-			if matched {
-				return StyleWarning.Render(visible)
-			}
-			// Re-color key=value within the visible window when possible.
-			if eq := strings.IndexByte(visible, '='); eq > 0 && a.containerDetailHScroll == 0 {
-				return StyleWarning.Render(visible[:eq]) + StyleNormal.Render(visible[eq:])
-			}
-			return StyleNormal.Render(visible)
-		}
-	}
-
-	switch {
-	case current:
-		return StyleDiffMatch.Render(display)
-	case matched:
-		return StyleWarning.Render(display)
-	default:
-		return StyleNormal.Render(display)
-	}
+	return strings.Join(parts, StyleMuted.Render("  ·  "))
 }
 
 func (a *App) containerDetailPosition(viewport int) string {
@@ -214,91 +141,40 @@ func (a *App) containerDetailPosition(viewport int) string {
 }
 
 func (a *App) containerDetailContentLen() int {
-	switch a.containerDetailTab {
-	case containerDetailTabEnv:
-		return len(flattenEnvGroups(groupEnvPairs(parseEnvPairs(a.containerDetailContent))))
-	case containerDetailTabConfig:
-		return maxInt(1, len(parseContainerConfig(a.containerDetailContent).labels))
-	case containerDetailTabCompose, containerDetailTabFile:
-		raw := a.containerDetailContent
-		if strings.HasPrefix(strings.TrimSpace(raw), "#") {
-			parts := strings.SplitN(raw, "\n", 2)
-			if len(parts) == 2 {
-				raw = parts[1]
-			}
-		}
-		return len(strings.Split(raw, "\n"))
-	default:
-		return len(a.containerDetailLines())
-	}
+	return len(a.containerDetailLines())
 }
 
+// renderContainerDetailTabBar: abas numeradas, como nas outras telas — sem o
+// número não há como saber que dá para pular direto para a aba 4.
 func (a *App) renderContainerDetailTabBar(width int) string {
 	if width <= 0 {
 		width = maxInt(20, a.width-4)
 	}
-	separator := " │ "
-	activePrefix := "▶ "
-	if width < 70 {
-		separator = " "
-		activePrefix = "›"
-	}
+	compact := width < 78
 
-	labels := make([]string, containerDetailTabTotal)
+	parts := make([]string, 0, containerDetailTabTotal)
 	for i := 0; i < containerDetailTabTotal; i++ {
 		tab := containerDetailTab(i)
-		label := tab.shortLabel()
+		label := fmt.Sprintf(" %d %s ", i+1, strings.ToUpper(tab.shortLabel()))
+		if compact {
+			label = fmt.Sprintf(" %d ", i+1)
+			if tab == a.containerDetailTab {
+				label = fmt.Sprintf(" %d %s ", i+1, strings.ToUpper(tab.shortLabel()))
+			}
+		}
 		if tab == a.containerDetailTab {
-			labels[i] = StyleTabActive.Render(activePrefix + label)
+			parts = append(parts, StyleSelected.Render(label))
 		} else {
-			labels[i] = StyleMuted.Render(label)
+			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
+	left := strings.Join(parts, StyleMuted.Render("│"))
 
-	active := int(a.containerDetailTab)
-	// Find the leftmost start index so the active tab stays fully visible.
-	start := 0
-	for start < active {
-		if containerTabsWidth(labels[start:], separator) <= width {
-			break
-		}
-		prefix := 0
-		if start > 0 {
-			prefix = lipgloss.Width(StyleMuted.Render("…" + separator))
-		}
-		if prefix+containerTabsWidth(labels[start:active+1], separator) <= width {
-			break
-		}
-		start++
+	right := a.containerDetailStatusBadge()
+	if right == "" || lipgloss.Width(left)+lipgloss.Width(right)+2 > width {
+		return padRightVisible(left, width)
 	}
-
-	var parts []string
-	used := 0
-	if start > 0 {
-		ell := StyleMuted.Render("…")
-		parts = append(parts, ell)
-		used = lipgloss.Width(ell)
-	}
-	for i := start; i < len(labels); i++ {
-		need := lipgloss.Width(labels[i])
-		if len(parts) > 0 {
-			need += lipgloss.Width(separator)
-		}
-		if used+need > width {
-			if i == active {
-				parts = []string{labels[i]}
-				used = lipgloss.Width(labels[i])
-				continue
-			}
-			if i > active {
-				parts = append(parts, StyleMuted.Render("…"))
-			}
-			break
-		}
-		parts = append(parts, labels[i])
-		used += need
-	}
-	return strings.Join(parts, separator)
+	return joinWithSpacer(left, right+" ", width)
 }
 
 func containerTabsWidth(labels []string, sep string) int {
@@ -313,21 +189,6 @@ func containerTabsWidth(labels []string, sep string) int {
 		}
 	}
 	return w
-}
-
-func (a *App) renderContainerDetailLine(tab containerDetailTab, line string) string {
-	lineWidth := maxInt(10, a.width-12)
-	if tab == containerDetailTabLogs {
-		line = sanitizeTerminalLine(line)
-	}
-	line = truncate(line, lineWidth)
-	text := "  " + line
-	if tab == containerDetailTabEnv {
-		if key, val, ok := strings.Cut(strings.TrimSpace(line), "="); ok {
-			return "  " + StyleWarning.Render(key) + "=" + StyleNormal.Render(val)
-		}
-	}
-	return StyleNormal.Render(text)
 }
 
 func sanitizeTerminalLine(line string) string {
@@ -345,11 +206,13 @@ func (a *App) containerDetailLines() []string {
 	if content == "" {
 		return []string{"(vazio)"}
 	}
-	lines := strings.Split(content, "\n")
+	// O docker devolve tudo terminado em "\n": sem aparar, toda aba mostra uma
+	// última linha vazia e conta uma linha a mais do que existe.
+	lines := strings.Split(strings.TrimRight(content, "\n"), "\n")
 	if len(lines) == 1 && lines[0] == "" {
 		return []string{"(vazio)"}
 	}
-	return lines
+	return layoutDetailLines(a.containerDetailTab, lines)
 }
 
 func (a *App) containerDetailMaxLineWidth() int {
@@ -362,25 +225,28 @@ func (a *App) containerDetailMaxLineWidth() int {
 	return maxW
 }
 
-func (a *App) containerDetailViewport() int {
-	// Match rich views: bodyH = height-6, cards ~3, box chrome ~2
-	h := maxInt(12, a.height-2)
-	bodyH := maxInt(8, h-6)
-	restH := maxInt(6, bodyH-3)
-	return maxInt(1, restH-2)
+// containerDetailBodyHeight é a altura do painel de conteúdo — a mesma conta
+// que a moldura faz, para a posição no cabeçalho bater com o que se vê.
+func (a *App) containerDetailBodyHeight() int {
+	return maxInt(6, maxInt(12, a.height-1)-4)
 }
 
-func (a *App) containerDetailSwitchTab(delta int) tea.Cmd {
+func (a *App) containerDetailViewport() int {
+	return maxInt(1, a.containerDetailBodyHeight()-2)
+}
+
+// containerDetailGotoTab: as setas passaram a rolar o texto de lado, então a
+// troca de aba é só pelo número — que a régua já mostra.
+func (a *App) containerDetailGotoTab(i int) tea.Cmd {
+	if i < 0 || i >= containerDetailTabTotal || containerDetailTab(i) == a.containerDetailTab {
+		return nil
+	}
 	a.stopContainerDetailFollow()
 	a.stopContainerDetailStatsLive()
 	a.containerDetailSearchQuery = ""
 	a.containerDetailSearchIdx = 0
 	a.containerDetailHScroll = 0
-	n := int(a.containerDetailTab) + delta
-	for n < 0 {
-		n += containerDetailTabTotal
-	}
-	a.containerDetailTab = containerDetailTab(n % containerDetailTabTotal)
+	a.containerDetailTab = containerDetailTab(i)
 	a.containerDetailScroll = 0
 	return a.loadContainerDetailTab()
 }
@@ -390,8 +256,16 @@ func (a *App) containerDetailScrollBy(delta int) {
 	a.containerDetailScroll = clampScroll(a.containerDetailScroll+delta, viewport, a.containerDetailContentLen())
 }
 
+// containerDetailTextWidth: a mesma conta do corpo (moldura, numeração e o
+// separador " │ "), para o passo lateral parar exatamente onde o texto acaba.
+func (a *App) containerDetailTextWidth() int {
+	inner := maxInt(20, maxInt(40, a.width)-2)
+	gutter := maxInt(3, len(strconv.Itoa(a.containerDetailContentLen())))
+	return maxInt(8, inner-gutter-3)
+}
+
 func (a *App) containerDetailHScrollBy(delta int) {
-	textW := maxInt(8, a.width-6)
+	textW := a.containerDetailTextWidth()
 	maxH := maxInt(0, a.containerDetailMaxLineWidth()-textW)
 	a.containerDetailHScroll += delta
 	if a.containerDetailHScroll < 0 {
@@ -611,14 +485,18 @@ func (a *App) handleContainerDetailKeys(msg tea.KeyMsg, p *core.Project) (tea.Mo
 		a.containerDetailCache = nil
 		a.containerDetailSearchOn = false
 		return a, nil
+	case "1", "2", "3", "4", "5", "6", "7":
+		return a, a.containerDetailGotoTab(int(msg.String()[0] - '1'))
 	case "left", "h":
-		return a, a.containerDetailSwitchTab(-1)
-	case "right", "l":
-		return a, a.containerDetailSwitchTab(1)
-	case ",":
 		a.containerDetailHScrollBy(-8)
-	case ".":
+	case "right", "l":
 		a.containerDetailHScrollBy(8)
+	case "shift+left", "H":
+		a.containerDetailHScrollBy(-a.containerDetailTextWidth() / 2)
+	case "shift+right", "L":
+		a.containerDetailHScrollBy(a.containerDetailTextWidth() / 2)
+	case "0":
+		a.containerDetailHScroll = 0
 	case "up", "k":
 		a.containerDetailScrollBy(-1)
 	case "down", "j":
@@ -635,11 +513,11 @@ func (a *App) handleContainerDetailKeys(msg tea.KeyMsg, p *core.Project) (tea.Mo
 		a.containerDetailSearchOn = true
 		a.containerDetailSearchInput = a.containerDetailSearchQuery
 		return a, nil
-	case "N":
+	case "n":
 		if a.containerDetailSearchQuery != "" {
 			a.jumpContainerDetailSearch(1)
 		}
-	case "P":
+	case "N":
 		if a.containerDetailSearchQuery != "" {
 			a.jumpContainerDetailSearch(-1)
 		}

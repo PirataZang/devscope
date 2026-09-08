@@ -4,8 +4,10 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/mattn/go-runewidth"
 )
@@ -41,31 +43,50 @@ func (a *App) moduleSize() (width, height int) {
 	return w, h
 }
 
+// renderModuleContext é a barra de topo de todo módulo. Antes repetia
+// "Projeto X  Ambiente Y  Servidor Z" — X e Y já estão na sidebar e "Ambiente"
+// rotulava o nome da branch. Agora identifica o módulo e o projeto aberto.
 func (a *App) renderModuleContext(p *core.Project, width int, module, status string) string {
-	name := "project"
-	if p != nil && p.Name != "" {
-		name = p.Name
-	}
-	env := "local"
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(a.tab)).Bold(true)
+	left := accent.Render(tabGlyph(a.tab) + " " + strings.ToUpper(module))
 	if p != nil {
-		env = projectEnvLabel(p)
+		left += StyleMuted.Render("   " + truncate(shortenPath(p.Path), maxInt(12, width/3)))
 	}
-	host := moduleHostname()
-	left := StyleMuted.Render("Projeto ") + StyleNormal.Render(truncate(name, 18)) +
-		StyleMuted.Render("  Ambiente ") + StyleWarning.Render(env) +
-		StyleMuted.Render("  Módulo ") + StyleNormal.Render(module)
-	if status == "" && p != nil {
-		status = string(p.Status)
+
+	right := ""
+	if p != nil {
+		right = projectStatusStyle(p.Status).Render(statusLabel(p.Status, a.animFrame)) +
+			StyleMuted.Render("  ") + healthChip(p.Health, a.animFrame)
+		if up := projectUptime(p, a.snapshot.HostMetrics.Uptime); up != "" {
+			right += StyleMuted.Render("  ⧗ " + up)
+		}
 	}
-	right := StyleMuted.Render(truncate(host, 14))
-	if status != "" {
-		right = StyleNormal.Render(truncate(status, 28)) + StyleMuted.Render("  ") + right
+	if status = strings.TrimSpace(status); status != "" {
+		if room := width - lipgloss.Width(left) - lipgloss.Width(right) - 6; room > 12 {
+			// Alguns módulos passam status já estilizado; truncate() cortaria
+			// dentro do escape ANSI.
+			if plain := stripANSI(status); plain == status {
+				status = StyleMuted.Render(truncate(status, room))
+			} else if lipgloss.Width(status) > room {
+				status = ansi.Truncate(status, room, "…")
+			}
+			right = status + StyleMuted.Render("   ") + right
+		}
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
+	if right == "" {
+		return truncateVisible(left, width)
 	}
-	return left + strings.Repeat(" ", pad) + right
+	return joinWithSpacer(left, right, width)
+}
+
+func projectUptime(p *core.Project, hostUptime time.Duration) string {
+	if p != nil && p.Uptime > 0 {
+		return formatUptime(p.Uptime)
+	}
+	if hostUptime > 0 {
+		return formatUptime(hostUptime)
+	}
+	return ""
 }
 
 func (a *App) renderModuleShell(p *core.Project, width, height int, module, status string, center, right string) string {

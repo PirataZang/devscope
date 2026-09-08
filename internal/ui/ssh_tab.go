@@ -24,10 +24,10 @@ const (
 type sshSubTab int
 
 const (
-	sshTabOverview sshSubTab = iota
-	sshTabTunnels
-	sshTabHistory
-	sshTabSettings
+	// Overview repetia o header; History e Settings tinham poucas linhas cada.
+	sshTabTunnels sshSubTab = iota
+	sshTabConfig
+	sshTabCount
 )
 
 type sshFocus int
@@ -268,12 +268,8 @@ func (a *App) renderSSHTab(p *core.Project) string {
 
 	var body string
 	switch a.sshSubTab {
-	case sshTabOverview:
-		body = a.renderSSHOverview(p, mainW, bodyH)
-	case sshTabHistory:
-		body = a.renderSSHHistory(mainW, bodyH)
-	case sshTabSettings:
-		body = a.renderSSHSettings(p, mainW, bodyH)
+	case sshTabConfig:
+		body = a.renderSSHConfig(p, mainW, bodyH)
 	default:
 		body = a.renderSSHTunnelsView(p, mainW, bodyH)
 	}
@@ -303,7 +299,7 @@ func (a *App) renderSSHCommands(width, height int) string {
 		[2]string{"c", "copy forward"},
 		[2]string{"d", "delete"},
 		[2]string{"A", "todos/projeto"},
-		[2]string{"0-3", "abas"},
+		[2]string{"1-2", "abas"},
 		[2]string{"tab", "foco painéis"},
 		[2]string{"ctrl+r", "refresh"},
 		[2]string{"esc", "voltar"},
@@ -336,52 +332,62 @@ func (a *App) sshHints() string {
 
 func (a *App) renderSSHHeader(p *core.Project, width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabSSH)).Bold(true)
-	name := "project"
-	if p != nil {
-		name = p.Name
+	left := accent.Render("⇌ SSH TUNNEL")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 24))
 	}
-	env := projectEnvLabel(p)
-	left := accent.Render("devscope") + StyleMuted.Render(" › ssh") +
-		StyleMuted.Render("  ·  ") + StyleNormal.Render(name) +
-		StyleMuted.Render("  ") + StyleMuted.Render(env)
-	online := 0
-	for _, t := range a.sshTunnels {
-		if t.Status == "online" {
-			online++
-		}
+	online, _ := a.sshCounts()
+	if online > 0 {
+		left += "   " + StyleHealthy.Render(fmt.Sprintf("● %d ativo(s)", online))
+	} else {
+		left += "   " + StyleMuted.Render("○ nenhum túnel ativo")
 	}
-	right := StyleHealthy.Render(fmt.Sprintf("%d online", online)) +
-		StyleMuted.Render(fmt.Sprintf(" / %d", len(a.sshTunnels)))
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right))
-	if pad < 1 {
-		pad = 1
+
+	right := []string{}
+	if a.sshLoading {
+		right = append(right, a.loadingMuted("carregando…"))
 	}
-	return left + strings.Repeat(" ", pad) + right
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
 func (a *App) renderSSHNav(width int) string {
-	names := []string{"Overview", "Tunnels", "History", "Settings"}
-	var parts []string
+	names := []string{"TÚNEIS", "CONFIG"}
+	counts := []int{len(a.sshTunnels), 0}
+	parts := make([]string, 0, len(names))
 	for i, n := range names {
-		label := fmt.Sprintf(" %d:%s ", i, n)
+		label := fmt.Sprintf(" %d %s ", i+1, n)
+		if counts[i] > 0 {
+			label = fmt.Sprintf(" %d %s %d ", i+1, n, counts[i])
+		}
 		if sshSubTab(i) == a.sshSubTab {
 			parts = append(parts, StyleSelected.Render(label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	pad := width - lipgloss.Width(stripANSI(line))
-	if pad < 0 {
-		pad = 0
+	left := strings.Join(parts, StyleMuted.Render("│"))
+
+	online, offline := a.sshCounts()
+	var chips []string
+	if online > 0 {
+		chips = append(chips, StyleHealthy.Render(fmt.Sprintf("● %d", online))+StyleMuted.Render(" online"))
 	}
-	return line + strings.Repeat(" ", pad)
+	if offline > 0 {
+		chips = append(chips, StyleMuted.Render(fmt.Sprintf("○ %d offline", offline)))
+	}
+	if a.sshShowAll {
+		chips = append(chips, StyleAccent.Render("A todos os projetos"))
+	} else if a.sshForeign > 0 {
+		chips = append(chips, StyleMuted.Render(fmt.Sprintf("+%d de outros projetos · A", a.sshForeign)))
+	}
+	if len(chips) == 0 {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, strings.Join(chips, "  ")+" ", width)
 }
 
-func (a *App) renderSSHOverview(p *core.Project, width, height int) string {
-	rightW := a.moduleRightWidth(width)
-	centerW := maxInt(36, width-rightW-1)
-	online, offline := 0, 0
+func (a *App) sshCounts() (online, offline int) {
 	for _, t := range a.sshTunnels {
 		if t.Status == "online" {
 			online++
@@ -389,154 +395,199 @@ func (a *App) renderSSHOverview(p *core.Project, width, height int) string {
 			offline++
 		}
 	}
-	sumH := maxInt(8, height*45/100)
-	listH := maxInt(6, height-sumH)
-	cli := "ausente"
-	if sshutil.Available() {
-		cli = firstNonEmpty(sshutil.Version(), "ok")
-	}
-	lines := []string{
-		StyleMuted.Render("CLI        ") + StyleNormal.Render(cli),
-		StyleMuted.Render("Tunnels    ") + StyleHealthy.Render(fmt.Sprintf("%d online", online)) +
-			StyleMuted.Render(" / ") + StyleUnhealthy.Render(fmt.Sprintf("%d offline", offline)),
-		StyleMuted.Render("Config     ") + StyleMuted.Render(".devscope/ssh.json"),
-		StyleMuted.Render("Default    ") + StyleNormal.Render("remote (−R) · porta do projeto"),
-	}
-	if p != nil && len(p.Ports) > 0 {
-		lines = append(lines, StyleMuted.Render("Proj ports ")+StyleAccent.Render(fmt.Sprintf("%v", p.Ports)))
-	}
-	evLines := make([]string, 0, listH-2)
-	if len(a.sshCfg.History) == 0 {
-		evLines = append(evLines, StyleMuted.Render("(sem histórico recente)"))
-	} else {
-		n := minInt(listH-2, len(a.sshCfg.History))
-		for i := 0; i < n; i++ {
-			h := a.sshCfg.History[i]
-			evLines = append(evLines, StyleMuted.Render(h.Started.Format("15:04"))+" "+
-				StyleNormal.Render(fmt.Sprintf("%s  %s  :%d", h.Name, h.Mode, h.LocalPort)))
-		}
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("OVERVIEW", fitExactLines(lines, sumH-2), centerW, sumH, false),
-		renderApiTitledBox("RECENT", fitExactLines(evLines, listH-2), centerW, listH, false),
-	)
-	details := []string{
-		StyleHealthy.Render(fmt.Sprintf("online   %d", online)),
-		StyleUnhealthy.Render(fmt.Sprintf("offline  %d", offline)),
-	}
-	actions := moduleActionLines(
-		[2]string{"1", "túneis"},
-		[2]string{"n", "novo túnel"},
-		[2]string{"s", "start"},
-		[2]string{"x", "stop"},
-		[2]string{"e", "editar"},
-		[2]string{"d", "delete"},
-		[2]string{"r", "refresh"},
-	)
-	right := a.renderModuleRightRail(rightW, height, details, actions)
-	return lipgloss.JoinHorizontal(lipgloss.Top, center, right)
+	return
 }
 
+// renderSSHTunnelsView: a tabela ocupa a largura toda para caber o encaminhamento
+// (localhost:5433 → 127.0.0.1:5432), que é a informação central de um túnel SSH
+// e não aparecia na lista — só ST/NAME/PORT/MODE.
 func (a *App) renderSSHTunnelsView(p *core.Project, width, height int) string {
 	_ = p
-	if height < 6 {
-		height = 6
+	if height < 8 {
+		height = 8
 	}
-	leftW := maxInt(32, width*40/100)
-	rightW := maxInt(28, width-leftW-1)
-	logsH := maxInt(4, height*34/100)
-	if logsH > height-6 {
-		logsH = height - 6
+	tableH := minInt(maxInt(6, height*55/100), len(a.sshTunnels)+4)
+	if tableH < 6 {
+		tableH = 6
 	}
-	detailsH := height - logsH
-	left := a.renderSSHTunnelTable(leftW, height)
-	right := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderSSHDetailsPane(rightW, detailsH),
-		a.renderSSHLogsPane(rightW, logsH),
+	bottomH := maxInt(5, height-tableH)
+	leftW := maxInt(30, width*52/100)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderSSHTunnelTable(width, tableH),
+		lipgloss.JoinHorizontal(lipgloss.Top,
+			a.renderSSHDetailsPane(leftW, bottomH),
+			a.renderSSHLogsPane(maxInt(24, width-leftW), bottomH),
+		),
 	)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
+}
+
+type sshCols struct{ dot, name, mode, forward, target, uptime, auto int }
+
+func sshColumns(width int) sshCols {
+	w := maxInt(30, width)
+	c := sshCols{dot: 1, name: minInt(18, maxInt(8, w*14/100)), mode: 9,
+		target: minInt(26, maxInt(10, w*20/100)), uptime: 8, auto: 4}
+	if w < 84 {
+		c.uptime, c.auto = 0, 0
+	}
+	used := c.dot + c.name + c.mode + c.target + c.uptime + c.auto + 6
+	c.forward = maxInt(12, w-used)
+	return c
 }
 
 func (a *App) renderSSHTunnelTable(width, height int) string {
 	focus := a.sshFocus == sshFocusTable
+	inner := maxInt(20, width-2)
+	c := sshColumns(inner - 2)
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return padRight(truncate(t, n), n)
+	}
+	rcell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return padLeft(truncate(t, n), n)
+	}
+	lines := []string{
+		"  " + head.Render(joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
+			cell("MODO", c.mode), cell("ENCAMINHAMENTO", c.forward), cell("SERVIDOR", c.target),
+			rcell("UPTIME", c.uptime), rcell("AUTO", c.auto))),
+		StyleMuted.Render(strings.Repeat("─", inner)),
+	}
+
 	n := len(a.sshTunnels)
-	a.sshScroll = ensureVisible(a.sshCursor, a.sshScroll, height-3, n)
-	nameW := maxInt(8, width-24)
-	header := fmt.Sprintf("%-3s %-*s %4s %-7s", "ST", nameW, "NAME", "PORT", "MODE")
-	lines := []string{StyleMuted.Render(truncate(header, width-2))}
+	viewport := maxInt(1, height-4)
 	if n == 0 {
-		lines = append(lines, StyleMuted.Render("  (nenhum túnel — n para criar)"))
+		lines = append(lines, "", "  "+StyleMuted.Render("nenhum túnel neste projeto — ")+
+			StyleKey.Render("n")+StyleMuted.Render(" cria o primeiro"))
 	} else {
-		start := a.sshScroll
-		end := minInt(start+height-3, n)
-		for i := start; i < end; i++ {
-			t := a.sshTunnels[i]
-			dot := StyleUnhealthy.Render("●")
-			switch t.Status {
-			case "online":
-				dot = StyleHealthy.Render(a.pulse())
-			case "starting":
-				dot = StyleWarning.Render(a.spinner())
-			}
-			row := fmt.Sprintf("%-*s %4d %-7s",
-				nameW, truncate(t.Name, nameW), t.LocalPort, truncate(t.Mode, 7),
-			)
-			prefix := "  "
-			style := StyleMuted
-			if i == a.sshCursor {
-				prefix = "▸ "
-				if focus {
-					style = StyleSelected
-				} else {
-					style = StyleNormal
-				}
-			}
-			lines = append(lines, style.Render(truncate(prefix+dot+" "+row, width-2)))
+		a.sshScroll = ensureVisible(a.sshCursor, a.sshScroll, viewport, n)
+		for i := a.sshScroll; i < minInt(a.sshScroll+viewport, n); i++ {
+			lines = append(lines, a.renderSSHRow(c, a.sshTunnels[i], i == a.sshCursor, focus))
 		}
 	}
-	title := fmt.Sprintf("TUNNELS (%d)", n)
-	if focus {
-		title = "> " + title
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return renderApiTitledBox(fmt.Sprintf("TÚNEIS (%d)", n),
+		fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
+func (a *App) renderSSHRow(c sshCols, t sshutil.Tunnel, cursor, focus bool) string {
+	glyph, dotStyle := sshTunnelDot(t, a.animFrame)
+	sel := cursor && focus
+
+	fwd := t.Forward
+	if fwd == "" {
+		fwd = sshutil.FormatForward(t.Mode, t.LocalPort, t.RemoteHost, t.RemotePort)
+	}
+	auto := emDash
+	for _, cfg := range a.sshCfg.Tunnels {
+		if cfg.Name == t.Name && cfg.AutoStart {
+			auto = "sim"
+		}
+	}
+	row := renderCells(sel, []dashCell{
+		{text: glyph, width: c.dot, style: dotStyle},
+		{text: t.Name, width: c.name, style: StyleNormal.Bold(true)},
+		{text: sshModeLabel(t.Mode), width: c.mode, style: sshModeStyle(t.Mode)},
+		{text: fwd, width: c.forward, style: lipgloss.NewStyle().Foreground(ColorAccent)},
+		{text: elideLeft(t.Target, maxInt(1, c.target)), width: c.target, style: StyleMuted},
+		{text: firstNonEmpty(t.Uptime, emDash), width: c.uptime, style: StyleMuted, right: true},
+		{text: auto, width: c.auto, style: StyleMuted, right: true},
+	})
+	if sel {
+		return StyleKey.Render("▌") + lipgloss.NewStyle().Background(ColorSelBg).Render(" ") + row
+	}
+	if cursor {
+		return StyleKey.Render("▌") + " " + row
+	}
+	return "  " + row
+}
+
+func sshTunnelDot(t sshutil.Tunnel, frame int) (string, lipgloss.Style) {
+	switch t.Status {
+	case "online":
+		return pulseGlyph(pulseOK, frame), StyleHealthy
+	case "starting":
+		return pulseGlyph(pulseWarn, frame), StyleWarning
+	default:
+		return pulseGlyph(pulseBad, frame), StyleMuted
+	}
+}
+
+// sshModeLabel troca local/remote/dynamic pelo flag do ssh — é assim que se
+// pensa no encaminhamento.
+func sshModeLabel(mode string) string {
+	switch mode {
+	case sshutil.ModeRemote:
+		return "-R remoto"
+	case sshutil.ModeDynamic:
+		return "-D socks"
+	default:
+		return "-L local"
+	}
+}
+
+func sshModeStyle(mode string) lipgloss.Style {
+	if mode == sshutil.ModeRemote {
+		return StyleWarning // expõe algo do seu PC no servidor
+	}
+	return StyleMuted
+}
+
+// renderSSHDetailsPane mostra o que a tabela não cabe e explica a direção do
+// encaminhamento — a confusão clássica entre -L e -R.
 func (a *App) renderSSHDetailsPane(width, height int) string {
 	focus := a.sshFocus == sshFocusDetails
-	var raw []string
+	innerW := maxInt(20, width-4)
 	t, ok := a.sshSelected()
 	if !ok {
-		raw = []string{StyleMuted.Render("(selecione um túnel na lista)")}
-	} else {
-		fwd := t.Forward
-		if fwd == "" {
-			fwd = sshutil.FormatForward(t.Mode, t.LocalPort, t.RemoteHost, t.RemotePort)
-		}
-		raw = []string{
-			tunnelStatusBadge(t.Status, a.animFrame),
-			"",
-			tunnelDetailKV("name", t.Name),
-			tunnelDetailKV("mode", t.Mode),
-			tunnelDetailKV("local", fmt.Sprintf(":%d", t.LocalPort)),
-			tunnelDetailKV("bind", fmt.Sprintf("%s:%d", firstNonEmpty(t.RemoteHost, "127.0.0.1"), t.RemotePort)),
-			tunnelDetailKV("target", t.Target),
-			tunnelDetailKV("forward", fwd),
-			tunnelDetailKV("identity", firstNonEmpty(t.Identity, "(default)")),
-			tunnelDetailKV("pid", fmt.Sprintf("%d", t.PID)),
-			tunnelDetailKV("uptime", t.Uptime),
-		}
+		return renderApiTitledBox("DETALHES",
+			[]string{StyleMuted.Render("selecione um túnel na lista acima")},
+			width, minInt(height, 3), focus)
 	}
-	title := "DETALHES"
-	if focus {
-		title = "> " + title
+
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 12)) }
+	valW := maxInt(10, innerW-12)
+	fwd := t.Forward
+	if fwd == "" {
+		fwd = sshutil.FormatForward(t.Mode, t.LocalPort, t.RemoteHost, t.RemotePort)
 	}
-	a.sshDetailsScroll = ensureVisible(0, a.sshDetailsScroll, height-2, len(raw))
-	start := a.sshDetailsScroll
-	end := minInt(start+height-2, len(raw))
-	if start > end {
-		start = 0
+	raw := []string{
+		StyleNormal.Bold(true).Render(truncate(t.Name, innerW-14)) + "  " + tunnelStatusBadge(t.Status, a.animFrame),
+		"",
+		label("Encaminha") + lipgloss.NewStyle().Foreground(ColorAccent).Render(elideLeft(fwd, valW)),
+		label("") + StyleMuted.Render(truncate(sshModeExplain(t.Mode), valW)),
+		label("Servidor") + StyleNormal.Render(elideLeft(firstNonEmpty(t.Target, emDash), valW)),
 	}
-	return renderApiTitledBox(title, fitExactLines(raw[start:end], height-2), width, height, focus)
+	if t.Identity != "" {
+		raw = append(raw, label("Chave")+StyleMuted.Render(elideLeft(t.Identity, valW)))
+	}
+	raw = append(raw, label("Projeto")+StyleMuted.Render(truncate(firstNonEmpty(t.Project, emDash), valW)))
+	if t.PID > 0 {
+		raw = append(raw, label("PID")+StyleMuted.Render(fmt.Sprintf("%d", t.PID)))
+	}
+	raw = append(raw, "", StyleKey.Render("c")+StyleMuted.Render(" copia o encaminhamento   ")+
+		StyleKey.Render("e")+StyleMuted.Render(" editar"))
+
+	a.sshDetailsScroll = clampScroll(a.sshDetailsScroll, height-2, len(raw))
+	end := minInt(a.sshDetailsScroll+height-2, len(raw))
+	return renderApiTitledBox("DETALHES", fitExactLines(raw[a.sshDetailsScroll:end], height-2), width, height, focus)
+}
+
+// sshModeExplain: -L e -R apontam em direções opostas e trocá-los é o erro
+// mais comum com túnel SSH.
+func sshModeExplain(mode string) string {
+	switch mode {
+	case sshutil.ModeRemote:
+		return "abre a porta no servidor e entrega no seu PC"
+	case sshutil.ModeDynamic:
+		return "proxy SOCKS local saindo pelo servidor"
+	default:
+		return "abre a porta no seu PC e entrega no servidor"
+	}
 }
 
 func (a *App) renderSSHLogsPane(width, height int) string {
@@ -568,158 +619,197 @@ func (a *App) renderSSHLogsPane(width, height int) string {
 	return renderApiTitledBox(title, fitExactLines(lines[start:end], height-2), width, height, focus)
 }
 
-func (a *App) renderSSHHistory(width, height int) string {
-	lines := []string{StyleMuted.Render("STARTED  NAME          MODE     PORT  TARGET")}
-	if len(a.sshCfg.History) == 0 {
-		lines = append(lines, StyleMuted.Render("(vazio — starts ficam registrados aqui)"))
-	} else {
-		for _, h := range a.sshCfg.History {
-			lines = append(lines, StyleNormal.Render(fmt.Sprintf("%s  %-12s  %-7s  %4d  %s",
-				h.Started.Format("01-02 15:04"),
-				truncate(h.Name, 12),
-				truncate(h.Mode, 7),
-				h.LocalPort,
-				truncate(h.Target, maxInt(8, width-48)),
-			)))
-		}
-	}
-	return renderApiTitledBox("HISTORY", fitExactLines(lines, height-2), width, height, true)
+// renderSSHConfig funde as antigas abas History e Settings.
+func (a *App) renderSSHConfig(p *core.Project, width, height int) string {
+	setup := a.sshSetupLines(p, width-2)
+	hist := a.sshHistoryLines(width - 2)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("CLIENTE E PROJETO", setup, width, len(setup)+2, false),
+		renderApiTitledBox("HISTÓRICO", hist, width,
+			minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
+	)
 }
 
-func (a *App) renderSSHSettings(p *core.Project, width, height int) string {
+func (a *App) sshSetupLines(p *core.Project, width int) []string {
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 14)) }
+	valW := maxInt(10, width-14)
+	cli := StyleUnhealthy.Render("✕ não encontrado")
+	if sshutil.Available() {
+		cli = StyleHealthy.Render("● " + firstNonEmpty(sshutil.Version(), "instalado"))
+	}
 	lines := []string{
-		StyleMuted.Render("Config file    ") + StyleMuted.Render(".devscope/ssh.json"),
-		StyleMuted.Render("CLI            ") + StyleNormal.Render(firstNonEmpty(sshutil.Version(), "(ssh)")),
-		StyleMuted.Render("Default mode   ") + StyleNormal.Render("remote (−R)"),
-		StyleMuted.Render("Host keys       ") + StyleMuted.Render("StrictHostKeyChecking=accept-new"),
-		StyleMuted.Render("Alive           ") + StyleMuted.Render("ServerAliveInterval=30"),
-		StyleMuted.Render("Fail forward    ") + StyleMuted.Render("ExitOnForwardFailure=yes"),
+		label("Cliente ssh") + cli,
+		label("Config") + StyleNormal.Render(".devscope/ssh.json"),
 	}
 	if p != nil {
-		lines = append(lines, StyleMuted.Render("Project path   ")+StyleMuted.Render(truncate(p.Path, width-18)))
+		lines = append(lines, label("Projeto")+StyleMuted.Render(elideLeft(shortenPath(p.Path), valW)))
 	}
-	return renderApiTitledBox("SETTINGS", fitExactLines(lines, height-2), width, height, true)
+	lines = append(lines,
+		label("-L local")+StyleMuted.Render("porta no seu PC → serviço do servidor"),
+		label("-R remoto")+StyleMuted.Render("porta no servidor → app do seu PC"),
+		label("-D socks")+StyleMuted.Render("proxy SOCKS saindo pelo servidor"),
+		label("Chaves")+StyleMuted.Render("~/.ssh/ · informe em identity ao criar"))
+	return lines
 }
 
+func (a *App) sshHistoryLines(width int) []string {
+	if len(a.sshCfg.History) == 0 {
+		return []string{StyleMuted.Render("(nenhum túnel iniciado ainda)")}
+	}
+	nameW := minInt(16, maxInt(8, width*16/100))
+	out := make([]string, 0, len(a.sshCfg.History))
+	for i, h := range a.sshCfg.History {
+		if i >= 12 {
+			out = append(out, StyleMuted.Render(fmt.Sprintf("+%d anteriores", len(a.sshCfg.History)-12)))
+			break
+		}
+		dur := emDash
+		if !h.Stopped.IsZero() && h.Stopped.After(h.Started) {
+			dur = formatUptime(h.Stopped.Sub(h.Started))
+		}
+		out = append(out, StyleNormal.Render(padRight(truncate(h.Name, nameW), nameW))+" "+
+			StyleMuted.Render(padRight(sshModeLabel(h.Mode), 10))+
+			lipgloss.NewStyle().Foreground(ColorAccent).Render(padLeft(fmt.Sprintf(":%d", h.LocalPort), 7))+"  "+
+			StyleMuted.Render(padRight(relTime(h.Started), 6))+
+			StyleMuted.Render(padRight(dur, 8))+
+			StyleMuted.Render(elideLeft(h.Target, maxInt(8, width-nameW-34))))
+	}
+	return out
+}
+
+// renderSSHWizard: formulário alinhado numa caixa só. Eram seis caixas
+// tituladas empilhadas — mais de 30 linhas para seis campos.
 func (a *App) renderSSHWizard(p *core.Project, width, height int) string {
 	proj := ""
 	if p != nil {
 		proj = p.Name
 	}
-	boxW := minInt(width-4, maxInt(52, width*58/100))
-	boxH := minInt(height-2, maxInt(22, height*60/100))
-	innerW := maxInt(28, boxW-6)
+	boxW := minInt(width-4, maxInt(62, width*66/100))
+	innerW := maxInt(38, boxW-6)
 	accent := tabAccentColor(TabSSH)
 
-	subtitle := "remote (−R): porta no servidor → app no seu PC"
-	switch a.sshNewMode {
-	case sshutil.ModeLocal:
-		subtitle = "local (−L): porta no PC → serviço no servidor"
-	case sshutil.ModeDynamic:
-		subtitle = "dynamic (−D): SOCKS no PC"
-	}
-	lines := tunnelModalChrome("SSH", accent, "Novo túnel", subtitle, proj, innerW)
+	lines := tunnelModalChrome("SSH", accent, "Novo túnel", sshModeExplain(a.sshNewMode), proj, innerW)
 	lines = append(lines, "")
-
-	nameBox := renderApiTitledBox("nome",
-		[]string{a.renderSSHWizardFieldValue(a.sshNewName, sshWizName, true)},
-		innerW, 3, a.sshWizardField == sshWizName,
-	)
-	modeShown := a.sshNewMode
-	if a.sshWizardField == sshWizMode {
-		modeShown = a.sshNewMode + "  ⟨space⟩"
-	}
-	modeBox := renderApiTitledBox("mode",
-		[]string{a.renderSSHWizardFieldValue(modeShown, sshWizMode, false)},
-		innerW, 3, a.sshWizardField == sshWizMode,
-	)
-	portLabel := "porta no servidor (−R)"
-	bindLabel := "destino no PC (host:porta)"
-	switch a.sshNewMode {
-	case sshutil.ModeLocal:
-		portLabel = "porta local (−L)"
-		bindLabel = "destino remoto (host:porta)"
-	case sshutil.ModeDynamic:
-		portLabel = "porta SOCKS local"
-		bindLabel = "destino"
-	}
-	portBox := renderApiTitledBox(portLabel,
-		[]string{a.renderSSHWizardFieldValue(a.sshNewLocalPortStr, sshWizLocalPort, true)},
-		innerW, 3, a.sshWizardField == sshWizLocalPort,
-	)
-	bindVal := a.sshNewBind
-	if a.sshNewMode == sshutil.ModeDynamic {
-		bindVal = "(não usado em dynamic)"
-	}
-	bindBox := renderApiTitledBox(bindLabel,
-		[]string{a.renderSSHWizardFieldValue(bindVal, sshWizBind, a.sshNewMode != sshutil.ModeDynamic)},
-		innerW, 3, a.sshWizardField == sshWizBind,
-	)
-	targetBox := renderApiTitledBox("target (user@host)",
-		[]string{a.renderSSHWizardFieldValue(a.sshNewTarget, sshWizTarget, true)},
-		innerW, 3, a.sshWizardField == sshWizTarget,
-	)
-	idBox := renderApiTitledBox("identity (−i, opcional)",
-		[]string{a.renderSSHWizardFieldValue(a.sshNewIdentity, sshWizIdentity, true)},
-		innerW, 3, a.sshWizardField == sshWizIdentity,
-	)
-
-	preview := StyleMuted.Render("preview  ")
-	name := strings.TrimSpace(a.sshNewName)
-	port := strings.TrimSpace(a.sshNewLocalPortStr)
-	target := strings.TrimSpace(a.sshNewTarget)
-	if name == "" || target == "" {
-		preview += StyleMuted.Render("(preencha nome e target)")
-	} else {
-		lp, _ := strconv.Atoi(port)
-		host, rp, _ := sshutil.ParseBind(a.sshNewBind)
-		preview += StyleHealthy.Render(truncate(name, 12)) +
-			StyleMuted.Render("  ·  ") +
-			StyleWarning.Render(sshutil.FormatForward(a.sshNewMode, lp, host, rp)) +
-			StyleMuted.Render("  ·  ") +
-			StyleNormal.Render(truncate(target, 20))
-	}
-
-	lines = append(lines, strings.Split(nameBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(modeBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(portBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(bindBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(targetBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(idBox, "\n")...)
-	hint := "no servidor: curl/open localhost:" + firstNonEmpty(port, "?") + " → chega no app deste PC"
-	if a.sshNewMode != sshutil.ModeRemote {
-		hint = "túnel fica em .devscope/ssh.json deste projeto"
-	}
+	lines = append(lines, a.sshWizardFields(p, innerW)...)
 	lines = append(lines, "",
-		StyleMuted.Render(hint),
-		preview,
+		StyleMuted.Render(strings.Repeat("─", innerW)),
+		StyleMuted.Render("$ ")+StyleNormal.Render(truncate("ssh "+strings.Join(
+			sshSignificantArgs(sshutil.TunnelArgs(a.sshWizardSpec())), " "), innerW-2)),
 		"",
-		StyleMuted.Render("tab campo  ·  ←→ cursor  ·  space mode  ·  enter salva e inicia  ·  esc"),
+		StyleMuted.Render("↑↓/tab campo  ·  space alterna  ·  enter salva e sobe  ·  esc"),
 	)
+	boxH := minInt(height-2, len(lines)+4)
 	return tunnelModalBox(lines, boxW, boxH, accent)
 }
 
-func (a *App) sshDeleteConfirmLabels() (target, detail string) {
-	t, ok := a.sshSelected()
-	if !ok {
-		return "—", ""
+// sshSignificantArgs esconde o -N e os -o de keepalive/host-key do preview: são
+// sempre os mesmos e afogavam o -L/-R, que é o que a pessoa quer conferir.
+func sshSignificantArgs(args []string) []string {
+	out := make([]string, 0, len(args))
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "-N":
+			continue
+		case "-o":
+			i++ // pula o valor
+			continue
+		}
+		out = append(out, args[i])
 	}
-	detail = fmt.Sprintf("%s  :%d  %s", t.Mode, t.LocalPort, t.Target)
-	return t.Name, detail
+	return out
 }
 
-func (a *App) renderSSHWizardFieldValue(value string, field int, editable bool) string {
-	focused := a.sshWizardField == field
-	if !focused {
-		return StyleNormal.Render(value)
+func (a *App) sshWizardFields(p *core.Project, width int) []string {
+	labelW := 14
+	valW := maxInt(14, minInt(30, width/3))
+	row := func(field int, label, value, hint string) string {
+		mark := "  "
+		key := StyleMuted.Render(padRight(label, labelW))
+		if a.sshWizardField == field {
+			mark = StyleKey.Render("▌ ")
+			key = StyleNormal.Bold(true).Render(padRight(label, labelW))
+		}
+		hintW := width - 2 - labelW - valW - 2
+		out := mark + key + a.sshWizardValue(field, value, valW)
+		if hintW >= 4 {
+			out += "  " + StyleMuted.Render(truncate(hint, hintW))
+		}
+		return out
+	}
+
+	dynamic := a.sshNewMode == sshutil.ModeDynamic
+	portLabel, portHint := "Porta local", a.sshPortHint(p)
+	bindLabel, bindHint := "Destino", "host:porta do outro lado"
+	switch a.sshNewMode {
+	case sshutil.ModeRemote:
+		portLabel, portHint = "Porta remota", "porta que abre no servidor"
+		bindLabel, bindHint = "Destino", "host:porta aqui no seu PC"
+	case sshutil.ModeDynamic:
+		portLabel, portHint = "Porta SOCKS", "porta local do proxy"
+	}
+	bindVal := a.sshNewBind
+	if dynamic {
+		bindVal, bindHint = emDash, "não se usa em -D"
+	}
+
+	return []string{
+		row(sshWizName, "Nome", a.sshNewName, "identifica o túnel"),
+		row(sshWizMode, "Modo", sshModeLabel(a.sshNewMode), "-L · -R · -D"),
+		row(sshWizLocalPort, portLabel, a.sshNewLocalPortStr, portHint),
+		row(sshWizBind, bindLabel, bindVal, bindHint),
+		row(sshWizTarget, "Servidor", a.sshNewTarget, a.sshTargetHint(p)),
+		row(sshWizIdentity, "Chave", firstNonEmpty(a.sshNewIdentity, emDash), "-i · opcional"),
+	}
+}
+
+// sshPortHint reaproveita as portas que o scanner achou no projeto.
+func (a *App) sshPortHint(p *core.Project) string {
+	if p == nil || len(p.Ports) == 0 {
+		return "porta que abre no seu PC"
+	}
+	parts := make([]string, 0, 4)
+	for i, port := range p.Ports {
+		if i == 4 {
+			parts = append(parts, fmt.Sprintf("+%d", len(p.Ports)-4))
+			break
+		}
+		parts = append(parts, strconv.Itoa(port))
+	}
+	return "no projeto: " + strings.Join(parts, " · ") + "  ⟨space⟩"
+}
+
+// sshTargetHint sugere o user@host a partir do remote git, quando ele não é um
+// host público de código.
+func (a *App) sshTargetHint(p *core.Project) string {
+	if p != nil && p.Git != nil {
+		if t := sshutil.SuggestSSHTarget(p.Git.Remote); t != "" && t != strings.TrimSpace(a.sshNewTarget) {
+			return "do git: " + t + "  ⟨space⟩"
+		}
+	}
+	return "user@host"
+}
+
+func (a *App) sshWizardSpec() sshutil.TunnelConfig {
+	port, _ := strconv.Atoi(strings.TrimSpace(a.sshNewLocalPortStr))
+	host, rport, _ := sshutil.ParseBind(a.sshNewBind)
+	return sshutil.TunnelConfig{
+		Name:       strings.TrimSpace(a.sshNewName),
+		Mode:       a.sshNewMode,
+		LocalPort:  port,
+		RemoteHost: host,
+		RemotePort: rport,
+		Target:     strings.TrimSpace(a.sshNewTarget),
+		Identity:   strings.TrimSpace(a.sshNewIdentity),
+	}
+}
+
+func (a *App) sshWizardValue(field int, value string, width int) string {
+	editable := field != sshWizMode && !(field == sshWizBind && a.sshNewMode == sshutil.ModeDynamic)
+	if a.sshWizardField != field {
+		return StyleNormal.Render(padRight(truncate(value, width), width))
 	}
 	if !editable {
-		return StyleSelected.Render(value)
+		return StyleSelected.Render(padRight(truncate(value+"  ⟨space⟩", width), width))
 	}
 	runes := []rune(value)
 	cur := a.sshWizardCursor
@@ -730,7 +820,46 @@ func (a *App) renderSSHWizardFieldValue(value string, field int, editable bool) 
 		cur = len(runes)
 	}
 	shown := string(runes[:cur]) + "█" + string(runes[cur:])
-	return StyleSelected.Render(shown)
+	return StyleSelected.Render(padRight(truncate(shown, width), width))
+}
+
+// sshWizardCycle é o ⟨space⟩: alterna o modo, percorre as portas do projeto ou
+// aceita o servidor sugerido pelo remote git.
+func (a *App) sshWizardCycle(p *core.Project) {
+	switch a.sshWizardField {
+	case sshWizMode:
+		a.cycleSSHMode()
+	case sshWizLocalPort:
+		if p == nil || len(p.Ports) == 0 {
+			return
+		}
+		cur, _ := strconv.Atoi(strings.TrimSpace(a.sshNewLocalPortStr))
+		next := p.Ports[0]
+		for i, port := range p.Ports {
+			if port == cur {
+				next = p.Ports[(i+1)%len(p.Ports)]
+				break
+			}
+		}
+		a.sshNewLocalPortStr = strconv.Itoa(next)
+		a.sshWizardCursor = len(a.sshNewLocalPortStr)
+	case sshWizTarget:
+		if p != nil && p.Git != nil {
+			if t := sshutil.SuggestSSHTarget(p.Git.Remote); t != "" {
+				a.sshNewTarget = t
+				a.sshWizardCursor = len([]rune(t))
+			}
+		}
+	}
+}
+
+func (a *App) sshDeleteConfirmLabels() (target, detail string) {
+	t, ok := a.sshSelected()
+	if !ok {
+		return "—", ""
+	}
+	detail = fmt.Sprintf("%s  :%d  %s", t.Mode, t.LocalPort, t.Target)
+	return t.Name, detail
 }
 
 func (a *App) beginSSHWizard(p *core.Project) {
@@ -868,15 +997,11 @@ func (a *App) handleSSHKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd
 		if a.sshSubTab == sshTabTunnels {
 			a.sshFocus = (a.sshFocus + 1) % 3
 		}
-	case "0":
-		a.sshSubTab = sshTabOverview
 	case "1":
 		a.sshSubTab = sshTabTunnels
 		a.sshFocus = sshFocusTable
 	case "2":
-		a.sshSubTab = sshTabHistory
-	case "3":
-		a.sshSubTab = sshTabSettings
+		a.sshSubTab = sshTabConfig
 	case "up", "k":
 		return a, a.sshMove(-1)
 	case "down", "j":
@@ -957,13 +1082,15 @@ func (a *App) updateSSHWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		a.sshWizard = false
 		return a, a.sshCreateAndStart(p)
 	case " ":
-		if a.sshWizardField == sshWizMode {
-			a.cycleSSHMode()
-		}
+		a.sshWizardCycle(p)
 		return a, nil
 	}
 
 	if a.sshWizardField == sshWizMode {
+		switch msg.String() {
+		case "left", "right", "[", "]":
+			a.cycleSSHMode()
+		}
 		return a, nil
 	}
 	if a.sshWizardField == sshWizBind && a.sshNewMode == sshutil.ModeDynamic {

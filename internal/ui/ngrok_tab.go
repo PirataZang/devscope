@@ -18,17 +18,27 @@ const (
 	ngrokWizName = iota
 	ngrokWizPort
 	ngrokWizProto
+	ngrokWizDomain
+	ngrokWizRegion
+	ngrokWizAuto
+	ngrokWizCount
 )
+
+// ngrokRegions são as regiões de edge do ngrok; a latência do túnel é a
+// distância até a edge, então escolher errado dobra o tempo de resposta.
+var ngrokRegions = []string{"us", "eu", "sa", "ap", "au", "in", "jp"}
+
+var ngrokProtos = []string{"http", "https", "tcp", "tls"}
 
 type ngrokSubTab int
 
+// Eram seis abas: Overview repetia o header, History e Domains tinham duas
+// linhas cada, Settings era estático. Sobraram as três que se usa.
 const (
-	ngrokTabOverview ngrokSubTab = iota
-	ngrokTabTunnels
+	ngrokTabTunnels ngrokSubTab = iota
 	ngrokTabRequests
-	ngrokTabHistory
-	ngrokTabDomains
-	ngrokTabSettings
+	ngrokTabConfig
+	ngrokTabCount
 )
 
 type ngrokFocus int
@@ -226,16 +236,10 @@ func (a *App) renderNgrokTab(p *core.Project) string {
 
 	var body string
 	switch a.ngrokSubTab {
-	case ngrokTabOverview:
-		body = a.renderNgrokOverview(p, w, bodyH)
 	case ngrokTabRequests:
 		body = a.renderNgrokRequestsFull(w, bodyH)
-	case ngrokTabHistory:
-		body = a.renderNgrokHistory(w, bodyH)
-	case ngrokTabDomains:
-		body = a.renderNgrokDomains(w, bodyH)
-	case ngrokTabSettings:
-		body = a.renderNgrokSettings(p, w, bodyH)
+	case ngrokTabConfig:
+		body = a.renderNgrokConfig(p, w, bodyH)
 	default:
 		body = a.renderNgrokTunnelsView(p, w, bodyH)
 	}
@@ -256,13 +260,13 @@ func (a *App) ngrokHints() string {
 		return "modal delete  y confirma  n/esc cancela"
 	}
 	if a.ngrokWizard {
-		return "modal novo túnel  tab campo  ←→ cursor  space proto  enter salvar+start  esc"
+		return "novo túnel  ·  ↑↓/tab campo  ·  space alterna  ·  enter salva e sobe  ·  esc"
 	}
-	scope := "A todos"
+	scope := "A todos os projetos"
 	if a.ngrokShowAll {
-		scope = "A projeto"
+		scope = "A só este projeto"
 	}
-	base := "0-5 aba  tab lista/detalhes/logs  n new  s start  x stop  r restart  c copy  o open  d delete  " + scope + "  esc"
+	base := "1-3 aba  ·  tab painel  ·  n novo  ·  s subir  ·  x parar  ·  r reiniciar  ·  c copiar URL  ·  o abrir  ·  e editar  ·  d apagar  ·  " + scope + "  ·  esc"
 	if a.ngrokLoading {
 		base = a.spinner() + " carregando…  " + base
 	}
@@ -275,73 +279,71 @@ func (a *App) ngrokHints() string {
 	return base
 }
 
+// renderNgrokHeader carrega o que estava espalhado entre header, QUICK STATS e
+// a aba OVERVIEW — os três repetiam região, versão e contagem de túneis.
 func (a *App) renderNgrokHeader(p *core.Project, width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabNgrok)).Bold(true)
-	name := "project"
-	if p != nil {
-		name = p.Name
+	left := accent.Render("⇪ NGROK")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 26))
 	}
-	env := projectEnvLabel(p)
-	left := accent.Render("devscope") + StyleMuted.Render(" › ngrok") +
-		StyleMuted.Render("  Projeto: ") + StyleNormal.Render(name) +
-		StyleMuted.Render("  Ambiente: ") + StyleWarning.Render(env)
+	left += "   " + a.ngrokAgentChip()
 
-	badge := StyleMuted.Render("○ Offline")
+	right := []string{StyleMuted.Render("região " + cfgRegionOr(a.ngrokCfg, "us"))}
+	if v := a.ngrokAgent.Version; v != "" {
+		right = append(right, StyleMuted.Render("v"+v))
+	}
+	if a.ngrokLoading {
+		right = append(right, a.loadingMuted("carregando…"))
+	}
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
+}
+
+func (a *App) ngrokAgentChip() string {
 	if a.ngrokAgent.Connected {
-		badge = a.livePulse("Connected")
+		return StyleHealthy.Render("● agente conectado")
 	}
-	online := 0
-	for _, t := range a.ngrokTunnels {
-		if t.Status == "online" {
-			online++
-		}
-	}
-	ver := a.ngrokAgent.Version
-	if ver == "" {
-		ver = "—"
-	}
-	region := a.ngrokCfg.Region
-	if region == "" {
-		region = "us"
-	}
-	scope := StyleMuted.Render("projeto")
-	if a.ngrokShowAll {
-		scope = StyleAccent.Render("TODOS")
-	}
-	right := badge + StyleMuted.Render(fmt.Sprintf("  Region:%s  v%s  Tunnels:%d  ", region, ver, online)) + scope
-	if !a.ngrokShowAll && a.ngrokForeign > 0 {
-		right += StyleMuted.Render(fmt.Sprintf("  (+%d outros · A)", a.ngrokForeign))
-	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
+	return StyleMuted.Render("○ agente offline")
 }
 
 func (a *App) renderNgrokNav(width int) string {
-	names := []string{"Overview", "Tunnels", "Requests", "History", "Domains", "Settings"}
-	var parts []string
+	names := []string{"TÚNEIS", "REQUESTS", "CONFIG"}
+	counts := []int{len(a.ngrokTunnels), len(a.ngrokRequests), 0}
+	parts := make([]string, 0, len(names))
 	for i, n := range names {
-		label := fmt.Sprintf(" %d:%s ", i, n)
+		label := fmt.Sprintf(" %d %s ", i+1, n)
+		if counts[i] > 0 {
+			label = fmt.Sprintf(" %d %s %d ", i+1, n, counts[i])
+		}
 		if ngrokSubTab(i) == a.ngrokSubTab {
 			parts = append(parts, StyleSelected.Render(label))
 		} else {
 			parts = append(parts, StyleMuted.Render(label))
 		}
 	}
-	line := strings.Join(parts, StyleMuted.Render("│"))
-	pad := width - lipgloss.Width(stripANSI(line))
-	if pad < 0 {
-		pad = 0
+	left := strings.Join(parts, StyleMuted.Render("│"))
+
+	online, offline := a.ngrokCounts()
+	var chips []string
+	if online > 0 {
+		chips = append(chips, StyleHealthy.Render(fmt.Sprintf("● %d", online))+StyleMuted.Render(" online"))
 	}
-	return line + strings.Repeat(" ", pad)
+	if offline > 0 {
+		chips = append(chips, StyleMuted.Render(fmt.Sprintf("○ %d offline", offline)))
+	}
+	if a.ngrokShowAll {
+		chips = append(chips, StyleAccent.Render("A todos os projetos"))
+	} else if a.ngrokForeign > 0 {
+		chips = append(chips, StyleMuted.Render(fmt.Sprintf("+%d de outros projetos · A", a.ngrokForeign)))
+	}
+	if len(chips) == 0 {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, strings.Join(chips, "  ")+" ", width)
 }
 
-func (a *App) renderNgrokOverview(p *core.Project, width, height int) string {
-	rightW := a.moduleRightWidth(width)
-	centerW := maxInt(36, width-rightW-1)
-	online, offline := 0, 0
+func (a *App) ngrokCounts() (online, offline int) {
 	for _, t := range a.ngrokTunnels {
 		if t.Status == "online" {
 			online++
@@ -349,49 +351,7 @@ func (a *App) renderNgrokOverview(p *core.Project, width, height int) string {
 			offline++
 		}
 	}
-	sumH := maxInt(8, height*45/100)
-	listH := maxInt(6, height-sumH)
-	lines := []string{
-		StyleMuted.Render("Status     ") + ngrokStatusLabel(a.ngrokAgent.Connected, a.animFrame),
-		StyleMuted.Render("Account    ") + StyleMuted.Render("(local agent)"),
-		StyleMuted.Render("Plan       ") + StyleNormal.Render("Free"),
-		StyleMuted.Render("Region     ") + StyleNormal.Render(a.ngrokCfg.Region),
-		StyleMuted.Render("Authtoken  ") + StyleMuted.Render("via ngrok config"),
-		StyleMuted.Render("Tunnels    ") + StyleHealthy.Render(fmt.Sprintf("%d online", online)) +
-			StyleMuted.Render(" / ") + StyleUnhealthy.Render(fmt.Sprintf("%d offline", offline)),
-		StyleMuted.Render("Requests   ") + StyleNormal.Render(fmt.Sprintf("%d capturados", len(a.ngrokRequests))),
-		StyleMuted.Render("Version    ") + StyleMuted.Render(a.ngrokAgent.Version),
-	}
-	evLines := make([]string, 0, listH-2)
-	if len(a.ngrokRequests) == 0 {
-		evLines = append(evLines, StyleMuted.Render("(sem eventos recentes)"))
-	} else {
-		n := minInt(listH-2, len(a.ngrokRequests))
-		for i := 0; i < n; i++ {
-			r := a.ngrokRequests[i]
-			evLines = append(evLines, StyleMuted.Render(r.Time.Format("15:04"))+" "+
-				StyleNormal.Render(fmt.Sprintf("%s %s %d", r.Method, truncate(r.Path, 28), r.Status)))
-		}
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("OVERVIEW", fitExactLines(lines, sumH-2), centerW, sumH, false),
-		renderApiTitledBox("RECENT EVENTS", fitExactLines(evLines, listH-2), centerW, listH, false),
-	)
-	details := []string{
-		StyleHealthy.Render(fmt.Sprintf("online   %d", online)),
-		StyleUnhealthy.Render(fmt.Sprintf("offline  %d", offline)),
-		StyleMuted.Render(fmt.Sprintf("req/min  ~%d", len(a.ngrokRequests))),
-	}
-	if p != nil && len(p.Ports) > 0 {
-		details = append(details, StyleMuted.Render("ports  ")+StyleAccent.Render(fmt.Sprintf("%v", p.Ports)))
-	}
-	actions := moduleActionLines(
-		[2]string{"1", "túneis"},
-		[2]string{"n", "novo túnel"},
-		[2]string{"r", "refresh"},
-	)
-	right := a.renderModuleRightRail(rightW, height, details, actions)
-	return lipgloss.JoinHorizontal(lipgloss.Top, center, right)
+	return
 }
 
 func ngrokStatusLabel(ok bool, frame int) string {
@@ -401,52 +361,135 @@ func ngrokStatusLabel(ok bool, frame int) string {
 	return StyleMuted.Render("○ Offline")
 }
 
+// renderNgrokTunnelsView: a tabela ocupa a largura inteira porque a URL pública
+// é o que se copia — antes ela ficava numa coluna de 40% e nem aparecia.
 func (a *App) renderNgrokTunnelsView(p *core.Project, width, height int) string {
 	_ = p
-	if height < 6 {
-		height = 6
+	if height < 8 {
+		height = 8
 	}
-	leftW := maxInt(32, width*40/100)
-	rightW := maxInt(28, width-leftW-1)
-	logsH := maxInt(4, height*34/100)
-	if logsH > height-6 {
-		logsH = height - 6
+	tableH := minInt(maxInt(6, height*55/100), len(a.ngrokTunnels)+4)
+	if tableH < 6 {
+		tableH = 6
 	}
-	detailsH := height - logsH
-	left := a.renderNgrokTunnelTable(leftW, height)
-	right := lipgloss.JoinVertical(lipgloss.Left,
-		a.renderNgrokDetailsPane(rightW, detailsH),
-		a.renderNgrokLogsPane(rightW, logsH),
+	bottomH := maxInt(5, height-tableH)
+	leftW := maxInt(30, width*52/100)
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderNgrokTunnelTable(width, tableH),
+		lipgloss.JoinHorizontal(lipgloss.Top,
+			a.renderNgrokDetailsPane(leftW, bottomH),
+			a.renderNgrokLogsPane(maxInt(24, width-leftW), bottomH),
+		),
 	)
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
 }
 
-func (a *App) renderNgrokQuickStats(width, height int) string {
-	online, offline := 0, 0
-	for _, t := range a.ngrokTunnels {
-		if t.Status == "online" {
-			online++
-		} else {
-			offline++
+type ngrokCols struct{ dot, name, proto, local, url, reqs, uptime, auto int }
+
+func ngrokColumns(width int) ngrokCols {
+	w := maxInt(30, width)
+	c := ngrokCols{dot: 1, name: minInt(18, maxInt(8, w*14/100)), proto: 5, local: 6, reqs: 6, uptime: 8, auto: 4}
+	if w < 78 {
+		c.uptime, c.auto = 0, 0
+	}
+	if w < 60 {
+		c.reqs = 0
+	}
+	used := c.dot + c.name + c.proto + c.local + c.reqs + c.uptime + c.auto + 7
+	c.url = maxInt(10, w-used)
+	return c
+}
+
+func (a *App) renderNgrokTunnelTable(width, height int) string {
+	focus := a.ngrokFocus == ngrokFocusTable
+	inner := maxInt(20, width-2)
+	c := ngrokColumns(inner - 2)
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return padRight(truncate(t, n), n)
+	}
+	rcell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return padLeft(truncate(t, n), n)
+	}
+
+	lines := []string{
+		"  " + head.Render(joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
+			cell("PROTO", c.proto), cell("LOCAL", c.local), cell("URL PÚBLICA", c.url),
+			rcell("REQS", c.reqs), rcell("UPTIME", c.uptime), rcell("AUTO", c.auto))),
+		StyleMuted.Render(strings.Repeat("─", inner)),
+	}
+
+	n := len(a.ngrokTunnels)
+	viewport := maxInt(1, height-4)
+	if n == 0 {
+		lines = append(lines, "", "  "+StyleMuted.Render("nenhum túnel neste projeto — ")+
+			StyleKey.Render("n")+StyleMuted.Render(" cria o primeiro"))
+	} else {
+		a.ngrokScroll = ensureVisible(a.ngrokCursor, a.ngrokScroll, viewport, n)
+		for i := a.ngrokScroll; i < minInt(a.ngrokScroll+viewport, n); i++ {
+			lines = append(lines, a.renderNgrokRow(c, a.ngrokTunnels[i], i == a.ngrokCursor, focus))
 		}
 	}
-	scope := "projeto"
-	if a.ngrokShowAll {
-		scope = "TODOS"
+	title := fmt.Sprintf("TÚNEIS (%d)", n)
+	return renderApiTitledBox(title, fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
+}
+
+func (a *App) renderNgrokRow(c ngrokCols, t ngrokutil.Tunnel, cursor, focus bool) string {
+	glyph, dotStyle := ngrokTunnelDot(t, a.animFrame)
+	sel := cursor && focus
+
+	url := firstNonEmpty(publicHostOf(t.PublicURL), t.Domain)
+	urlStyle := lipgloss.NewStyle().Foreground(ColorAccent)
+	if url == "" {
+		url, urlStyle = emDash, StyleMuted
 	}
-	region := a.ngrokCfg.Region
-	if region == "" {
-		region = "us"
+	auto := emDash
+	for _, cfg := range a.ngrokCfg.Tunnels {
+		if cfg.Name == t.Name && cfg.AutoStart {
+			auto = "sim"
+		}
 	}
-	lines := []string{
-		StyleHealthy.Render(fmt.Sprintf("Online     %d", online)),
-		StyleUnhealthy.Render(fmt.Sprintf("Offline    %d", offline)),
-		StyleMuted.Render(fmt.Sprintf("Requests   %d", len(a.ngrokRequests))),
-		StyleMuted.Render(fmt.Sprintf("Foreign    %d  (A)", a.ngrokForeign)),
-		StyleMuted.Render("Scope      ") + StyleNormal.Render(scope),
-		StyleMuted.Render("Region     ") + StyleNormal.Render(region),
+	reqs := emDash
+	if t.Requests > 0 {
+		reqs = fmt.Sprintf("%d", t.Requests)
 	}
-	return renderApiTitledBox("QUICK STATS", fitExactLines(lines, height-2), width, height, false)
+
+	cells := []dashCell{
+		{text: glyph, width: c.dot, style: dotStyle},
+		{text: t.Name, width: c.name, style: StyleNormal.Bold(true)},
+		{text: t.Proto, width: c.proto, style: StyleMuted},
+		{text: fmt.Sprintf(":%d", t.Port), width: c.local, style: StyleMuted},
+		{text: elideLeft(url, maxInt(1, c.url)), width: c.url, style: urlStyle},
+		{text: reqs, width: c.reqs, style: StyleMuted, right: true},
+		{text: firstNonEmpty(t.Uptime, emDash), width: c.uptime, style: StyleMuted, right: true},
+		{text: auto, width: c.auto, style: StyleMuted, right: true},
+	}
+	row := renderCells(sel, cells)
+	if sel {
+		return StyleKey.Render("▌") + lipgloss.NewStyle().Background(ColorSelBg).Render(" ") + row
+	}
+	if cursor {
+		return StyleKey.Render("▌") + " " + row
+	}
+	return "  " + row
+}
+
+func ngrokTunnelDot(t ngrokutil.Tunnel, frame int) (string, lipgloss.Style) {
+	switch t.Status {
+	case "online":
+		return pulseGlyph(pulseOK, frame), StyleHealthy
+	case "starting":
+		return pulseGlyph(pulseWarn, frame), StyleWarning
+	case "offline":
+		return pulseGlyph(pulseBad, frame), StyleMuted
+	default:
+		return pulseGlyph(pulseIdle, frame), StyleMuted
+	}
 }
 
 func (a *App) renderNgrokCommands(width, height int) string {
@@ -464,130 +507,173 @@ func (a *App) renderNgrokCommands(width, height int) string {
 	)
 }
 
-func (a *App) renderNgrokTunnelTable(width, height int) string {
-	focus := a.ngrokFocus == ngrokFocusTable
-	n := len(a.ngrokTunnels)
-	a.ngrokScroll = ensureVisible(a.ngrokCursor, a.ngrokScroll, height-3, n)
-	nameW := maxInt(8, width-22)
-	header := fmt.Sprintf("%-3s %-*s %4s %-5s", "ST", nameW, "NAME", "PORT", "PROTO")
-	lines := []string{StyleMuted.Render(truncate(header, width-2))}
-	if n == 0 {
-		lines = append(lines, StyleMuted.Render("  (nenhum túnel — n para criar)"))
-	} else {
-		start := a.ngrokScroll
-		end := minInt(start+height-3, n)
-		for i := start; i < end; i++ {
-			t := a.ngrokTunnels[i]
-			dot := StyleUnhealthy.Render("●")
-			switch t.Status {
-			case "online":
-				dot = StyleHealthy.Render(a.pulse())
-			case "starting":
-				dot = StyleWarning.Render(a.spinner())
-			}
-			row := fmt.Sprintf("%-*s %4d %-5s",
-				nameW, truncate(t.Name, nameW), t.Port, truncate(t.Proto, 5),
-			)
-			prefix := "  "
-			style := StyleMuted
-			if i == a.ngrokCursor {
-				prefix = "▸ "
-				if focus {
-					style = StyleSelected
-				} else {
-					style = StyleNormal
-				}
-			}
-			lines = append(lines, style.Render(truncate(prefix+dot+" "+row, width-2)))
-		}
-	}
-	title := fmt.Sprintf("TUNNELS (%d)", n)
-	if focus {
-		title = "> " + title
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
-}
-
+// renderNgrokDetailsPane mostra o que a tabela não cabe: as URLs inteiras (é o
+// que se copia) e a procedência do domínio. Status/porta/reqs/uptime saíram —
+// já estão na linha da tabela, a duas linhas de distância.
 func (a *App) renderNgrokDetailsPane(width, height int) string {
 	focus := a.ngrokFocus == ngrokFocusDetails
-	innerW := maxInt(20, width-2)
-	var raw []string
+	innerW := maxInt(20, width-4)
 	t, ok := a.ngrokSelected()
 	if !ok {
-		raw = []string{StyleMuted.Render("(selecione um túnel na lista)")}
-	} else {
-		raw = append(raw,
-			StyleNormal.Bold(true).Render(truncate(t.Name, innerW))+"  "+tunnelStatusBadge(t.Status, a.animFrame),
-			"",
-		)
-		metrics := tunnelMetricRow([][2]string{
-			{"STATUS", t.Status},
-			{"PORT", fmt.Sprintf("%d", t.Port)},
-			{"REQ", fmt.Sprintf("%d", t.Requests)},
-			{"UPTIME", firstNonEmpty(t.Uptime, "—")},
-		}, innerW)
-		if metrics != "" {
-			raw = append(raw, strings.Split(metrics, "\n")...)
-			raw = append(raw, "")
+		return renderApiTitledBox("DETALHES",
+			[]string{StyleMuted.Render("selecione um túnel na lista acima")},
+			width, minInt(height, 3), focus)
+	}
+
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 11)) }
+	valW := maxInt(10, innerW-11)
+	raw := []string{
+		StyleNormal.Bold(true).Render(truncate(t.Name, innerW-14)) + "  " + tunnelStatusBadge(t.Status, a.animFrame),
+		"",
+		label("Público") + lipgloss.NewStyle().Foreground(ColorAccent).Render(elideLeft(firstNonEmpty(t.PublicURL, emDash), valW)),
+		label("Local") + StyleNormal.Render(elideLeft(firstNonEmpty(t.LocalURL, fmt.Sprintf("http://localhost:%d", t.Port)), valW)),
+	}
+
+	host := firstNonEmpty(t.Domain, publicHostOf(t.PublicURL))
+	if host != "" {
+		origem := StyleMuted.Render("efêmero · muda no próximo restart")
+		if ngrokDomainIsReserved(a.ngrokCfg, t.Name, host) {
+			origem = StyleAccent.Render("reservado · estável")
 		}
-		raw = append(raw,
-			tunnelDetailKV("Public", t.PublicURL),
-			tunnelDetailKV("Local", t.LocalURL),
-			tunnelDetailKV("Domain", t.Domain),
-			tunnelDetailKV("Proto", t.Proto),
-			tunnelDetailKV("Region", firstNonEmpty(t.Region, a.ngrokCfg.Region)),
-			tunnelDetailKV("Project", t.Project),
-		)
+		raw = append(raw, label("Domínio")+StyleNormal.Render(elideLeft(host, valW)), label("")+origem)
+	} else {
+		raw = append(raw, label("Domínio")+StyleMuted.Render("— · defina um ao criar para a URL não mudar"))
 	}
+
+	raw = append(raw,
+		label("Região")+StyleNormal.Render(firstNonEmpty(t.Region, cfgRegionOr(a.ngrokCfg, "us"))),
+		label("Projeto")+StyleMuted.Render(truncate(firstNonEmpty(t.Project, emDash), valW)),
+	)
+	if t.PID > 0 {
+		raw = append(raw, label("PID")+StyleMuted.Render(fmt.Sprintf("%d", t.PID)))
+	}
+	if t.BytesIn > 0 || t.BytesOut > 0 {
+		raw = append(raw, label("Tráfego")+StyleMuted.Render(
+			fmt.Sprintf("↓ %s   ↑ %s", formatMiB(t.BytesIn), formatMiB(t.BytesOut))))
+	}
+	raw = append(raw, "", StyleKey.Render("c")+StyleMuted.Render(" copia a URL   ")+
+		StyleKey.Render("o")+StyleMuted.Render(" abre no browser"))
+
 	a.ngrokDetailsScroll = clampScroll(a.ngrokDetailsScroll, height-2, len(raw))
-	start := a.ngrokDetailsScroll
-	end := minInt(start+height-2, len(raw))
-	lines := raw[start:end]
-	title := "DETALHES"
-	if focus {
-		title = "> DETALHES"
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	end := minInt(a.ngrokDetailsScroll+height-2, len(raw))
+	return renderApiTitledBox("DETALHES", fitExactLines(raw[a.ngrokDetailsScroll:end], height-2), width, height, focus)
 }
 
+// renderNgrokRequestsPane: ganhou TÚNEL (com três túneis abertos, saber qual
+// recebeu é o essencial), LAT e IP. E o status voltou a ter cor — o código
+// antigo pintava e depois passava stripANSI na linha inteira.
 func (a *App) renderNgrokRequestsPane(width, height int) string {
 	focus := a.ngrokFocus == ngrokFocusRequests
-	lines := make([]string, 0, height-2)
-	lines = append(lines, StyleMuted.Render(truncate("TIME  METHOD ST  PATH", width-2)))
+	inner := maxInt(20, width-2)
+
+	hostW := 0
+	latW, ipW := 0, 0
+	if inner >= 66 {
+		hostW = minInt(18, maxInt(8, inner*16/100))
+	}
+	if inner >= 52 {
+		latW = 7
+	}
+	if inner >= 96 {
+		ipW = 15
+	}
+	pathW := maxInt(10, inner-2-9-5-4-hostW-latW-ipW-7)
+
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return padRight(truncate(t, n), n)
+	}
+	lines := []string{
+		"  " + head.Render(joinNonEmpty(" ", cell("HORA", 8), cell("MÉT", 4), cell("ST", 3),
+			cell("TÚNEL", hostW), cell("CAMINHO", pathW), padLeft("LAT", latW), cell("IP", ipW))),
+		StyleMuted.Render(strings.Repeat("─", inner)),
+	}
+
 	if len(a.ngrokRequests) == 0 {
-		lines = append(lines, StyleMuted.Render("(sem requests — agente/inspect)"))
+		lines = append(lines, "", "  "+StyleMuted.Render("nenhuma requisição capturada ainda"),
+			"  "+StyleMuted.Render("o agente registra a partir do momento em que o túnel sobe"))
 	} else {
-		a.ngrokReqScroll = ensureVisible(a.ngrokReqCursor, a.ngrokReqScroll, height-3, len(a.ngrokRequests))
-		start := a.ngrokReqScroll
-		end := minInt(start+height-3, len(a.ngrokRequests))
-		for i := start; i < end; i++ {
+		viewport := maxInt(1, height-4)
+		a.ngrokReqScroll = ensureVisible(a.ngrokReqCursor, a.ngrokReqScroll, viewport, len(a.ngrokRequests))
+		for i := a.ngrokReqScroll; i < minInt(a.ngrokReqScroll+viewport, len(a.ngrokRequests)); i++ {
 			r := a.ngrokRequests[i]
-			stStyle := StyleHealthy
-			if r.Status >= 400 {
-				stStyle = StyleUnhealthy
-			} else if r.Status >= 300 {
-				stStyle = StyleWarning
+			sel := i == a.ngrokReqCursor && focus
+			lat := emDash
+			if r.LatencyMS > 0 {
+				lat = fmt.Sprintf("%dms", r.LatencyMS)
 			}
-			mark := "  "
-			style := StyleMuted
-			if i == a.ngrokReqCursor && focus {
-				mark = "▸ "
-				style = StyleSelected
+			row := renderCells(sel, []dashCell{
+				{text: r.Time.Format("15:04:05"), width: 8, style: StyleMuted},
+				{text: r.Method, width: 4, style: ngrokMethodStyle(r.Method)},
+				{text: fmt.Sprintf("%d", r.Status), width: 3, style: ngrokStatusStyle(r.Status)},
+				{text: shortTunnelHost(r.Host), width: hostW, style: StyleMuted},
+				{text: r.Path, width: pathW, style: StyleNormal},
+				{text: lat, width: latW, style: ngrokLatencyStyle(r.LatencyMS), right: true},
+				{text: r.IP, width: ipW, style: StyleMuted},
+			})
+			if sel {
+				lines = append(lines, StyleKey.Render("▌")+lipgloss.NewStyle().Background(ColorSelBg).Render(" ")+row)
+			} else {
+				lines = append(lines, "  "+row)
 			}
-			line := fmt.Sprintf("%s %s %s %s",
-				r.Time.Format("15:04:05"),
-				fmt.Sprintf("%-4s", r.Method),
-				stStyle.Render(fmt.Sprintf("%3d", r.Status)),
-				truncate(r.Path, maxInt(8, width-22)),
-			)
-			lines = append(lines, style.Render(truncate(mark+stripANSI(line), width-2)))
 		}
 	}
-	title := "LIVE REQUESTS"
-	if focus {
-		title = "> LIVE REQUESTS"
+	return renderApiTitledBox(fmt.Sprintf("REQUISIÇÕES (%d)", len(a.ngrokRequests)),
+		fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
+}
+
+func ngrokStatusStyle(code int) lipgloss.Style {
+	switch {
+	case code >= 500:
+		return StyleUnhealthy
+	case code >= 400:
+		return StyleWarning
+	case code >= 300:
+		return StyleMuted
+	case code > 0:
+		return StyleHealthy
+	default:
+		return StyleMuted
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+}
+
+func ngrokMethodStyle(m string) lipgloss.Style {
+	switch strings.ToUpper(m) {
+	case "GET":
+		return StyleMuted
+	case "DELETE":
+		return StyleUnhealthy
+	case "POST", "PUT", "PATCH":
+		return lipgloss.NewStyle().Foreground(ColorAccent)
+	default:
+		return StyleMuted
+	}
+}
+
+// ngrokLatencyStyle: acima de 1s a requisição é o problema, não o detalhe.
+func ngrokLatencyStyle(ms int64) lipgloss.Style {
+	switch {
+	case ms >= 1000:
+		return StyleUnhealthy
+	case ms >= 300:
+		return StyleWarning
+	default:
+		return StyleMuted
+	}
+}
+
+// shortTunnelHost corta o sufixo do provedor — o que distingue é o subdomínio.
+func shortTunnelHost(host string) string {
+	host = publicHostOf(host)
+	for _, suffix := range []string{".ngrok.app", ".ngrok-free.app", ".ngrok.io", ".ngrok.dev"} {
+		if strings.HasSuffix(host, suffix) {
+			return strings.TrimSuffix(host, suffix)
+		}
+	}
+	return host
 }
 
 func (a *App) renderNgrokLogsPane(width, height int) string {
@@ -647,59 +733,123 @@ func (a *App) renderNgrokRequestsFull(width, height int) string {
 	return a.renderNgrokRequestsPane(width, height)
 }
 
-func (a *App) renderNgrokHistory(width, height int) string {
-	lines := make([]string, 0, height-2)
-	if len(a.ngrokCfg.History) == 0 {
-		lines = append(lines, StyleMuted.Render("(histórico vazio — aparece após start/stop)"))
-	} else {
-		for _, h := range a.ngrokCfg.History {
-			dur := "—"
-			if !h.Stopped.IsZero() && !h.Started.IsZero() {
-				dur = formatUptime(h.Stopped.Sub(h.Started))
-			}
-			lines = append(lines, StyleNormal.Render(fmt.Sprintf("%-12s :%d  %s  %s  req=%d",
-				truncate(h.Name, 12), h.Port, h.Started.Format("01-02 15:04"), dur, h.Requests)))
-		}
-	}
-	return renderApiTitledBox("HISTORY", fitExactLines(lines, height-2), width, height, true)
+// renderNgrokConfig funde as antigas abas History, Domains e Settings — as três
+// mostravam duas linhas cada e custavam três paradas na navegação.
+func (a *App) renderNgrokConfig(p *core.Project, width, height int) string {
+	rightW := minInt(42, maxInt(30, width*32/100))
+	leftW := maxInt(36, width-rightW-1)
+
+	setup := a.ngrokSetupLines(p, leftW-2)
+	hist := a.ngrokHistoryLines(leftW - 2)
+	left := lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("AGENTE E PROJETO", setup, leftW, len(setup)+2, false),
+		renderApiTitledBox("HISTÓRICO", hist, leftW, minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
+	)
+	dom := a.ngrokDomainLines(rightW - 2)
+	right := lipgloss.JoinVertical(lipgloss.Left,
+		renderApiTitledBox("DOMÍNIOS", dom, rightW, len(dom)+2, false),
+		renderActionsBox(rightW, maxInt(3, height-len(dom)-2),
+			[2]string{"n", "novo túnel"},
+			[2]string{"e", "editar"},
+			[2]string{"r", "refresh"},
+			[2]string{"A", "todos os projetos"},
+			[2]string{"1", "voltar aos túneis"},
+		),
+	)
+	return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
 }
 
-func (a *App) renderNgrokDomains(width, height int) string {
-	seen := map[string]bool{}
-	lines := make([]string, 0, height-2)
-	for _, t := range a.ngrokTunnels {
-		if t.Domain == "" || seen[t.Domain] {
-			continue
-		}
-		seen[t.Domain] = true
-		st := StyleUnhealthy.Render("offline")
-		if t.Status == "online" {
-			st = StyleHealthy.Render("online")
-		}
-		lines = append(lines, StyleNormal.Render(truncate(t.Domain, width/2))+"  "+st+"  TLS")
-	}
-	if len(lines) == 0 {
-		lines = append(lines, StyleMuted.Render("(nenhum domínio — planos pagos / reserved domain)"))
-	}
-	return renderApiTitledBox("DOMAINS", fitExactLines(lines, height-2), width, height, true)
-}
-
-func (a *App) renderNgrokSettings(p *core.Project, width, height int) string {
-	token := "via `ngrok config add-authtoken`"
+func (a *App) ngrokSetupLines(p *core.Project, width int) []string {
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 14)) }
+	valW := maxInt(10, width-14)
 	lines := []string{
-		StyleMuted.Render("Authtoken      ") + StyleMuted.Render(token),
-		StyleMuted.Render("Default Region ") + StyleNormal.Render(a.ngrokCfg.Region),
-		StyleMuted.Render("Agent API      ") + StyleMuted.Render(ngrokutil.AgentBase()),
-		StyleMuted.Render("Config file    ") + StyleMuted.Render(".devscope/ngrok.json"),
-		StyleMuted.Render("Auto Start     ") + StyleMuted.Render("por túnel (flag no wizard)"),
-		StyleMuted.Render("Inspect        ") + StyleHealthy.Render("on (agent :4040)"),
-		"",
-		StyleMuted.Render("CLI version    ") + StyleNormal.Render(ngrokutil.Version()),
+		label("Agente") + a.ngrokAgentChip() + StyleMuted.Render("  "+a.ngrokAgent.URI),
+		label("CLI") + StyleNormal.Render(firstNonEmpty("ngrok "+a.ngrokAgent.Version, "ngrok")),
+		label("Região padrão") + StyleNormal.Render(cfgRegionOr(a.ngrokCfg, "us")),
+		label("Config") + StyleNormal.Render(elideLeft(".devscope/ngrok.json", valW)),
 	}
 	if p != nil {
-		lines = append(lines, StyleMuted.Render("Project path   ")+StyleMuted.Render(truncate(p.Path, width-18)))
+		lines = append(lines, label("Projeto")+StyleMuted.Render(elideLeft(shortenPath(p.Path), valW)))
 	}
-	return renderApiTitledBox("SETTINGS", fitExactLines(lines, height-2), width, height, true)
+	lines = append(lines,
+		label("Authtoken")+StyleMuted.Render("ngrok config add-authtoken <token>"))
+	return lines
+}
+
+func (a *App) ngrokHistoryLines(width int) []string {
+	if len(a.ngrokCfg.History) == 0 {
+		return []string{StyleMuted.Render("(nenhum túnel iniciado ainda)")}
+	}
+	nameW := minInt(16, maxInt(8, width*22/100))
+	out := make([]string, 0, len(a.ngrokCfg.History))
+	for i, h := range a.ngrokCfg.History {
+		if i >= 12 {
+			out = append(out, StyleMuted.Render(fmt.Sprintf("+%d anteriores", len(a.ngrokCfg.History)-12)))
+			break
+		}
+		dur := emDash
+		if !h.Stopped.IsZero() && h.Stopped.After(h.Started) {
+			dur = formatUptime(h.Stopped.Sub(h.Started))
+		}
+		out = append(out, StyleNormal.Render(padRight(truncate(h.Name, nameW), nameW))+" "+
+			lipgloss.NewStyle().Foreground(ColorAccent).Render(padLeft(fmt.Sprintf(":%d", h.Port), 6))+"  "+
+			StyleMuted.Render(padRight(relTime(h.Started), 6))+
+			StyleMuted.Render(padRight(dur, 8))+
+			StyleMuted.Render(padLeft(fmt.Sprintf("%d req", h.Requests), 10)))
+	}
+	return out
+}
+
+func (a *App) ngrokDomainLines(width int) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, t := range a.ngrokTunnels {
+		host := firstNonEmpty(t.Domain, publicHostOf(t.PublicURL))
+		if host == "" || seen[host] {
+			continue
+		}
+		seen[host] = true
+		reserved := ngrokDomainIsReserved(a.ngrokCfg, t.Name, host)
+		glyph, st := pulseGlyph(pulseBad, a.animFrame), StyleMuted
+		if t.Status == "online" {
+			glyph, st = pulseGlyph(pulseOK, a.animFrame), StyleHealthy
+		}
+		tag := StyleMuted.Render(" efêmero")
+		if reserved {
+			tag = StyleAccent.Render(" reservado")
+		}
+		hostW := maxInt(10, width-12)
+		out = append(out, st.Render(glyph)+" "+
+			StyleNormal.Render(padRight(elideLeft(host, hostW), hostW))+tag)
+	}
+	if len(out) == 0 {
+		return []string{
+			StyleMuted.Render("(nenhum domínio ativo)"),
+			StyleMuted.Render("reserve um em dashboard.ngrok.com"),
+			StyleMuted.Render("e preencha o campo Domínio ao criar"),
+		}
+	}
+	return out
+}
+
+// ngrokDomainIsReserved: domínio que veio da config do projeto é reservado; o
+// que o agente sorteou some no próximo restart.
+func ngrokDomainIsReserved(cfg ngrokutil.ProjectConfig, name, host string) bool {
+	for _, c := range cfg.Tunnels {
+		if c.Name == name && strings.EqualFold(strings.TrimSpace(c.Domain), host) {
+			return true
+		}
+	}
+	return false
+}
+
+func publicHostOf(u string) string {
+	u = strings.TrimPrefix(strings.TrimPrefix(u, "https://"), "http://")
+	u = strings.TrimPrefix(u, "tcp://")
+	if i := strings.Index(u, "/"); i >= 0 {
+		u = u[:i]
+	}
+	return u
 }
 
 func (a *App) renderNgrokWizard(p *core.Project, width, height int) string {
@@ -707,56 +857,117 @@ func (a *App) renderNgrokWizard(p *core.Project, width, height int) string {
 	if p != nil {
 		proj = p.Name
 	}
-	boxW := minInt(width-4, maxInt(52, width*58/100))
-	boxH := minInt(height-2, maxInt(18, height*55/100))
-	innerW := maxInt(28, boxW-6)
+	boxW := minInt(width-4, maxInt(58, width*62/100))
+	innerW := maxInt(34, boxW-6)
 	accent := tabAccentColor(TabNgrok)
 
-	lines := tunnelModalChrome("NGROK", accent, "Novo túnel", "expor porta local via agent", proj, innerW)
+	lines := tunnelModalChrome("NGROK", accent, "Novo túnel", "expor uma porta local", proj, innerW)
 	lines = append(lines, "")
-
-	nameBox := renderApiTitledBox("nome",
-		[]string{a.renderNgrokWizardFieldValue(a.ngrokNewName, ngrokWizName, true)},
-		innerW, 3, a.ngrokWizardField == ngrokWizName,
-	)
-	portBox := renderApiTitledBox("porta",
-		[]string{a.renderNgrokWizardFieldValue(a.ngrokNewPortStr, ngrokWizPort, true)},
-		innerW, 3, a.ngrokWizardField == ngrokWizPort,
-	)
-	protoShown := a.ngrokNewProto
-	if a.ngrokWizardField == ngrokWizProto {
-		protoShown = a.ngrokNewProto + "  ⟨space⟩"
-	}
-	protoBox := renderApiTitledBox("proto",
-		[]string{a.renderNgrokWizardFieldValue(protoShown, ngrokWizProto, false)},
-		innerW, 3, a.ngrokWizardField == ngrokWizProto,
-	)
-
-	preview := StyleMuted.Render("preview  ")
-	name := strings.TrimSpace(a.ngrokNewName)
-	port := strings.TrimSpace(a.ngrokNewPortStr)
-	if name == "" {
-		preview += StyleMuted.Render("(preencha nome e porta)")
-	} else {
-		preview += StyleHealthy.Render(truncate(name, 16)) +
-			StyleMuted.Render("  ·  ") +
-			StyleWarning.Render(":"+firstNonEmpty(port, "?")) +
-			StyleMuted.Render("  ·  ") +
-			StyleNormal.Render(a.ngrokNewProto)
-	}
-
-	lines = append(lines, strings.Split(nameBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(portBox, "\n")...)
-	lines = append(lines, "")
-	lines = append(lines, strings.Split(protoBox, "\n")...)
+	lines = append(lines, a.ngrokWizardFields(p, innerW)...)
 	lines = append(lines, "",
-		StyleMuted.Render("projeto fixo — túnel fica ligado a "+firstNonEmpty(proj, "este projeto")),
-		preview,
+		StyleMuted.Render(strings.Repeat("─", innerW)),
+		// O que se vê é o que roda: mesma linha que StartArgs monta.
+		StyleMuted.Render("$ ")+StyleNormal.Render(truncate("ngrok "+strings.Join(
+			ngrokutil.StartArgs(a.ngrokWizardSpec()), " "), innerW-2)),
 		"",
-		StyleMuted.Render("tab campo  ·  ←→ cursor  ·  space proto  ·  enter salva e inicia  ·  esc"),
+		StyleMuted.Render("↑↓/tab campo  ·  space alterna  ·  enter salva e sobe  ·  esc"),
 	)
+	boxH := minInt(height-2, len(lines)+4)
 	return tunnelModalBox(lines, boxW, boxH, accent)
+}
+
+func (a *App) ngrokWizardFields(p *core.Project, width int) []string {
+	labelW := 12
+	valW := maxInt(12, minInt(26, width/3))
+	row := func(field int, label, value, hint string) string {
+		mark := "  "
+		key := StyleMuted.Render(padRight(label, labelW))
+		if a.ngrokWizardField == field {
+			mark = StyleKey.Render("▌ ")
+			key = StyleNormal.Bold(true).Render(padRight(label, labelW))
+		}
+		// A dica encolhe com a caixa — sem isso a linha quebrava em duas.
+		hintW := width - 2 - labelW - valW - 2
+		if hintW < 4 {
+			return mark + key + a.ngrokWizardValue(field, value, valW)
+		}
+		return mark + key + a.ngrokWizardValue(field, value, valW) + "  " +
+			StyleMuted.Render(truncate(hint, hintW))
+	}
+
+	auto := "não"
+	if a.ngrokNewAuto {
+		auto = "sim"
+	}
+	domain := a.ngrokNewDomain
+	domainHint := "opcional · domínio reservado da conta"
+	if strings.TrimSpace(domain) == "" && a.ngrokWizardField != ngrokWizDomain {
+		domain = emDash
+		domainHint = "sem domínio a URL muda a cada restart"
+	}
+	return []string{
+		row(ngrokWizName, "Nome", a.ngrokNewName, "identifica o túnel no agente"),
+		row(ngrokWizPort, "Porta", a.ngrokNewPortStr, a.ngrokPortHint(p)),
+		row(ngrokWizProto, "Proto", a.ngrokNewProto, strings.Join(ngrokProtos, " · ")),
+		row(ngrokWizDomain, "Domínio", domain, domainHint),
+		row(ngrokWizRegion, "Região", a.ngrokWizardRegion(), "edge mais perto = menos latência"),
+		row(ngrokWizAuto, "Auto-start", auto, "sobe junto com o projeto"),
+	}
+}
+
+// ngrokPortHint mostra as portas que o scanner já achou no projeto — digitar a
+// porta de cabeça era o passo mais chato de criar um túnel.
+func (a *App) ngrokPortHint(p *core.Project) string {
+	if p == nil || len(p.Ports) == 0 {
+		return "porta local a expor"
+	}
+	parts := make([]string, 0, 4)
+	for i, port := range p.Ports {
+		if i == 4 {
+			parts = append(parts, fmt.Sprintf("+%d", len(p.Ports)-4))
+			break
+		}
+		parts = append(parts, strconv.Itoa(port))
+	}
+	return "no projeto: " + strings.Join(parts, " · ") + "  ⟨space⟩"
+}
+
+func (a *App) ngrokWizardRegion() string {
+	if r := strings.TrimSpace(a.ngrokNewRegion); r != "" {
+		return r
+	}
+	return cfgRegionOr(a.ngrokCfg, "us")
+}
+
+// ngrokWizardSpec é o túnel que o formulário descreve agora — alimenta tanto o
+// preview do comando quanto o enter.
+func (a *App) ngrokWizardSpec() ngrokutil.TunnelConfig {
+	port, _ := strconv.Atoi(strings.TrimSpace(a.ngrokNewPortStr))
+	return ngrokutil.TunnelConfig{
+		Name:      strings.TrimSpace(a.ngrokNewName),
+		Port:      port,
+		Proto:     a.ngrokNewProto,
+		Domain:    strings.TrimSpace(a.ngrokNewDomain),
+		Region:    a.ngrokWizardRegion(),
+		AutoStart: a.ngrokNewAuto,
+	}
+}
+
+func (a *App) ngrokWizardValue(field int, value string, width int) string {
+	editable := field == ngrokWizName || field == ngrokWizPort || field == ngrokWizDomain
+	if a.ngrokWizardField != field {
+		return StyleNormal.Render(padRight(truncate(value, width), width))
+	}
+	if !editable {
+		return StyleSelected.Render(padRight(truncate(value+"  ⟨space⟩", width), width))
+	}
+	runes := []rune(value)
+	cur := clampCursor(a.ngrokWizardCursor, len(runes)+1)
+	if a.ngrokWizardCursor >= len(runes) {
+		cur = len(runes)
+	}
+	shown := string(runes[:cur]) + "█" + string(runes[cur:])
+	return StyleSelected.Render(padRight(truncate(shown, width), width))
 }
 
 func (a *App) ngrokDeleteConfirmLabels() (target, detail string) {
@@ -806,6 +1017,9 @@ func (a *App) beginNgrokWizard(p *core.Project) {
 		a.ngrokNewPort = port
 		a.ngrokNewPortStr = strconv.Itoa(port)
 	}
+	if a.ngrokNewRegion == "" {
+		a.ngrokNewRegion = cfgRegionOr(a.ngrokCfg, "us")
+	}
 	a.ngrokWizard = true
 	a.ngrokWizardField = ngrokWizName
 	a.ngrokWizardCursor = len([]rune(a.ngrokNewName))
@@ -817,6 +1031,8 @@ func (a *App) ngrokWizardText() string {
 		return a.ngrokNewName
 	case ngrokWizPort:
 		return a.ngrokNewPortStr
+	case ngrokWizDomain:
+		return a.ngrokNewDomain
 	default:
 		return ""
 	}
@@ -828,33 +1044,59 @@ func (a *App) setNgrokWizardText(s string) {
 		a.ngrokNewName = s
 	case ngrokWizPort:
 		a.ngrokNewPortStr = s
+	case ngrokWizDomain:
+		a.ngrokNewDomain = s
 	}
 }
 
 func (a *App) ngrokWizardFocusField(field int) {
 	if field < ngrokWizName {
-		field = ngrokWizProto
+		field = ngrokWizCount - 1
 	}
-	if field > ngrokWizProto {
+	if field >= ngrokWizCount {
 		field = ngrokWizName
 	}
 	a.ngrokWizardField = field
-	if field == ngrokWizProto {
-		a.ngrokWizardCursor = 0
-		return
-	}
 	a.ngrokWizardCursor = len([]rune(a.ngrokWizardText()))
 }
 
-func (a *App) cycleNgrokProto() {
-	switch a.ngrokNewProto {
-	case "http":
-		a.ngrokNewProto = "tcp"
-	case "tcp":
-		a.ngrokNewProto = "https"
-	default:
-		a.ngrokNewProto = "http"
+// ngrokWizardCycle é o ⟨space⟩ de cada campo: nos campos de escolha alterna o
+// valor, na porta percorre as portas que o projeto já expõe.
+func (a *App) ngrokWizardCycle(p *core.Project) {
+	switch a.ngrokWizardField {
+	case ngrokWizProto:
+		a.ngrokNewProto = cycleFrom(ngrokProtos, a.ngrokNewProto)
+	case ngrokWizRegion:
+		a.ngrokNewRegion = cycleFrom(ngrokRegions, a.ngrokWizardRegion())
+	case ngrokWizAuto:
+		a.ngrokNewAuto = !a.ngrokNewAuto
+	case ngrokWizPort:
+		if p == nil || len(p.Ports) == 0 {
+			return
+		}
+		cur, _ := strconv.Atoi(strings.TrimSpace(a.ngrokNewPortStr))
+		next := p.Ports[0]
+		for i, port := range p.Ports {
+			if port == cur {
+				next = p.Ports[(i+1)%len(p.Ports)]
+				break
+			}
+		}
+		a.ngrokNewPortStr = strconv.Itoa(next)
+		a.ngrokWizardCursor = len(a.ngrokNewPortStr)
 	}
+}
+
+func cycleFrom(options []string, current string) string {
+	for i, o := range options {
+		if o == current {
+			return options[(i+1)%len(options)]
+		}
+	}
+	if len(options) == 0 {
+		return current
+	}
+	return options[0]
 }
 
 func (a *App) ngrokSelected() (ngrokutil.Tunnel, bool) {
@@ -897,8 +1139,6 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		} else if a.ngrokSubTab == ngrokTabTunnels {
 			a.ngrokFocus = (a.ngrokFocus + 1) % 3 // table → details → logs
 		}
-	case "0":
-		a.ngrokSubTab = ngrokTabOverview
 	case "1":
 		a.ngrokSubTab = ngrokTabTunnels
 		a.ngrokFocus = ngrokFocusTable
@@ -906,11 +1146,7 @@ func (a *App) handleNgrokKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		a.ngrokSubTab = ngrokTabRequests
 		a.ngrokFocus = ngrokFocusRequests
 	case "3":
-		a.ngrokSubTab = ngrokTabHistory
-	case "4":
-		a.ngrokSubTab = ngrokTabDomains
-	case "5":
-		a.ngrokSubTab = ngrokTabSettings
+		a.ngrokSubTab = ngrokTabConfig
 	case "up", "k":
 		return a, a.ngrokMove(-1)
 	case "down", "j":
@@ -1026,6 +1262,9 @@ func (a *App) updateNgrokWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea
 		}
 		a.ngrokNewName = name
 		a.ngrokNewPort = port
+		if a.ngrokNewRegion == "" {
+			a.ngrokNewRegion = a.ngrokWizardRegion()
+		}
 		a.ngrokWizard = false
 		return a, a.ngrokCreateAndStart(p)
 	case "tab", "down":
@@ -1034,21 +1273,17 @@ func (a *App) updateNgrokWizard(msg tea.KeyMsg, p *core.Project) (tea.Model, tea
 	case "shift+tab", "up":
 		a.ngrokWizardFocusField(a.ngrokWizardField - 1)
 		return a, nil
-	case "[", "]":
-		a.cycleNgrokProto()
-		a.ngrokWizardField = ngrokWizProto
-		return a, nil
 	case " ":
-		if a.ngrokWizardField == ngrokWizProto {
-			a.cycleNgrokProto()
-		}
+		a.ngrokWizardCycle(p)
 		return a, nil
 	}
 
-	if a.ngrokWizardField == ngrokWizProto {
+	// Campos de escolha não têm texto para editar.
+	switch a.ngrokWizardField {
+	case ngrokWizProto, ngrokWizRegion, ngrokWizAuto:
 		switch msg.String() {
-		case "left", "right":
-			a.cycleNgrokProto()
+		case "left", "right", "[", "]":
+			a.ngrokWizardCycle(p)
 		}
 		return a, nil
 	}
@@ -1121,15 +1356,23 @@ func (a *App) ngrokCreateAndStart(p *core.Project) tea.Cmd {
 	if port == 0 {
 		port = ngrokutil.SuggestPort(p.Ports, p.Framework.Name)
 	}
+	region := strings.TrimSpace(a.ngrokNewRegion)
+	if region == "" {
+		region = cfgRegionOr(a.ngrokCfg, "us")
+	}
+	spec := ngrokutil.TunnelConfig{
+		Name: name, Port: port, Proto: proto,
+		Domain: strings.TrimSpace(a.ngrokNewDomain), Region: region, AutoStart: a.ngrokNewAuto,
+	}
 	cfg := a.ngrokCfg
 	cfg.Project = p.Name
-	cfg.UpsertTunnel(ngrokutil.TunnelConfig{Name: name, Port: port, Proto: proto, Region: cfg.Region})
+	cfg.UpsertTunnel(spec)
 	_ = ngrokutil.SaveProject(p.Path, cfg)
 	a.ngrokCfg = cfg
 	a.ngrokLoading = true
-	a.ngrokStatus = "starting " + name + "…"
+	a.ngrokStatus = "subindo " + name + "…"
 	return func() tea.Msg {
-		err := ngrokutil.StartTunnel(name, port, proto)
+		err := ngrokutil.StartTunnel(spec)
 		if err != nil {
 			return ngrokActionMsg{err: err.Error()}
 		}
@@ -1146,9 +1389,10 @@ func (a *App) ngrokStartSelected(p *core.Project) tea.Cmd {
 		a.ngrokStatus = t.Name + " já online"
 		return nil
 	}
+	spec := a.ngrokSpecFor(t)
 	a.ngrokLoading = true
 	return func() tea.Msg {
-		err := ngrokutil.StartTunnel(t.Name, t.Port, t.Proto)
+		err := ngrokutil.StartTunnel(spec)
 		if err != nil {
 			return ngrokActionMsg{err: err.Error()}
 		}
@@ -1187,11 +1431,12 @@ func (a *App) ngrokRestartSelected(p *core.Project) tea.Cmd {
 	if !ok {
 		return nil
 	}
+	spec := a.ngrokSpecFor(t)
 	a.ngrokLoading = true
 	return func() tea.Msg {
 		_ = ngrokutil.StopTunnel(t.Name)
 		time.Sleep(400 * time.Millisecond)
-		err := ngrokutil.StartTunnel(t.Name, t.Port, t.Proto)
+		err := ngrokutil.StartTunnel(spec)
 		if err != nil {
 			return ngrokActionMsg{err: err.Error()}
 		}
@@ -1268,4 +1513,34 @@ func (a *App) ngrokOpenBrowser() tea.Cmd {
 		_ = cmd.Start()
 		return ngrokActionMsg{out: "opened browser"}
 	}
+}
+
+// ngrokSpecFor recupera a config salva do túnel (domínio reservado, região)
+// para religá-lo igual. Sem isso, restart devolvia uma URL nova.
+func (a *App) ngrokSpecFor(t ngrokutil.Tunnel) ngrokutil.TunnelConfig {
+	for _, c := range a.ngrokCfg.Tunnels {
+		if c.Name == t.Name {
+			if c.Port == 0 {
+				c.Port = t.Port
+			}
+			if c.Proto == "" {
+				c.Proto = t.Proto
+			}
+			if c.Region == "" {
+				c.Region = a.ngrokCfg.Region
+			}
+			return c
+		}
+	}
+	return ngrokutil.TunnelConfig{
+		Name: t.Name, Port: t.Port, Proto: t.Proto,
+		Domain: t.Domain, Region: firstNonEmpty(t.Region, a.ngrokCfg.Region),
+	}
+}
+
+func cfgRegionOr(cfg ngrokutil.ProjectConfig, fallback string) string {
+	if cfg.Region != "" {
+		return cfg.Region
+	}
+	return fallback
 }

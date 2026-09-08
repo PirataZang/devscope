@@ -246,84 +246,66 @@ func (a *App) apiSidebarWidth() int {
 	return w
 }
 
+// renderApiTab: cabeçalho (módulo + método + status da última resposta) e
+// barra de comandos larga no rodapé (§2.3) — a coluna vertical "AÇÕES" que
+// existia antes saiu. Sem sub-abas de módulo: os quatro blocos da esquerda já
+// são numerados ([1]-[4]) e trocados por número, dispensando uma régua extra.
 func (a *App) renderApiTab(p *core.Project) string {
-	height := maxInt(14, a.height-2)
-	panelW := maxInt(20, a.width)
-	innerW := maxInt(16, panelW-2)
-	cmdW := actionsCmdWidth(innerW)
-	workW := maxInt(40, innerW-cmdW)
-	chrome := a.renderApiChrome(workW)
-	chromeH := lipgloss.Height(chrome)
-	bodyHeight := maxInt(8, height-chromeH-2) // chrome + footer
+	w := a.screenWidth()
+	h := a.screenHeight()
+	header := a.renderApiHeader(w)
+	cmdBar := a.renderApiCommandBar(w)
+	bodyH := maxInt(10, h-lipgloss.Height(header)-lipgloss.Height(cmdBar))
+
 	sideW := a.apiSidebarWidth()
-	if sideW+28 > workW {
-		sideW = maxInt(20, workW/3)
+	if sideW+28 > w {
+		sideW = maxInt(20, w/3)
 	}
-	mainW := maxInt(24, workW-sideW)
-
-	left := a.renderApiLeftColumn(p, sideW, bodyHeight)
-	right := a.renderApiRightColumn(mainW, bodyHeight)
+	mainW := maxInt(24, w-sideW)
+	left := a.renderApiLeftColumn(p, sideW, bodyH)
+	right := a.renderApiRightColumn(mainW, bodyH)
 	body := lipgloss.JoinHorizontal(lipgloss.Top, left, right)
-	footer := a.renderApiFooterLine(workW)
-	actions := renderActionsBox(cmdW, bodyHeight+lipgloss.Height(footer),
-		[2]string{"enter", "send"},
-		[2]string{"m", "method"},
-		[2]string{"u", "url"},
-		[2]string{"H", "headers"},
-		[2]string{"e", "body"},
-		[2]string{"[]", "abas"},
-		[2]string{"tab", "painel"},
-		[2]string{"N/P", "history"},
-		[2]string{"esc", "sair"},
-	)
 
-	content := chrome + "\n" + lipgloss.JoinHorizontal(lipgloss.Top,
-		lipgloss.JoinVertical(lipgloss.Left, body, footer),
-		actions,
-	)
-	panel := clampRenderedHeight(content, height)
+	stack := lipgloss.JoinVertical(lipgloss.Left, header, body)
+	if fill := h - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
+	}
+	return clampRenderedHeight(lipgloss.JoinVertical(lipgloss.Left, stack, cmdBar), h)
+}
 
+func (a *App) renderApiHeader(width int) string {
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabAPI)).Bold(true)
 	method := a.apiMethod
 	if method == "" {
 		method = "GET"
 	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		panel,
-		a.renderStatusBar("api · "+method),
-	)
+	left := accent.Render("⇅ API")
+	if p := a.currentProject(); p != nil && p.Name != "" {
+		left += StyleMuted.Render("   ") + StyleNormal.Bold(true).Render(truncate(p.Name, 20))
+	}
+	left += "  " + apiMethodStyle(method).Render(" "+method+" ")
+
+	var right []string
+	switch {
+	case a.apiLoading:
+		right = append(right, StyleWarning.Render(a.spinner()+" enviando…"))
+	case a.apiResponseErr != "":
+		right = append(right, StyleUnhealthy.Render("● erro"))
+	case a.apiResponseStatus != "":
+		right = append(right, a.apiStatusStyle().Render("● "+a.apiResponseStatus))
+		right = append(right, StyleMuted.Render(a.apiResponseTime.Round(time.Millisecond).String()))
+	default:
+		right = append(right, StyleMuted.Render("rascunho"))
+	}
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
-func (a *App) renderApiChrome(width int) string {
-	method := a.apiMethod
-	if method == "" {
-		method = "GET"
-	}
-	brand := StyleSection.Render("⚡ API")
-	methodBadge := apiMethodStyle(method).Render(" " + method + " ")
-	url := strings.TrimSpace(a.apiURL)
-	if url == "" {
-		url = "—"
-	}
-	url = fitApiFieldWindow(url, 0, maxInt(12, width/2), false)
-
-	meta := StyleMuted.Render("scratchpad")
-	if a.apiLoading {
-		meta = StyleWarning.Render(a.spinner() + " enviando…")
-	} else if a.apiResponseErr != "" {
-		meta = StyleUnhealthy.Render("● erro")
-	} else if a.apiResponseStatus != "" {
-		meta = a.apiStatusStyle().Render("● "+a.apiResponseStatus) + "  " +
-			StyleMuted.Render(a.apiResponseTime.Round(time.Millisecond).String())
-	}
-
-	line1 := lipgloss.JoinHorizontal(lipgloss.Top, brand, "  ", methodBadge, "  ", meta)
-	line2 := StyleMuted.Render("↗ ") + StyleNormal.Render(truncate(url, maxInt(10, width-4)))
-	sep := StyleMuted.Render(strings.Repeat("─", maxInt(8, width)))
-	return truncate(line1, width) + "\n" + truncate(line2, width) + "\n" + sep
-}
-
-func (a *App) renderApiFooterLine(width int) string {
-	return StyleMuted.Render(truncate(a.apiFooter(), width))
+// renderApiCommandBar reaproveita a lógica de apiFooter (contextual por bloco
+// focado), agora como itens de tecla — nunca estoura a largura (§2.3).
+func (a *App) renderApiCommandBar(width int) string {
+	items := a.apiCommandItems()
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
 
 func (a *App) renderApiLeftColumn(p *core.Project, width, height int) string {
@@ -951,31 +933,45 @@ func (a *App) renderApiResponsePanel(viewport, width int) []string {
 	return fitExactLines(out, viewport)
 }
 
-func (a *App) apiFooter() string {
+// apiCommandItems espelha o antigo apiFooter (hint contextual por bloco
+// focado), agora como pares tecla/ação para a barra de comandos.
+func (a *App) apiCommandItems() [][2]string {
 	if a.apiEditing {
 		if a.apiBlock == apiBlockRight && a.apiRightTab == apiRightBody {
-			return "body  ctrl+a tudo  shift+←→ sel  tab indent  esc  ctrl+enter send"
+			return [][2]string{
+				{"ctrl+a", "selecionar tudo"}, {"shift+←→", "selecionar"},
+				{"tab", "indentar"}, {"ctrl+enter", "enviar"}, {"esc", "sair"},
+			}
 		}
-		return "editando  ctrl+a tudo  shift+←→ sel  esc  enter send"
+		return [][2]string{
+			{"ctrl+a", "selecionar tudo"}, {"shift+←→", "selecionar"},
+			{"enter", "enviar"}, {"esc", "sair"},
+		}
 	}
 	switch a.apiBlock {
 	case apiBlockRequest:
-		return "↑↓ método  tab blocos  → Body/Resp  [] abas  enter send  esc abas"
-	case apiBlockURL:
-		return "digite a URL  tab próximo  → Body/Resp  [] abas  enter send  esc abas"
-	case apiBlockHeaders:
-		return "digite para editar  tab próximo  → Body/Resp  [] abas  enter send  esc abas"
+		return [][2]string{
+			{"↑↓", "método"}, {"tab", "próximo bloco"}, {"→", "body/resposta"},
+			{"[]", "abas do bloco"}, {"enter", "enviar"}, {"esc", "voltar"},
+		}
+	case apiBlockURL, apiBlockHeaders:
+		return [][2]string{
+			{"tab", "próximo bloco"}, {"→", "body/resposta"},
+			{"[]", "abas do bloco"}, {"enter", "enviar"}, {"esc", "voltar"},
+		}
 	case apiBlockAuth:
-		if a.apiEditing {
-			return "editando auth  tab user/pass  esc sair  enter send"
+		return [][2]string{
+			{"a/↑↓", "tipo"}, {"e", "editar"}, {"enter", "enviar"}, {"esc", "voltar"},
 		}
-		return "a/↑↓ tipo  e editar  enter send  esc abas"
 	default:
-		base := "e editar body  [] Body/Resp  tab Request  / buscar  enter send"
-		if a.apiSearchQuery != "" {
-			base += "  N/P match"
+		items := [][2]string{
+			{"e", "editar body"}, {"[]", "body/resposta"}, {"tab", "voltar ao request"},
+			{"/", "buscar"}, {"enter", "enviar"},
 		}
-		return base + "  esc abas"
+		if a.apiSearchQuery != "" {
+			items = append(items, [2]string{"n/N", "ocorrência"})
+		}
+		return append(items, [2]string{"esc", "voltar"})
 	}
 }
 

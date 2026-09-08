@@ -41,13 +41,16 @@ func TestCFLandingAndOpen(t *testing.T) {
 		t.Fatal("enter should open client")
 	}
 	view := stripANSI(a.renderCFTab(&p))
-	for _, want := range []string{"devscope", "cloudflare", "TUNNELS", "DETALHES", "LOGS"} {
+	for _, want := range []string{"CLOUDFLARE TUNNEL", "TÚNEIS", "DETALHES", "LOGS", "URL PÚBLICA"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in:\n%s", want, view)
 		}
 	}
-	if strings.Contains(view, "NAV") || strings.Contains(view, "QUICK STATS") {
-		t.Fatalf("old layout leftovers:\n%s", view)
+	// Overview/History/Setup/Settings viraram TÚNEIS · CONTA · CONFIG.
+	for _, gone := range []string{"NAV", "QUICK STATS", "Overview", "Settings"} {
+		if strings.Contains(view, gone) {
+			t.Fatalf("sobra do layout antigo %q:\n%s", gone, view)
+		}
 	}
 }
 
@@ -95,21 +98,27 @@ func TestCFWizardEditsURLAsText(t *testing.T) {
 		t.Fatalf("lista de modos inesperada: %v", cfutil.Modes)
 	}
 
-	view := stripANSI(a.renderCFWizard(&p, 60, 14))
-	if !strings.Contains(view, "fixo") || !strings.Contains(view, "digiliza") {
-		t.Fatalf("project should be fixed in wizard: %q", view)
+	view := stripANSI(a.renderCFWizard(&p, 110, 30))
+	if !strings.Contains(view, "digiliza") {
+		t.Fatalf("projeto deve aparecer no wizard: %q", view)
+	}
+	// O preview mostra exatamente o comando que vai rodar.
+	args := strings.Join(cfutil.TunnelArgs(a.cfWizardSpec()), " ")
+	if !strings.Contains(view, args) {
+		t.Fatalf("wizard deve mostrar o comando %q:\n%s", args, view)
 	}
 }
 
-func TestCFSetupScreen(t *testing.T) {
+// As abas History, Setup e Settings viraram CONFIG.
+func TestCFConfigScreen(t *testing.T) {
 	a := &App{
-		width: 100, height: 30, cfOpen: true, cfSubTab: cfTabSetup,
-		cfAuth: cfutil.AuthInfo{CLI: true, Version: "2026.7.3", CertPath: "/home/u/.cloudflared/cert.pem"},
+		width: 120, height: 30, cfOpen: true, cfSubTab: cfTabConfig,
+		cfAuth: cfutil.AuthInfo{CLI: true, LoggedIn: true, Version: "2026.7.3", CertPath: "/home/u/.cloudflared/cert.pem"},
 	}
-	view := stripANSI(a.renderCFSetup(80, 20))
-	for _, want := range []string{"INSTALL", "LOGIN", "NAMED", "QUICK", "I", "L"} {
+	view := stripANSI(a.renderCFConfig(&core.Project{Name: "demo", Path: "/p/demo"}, 120, 24))
+	for _, want := range []string{"CLI E PROJETO", "PRIMEIROS PASSOS", "HISTÓRICO", "2026.7.3", "instalar", "login"} {
 		if !strings.Contains(view, want) {
-			t.Fatalf("missing %q in setup:\n%s", want, view)
+			t.Fatalf("config sem %q:\n%s", want, view)
 		}
 	}
 }
@@ -130,7 +139,7 @@ func TestCFTunnelsViewLayout(t *testing.T) {
 		},
 	}
 	got := stripANSI(a.renderCFTunnelsView(&core.Project{Name: "digiliza-site"}, 120, 20))
-	for _, want := range []string{"DETALHES", "LOGS", "TUNNELS", "site", "messaging-cal-ghz-kid"} {
+	for _, want := range []string{"DETALHES", "LOGS", "TÚNEIS", "URL PÚBLICA", "site", "messaging-cal-ghz-kid"} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("missing %q in:\n%s", want, got)
 		}
@@ -146,7 +155,7 @@ func TestCFWizardIsModal(t *testing.T) {
 		cfNewName: "api", cfNewURL: "http://127.0.0.1:3000", cfNewMode: "quick",
 	}
 	view := stripANSI(a.renderCFTab(&core.Project{Name: "digiliza"}))
-	for _, want := range []string{"CLOUDFLARE", "Novo túnel", "fixo", "digiliza", "preview", "TUNNELS"} {
+	for _, want := range []string{"CLOUDFLARE", "Novo túnel", "digiliza", "Hostname", "Modo", "TÚNEIS"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("missing %q in wizard modal:\n%s", want, view)
 		}

@@ -551,6 +551,17 @@ func extractPublicURL(line string) string {
 // named usa `tunnel run --url <url> <name>` e http2 é o quick forçando o
 // transporte — serve pra rede que bloqueia QUIC na UDP 7844, onde o quick fica
 // tentando reconectar sem nunca subir.
+// TunnelArgs é o comando que StartTunnel roda. A tela mostra essa mesma linha
+// como preview — o que se vê é o que executa.
+func TunnelArgs(t TunnelConfig) []string {
+	t.normalize()
+	name := sanitizeName(t.Name)
+	if name == "" {
+		name = "tunnel"
+	}
+	return tunnelArgs(name, t.URL, NormalizeMode(t.Mode, t.Hostname))
+}
+
 func tunnelArgs(name, url, mode string) []string {
 	switch mode {
 	case "named":

@@ -11,314 +11,413 @@ import (
 )
 
 func (a *App) renderOverviewTab(p *core.Project) string {
-	w := a.width
-	if w < 40 {
-		w = 40
-	}
-	h := a.projectPanelHeight()
-	if h < 6 {
-		h = 6
-	}
-	return a.renderOverviewDashboard(p, w, h)
+	return a.renderOverviewDashboard(p, maxInt(40, a.width), maxInt(6, a.projectPanelHeight()))
 }
 
 func (a *App) renderOverviewDashboard(p *core.Project, width, height int) string {
-	ctx := a.renderOverviewContext(p, width)
-	ctxH := lipgloss.Height(ctx)
-	bodyH := maxInt(4, height-ctxH)
-
-	// Short / narrow: single column, no right rail (VS Code terminal).
-	if a.projectTiny() || width < 70 || bodyH < 18 {
-		return lipgloss.JoinVertical(lipgloss.Left, ctx, a.renderOverviewCompact(p, width, bodyH))
+	head := []string{a.renderModuleContext(p, width, "Visão Geral", "")}
+	// A faixa de alerta só existe quando há problema — a caixa "Atenção" antiga
+	// gastava um terço da largura para dizer "tudo certo".
+	if alert := a.renderOverviewAlert(p, width); alert != "" {
+		head = append(head, alert)
 	}
-
-	rightW := maxInt(24, width*28/100)
-	if rightW > 38 {
-		rightW = 38
+	if !a.projectTiny() {
+		head = append(head, "")
 	}
-	centerW := maxInt(36, width-rightW-1)
+	bodyH := maxInt(4, height-len(head))
 
-	center := a.renderOverviewCenter(p, centerW, bodyH)
-	right := a.renderOverviewRight(p, rightW, bodyH)
-	body := lipgloss.JoinHorizontal(lipgloss.Top, center, right)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, body)
+	var body string
+	if a.projectTiny() || width < 80 {
+		body = a.renderOverviewCenter(p, width, bodyH, true)
+	} else {
+		railW := minInt(38, maxInt(28, width*28/100))
+		centerW := maxInt(40, width-railW-1)
+		body = lipgloss.JoinHorizontal(lipgloss.Top,
+			a.renderOverviewCenter(p, centerW, bodyH, false),
+			a.renderOverviewRail(p, railW, bodyH),
+		)
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, append(head, body)...)
 }
 
-func (a *App) renderOverviewCompact(p *core.Project, width, height int) string {
-	if height < 4 {
-		height = 4
+// ─── faixa de alerta ────────────────────────────────────────────────────────
+
+func (a *App) renderOverviewAlert(p *core.Project, width int) string {
+	reasons := overviewProblems(p)
+	if len(reasons) == 0 {
+		return ""
 	}
-	// Proportional rows that always sum to height (no hard floors).
-	r1 := maxInt(3, height*30/100)
-	r2 := maxInt(3, height*28/100)
-	r3 := maxInt(3, height-r1-r2)
-	if r1+r2+r3 > height {
-		r3 = maxInt(2, height-r1-r2)
+	word := "problemas"
+	if len(reasons) == 1 {
+		word = "problema"
 	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderOverviewProjectBox(p, width, r1),
-		a.renderOverviewRuntimeBox(p, width, r2),
-		a.renderOverviewGitBox(p, width, r3),
-	)
+	head := StyleWarning.Bold(true).Render(fmt.Sprintf("⚠ %d %s", len(reasons), word))
+	if len(reasons) > 3 {
+		reasons = append(reasons[:3], fmt.Sprintf("+%d", len(reasons)-3))
+	}
+	tail := StyleKey.Render("l") + StyleMuted.Render(" abre os containers")
+	left := head + StyleMuted.Render("   "+strings.Join(reasons, " · "))
+	return joinWithSpacer(
+		truncateVisible(left, maxInt(10, width-lipgloss.Width(tail)-3)),
+		tail, width)
 }
 
-func (a *App) renderOverviewContext(p *core.Project, width int) string {
-	env := projectEnvLabel(p)
-	host := moduleHostname()
-	up := formatUptime(p.Uptime)
-	if p.Uptime <= 0 {
-		up = formatUptime(a.snapshot.HostMetrics.Uptime)
-	}
-	online := a.livePulse("Online")
-	switch {
-	case p.Health == core.HealthUnhealthy:
-		online = StyleUnhealthy.Render("● Offline")
-	case p.Status == core.StatusDegraded:
-		online = StyleWarning.Render(animPulseSlow(a.animFrame) + " Degraded")
-	case p.Status == core.StatusStopped:
-		online = StyleStopped.Render(animStoppedGlyph + " Stopped")
-	}
-
-	left := StyleMuted.Render("Projeto ") + StyleNormal.Render(p.Name) +
-		StyleMuted.Render("  Ambiente ") + StyleWarning.Render(env) +
-		StyleMuted.Render("  Servidor ") + StyleNormal.Render(truncate(host, 18)) +
-		StyleMuted.Render("  Uptime ") + StyleMuted.Render(up)
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(online)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + online
-}
-
-func projectEnvLabel(p *core.Project) string {
-	if p.Git == nil || p.Git.Branch == "" {
-		return "local"
-	}
-	b := strings.ToLower(p.Git.Branch)
-	switch {
-	case b == "main" || b == "master" || strings.Contains(b, "prod"):
-		return "Prod"
-	case strings.HasPrefix(b, "des-") || strings.Contains(b, "dev") || b == "develop" || b == "development":
-		return "Dev"
-	case strings.Contains(b, "stag") || strings.Contains(b, "homolog"):
-		return "Stage"
-	default:
-		return truncate(p.Git.Branch, 12)
-	}
-}
-
-func (a *App) renderOverviewCenter(p *core.Project, width, height int) string {
-	// Soft mins — never let floors sum past available height.
-	row1H := height * 18 / 100
-	row2H := height * 28 / 100
-	row3H := height * 14 / 100
-	row4H := height * 16 / 100
-	if row1H < 3 {
-		row1H = 3
-	}
-	if row2H < 3 {
-		row2H = 3
-	}
-	if row3H < 3 {
-		row3H = 3
-	}
-	if row4H < 3 {
-		row4H = 3
-	}
-	row5H := height - row1H - row2H - row3H - row4H
-	if row5H < 3 {
-		// Collapse activity/health into leftover; shrink upper rows.
-		need := 3 - row5H
-		for need > 0 && row2H > 3 {
-			row2H--
-			need--
+func overviewProblems(p *core.Project) []string {
+	var out []string
+	for _, hc := range p.HealthChecks {
+		if hc.Status == core.HealthUnhealthy {
+			out = append(out, "probe "+truncate(hc.URL, 28)+" falhando")
 		}
-		for need > 0 && row1H > 3 {
-			row1H--
-			need--
-		}
-		row5H = height - row1H - row2H - row3H - row4H
-		if row5H < 2 {
-			row5H = 2
-		}
-	}
-
-	projAlertW := maxInt(12, width*28/100)
-	projMainW := width - projAlertW
-	stackW := width / 2
-	runtimeW := width - stackW
-	actW := width / 2
-	healthW := width - actW
-
-	row1 := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderOverviewProjectBox(p, projMainW, row1H),
-		a.renderOverviewAlertBox(p, projAlertW, row1H),
-	)
-	row2 := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderOverviewStackBox(p, stackW, row2H),
-		a.renderOverviewRuntimeBox(p, runtimeW, row2H),
-	)
-	row3 := a.renderOverviewModulesBox(p, width, row3H)
-	row4 := a.renderOverviewGitBox(p, width, row4H)
-	row5 := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.renderOverviewActivityBox(p, actW, row5H),
-		a.renderOverviewHealthBox(p, healthW, row5H),
-	)
-	return lipgloss.JoinVertical(lipgloss.Left, row1, row2, row3, row4, row5)
-}
-
-func (a *App) renderOverviewProjectBox(p *core.Project, width, height int) string {
-	lines := []string{
-		StyleMuted.Render("Path     ") + StyleNormal.Render(truncate(p.Path, maxInt(12, width-14))),
-		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame)),
-		StyleMuted.Render("Health   ") + healthLabel(p.Health),
-	}
-	return renderApiTitledBox("PROJETO", fitExactLines(lines, height-2), width, height, false)
-}
-
-func (a *App) renderOverviewAlertBox(p *core.Project, width, height int) string {
-	bad := 0
-	for _, c := range p.HealthChecks {
-		if c.Status == core.HealthUnhealthy {
-			bad++
-		}
-	}
-	if bad == 0 && p.Health == core.HealthUnhealthy {
-		bad = 1
 	}
 	for _, c := range p.Containers {
-		st := strings.ToLower(c.State + " " + c.Status)
-		if strings.Contains(st, "exited") || strings.Contains(st, "dead") || strings.Contains(st, "restarting") {
-			bad++
+		switch st := strings.ToLower(c.State + " " + c.Status + " " + c.Health); {
+		case strings.Contains(st, "restart"):
+			out = append(out, c.Name+" reiniciando")
+		case strings.Contains(st, "exited"), strings.Contains(st, "dead"):
+			out = append(out, c.Name+" parado")
+		case strings.Contains(st, "unhealthy"):
+			out = append(out, c.Name+" unhealthy")
 		}
 	}
-	var lines []string
-	if bad == 0 {
-		lines = []string{StyleHealthy.Render("tudo certo"), StyleMuted.Render("sem alertas")}
-	} else {
-		lines = []string{
-			StyleWarning.Render(fmt.Sprintf("%d problema(s)", bad)),
-			StyleMuted.Render("ver Health (5)"),
-		}
+	if len(out) == 0 && p.Health == core.HealthUnhealthy {
+		out = append(out, "health check falhando")
 	}
-	return renderApiTitledBox("Atenção", fitExactLines(lines, height-2), width, height, bad > 0)
+	return out
 }
 
-func (a *App) renderOverviewStackBox(p *core.Project, width, height int) string {
+// ─── coluna principal ───────────────────────────────────────────────────────
+
+type overviewSection struct {
+	height int
+	render func(width int) string
+}
+
+func overviewBox(title string, lines []string) overviewSection {
+	h := len(lines) + 2
+	return overviewSection{h, func(w int) string {
+		return renderApiTitledBox(title, lines, w, h, false)
+	}}
+}
+
+// overviewPair põe duas caixas curtas lado a lado — separadas, cada uma gastava
+// a largura inteira do painel para mostrar duas linhas.
+func overviewPair(t1 string, l1 []string, t2 string, l2 []string) overviewSection {
+	h := maxInt(len(l1), len(l2)) + 2
+	return overviewSection{h, func(w int) string {
+		left := w / 2
+		return lipgloss.JoinHorizontal(lipgloss.Top,
+			renderApiTitledBox(t1, l1, left, h, false),
+			renderApiTitledBox(t2, l2, w-left, h, false))
+	}}
+}
+
+// renderOverviewCenter dá a cada caixa a altura do seu conteúdo e entrega a
+// sobra para CONTAINERS — a única lista que cresce de verdade. Antes as alturas
+// eram percentuais fixos, e caixas de 2 linhas viravam torres de 13.
+func (a *App) renderOverviewCenter(p *core.Project, width, height int, solo bool) string {
+	inner := maxInt(10, width-2)
+	half := maxInt(10, width/2-2)
+	stack := a.overviewStackRuntimeLines(p, inner)
+
+	var tail []overviewSection
+	if solo {
+		tail = append(tail, overviewBox("GIT", a.overviewGitLines(p, inner)))
+	}
+	if mods := overviewModuleLines(p, inner); len(mods) > 0 {
+		tail = append(tail, overviewBox("MÓDULOS", mods))
+	}
+
+	activity := overviewActivity(p, a.snapshot.ScannedAt)
+	if pair := !solo && width >= 90; pair {
+		tail = append(tail, overviewPair(
+			"SAÚDE", overviewHealthLines(p, half, a.animFrame),
+			"ATIVIDADE", activity))
+	} else {
+		tail = append(tail, overviewBox("SAÚDE", overviewHealthLines(p, inner, a.animFrame)))
+		if len(activity) > 0 {
+			tail = append(tail, overviewBox("ATIVIDADE", activity))
+		}
+	}
+
+	room := height - (len(stack) + 2) - 2 // 2 = borda da caixa CONTAINERS
+	for _, s := range tail {
+		room -= s.height
+	}
+	// Corta as caixas de baixo antes de espremer a lista de containers.
+	for len(tail) > 0 && room < 3 {
+		room += tail[len(tail)-1].height
+		tail = tail[:len(tail)-1]
+	}
+
+	ctrs := overviewContainerLines(p, inner, a.animFrame)
+	if room = maxInt(1, room); len(ctrs) > room {
+		ctrs = append(ctrs[:room-1],
+			StyleMuted.Render(fmt.Sprintf("+%d containers", len(ctrs)-room+1)))
+	}
+
+	boxes := []string{
+		renderApiTitledBox("STACK & RUNTIME", stack, width, len(stack)+2, false),
+		renderApiTitledBox(fmt.Sprintf("CONTAINERS (%d)", len(p.Containers)), ctrs, width, len(ctrs)+2, false),
+	}
+	for _, s := range tail {
+		boxes = append(boxes, s.render(width))
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, boxes...)
+}
+
+func (a *App) overviewStackRuntimeLines(p *core.Project, width int) []string {
+	label := func(k string) string { return StyleMuted.Render(padRight(k, 9)) }
+	lines := make([]string, 0, 8)
+
 	frameworks := p.Frameworks
 	if len(frameworks) == 0 && p.Framework.Name != "" && p.Framework.Name != "Unknown" {
 		frameworks = []core.FrameworkInfo{p.Framework}
 	}
-	lines := make([]string, 0, height-2)
 	if len(frameworks) == 0 {
-		lines = append(lines, StyleMuted.Render("(nenhum detectado)"))
+		lines = append(lines, label("Stack")+StyleMuted.Render("(nenhum detectado)"))
 	} else {
-		for i, fw := range frameworks {
-			prefix := "├ "
-			if i == len(frameworks)-1 {
-				prefix = "└ "
-			}
-			ver := ""
+		parts := make([]string, 0, len(frameworks))
+		for _, fw := range frameworks {
+			name := fw.Name
 			if fw.Version != "" {
-				ver = " v" + fw.Version
+				name += " " + fw.Version // era "Laravel () v11.2"
 			}
-			lines = append(lines, fmt.Sprintf("%s%s %s%s",
-				StyleMuted.Render(prefix),
-				frameworkIcon(fw.Name),
-				StyleNormal.Render(fw.Name),
-				StyleMuted.Render(" ("+fw.Language+")"+ver),
-			))
+			parts = append(parts, stackStyle(fw.Name).Render(name))
 		}
+		lines = append(lines, label("Stack")+strings.Join(parts, StyleMuted.Render("  ·  ")))
 	}
-	return renderApiTitledBox("STACK", fitExactLines(lines, height-2), width, height, false)
-}
 
-func (a *App) renderOverviewRuntimeBox(p *core.Project, width, height int) string {
-	cpu, ram := projectRuntimeMetrics(p)
-	hostRAM := a.snapshot.HostMetrics.MemoryTotalMB
-	if hostRAM <= 0 {
-		hostRAM = 8192
-	}
-	lines := make([]string, 0, height-2)
-	if p.HasDockerCompose {
-		lines = append(lines, StyleIconDocker.Render("Docker")+" "+StyleMuted.Render("compose detectado"))
-	} else if p.HasDockerfile {
-		lines = append(lines, StyleIconDocker.Render("Docker")+" "+StyleMuted.Render("Dockerfile"))
-	} else {
-		lines = append(lines, StyleMuted.Render("Docker  —"))
+	var runtime []string
+	switch {
+	case p.HasDockerCompose:
+		runtime = append(runtime, StyleNormal.Render("compose"))
+	case p.HasDockerfile:
+		runtime = append(runtime, StyleNormal.Render("Dockerfile"))
 	}
 	if p.ContainerCount > 0 {
-		lines = append(lines, StyleNormal.Render(fmt.Sprintf("Containers  %d vinculados", p.ContainerCount)))
+		runtime = append(runtime, StyleNormal.Render(fmt.Sprintf("%d containers", p.ContainerCount)))
+	}
+	if p.WorkerCount > 0 {
+		runtime = append(runtime, StyleNormal.Render(fmt.Sprintf("%d workers", p.WorkerCount)))
+	}
+	if len(runtime) == 0 {
+		runtime = append(runtime, StyleMuted.Render(emDash))
+	}
+	lines = append(lines, label("Docker")+strings.Join(runtime, StyleMuted.Render("  ·  ")))
+
+	cpu, ram := projectRuntimeMetrics(p)
+	bar := minInt(16, maxInt(6, width/4))
+	ramPct := 0.0
+	if total := a.snapshot.HostMetrics.MemoryTotalMB; total > 0 {
+		ramPct = float64(ram) * 100 / float64(total)
 	}
 	lines = append(lines,
-		StyleMuted.Render("CPU ")+meterBar(cpu, 8)+StyleMuted.Render(fmt.Sprintf(" %.1f%%", cpu)),
-		StyleMuted.Render("RAM ")+meterBar(float64(ram)*100/float64(hostRAM), 8)+
-			StyleMuted.Render(fmt.Sprintf(" %d / %d MB", ram, hostRAM)),
+		label("CPU")+barSolid(cpu, bar)+StyleMuted.Render(fmt.Sprintf("  %.1f%%", cpu)),
+		label("RAM")+barSolid(ramPct, bar)+StyleMuted.Render(fmt.Sprintf("  %d MB", ram)),
 	)
+
 	if len(p.Ports) > 0 {
-		lines = append(lines, StyleAccent.Render(collectors.FormatPortsShort(p.Ports, 6)))
+		lines = append(lines, label("Portas")+
+			lipgloss.NewStyle().Foreground(ColorAccent).Render(collectors.FormatPortsShort(p.Ports, 6)))
 	}
-	return renderApiTitledBox("RUNTIME", fitExactLines(lines, height-2), width, height, false)
-}
-
-func (a *App) renderOverviewModulesBox(p *core.Project, width, height int) string {
-	lines := make([]string, 0, height-2)
-	if len(p.Modules) == 0 {
-		if p.WorkerCount > 0 {
-			for _, w := range p.Workers {
-				st := StyleMuted.Render(w.Status)
-				if strings.EqualFold(w.Status, "online") {
-					st = StyleHealthy.Render("Online")
-				}
-				lines = append(lines, fmt.Sprintf("%s  %s  %s",
-					StyleNormal.Render(truncate(w.Name, 18)),
-					StyleMuted.Render("worker"),
-					st,
-				))
+	for i, d := range p.Domains {
+		if i >= 2 {
+			lines = append(lines, label("")+StyleMuted.Render(fmt.Sprintf("+%d domínios", len(p.Domains)-2)))
+			break
+		}
+		key := "Domínio"
+		if i > 0 {
+			key = ""
+		}
+		row := label(key) + StyleNormal.Render(truncate(d.Host, maxInt(10, width-24)))
+		if days, ok := sslDaysFor(p, d.Host); ok {
+			st := StyleHealthy
+			switch {
+			case days < 15:
+				st = StyleUnhealthy
+			case days < 30:
+				st = StyleWarning
 			}
-		} else {
-			lines = append(lines, StyleMuted.Render("(nenhum módulo detectado)"))
+			row += StyleMuted.Render("   SSL ") + st.Render(fmt.Sprintf("%d dias", days))
 		}
-	} else {
-		for _, m := range p.Modules {
-			lines = append(lines, fmt.Sprintf("%s  %s  %s",
-				StyleNormal.Render(truncate(m.Name, 16)),
-				StyleMuted.Render(truncate(m.Path, maxInt(8, width/3))),
-				StyleHealthy.Render("Online"),
-			))
-		}
+		lines = append(lines, row)
 	}
-	return renderApiTitledBox("MÓDULOS ATIVOS", fitExactLines(lines, height-2), width, height, false)
+	return lines
 }
 
-func (a *App) renderOverviewGitBox(p *core.Project, width, height int) string {
-	lines := make([]string, 0, height-2)
-	if p.Git == nil || !p.Git.IsRepo {
-		lines = append(lines, StyleMuted.Render("não é um repositório git"))
-	} else {
-		g := p.Git
-		lines = append(lines,
-			StyleMuted.Render("Branch   ")+StyleWarning.Render(g.Branch),
-			StyleMuted.Render("Commit   ")+StyleMuted.Render(truncate(g.LastCommit, 8))+" "+
-				StyleNormal.Render(truncate(g.LastCommitMsg, maxInt(12, width-28))),
-			StyleMuted.Render("Sync     ")+StyleNormal.Render(fmt.Sprintf("+%d / -%d", g.Ahead, g.Behind))+
-				StyleMuted.Render(fmt.Sprintf("  ·  %d modified", g.Modified)),
-		)
-	}
-	return renderApiTitledBox("GIT", fitExactLines(lines, height-2), width, height, false)
-}
-
-func (a *App) renderOverviewActivityBox(p *core.Project, width, height int) string {
-	items := overviewActivity(p, a.snapshot.ScannedAt)
-	lines := make([]string, 0, height-2)
-	if len(items) == 0 {
-		lines = append(lines, StyleMuted.Render("(sem atividade recente)"))
-	} else {
-		for _, it := range items {
-			lines = append(lines, it)
+func sslDaysFor(p *core.Project, host string) (int, bool) {
+	for _, c := range p.SSL {
+		if strings.EqualFold(c.Domain, host) {
+			return c.DaysLeft, true
 		}
 	}
-	return renderApiTitledBox("ATIVIDADE RECENTE", fitExactLines(lines, height-2), width, height, false)
+	return 0, false
+}
+
+func overviewContainerLines(p *core.Project, width, frame int) []string {
+	if len(p.Containers) == 0 {
+		if p.ContainerCount > 0 {
+			return []string{StyleMuted.Render(fmt.Sprintf("%d vinculados · abra a aba Containers", p.ContainerCount))}
+		}
+		return []string{StyleMuted.Render("(nenhum container)")}
+	}
+	nameW := minInt(22, maxInt(10, width*24/100))
+	imgW := minInt(28, maxInt(8, width*26/100))
+	// Colunas que não cabem inteiras somem — ":80…" não informa nada.
+	statusW := minInt(14, width*14/100)
+	if statusW < 8 {
+		statusW = 0
+	}
+	portW := width - nameW - imgW - statusW - 20
+	if statusW > 0 {
+		portW--
+	}
+	if portW < 6 {
+		portW = 0
+	}
+
+	out := make([]string, 0, len(p.Containers))
+	for _, c := range p.Containers {
+		glyph, st := containerDot(c, frame)
+		row := st.Render(glyph) + " " +
+			StyleNormal.Render(padRight(truncate(c.Name, nameW), nameW)) + " " +
+			StyleMuted.Render(padRight(truncate(c.Image, imgW), imgW))
+		if statusW > 0 {
+			row += " " + StyleMuted.Render(padRight(truncate(c.Status, statusW), statusW))
+		}
+		if portW > 0 {
+			row += " " + lipgloss.NewStyle().Foreground(ColorAccent).
+				Render(padRight(truncate(containerPortsShort(c), portW), portW))
+		}
+		out = append(out, row+" "+
+			StyleMuted.Render(fmt.Sprintf("%5.1f%%", c.CPU))+" "+
+			StyleMuted.Render(fmt.Sprintf("%7s", formatMiB(c.Memory))))
+	}
+	return out
+}
+
+func containerPortsShort(c core.Container) string {
+	maps := collectors.ParseContainerPortMappings(c.Ports)
+	if len(maps) == 0 {
+		return ""
+	}
+	seen := make(map[int]bool, len(maps))
+	parts := make([]string, 0, 3)
+	for _, m := range maps {
+		if seen[m.HostPort] {
+			continue
+		}
+		seen[m.HostPort] = true
+		if len(parts) == 3 {
+			parts = append(parts, fmt.Sprintf("+%d", len(maps)-3))
+			break
+		}
+		parts = append(parts, fmt.Sprintf(":%d", m.HostPort))
+	}
+	return strings.Join(parts, " ")
+}
+
+// containerDot: "unhealthy" contém "healthy", então testa primeiro.
+func containerDot(c core.Container, frame int) (string, lipgloss.Style) {
+	st := strings.ToLower(c.State + " " + c.Status + " " + c.Health)
+	switch {
+	case strings.Contains(st, "unhealthy"), strings.Contains(st, "restart"):
+		return pulseGlyph(pulseWarn, frame), StyleWarning
+	case strings.Contains(st, "exited"), strings.Contains(st, "dead"), strings.Contains(st, "created"):
+		return pulseGlyph(pulseBad, frame), StyleStopped
+	case strings.Contains(st, "running"), strings.Contains(st, "up "):
+		return pulseGlyph(pulseOK, frame), StyleRunning
+	default:
+		return pulseGlyph(pulseIdle, frame), StyleMuted
+	}
+}
+
+func formatMiB(bytes int64) string {
+	return fmt.Sprintf("%d MB", bytes/(1<<20))
+}
+
+func overviewModuleLines(p *core.Project, width int) []string {
+	if len(p.Modules) == 0 {
+		return nil // workers viram "N workers" na linha do Docker
+	}
+	out := make([]string, 0, len(p.Modules))
+	for _, m := range p.Modules {
+		out = append(out, StyleNormal.Render(padRight(truncate(m.Name, 18), 18))+" "+
+			StyleMuted.Render(truncate(m.Path, maxInt(8, width-20))))
+	}
+	return out
+}
+
+func overviewHealthLines(p *core.Project, width, frame int) []string {
+	if len(p.HealthChecks) == 0 {
+		return []string{
+			healthRow("App", p.Health, frame),
+			healthRow("Git", healthFromBool(p.Git != nil && p.Git.IsRepo), frame),
+			healthRow("Docker", healthFromBool(p.HasDockerCompose || p.ContainerCount > 0), frame),
+		}
+	}
+	urlW := maxInt(16, width-12)
+	out := make([]string, 0, len(p.HealthChecks))
+	for _, hc := range p.HealthChecks {
+		glyph, st := healthGlyph(hc.Status, frame)
+		lat := emDash
+		if hc.LatencyMS > 0 {
+			lat = fmt.Sprintf("%d ms", hc.LatencyMS)
+		}
+		out = append(out, st.Render(glyph)+" "+
+			StyleNormal.Render(padRight(truncate(hc.URL, urlW), urlW))+
+			StyleMuted.Render(fmt.Sprintf("%8s", lat)))
+	}
+	return out
+}
+
+func healthGlyph(h core.HealthStatus, frame int) (string, lipgloss.Style) {
+	switch h {
+	case core.HealthHealthy:
+		return pulseGlyph(pulseOK, frame), StyleHealthy
+	case core.HealthUnhealthy:
+		return pulseGlyph(pulseBad, frame), StyleUnhealthy
+	default:
+		return pulseGlyph(pulseIdle, frame), StyleMuted
+	}
+}
+
+// projectRuntimeMetrics e healthPlain vieram de metrics_tab.go / health_tab.go,
+// apagados com as abas Metrics e Status — a Visão Geral é a única consumidora.
+func projectRuntimeMetrics(p *core.Project) (float64, int64) {
+	var cpu float64
+	var memory int64
+	for _, c := range p.Containers {
+		cpu += c.CPU
+		memory += c.Memory
+	}
+	for _, w := range p.Workers {
+		if strings.EqualFold(w.Status, "online") {
+			cpu += w.CPU
+			memory += w.Memory
+		}
+	}
+	return cpu, memory / (1024 * 1024)
+}
+
+func healthPlain(h core.HealthStatus) string {
+	if h == "" {
+		return "Unknown"
+	}
+	return string(h)
+}
+
+func healthFromBool(ok bool) core.HealthStatus {
+	if ok {
+		return core.HealthHealthy
+	}
+	return core.HealthUnknown
+}
+
+func healthRow(label string, h core.HealthStatus, frame int) string {
+	glyph, st := healthGlyph(h, frame)
+	return st.Render(glyph) + " " + StyleNormal.Render(padRight(truncate(label, 12), 12)) +
+		StyleMuted.Render(healthPlain(h))
 }
 
 func overviewActivity(p *core.Project, scanned time.Time) []string {
@@ -328,24 +427,23 @@ func overviewActivity(p *core.Project, scanned time.Time) []string {
 		if !p.Git.LastCommitDate.IsZero() {
 			when = relTime(p.Git.LastCommitDate)
 		}
-		out = append(out, StyleHealthy.Render("✓")+" "+StyleMuted.Render(when)+" "+
-			StyleNormal.Render(truncate(p.Git.LastCommitMsg, 36)))
+		out = append(out, StyleHealthy.Render("✓")+" "+StyleMuted.Render(padRight(when, 5))+" "+
+			StyleNormal.Render(truncate(p.Git.LastCommitMsg, 52)))
 	}
 	for _, c := range p.Containers {
-		st := strings.ToLower(c.Status + " " + c.State)
-		if strings.Contains(st, "restart") {
-			out = append(out, StyleWarning.Render("△")+" "+StyleMuted.Render("recente")+" "+
+		if strings.Contains(strings.ToLower(c.Status+" "+c.State), "restart") {
+			out = append(out, StyleWarning.Render("△")+" "+StyleMuted.Render(padRight("agora", 5))+" "+
 				StyleNormal.Render("restart "+truncate(c.Name, 24)))
 		}
 	}
 	for _, hc := range p.HealthChecks {
 		if hc.Status == core.HealthUnhealthy {
-			out = append(out, StyleUnhealthy.Render("✗")+" "+StyleMuted.Render("health")+" "+
-				StyleNormal.Render(truncate(hc.URL, 32)))
+			out = append(out, StyleUnhealthy.Render("✗")+" "+StyleMuted.Render(padRight("agora", 5))+" "+
+				StyleNormal.Render(truncate(hc.URL, 46)))
 		}
 	}
 	if !scanned.IsZero() && len(out) < 3 {
-		out = append(out, StyleMuted.Render("·")+" "+StyleMuted.Render(relTime(scanned))+" "+
+		out = append(out, StyleMuted.Render("·")+" "+StyleMuted.Render(padRight(relTime(scanned), 5))+" "+
 			StyleMuted.Render("último scan"))
 	}
 	if len(out) > 5 {
@@ -363,86 +461,98 @@ func relTime(t time.Time) string {
 		return fmt.Sprintf("%dm", int(d.Minutes()))
 	case d < 24*time.Hour:
 		return fmt.Sprintf("%dh", int(d.Hours()))
-	default:
+	case d < 30*24*time.Hour:
 		return fmt.Sprintf("%dd", int(d.Hours()/24))
+	case d < 365*24*time.Hour:
+		return fmt.Sprintf("%dmes", int(d.Hours()/(24*30)))
+	default:
+		return fmt.Sprintf("%da", int(d.Hours()/(24*365)))
 	}
 }
 
-func (a *App) renderOverviewHealthBox(p *core.Project, width, height int) string {
-	lines := make([]string, 0, height-2)
-	if len(p.HealthChecks) == 0 {
-		lines = append(lines,
-			healthRow("App", p.Health),
-			healthRow("Git", healthFromBool(p.Git != nil && p.Git.IsRepo)),
-			healthRow("Docker", healthFromBool(p.HasDockerCompose || p.ContainerCount > 0)),
-		)
-	} else {
-		for _, hc := range p.HealthChecks {
-			label := truncate(hc.URL, maxInt(10, width-16))
-			lines = append(lines, healthRow(label, hc.Status))
-		}
-	}
-	return renderApiTitledBox("HEALTH CHECK", fitExactLines(lines, height-2), width, height, false)
-}
+// ─── rail direito ───────────────────────────────────────────────────────────
 
-func healthFromBool(ok bool) core.HealthStatus {
-	if ok {
-		return core.HealthHealthy
-	}
-	return core.HealthUnknown
-}
-
-func healthRow(label string, h core.HealthStatus) string {
-	return StyleMuted.Render(fmt.Sprintf("%-12s", truncate(label, 12))) + " " + healthLabel(h)
-}
-
-func (a *App) renderOverviewRight(p *core.Project, width, height int) string {
-	detH := maxInt(8, height*36/100)
-	actH := maxInt(8, height*36/100)
-	noteH := maxInt(4, height-detH-actH)
+func (a *App) renderOverviewRail(p *core.Project, width, height int) string {
+	git := a.overviewGitLines(p, maxInt(10, width-2))
 	return lipgloss.JoinVertical(lipgloss.Left,
-		a.renderOverviewDetailsBox(p, width, detH),
-		a.renderOverviewActionsBox(width, actH),
-		a.renderOverviewNotesBox(width, noteH),
+		renderApiTitledBox("GIT", git, width, minInt(height, len(git)+2), false),
+		renderActionsBox(width, maxInt(3, height-len(git)-2),
+			[2]string{"a", "analisar"},
+			[2]string{"l", "containers"},
+			[2]string{"g", "git"},
+			[2]string{"o", "browser"},
+			[2]string{"E", "shell"},
+			[2]string{"r", "refresh"},
+			[2]string{"tab", "próximo módulo"},
+		),
 	)
 }
 
-func (a *App) renderOverviewDetailsBox(p *core.Project, width, height int) string {
-	env := projectEnvLabel(p)
-	host := moduleHostname()
-	scan := "—"
-	if !a.snapshot.ScannedAt.IsZero() {
-		scan = a.snapshot.ScannedAt.Format("15:04:05")
+func (a *App) overviewGitLines(p *core.Project, width int) []string {
+	if p.Git == nil || !p.Git.IsRepo {
+		return []string{StyleMuted.Render("não é um repositório git")}
+	}
+	g := p.Git
+	sync := ""
+	if g.Ahead > 0 {
+		sync += StyleHealthy.Render(fmt.Sprintf("  ↑%d", g.Ahead))
+	}
+	if g.Behind > 0 {
+		sync += StyleWarning.Render(fmt.Sprintf("  ↓%d", g.Behind))
 	}
 	lines := []string{
-		StyleMuted.Render("Name     ") + StyleNormal.Render(truncate(p.Name, width-12)),
-		StyleMuted.Render("Ambiente ") + StyleWarning.Render(env),
-		StyleMuted.Render("Servidor ") + StyleNormal.Render(truncate(host, width-12)),
-		StyleMuted.Render("Path     ") + StyleMuted.Render(truncate(p.Path, width-12)),
-		StyleMuted.Render("Status   ") + projectStatusStyle(p.Status).Render(statusTextAt(p.Status, a.animFrame)),
-		StyleMuted.Render("Health   ") + healthLabel(p.Health),
-		StyleMuted.Render("Scan     ") + StyleMuted.Render(scan),
+		lipgloss.NewStyle().Foreground(ColorAccent).Render(
+			"⑂ "+truncate(g.Branch, maxInt(8, width-lipgloss.Width(sync)-2))) + sync,
 	}
-	return renderApiTitledBox("DETALHES", fitExactLines(lines, height-2), width, height, false)
+	if g.LastCommit != "" {
+		lines = append(lines, StyleMuted.Render(truncate(g.LastCommit, 7)+"  ")+
+			StyleNormal.Render(truncate(g.LastCommitMsg, maxInt(8, width-10))))
+	}
+	var who []string
+	if g.Author != "" {
+		who = append(who, g.Author)
+	}
+	if !g.LastCommitDate.IsZero() {
+		who = append(who, "há "+relTime(g.LastCommitDate))
+	}
+	if len(who) > 0 {
+		lines = append(lines, StyleMuted.Render(truncate(strings.Join(who, "  ·  "), width)))
+	}
+
+	var dirty []string
+	if g.Modified > 0 {
+		dirty = append(dirty, fmt.Sprintf("%d modificados", g.Modified))
+	}
+	if g.Staged > 0 {
+		dirty = append(dirty, fmt.Sprintf("%d staged", g.Staged))
+	}
+	if g.Untracked > 0 {
+		dirty = append(dirty, fmt.Sprintf("%d novos", g.Untracked))
+	}
+	if len(dirty) == 0 {
+		lines = append(lines, StyleHealthy.Render("árvore limpa"))
+	} else {
+		lines = append(lines, StyleWarning.Render(truncate(strings.Join(dirty, " · "), width)))
+	}
+	if g.StashCount > 0 {
+		lines = append(lines, StyleMuted.Render(fmt.Sprintf("%d stash", g.StashCount)))
+	}
+	return lines
 }
 
-func (a *App) renderOverviewActionsBox(width, height int) string {
-	return renderActionsBox(width, height,
-		[2]string{"a", "analisar"},
-		[2]string{"h", "status (probes)"},
-		[2]string{"m", "metrics CPU/RAM"},
-		[2]string{"o", "browser"},
-		[2]string{"E", "shell"},
-		[2]string{"3", "containers"},
-		[2]string{"l", "containers/logs"},
-	)
-}
-
-func (a *App) renderOverviewNotesBox(width, height int) string {
-	// ponytail: display-only until notes persist somewhere real
-	lines := []string{
-		StyleMuted.Render("(vazio)"),
-		StyleMuted.Render("notas locais em breve"),
+func projectEnvLabel(p *core.Project) string {
+	if p.Git == nil || p.Git.Branch == "" {
+		return "local"
 	}
-	return renderApiTitledBox("NOTAS", fitExactLines(lines, height-2), width, height, false)
+	b := strings.ToLower(p.Git.Branch)
+	switch {
+	case b == "main" || b == "master" || strings.Contains(b, "prod"):
+		return "Prod"
+	case strings.HasPrefix(b, "des-") || strings.Contains(b, "dev") || b == "develop" || b == "development":
+		return "Dev"
+	case strings.Contains(b, "stag") || strings.Contains(b, "homolog"):
+		return "Stage"
+	default:
+		return truncate(p.Git.Branch, 12)
+	}
 }

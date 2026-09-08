@@ -13,10 +13,6 @@ type deployDoneMsg struct {
 	err error
 }
 
-type lazyGitDoneMsg struct {
-	err error
-}
-
 func (a *App) runDeploy(p *core.Project) tea.Cmd {
 	if p.DeployScript == "" {
 		return nil
@@ -41,18 +37,6 @@ func deployCommand(projectPath, script string) *exec.Cmd {
 		cmd.Dir = projectPath
 	}
 	return cmd
-}
-
-func (a *App) openLazyGit(path string) tea.Cmd {
-	if _, err := exec.LookPath("lazygit"); err != nil {
-		a.statusMsg = "lazygit não encontrado no PATH"
-		return nil
-	}
-	cmd := exec.Command("lazygit")
-	cmd.Dir = path
-	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return lazyGitDoneMsg{err: err}
-	})
 }
 
 func (a *App) openProjectURL(p *core.Project) {

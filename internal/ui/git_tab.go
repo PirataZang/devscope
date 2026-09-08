@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/mattn/go-runewidth"
 )
 
 type gitSubview int
@@ -80,6 +81,11 @@ func (a *App) gitPanelInnerLines() int {
 }
 
 func (a *App) gitBranchColWidth() int {
+	// Durante o render das colunas vale a largura do painel: a.width inclui a
+	// sidebar, e as duas contas divergindo truncavam o texto duas vezes.
+	if a.gitBranchColOverride > 0 {
+		return a.gitBranchColOverride
+	}
 	if a.width <= 0 {
 		return gitBranchColWidthMin
 	}
@@ -94,6 +100,9 @@ func (a *App) gitBranchColWidth() int {
 }
 
 func (a *App) gitCommitColWidth() int {
+	if a.gitCommitColOverride > 0 {
+		return a.gitCommitColOverride
+	}
 	if a.width <= 0 {
 		return 90
 	}
@@ -135,40 +144,136 @@ func (a *App) renderGitTab(p *core.Project) string {
 		viewBranch = g.Branch
 	}
 
-	// Short terminals: stats cards (3 rows) and the filter hint are dropped so
-	// the panels keep enough room — the same numbers live in the header/sidebar.
-	tiny := a.projectTiny()
-	chrome := []string{a.renderGitHeader(current, g, w)}
-	if !tiny {
-		chrome = append(chrome, a.renderGitStatsRow(g, w))
-	}
+	// A linha de contadores custa 1 linha (eram 3 de cards), então fica mesmo
+	// em terminal curto — é ela que diz se há algo para commitar.
+	chrome := []string{a.renderGitHeader(current, g, w), a.renderGitStatsRow(g, w)}
 	chrome = append(chrome, a.renderGitNotifLine())
-	if !tiny || a.gitBranchFilterOn || strings.TrimSpace(a.gitBranchFilter) != "" {
+	// A barra de contadores já anuncia "b filtra branch"; a linha só aparece
+	// quando o filtro está ativo, mostrando o que foi digitado.
+	if a.gitBranchFilterOn || strings.TrimSpace(a.gitBranchFilter) != "" {
 		chrome = append(chrome, a.renderGitBranchFilterLine(w))
 	}
 	chromeH := 0
 	for _, c := range chrome {
 		chromeH += lipgloss.Height(c)
 	}
-	bodyH := maxInt(9, h-chromeH)
+	// A barra de comandos larga substitui a coluna AÇÕES: devolve ~22 colunas
+	// para branches e commits, e um comando escrito por extenso lê melhor do
+	// que "abrir no si…" numa coluna estreita.
+	cmdBar := a.renderGitCommandBar(g, w)
+	bodyH := maxInt(9, h-chromeH-lipgloss.Height(cmdBar))
 
-	logH := maxInt(3, bodyH*28/100)
-	midH := maxInt(3, (bodyH-logH)*40/100)
-	topH := maxInt(3, bodyH-logH-midH)
+	logH := maxInt(3, bodyH*22/100)
+	// A altura de ALTERAÇÕES é medida antes: quando ela colapsa numa dica, a
+	// sobra vai para branches e commits, que são a prioridade da tela.
+	proposedMid := maxInt(4, bodyH*30/100)
+	filesH := a.gitWorkingRowHeight(g, viewBranch, proposedMid)
 
-	cmdW := actionsCmdWidth(w)
-	if cmdW < 20 && w >= 64 {
-		cmdW = 20
+	// Stashes ao lado das alterações: com dezenas deles a lista precisa de
+	// largura para a mensagem, e no rail vertical ela saía toda truncada.
+	stashW, stashH := 0, 0
+	if g.StashCount > 0 && w >= 96 {
+		stashW = minInt(46, maxInt(30, w*34/100))
+		// O painel não herda a altura colapsada das alterações: com dezenas de
+		// stashes, mostrar um só desperdiça a caixa.
+		stashH = minInt(proposedMid, len(g.Stashes)+2)
 	}
-	mainW := maxInt(40, w-cmdW)
-	top := a.renderGitMainColumnsSized(g, viewBranch, mainW, topH)
-	mid := a.renderGitWorkingRow(g, viewBranch, mainW, midH)
-	log := a.renderGitCommandLog(mainW, logH)
-	main := lipgloss.JoinVertical(lipgloss.Left, top, mid, log)
-	side := a.renderGitSideColumn(g, cmdW, lipgloss.Height(main))
+	midH := maxInt(filesH, stashH)
+	topH := maxInt(4, bodyH-logH-midH)
+
+	mid := a.renderGitWorkingRow(g, viewBranch, w-stashW, filesH)
+	if stashW > 0 {
+		mid = lipgloss.JoinHorizontal(lipgloss.Top, mid, a.renderGitStashPanel(g, stashW, stashH))
+	}
+
+	// Branches e commits ocupam a largura inteira — são o que se usa.
+	top := a.renderGitMainColumnsSized(g, viewBranch, w, topH)
+	log := a.renderGitCommandLog(w, logH)
 	a.gitCmdLogRelY = chromeH + topH + midH
-	body := lipgloss.JoinHorizontal(lipgloss.Top, main, side)
+	stack := lipgloss.JoinVertical(lipgloss.Left, top, mid, log)
+	// A barra de comandos fecha a tela; sem isso ela flutuava logo abaixo do
+	// log e sobrava um vão embaixo.
+	if fill := h - chromeH - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
+	}
+	body := lipgloss.JoinVertical(lipgloss.Left, stack, cmdBar)
 	return lipgloss.JoinVertical(lipgloss.Left, append(chrome, body)...)
+}
+
+// renderGitCommandBar: os comandos por extenso numa barra larga. Na coluna
+// AÇÕES de 22 colunas eles saíam cortados ("abrir no si…") e roubavam largura
+// justamente de branches e commits.
+func (a *App) renderGitCommandBar(g *core.GitInfo, width int) string {
+	if a.gitConflictOn {
+		ours := firstNonEmpty(a.gitConflictOurs, "HEAD")
+		theirs := firstNonEmpty(a.gitConflictTheirs, "entrando")
+		return StyleStatusBar.Width(width).Render(fitKeybinds(maxInt(10, width-2),
+			[2]string{"enter", "ver conflito"},
+			[2]string{"o", "ficar com " + truncate(ours, 12)},
+			[2]string{"t", "ficar com " + truncate(theirs, 12)},
+			[2]string{"b", "manter ambas"},
+			[2]string{"c", "continuar"},
+			[2]string{"x", "abortar"},
+		))
+	}
+
+	// Ordem por frequência de uso, não alfabética.
+	items := [][2]string{
+		{"c", "commit"},
+		{"a", "stage"},
+		{"A", "stage tudo"},
+		{"space", "checkout"},
+		{"enter", "detalhe"},
+		{"p", "pull"},
+		{"P", "push"},
+		{"n", "nova branch"},
+		{"x", "cherry-pick"},
+		{"d", "excluir"},
+		{"o", "abrir no site"},
+	}
+	if g.StashCount > 0 {
+		items = append(items, [2]string{"s", "stash"})
+	}
+	// Até duas linhas: a barra estreita não pode esconder comando.
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
+}
+
+// renderGitStashPanel dá largura à mensagem do stash — no rail vertical de 22
+// colunas toda linha virava "stash@{0} WIP o…", que não identifica nada.
+func (a *App) renderGitStashPanel(g *core.GitInfo, width, height int) string {
+	inner := maxInt(10, width-4)
+	viewport := maxInt(1, height-2)
+	lines := make([]string, 0, viewport)
+	for i, st := range g.Stashes {
+		if i >= viewport {
+			lines = append(lines, StyleMuted.Render(fmt.Sprintf("+%d mais antigos", len(g.Stashes)-viewport)))
+			break
+		}
+		ref := StyleAccent.Render(padRight(truncate(st.Ref, 11), 11))
+		lines = append(lines, ref+StyleNormal.Render(truncate(gitStashSubject(st.Message), maxInt(6, inner-12))))
+	}
+	if len(lines) == 0 {
+		lines = append(lines, StyleMuted.Render("(nenhum stash)"))
+	}
+	return renderApiTitledBox(fmt.Sprintf("STASHES (%d)", g.StashCount),
+		fitExactLines(lines, viewport), width, height, false)
+}
+
+// gitStashSubject tira o prefixo "WIP on <branch>:" que se repete em todos e
+// come a largura da mensagem, que é o que distingue um stash do outro.
+func gitStashSubject(msg string) string {
+	msg = strings.TrimSpace(msg)
+	for _, prefix := range []string{"WIP on ", "On "} {
+		if strings.HasPrefix(msg, prefix) {
+			if i := strings.Index(msg, ": "); i >= 0 {
+				rest := strings.TrimSpace(msg[i+2:])
+				if rest != "" {
+					return rest
+				}
+			}
+		}
+	}
+	return msg
 }
 
 func (a *App) renderGitBranchFilterLine(width int) string {
@@ -183,26 +288,52 @@ func (a *App) renderGitBranchFilterLine(width int) string {
 	return StyleMuted.Render(truncate("b filtrar branches · tip: digite parte do nome", maxInt(20, width-2)))
 }
 
+// renderGitHeader segue o padrão de barra de módulo do resto do app: identifica
+// o módulo, o projeto e — o que mais importa aqui — a branch e a sincronia com
+// o remoto, que decidem se você pode dar push.
 func (a *App) renderGitHeader(p *core.Project, g *core.GitInfo, width int) string {
-	path := shortenPath(p.Path)
-	clean := StyleHealthy.Render("✓ clean")
-	if g.Modified > 0 || g.Staged > 0 || g.Untracked > 0 {
-		clean = StyleWarning.Render("● dirty")
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabGit)).Bold(true)
+	left := accent.Render("⑂ GIT")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 22))
 	}
-	remote := compactGitRemote(g.Remote)
-	left := StyleSection.Render("GIT") + StyleMuted.Render("  "+path) + "  " + clean
-	if g.StashCount > 0 {
-		left += StyleMuted.Render(fmt.Sprintf("  stash:%d", g.StashCount))
+	left += "   " + gitBranchChip(g)
+
+	var right []string
+	if remote := compactGitRemote(gitPrimaryRemote(g)); remote != "" {
+		right = append(right, StyleMuted.Render("↗ "+truncate(remote, 34)))
 	}
-	if remote != "" {
-		left += StyleMuted.Render("  ↗ " + truncate(remote, 36))
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	joined := strings.Join(right, StyleMuted.Render("  ·  "))
+	// Sem teto no lado direito o remoto empurrava a branch para fora em tela
+	// estreita — e a branch é a informação que não pode sumir.
+	if lipgloss.Width(left)+lipgloss.Width(joined)+2 > width {
+		joined = StyleMuted.Render(a.now.Format("15:04:05"))
 	}
-	right := StyleMuted.Render("HEAD ") + StyleWarning.Render(g.Branch)
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
+	return joinWithSpacer(truncateVisible(left, width), joined, width)
+}
+
+// gitBranchChip: branch + sincronia. ↑ sozinho é push pendente, ↓ sozinho é
+// pull pendente, os dois juntos são divergência — o caso que dói.
+// gitPrimaryRemote: Remote é a URL do origin, Remotes é a lista completa. Nem
+// sempre os dois vêm preenchidos — a caixa REMOTOS lia a lista, o cabeçalho lia
+// a URL, e sozinho ele perderia o remoto quando só a lista existisse.
+func gitPrimaryRemote(g *core.GitInfo) string {
+	if g == nil {
+		return ""
 	}
-	return left + strings.Repeat(" ", pad) + right
+	if u := strings.TrimSpace(g.Remote); u != "" {
+		return u
+	}
+	for _, r := range g.Remotes {
+		if r.Name == "origin" && r.URL != "" {
+			return r.URL
+		}
+	}
+	if len(g.Remotes) > 0 {
+		return g.Remotes[0].URL
+	}
+	return ""
 }
 
 func compactGitRemote(u string) string {
@@ -210,33 +341,51 @@ func compactGitRemote(u string) string {
 	u = strings.TrimPrefix(u, "http://")
 	u = strings.TrimPrefix(u, "git@")
 	u = strings.TrimSuffix(u, ".git")
-	u = strings.ReplaceAll(u, ":", "/")
-	return u
+	return strings.ReplaceAll(u, ":", "/")
 }
 
+func gitBranchChip(g *core.GitInfo) string {
+	chip := lipgloss.NewStyle().Foreground(ColorAccent).Bold(true).Render("⑂ " + g.Branch)
+	switch {
+	case g.Ahead > 0 && g.Behind > 0:
+		chip += StyleWarning.Render(fmt.Sprintf("  ↑%d ↓%d divergiu", g.Ahead, g.Behind))
+	case g.Ahead > 0:
+		chip += StyleHealthy.Render(fmt.Sprintf("  ↑%d p/ enviar", g.Ahead))
+	case g.Behind > 0:
+		chip += StyleWarning.Render(fmt.Sprintf("  ↓%d p/ trazer", g.Behind))
+	case g.Remote != "":
+		chip += StyleMuted.Render("  em dia")
+	}
+	return chip
+}
+
+// renderGitStatsRow: os seis cards de um valor cada viraram uma linha. Eles
+// repetiam a branch do cabeçalho, o stash do rail e gastavam 3 linhas para
+// mostrar seis números.
 func (a *App) renderGitStatsRow(g *core.GitInfo, width int) string {
-	boxW := maxInt(10, width/6)
-	cards := []struct{ title, value string }{
-		{"BRANCH", g.Branch},
-		{"AHEAD/BEHIND", fmt.Sprintf("↑ %d / ↓ %d", g.Ahead, g.Behind)},
-		{"MODIFIED", fmt.Sprintf("%d", g.Modified)},
-		{"STAGED", fmt.Sprintf("%d", g.Staged)},
-		{"UNTRACKED", fmt.Sprintf("%d", g.Untracked)},
-		{"STASHES", fmt.Sprintf("%d", g.StashCount)},
-	}
-	var parts []string
-	for _, c := range cards {
-		val := StyleNormal.Render(truncate(c.value, boxW-4))
-		if c.title == "BRANCH" {
-			val = StyleWarning.Render(truncate(c.value, boxW-4))
+	var chips []string
+	add := func(st lipgloss.Style, n int, label string) {
+		if n > 0 {
+			chips = append(chips, st.Render(fmt.Sprintf("%d", n))+StyleMuted.Render(" "+label))
 		}
-		if c.title == "AHEAD/BEHIND" && (g.Ahead > 0 || g.Behind > 0) {
-			val = StyleAccent.Render(truncate(c.value, boxW-4))
-		}
-		body := []string{val}
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines(body, 1), boxW, 3, false))
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	add(StyleHealthy, g.Staged, "staged")
+	add(StyleWarning, g.Modified, "modificados")
+	add(StyleAccent, g.Untracked, "novos")
+	add(StyleMuted, g.StashCount, "stash")
+	left := "  "
+	if len(chips) == 0 {
+		left += StyleHealthy.Render("✓ árvore limpa")
+	} else {
+		left += strings.Join(chips, StyleMuted.Render("  ·  "))
+	}
+
+	right := StyleMuted.Render("←→ painéis  ·  ") + StyleKey.Render("b") + StyleMuted.Render(" filtra branch  ·  ") +
+		StyleKey.Render("^g") + StyleMuted.Render(" grafo ")
+	if lipgloss.Width(left)+lipgloss.Width(right)+2 > width {
+		return padRightVisible(left, width)
+	}
+	return joinWithSpacer(left, right, width)
 }
 
 func (a *App) renderGitNotifLine() string {
@@ -260,7 +409,7 @@ func (a *App) renderGitNotifLine() string {
 		if src == "" {
 			src = "?"
 		}
-		return StyleGitCherry.Render("🍒 " + a.gitCherryPickSummary() + " de " + src + " — shift+v cola")
+		return StyleGitCherry.Render("⊕ " + a.gitCherryPickSummary() + " de " + src + " — shift+v cola")
 	case a.gitSelectedCommitCount() > 0:
 		return StyleGitSelected.Render(fmt.Sprintf("✓ %d selected — shift+c copia", a.gitSelectedCommitCount()))
 	case a.gitActionLoading:
@@ -294,7 +443,7 @@ func (a *App) renderGitStatusBar(g *core.GitInfo, viewBranch string) string {
 		parts = append(parts, StyleGitSelected.Render(fmt.Sprintf("%d selected", n)))
 	}
 	if a.gitCherryPickActive {
-		parts = append(parts, StyleGitCherry.Render(fmt.Sprintf("🍒 %d to paste", len(a.gitCherryPickBuffer))))
+		parts = append(parts, StyleGitCherry.Render(fmt.Sprintf("⊕ %d p/ colar", len(a.gitCherryPickBuffer))))
 	}
 	if a.gitMarkedBranch != "" {
 		parts = append(parts, StyleGitMarked.Render("↑ "+a.gitMarkedBranch))
@@ -310,11 +459,19 @@ func (a *App) renderGitMainColumns(g *core.GitInfo, viewBranch string) string {
 }
 
 func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, width, height int) string {
-	branchW := a.gitBranchColWidth()
+	// Branches e commits são o foco da tela: a coluna de branch recebe largura
+	// para o nome inteiro (fix/rotas_financeiro tem 20), e o resto vai para a
+	// mensagem do commit.
+	branchW := minInt(34, maxInt(gitBranchColWidthMin, width*36/100))
 	if branchW > width/2 {
-		branchW = maxInt(14, width/3)
+		branchW = maxInt(gitBranchColWidthMin, width/2)
 	}
 	commitW := maxInt(24, width-branchW)
+
+	a.gitBranchColOverride = branchW
+	a.gitCommitColOverride = commitW
+	defer func() { a.gitBranchColOverride, a.gitCommitColOverride = 0, 0 }()
+
 	// Temporarily size list viewport from height for this render.
 	prevH := a.height
 	// viewport ≈ height - title/scroll chrome (3)
@@ -339,11 +496,26 @@ func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, widt
 	)
 }
 
+// gitWorkingRowHeight devolve a altura real da caixa de alterações: 3 quando
+// só há uma dica para mostrar, o proposto quando há lista para rolar.
+func (a *App) gitWorkingRowHeight(g *core.GitInfo, viewBranch string, proposed int) int {
+	if len(a.gitFileLines(g, viewBranch, maxInt(1, proposed-2))) == 1 {
+		return 3
+	}
+	return proposed
+}
+
 func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, height int) string {
 	filesFocus := a.gitFocus == gitFocusFiles
 	bodyH := height - 2
 	fileLines := a.gitFileLines(g, viewBranch, bodyH)
-	filesTitle := "MODIFIED FILES"
+	// Uma dica de uma linha não justifica uma caixa de nove. Vale tanto para
+	// "working tree limpo" quanto para "checkout da branch para ver WT" —
+	// nos dois casos não há lista para rolar.
+	if len(fileLines) == 1 {
+		bodyH, height = 1, 3
+	}
+	filesTitle := "ALTERAÇÕES"
 	if a.gitConflictOn {
 		n := collectors.GitUnmergedCount(g.Files)
 		if n == 0 {
@@ -484,7 +656,9 @@ func (a *App) focusFirstConflict(g *core.GitInfo) {
 
 func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []string {
 	if viewBranch != g.Branch {
-		return []string{StyleMuted.Render("checkout da branch para ver WT")}
+		return []string{StyleMuted.Render("vendo ") + StyleAccent.Render(viewBranch) +
+			StyleMuted.Render(" · as alterações são de ") + StyleAccent.Render(g.Branch) +
+			StyleMuted.Render(" · space faz checkout")}
 	}
 	if a.gitConflictOn {
 		return a.gitConflictFileLines(g, maxLines)
@@ -573,122 +747,6 @@ func (a *App) gitConflictFileLines(g *core.GitInfo, maxLines int) []string {
 	return lines
 }
 
-func (a *App) renderGitSideColumn(g *core.GitInfo, width, height int) string {
-	if width < 12 {
-		return ""
-	}
-	actH := maxInt(4, height/3)
-	if actH > height-9 {
-		actH = maxInt(4, height-9)
-	}
-	var actions string
-	if a.gitConflictOn {
-		ours := firstNonEmpty(a.gitConflictOurs, "HEAD")
-		theirs := firstNonEmpty(a.gitConflictTheirs, "incoming")
-		actions = renderActionsBox(width, actH,
-			[2]string{"enter/e", "ver conflito"},
-			[2]string{"o", "ours " + truncate(ours, 10)},
-			[2]string{"t", "theirs " + truncate(theirs, 8)},
-			[2]string{"b", "ambas"},
-			[2]string{"c", "continue"},
-			[2]string{"x", "abort"},
-			[2]string{"L", "lazygit"},
-		)
-	} else {
-		actions = renderActionsBox(width, actH,
-			[2]string{"c", "commit"},
-			[2]string{"a/A", "stage"},
-			[2]string{"space", "checkout"},
-			[2]string{"enter", "detail"},
-			[2]string{"x", "cherry"},
-			[2]string{"p/P", "pull/push"},
-			[2]string{"n", "branch"},
-			[2]string{"d", "delete"},
-			[2]string{"b", "filter"},
-			[2]string{"←→", "painéis"},
-			[2]string{"o", "abrir link"},
-			[2]string{"C-g", "graph"},
-		)
-	}
-	used := lipgloss.Height(actions)
-	rest := maxInt(9, height-used)
-	boxH := maxInt(3, rest/3)
-	lastH := maxInt(3, rest-boxH*2)
-
-	inner := maxInt(4, width-4)
-	act := a.gitSideActivityLines(g, boxH-2, inner)
-	stashes := a.gitSideStashLines(g, boxH-2, inner)
-	remotes := a.gitSideRemoteLines(g, lastH-2, inner)
-
-	return lipgloss.JoinVertical(lipgloss.Left,
-		actions,
-		renderApiTitledBox("ACTIVITY", fitExactLines(act, boxH-2), width, boxH, false),
-		renderApiTitledBox("STASHES", fitExactLines(stashes, boxH-2), width, boxH, false),
-		renderApiTitledBox("REMOTES", fitExactLines(remotes, lastH-2), width, lastH, false),
-	)
-}
-
-func (a *App) gitSideActivityLines(g *core.GitInfo, maxLines, inner int) []string {
-	lines := make([]string, 0, maxLines)
-	if len(a.gitActivity) == 0 {
-		if g.LastCommit != "" {
-			lines = append(lines, StyleMuted.Render(truncate("Commit "+g.LastCommit, inner)))
-		} else {
-			lines = append(lines, StyleMuted.Render("(vazio)"))
-		}
-		return lines
-	}
-	for i, e := range a.gitActivity {
-		if i >= maxLines {
-			break
-		}
-		lines = append(lines, StyleNormal.Render(truncate(e, inner)))
-	}
-	return lines
-}
-
-func (a *App) gitSideStashLines(g *core.GitInfo, maxLines, inner int) []string {
-	if len(g.Stashes) == 0 {
-		return []string{StyleMuted.Render("(nenhum)")}
-	}
-	lines := make([]string, 0, maxLines)
-	for i, s := range g.Stashes {
-		if i >= maxLines {
-			break
-		}
-		lines = append(lines, StyleMuted.Render(truncate(s.Ref+" "+s.Message, inner)))
-	}
-	return lines
-}
-
-func (a *App) gitSideRemoteLines(g *core.GitInfo, maxLines, inner int) []string {
-	if len(g.Remotes) == 0 {
-		return []string{StyleMuted.Render("(sem remotes)")}
-	}
-	lines := make([]string, 0, maxLines)
-	for _, r := range g.Remotes {
-		lines = append(lines, StyleWarning.Render(truncate(r.Name, inner)))
-		if len(lines) >= maxLines {
-			break
-		}
-		lines = append(lines, StyleMuted.Render(truncate(compactGitRemote(r.URL), inner)))
-		if len(lines) >= maxLines {
-			break
-		}
-		if r.Name == "origin" || r.Name == g.Remotes[0].Name {
-			sync := "up to date"
-			if g.Ahead > 0 || g.Behind > 0 {
-				sync = fmt.Sprintf("↑%d ↓%d", g.Ahead, g.Behind)
-			}
-			lines = append(lines, StyleMuted.Render(truncate(sync, inner)))
-		}
-		if len(lines) >= maxLines {
-			break
-		}
-	}
-	return lines
-}
-
 func (a *App) gitCommandLogFlatLines() []string {
 	if len(a.gitCommandLog) == 0 {
 		return []string{
@@ -727,7 +785,7 @@ func extractGitURL(s string) string {
 
 func (a *App) renderGitCommandLog(width, height int) string {
 	focus := a.gitFocus == gitFocusCmdLog
-	title := "COMMAND LOG"
+	title := "LOG DE COMANDOS"
 	if focus {
 		title = "> " + title
 	}
@@ -884,63 +942,46 @@ func (a *App) renderGitBranchHistory(p *core.Project) string {
 
 func (a *App) renderGitBranchHistoryHeader(p *core.Project, branch string, width int) string {
 	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabGit)).Bold(true)
-	left := accent.Render("devscope") + StyleMuted.Render(" › git › branch") +
-		StyleMuted.Render("  ") + StyleWarning.Render(truncate(branch, 28))
-	badge := StyleMuted.Render("○")
-	if p != nil && p.Git != nil && p.Git.Branch == branch {
-		badge = StyleHealthy.Render("● HEAD")
+	left := accent.Render("⑂ GIT") + StyleMuted.Render(" › histórico") +
+		StyleMuted.Render("   ") +
+		lipgloss.NewStyle().Foreground(ColorAccent).Bold(true).Render(truncate(branch, 30))
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 22))
 	}
-	n := len(a.gitDisplayedCommits())
-	right := badge + StyleMuted.Render(fmt.Sprintf("  commits:%d", n))
+	// HEAD e contagem ficam na linha de baixo; aqui só o que ela não diz.
+	right := StyleMuted.Render(a.now.Format("15:04:05"))
 	if a.gitBranchLoading {
-		right += StyleMuted.Render("  · atualizando…")
+		right = a.loadingMuted("atualizando…") + StyleMuted.Render("  ·  ") + right
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
+	return joinWithSpacer(truncateVisible(left, width), right, width)
 }
 
+// renderGitBranchHistoryCards: os cinco cards de um valor cada viraram uma
+// linha. BRANCH repetia o cabeçalho logo acima, e TIP/HEAD gastavam 3 linhas
+// para uma palavra.
 func (a *App) renderGitBranchHistoryCards(p *core.Project, branch string, commits []core.GitCommit, width int) string {
-	authors := gitUniqueAuthors(commits)
-	tip := "—"
-	if len(commits) > 0 {
-		tip = commits[0].Date
-		if tip == "" {
-			tip = "—"
+	var chips []string
+	chips = append(chips, StyleNormal.Render(fmt.Sprintf("%d", len(commits)))+StyleMuted.Render(" commits"))
+	if n := len(gitUniqueAuthors(commits)); n > 0 {
+		chips = append(chips, StyleNormal.Render(fmt.Sprintf("%d", n))+StyleMuted.Render(" autores"))
+	}
+	if len(commits) > 0 && commits[0].Date != "" {
+		chips = append(chips, StyleMuted.Render("último há ")+StyleNormal.Render(commits[0].Date))
+	}
+	left := "  " + strings.Join(chips, StyleMuted.Render("  ·  "))
+
+	right := StyleMuted.Render("outra branch")
+	if p != nil && p.Git != nil && p.Git.Branch == branch {
+		right = StyleHealthy.Render("● é a HEAD")
+		if tag := gitSyncTag(p.Git); tag != "" {
+			right += tag
 		}
 	}
-	head := "outra"
-	aheadBehind := "—"
-	if p != nil && p.Git != nil {
-		if p.Git.Branch == branch {
-			head = "sim"
-			aheadBehind = fmt.Sprintf("↑%d ↓%d", p.Git.Ahead, p.Git.Behind)
-		}
+	right += StyleMuted.Render("  ·  ") + StyleKey.Render("esc") + StyleMuted.Render(" volta ")
+	if lipgloss.Width(left)+lipgloss.Width(right)+2 > width {
+		return padRightVisible(left, width)
 	}
-	boxW := maxInt(12, width/5)
-	cards := []struct{ title, value string }{
-		{"BRANCH", branch},
-		{"COMMITS", fmt.Sprintf("%d", len(commits))},
-		{"AUTHORS", fmt.Sprintf("%d", len(authors))},
-		{"TIP", tip},
-		{"HEAD", head + "  " + aheadBehind},
-	}
-	parts := make([]string, 0, len(cards))
-	for _, c := range cards {
-		val := StyleNormal.Render(truncate(c.value, boxW-4))
-		switch c.title {
-		case "BRANCH":
-			val = StyleWarning.Render(truncate(c.value, boxW-4))
-		case "HEAD":
-			if head == "sim" {
-				val = StyleHealthy.Render(truncate(c.value, boxW-4))
-			}
-		}
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{val}, 1), boxW, 3, false))
-	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return joinWithSpacer(left, right, width)
 }
 
 func (a *App) renderGitBranchHistoryTable(commits []core.GitCommit, width, height int) string {
@@ -1816,7 +1857,39 @@ func (a *App) renderGitBranchLine(b core.GitBranch, viewBranch, headBranch strin
 	if viewing {
 		line += StyleAccent.Render(viewTag)
 	}
+	// A branch atual carrega a sincronia; as remotas se identificam como tal.
+	// Sem isso a lista não dizia qual delas tinha algo pendente.
+	if b.Current {
+		if tag := gitSyncTag(a.currentGitInfo()); tag != "" {
+			line += tag
+		}
+	} else if b.Remote {
+		line += StyleMuted.Render(" remoto")
+	}
 	return line
+}
+
+// gitSyncTag é a versão curta do chip de sincronia, para caber na coluna.
+func gitSyncTag(g *core.GitInfo) string {
+	if g == nil {
+		return ""
+	}
+	switch {
+	case g.Ahead > 0 && g.Behind > 0:
+		return StyleWarning.Render(fmt.Sprintf(" ↑%d↓%d", g.Ahead, g.Behind))
+	case g.Ahead > 0:
+		return StyleHealthy.Render(fmt.Sprintf(" ↑%d", g.Ahead))
+	case g.Behind > 0:
+		return StyleWarning.Render(fmt.Sprintf(" ↓%d", g.Behind))
+	}
+	return ""
+}
+
+func (a *App) currentGitInfo() *core.GitInfo {
+	if p := a.currentProject(); p != nil {
+		return p.Git
+	}
+	return nil
 }
 
 func (a *App) renderGitCommits(viewBranch string) string {
@@ -1864,20 +1937,32 @@ func (a *App) renderGitCommitLine(c core.GitCommit, idx int) string {
 
 	marker := ""
 	if cherry {
-		marker = " 🍒"
+		marker = " ⊕" // 🍒 mede 2 colunas e desalinhava a coluna
 	} else if selected {
 		marker = " ✓"
 	}
 
 	colW := maxInt(12, a.gitCommitColWidth()-4)
+	markW := runewidth.StringWidth(marker)
 	var line string
-	if colW < 55 {
-		msgW := maxInt(8, colW-11-len(marker))
-		line = fmt.Sprintf(" %-7s %s%s", truncate(c.Hash, 7), truncate(c.Message, msgW), marker)
-	} else {
-		msgW := colW - 29 - len(marker)
-		line = fmt.Sprintf("  %-9s  %-*s  %s%s",
-			c.Hash, msgW, truncate(c.Message, msgW), truncate(c.Author, 14), marker)
+	switch {
+	case colW < 46:
+		// Só hash curto + mensagem: é o mínimo que identifica um commit.
+		msgW := maxInt(8, colW-9-markW)
+		line = fmt.Sprintf(" %-7s %s%s", truncate(c.Hash, 7), padRight(truncate(c.Message, msgW), msgW), marker)
+	case colW < 72:
+		// "há quanto tempo" vale mais que o autor quando o espaço é curto.
+		dateW := 6
+		msgW := maxInt(10, colW-11-dateW-markW)
+		line = fmt.Sprintf(" %-7s %s %s%s", truncate(c.Hash, 7),
+			padRight(truncate(c.Message, msgW), msgW), padLeft(truncate(c.Date, dateW), dateW), marker)
+	default:
+		authorW, dateW := 12, 6
+		msgW := maxInt(12, colW-13-authorW-dateW-markW)
+		line = fmt.Sprintf("  %-8s %s %s %s%s", truncate(c.Hash, 8),
+			padRight(truncate(c.Message, msgW), msgW),
+			padRight(truncate(c.Author, authorW), authorW),
+			padLeft(truncate(c.Date, dateW), dateW), marker)
 	}
 	line = truncate(line, colW)
 

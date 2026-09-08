@@ -24,9 +24,7 @@ const (
 	TabContainers
 	TabKubernetes
 	TabSwarm
-	TabHealth
 	TabLogs
-	TabMetrics
 	TabAPI
 	TabDatabase
 	TabJSON
@@ -53,12 +51,8 @@ func (t Tab) String() string {
 		return "Kubernetes"
 	case TabSwarm:
 		return "Swarm"
-	case TabHealth:
-		return "Status"
 	case TabLogs:
 		return "Logs"
-	case TabMetrics:
-		return "Metrics"
 	case TabAPI:
 		return "API"
 	case TabDatabase:
@@ -90,7 +84,7 @@ func (t Tab) String() string {
 
 // AllTabs follows sidebar order (WATCH → SCOPE → AUTOMATION → MANAGER → TUNNEL → TOOLS).
 var AllTabs = []Tab{
-	TabOverview, TabMetrics, TabHealth,
+	TabOverview,
 	TabGit, TabContainers,
 	TabActions, TabJenkins,
 	TabSwarm, TabKubernetes,

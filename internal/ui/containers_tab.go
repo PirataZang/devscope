@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 
@@ -185,86 +186,176 @@ func (a *App) renderContainerList(p *core.Project) string {
 		return renderApiTitledBox("CONTAINERS", fitExactLines(msg, h-2), w, h, true)
 	}
 
-	running, stopped, missing := 0, 0, 0
-	for _, c := range containers {
-		switch strings.ToLower(c.Status) {
-		case "running":
-			running++
-		case "missing":
-			missing++
-		default:
-			stopped++
-		}
-	}
-
-	header := a.renderContainersHeader(p, running, stopped, missing, w)
-	stats := a.renderContainersStatsRow(p, w)
-	search := a.renderContainersSearch(w)
+	header := a.renderContainersHeader(p, w)
+	strip := a.renderContainersStrip(containers, w)
 	notif := a.renderContainersNotif()
-	chromeH := lipgloss.Height(header) + lipgloss.Height(stats) + lipgloss.Height(search) + lipgloss.Height(notif) + 1
-	bodyH := maxInt(10, h-chromeH-1)
-	// AÇÕES tem muitos atalhos — reserva altura pra não cortar a lista.
-	actionsNeed := len(a.containerActionItems()) + 3
-	bottomH := maxInt(actionsNeed, bodyH*36/100)
-	if bottomH > bodyH-6 {
-		bottomH = maxInt(actionsNeed, bodyH-6)
-	}
-	if bottomH > bodyH {
-		bottomH = bodyH
-	}
+	// A coluna AÇÕES de 30 colunas guardava 17 atalhos cortados; virou barra
+	// larga no rodapé, como no Git.
+	cmdBar := a.renderContainersCommandBar(w)
+	chromeH := lipgloss.Height(header) + lipgloss.Height(strip) + lipgloss.Height(notif) + 1
+	bodyH := maxInt(10, h-chromeH-lipgloss.Height(cmdBar))
+	bottomH := maxInt(6, bodyH*34/100)
 	tableH := maxInt(6, bodyH-bottomH)
 
 	table := a.renderContainersTable(containers, w, tableH)
 	bottom := a.renderContainersBottom(w, bottomH)
 
-	return lipgloss.JoinVertical(lipgloss.Left, header, stats, search, notif, table, bottom)
+	stack := lipgloss.JoinVertical(lipgloss.Left, table, bottom)
+	if fill := h - chromeH - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
+		stack += strings.Repeat("\n", fill)
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, header, strip, notif, stack, cmdBar)
 }
 
-func (a *App) renderContainersHeader(p *core.Project, running, stopped, missing, width int) string {
-	scope := StyleMuted.Render("  " + shortenPath(p.Path))
+func (a *App) renderContainersHeader(p *core.Project, width int) string {
+	accent := lipgloss.NewStyle().Foreground(tabAccentColor(TabContainers)).Bold(true)
+	left := accent.Render("▣ CONTAINERS")
+	if p != nil && p.Name != "" {
+		left += StyleMuted.Render("   " + truncate(p.Name, 24))
+	}
 	if a.containerShowAll {
-		scope = StyleAccent.Render("  TODOS + ÓRFÃOS")
+		left += "   " + StyleAccent.Render("todos os projetos + órfãos")
 	}
 	if a.containerOnlyDocker {
-		scope += StyleAccent.Render(" · só docker")
+		left += StyleMuted.Render("   só docker")
 	}
-	left := StyleSection.Render("CONTAINERS") + scope
-	right := StyleHealthy.Render(fmt.Sprintf("%d running", running)) + StyleMuted.Render("  ") + StyleStopped.Render(fmt.Sprintf("%d stopped", stopped))
-	if missing > 0 && !a.containerOnlyDocker {
-		right += StyleMuted.Render("  ") + StyleWarning.Render(fmt.Sprintf("%d missing", missing))
+
+	var right []string
+	if p != nil && p.HasDockerCompose {
+		right = append(right, StyleMuted.Render("compose"))
 	}
-	if n := len(a.snapshot.OrphanContainers); a.containerShowAll && n > 0 {
-		right += StyleMuted.Render("  ") + StyleWarning.Render(fmt.Sprintf("%d orphan", n))
+	if a.projectDockerLoading {
+		right = append(right, a.loadingMuted("atualizando…"))
 	}
-	pad := width - lipgloss.Width(stripANSI(left)) - lipgloss.Width(stripANSI(right)) - 1
-	if pad < 1 {
-		pad = 1
-	}
-	return left + strings.Repeat(" ", pad) + right
+	right = append(right, StyleMuted.Render(a.now.Format("15:04:05")))
+	return joinWithSpacer(truncateVisible(left, width), strings.Join(right, StyleMuted.Render("  ·  ")), width)
 }
 
-func (a *App) renderContainersStatsRow(p *core.Project, width int) string {
-	host := a.snapshot.HostMetrics
-	cpu := host.CPUPercent
-	if p.Metrics.CPUPercent > 0 {
-		cpu = p.Metrics.CPUPercent
+// renderContainersStrip: as quatro caixas CPU/RAM/DISK/NET mostravam métrica do
+// HOST — que é assunto do dashboard, e aqui aparecia como DISK 0% / NET —.
+// No lugar entram os contadores por estado, que é o que se olha numa lista de
+// containers, e a linha de busca.
+func (a *App) renderContainersStrip(containers []core.Container, width int) string {
+	running, restarting, unhealthy, stopped, paused := containerCounts(containers)
+	var chips []string
+	add := func(st lipgloss.Style, level pulseLevel, n int, label string) {
+		if n > 0 {
+			chips = append(chips, st.Render(fmt.Sprintf("%s %d", pulseGlyph(level, a.animFrame), n))+
+				StyleMuted.Render(" "+label))
+		}
 	}
-	ram := fmt.Sprintf("%.0f%%", host.MemoryPercent)
-	if p.Metrics.MemoryMB > 0 {
-		ram = fmt.Sprintf("%dM", p.Metrics.MemoryMB)
+	add(StyleHealthy, pulseOK, running, "no ar")
+	add(StyleWarning, pulseWarn, restarting, "reiniciando")
+	add(StyleUnhealthy, pulseBad, unhealthy, "unhealthy")
+	add(StyleWarning, pulseWarn, paused, "pausado")
+	add(StyleMuted, pulseBad, stopped, "parado")
+	if n := len(a.snapshot.OrphanContainers); a.containerShowAll && n > 0 {
+		chips = append(chips, StyleWarning.Render(fmt.Sprintf("%d órfãos", n)))
 	}
-	boxW := maxInt(10, width/4)
-	cards := []struct{ title, value string }{
-		{"CPU", fmt.Sprintf("%.1f%%", cpu)},
-		{"RAM", ram},
-		{"DISK", fmt.Sprintf("%.0f%%", host.DiskPercent)},
-		{"NET", a.containerNetSummary()},
+	left := "  "
+	if len(chips) == 0 {
+		left += StyleMuted.Render("nenhum container")
+	} else {
+		left += strings.Join(chips, StyleMuted.Render("  ·  "))
 	}
-	var parts []string
-	for _, c := range cards {
-		parts = append(parts, renderApiTitledBox(c.title, fitExactLines([]string{StyleNormal.Render(truncate(c.value, boxW-4))}, 1), boxW, 3, false))
+
+	right := a.containersFilterLabel()
+	if lipgloss.Width(left)+lipgloss.Width(right)+2 > width {
+		return padRightVisible(left, width)
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return joinWithSpacer(left, right, width)
+}
+
+func (a *App) containersFilterLabel() string {
+	switch {
+	case a.containerFilterOn:
+		return StyleKey.Render("/ ") + StyleSelected.Render(a.containerFilterInput+"▌") + " "
+	case a.containerFilter != "":
+		return StyleMuted.Render("filtro ") + StyleNormal.Render(a.containerFilter) +
+			StyleMuted.Render("  esc limpa ")
+	default:
+		return StyleKey.Render("/") + StyleMuted.Render(" buscar  ·  ") +
+			StyleKey.Render("A") + StyleMuted.Render(" escopo  ·  ") +
+			StyleKey.Render("g") + StyleMuted.Render(" métrica ")
+	}
+}
+
+// containerCounts classifica pelo State do docker. A contagem antiga comparava
+// c.Status ("Up 2 days") com "running" e por isso dizia sempre "0 running".
+func containerCounts(containers []core.Container) (running, restarting, unhealthy, stopped, paused int) {
+	for _, c := range containers {
+		if strings.EqualFold(c.Health, "unhealthy") {
+			unhealthy++
+			continue
+		}
+		switch containerStateKind(c) {
+		case "running":
+			running++
+		case "restarting":
+			restarting++
+		case "paused":
+			paused++
+		default: // exited, created, missing — nenhum está no ar
+			stopped++
+		}
+	}
+	return
+}
+
+// containerStateKind normaliza State/Status num dos estados que a tela mostra.
+func containerStateKind(c core.Container) string {
+	s := strings.ToLower(strings.TrimSpace(c.State))
+	if s == "" {
+		s = strings.ToLower(c.Status)
+	}
+	switch {
+	case strings.Contains(s, "restart"):
+		return "restarting"
+	case strings.Contains(s, "paus"):
+		return "paused"
+	case strings.Contains(s, "created"):
+		return "created" // nunca subiu: é diferente de ter subido e caído
+	case strings.Contains(s, "missing"):
+		return "missing"
+	case strings.Contains(s, "exit"), strings.Contains(s, "dead"):
+		return "stopped"
+	case strings.Contains(s, "run"), strings.HasPrefix(s, "up "):
+		return "running"
+	default:
+		return "stopped"
+	}
+}
+
+// renderContainersCommandBar: os 17 atalhos por extenso numa barra larga, em
+// até duas linhas. Na coluna de 30 colunas saíam "r start/rest" e "S-R ∞/off".
+func (a *App) renderContainersCommandBar(width int) string {
+	scope := "todos os projetos"
+	if a.containerShowAll {
+		scope = "só este projeto"
+	}
+	only := "só docker"
+	if a.containerOnlyDocker {
+		only = "incluir ausentes"
+	}
+	items := [][2]string{
+		{"enter", "portas"},
+		{"m", "detalhe"},
+		{"e", "shell"},
+		{"r", "iniciar"},
+		{"s", "parar"},
+		{"R", "reiniciar"},
+		{"p", "pausar"},
+		{"d", "remover"},
+		{"i", "imagens"},
+		{"n", "novo svc"},
+		{"S-R", "reinício ∞/off"},
+		{"S-U", "compose ↑"},
+		{"S-D", "compose ↓"},
+		{"^g", "deps"},
+		{"A", scope},
+		{"v", only},
+	}
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
 
 func (a *App) containerNetSummary() string {
@@ -302,6 +393,8 @@ func (a *App) renderContainersNotif() string {
 }
 
 func (a *App) renderContainersTable(containers []core.Container, width, height int) string {
+	a.containerTableWidth = maxInt(20, width-3)
+	defer func() { a.containerTableWidth = 0 }()
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2) // header + separator
 	if len(containers) == 0 {
@@ -311,9 +404,9 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 	start := a.containerScroll
 	end := minInt(start+viewport, len(containers))
 
-	lines := []string{a.renderContainerHeader(), StyleMuted.Render(strings.Repeat("─", maxInt(20, width-6)))}
+	lines := []string{a.renderContainerHeader(), StyleMuted.Render(strings.Repeat("─", maxInt(20, width-2)))}
 	if start > 0 {
-		lines[1] = StyleMuted.Render(fmt.Sprintf("↑ %d  ", start) + strings.Repeat("─", maxInt(10, width-14)))
+		lines[1] = StyleMuted.Render(fmt.Sprintf("↑ %d  ", start) + strings.Repeat("─", maxInt(10, width-10)))
 	}
 	for i := start; i < end; i++ {
 		lines = append(lines, a.renderContainerRow(containers[i], i == a.tabCursor))
@@ -379,10 +472,9 @@ func containersActionsWidth(total int) int {
 }
 
 func (a *App) renderContainersBottom(width, height int) string {
-	cmdW := containersActionsWidth(width)
-	rest := maxInt(12, width-cmdW)
-	w1 := maxInt(10, rest*42/100)
-	w2 := maxInt(10, rest*30/100)
+	rest := maxInt(12, width)
+	w1 := maxInt(10, rest*46/100)
+	w2 := maxInt(10, rest*28/100)
 	w3 := maxInt(10, rest-w1-w2)
 	// Keep columns exact so JoinHorizontal never wraps the terminal line.
 	if w1+w2+w3 > rest {
@@ -406,9 +498,8 @@ func (a *App) renderContainersBottom(width, height int) string {
 		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
 		renderApiTitledBox("PORTAS", fitExactLines(ports, inner), w3, height, false),
 	}
-	if cmdW >= 12 {
-		// Usa a altura completa do rodapé — não deixa o box encolher e cortar atalhos.
-		parts = append(parts, renderContainersActionsBox(cmdW, height, actions...))
+	if false {
+		parts = append(parts, renderContainersActionsBox(0, height, actions...))
 	}
 	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
 }
@@ -522,14 +613,15 @@ func (a *App) containerPreviewStatLines(maxLines, width int) []string {
 }
 
 // renderMetricSparkline: maxHint>0 scales against that ceiling; 0 = relative to window max.
+// renderMetricSparkline usa o Braille do resto do app: cada célula carrega duas
+// amostras, então mostra o dobro de histórico das barras de bloco que havia
+// aqui — e o vocabulário fica igual ao do dashboard.
 func renderMetricSparkline(hist []float64, width int, maxHint float64) string {
-	n := maxInt(8, width)
+	cells := maxInt(4, width)
 	if len(hist) == 0 {
-		return strings.Repeat("·", n)
+		return brailleSpark(nil, cells)
 	}
-	if len(hist) > n {
-		hist = hist[len(hist)-n:]
-	}
+	// NET não tem teto fixo: normaliza pelo pico da própria janela.
 	maxV := maxHint
 	if maxV <= 0 {
 		for _, v := range hist {
@@ -541,22 +633,11 @@ func renderMetricSparkline(hist []float64, width int, maxHint float64) string {
 			maxV = 1
 		}
 	}
-	bars := []rune("▁▂▃▄▅▆▇█")
-	var b strings.Builder
+	pct := make([]float64, 0, len(hist))
 	for _, v := range hist {
-		idx := int(v / maxV * float64(len(bars)-1))
-		if idx < 0 {
-			idx = 0
-		}
-		if idx >= len(bars) {
-			idx = len(bars) - 1
-		}
-		b.WriteRune(bars[idx])
+		pct = append(pct, v/maxV*100)
 	}
-	for i := len(hist); i < n; i++ {
-		b.WriteRune('·')
-	}
-	return b.String()
+	return brailleSpark(pct, cells)
 }
 
 func formatNetKB(kb float64) string {
@@ -770,122 +851,335 @@ func (a *App) containerProjectLabel(c core.Container) string {
 }
 
 func (a *App) renderContainerRow(c core.Container, selected bool) string {
-	style := StyleNormal
-	if selected {
-		style = StyleSelected
-	}
 	cols := a.containerColumns()
-	gap := lipgloss.NewStyle().Width(1).Render("")
-	cell := func(width int, text string) string {
-		return style.Width(width).MaxWidth(width).Render(truncate(text, width))
+	wave, waveStyle, stateLabel, stateStyle := a.containerStateVisual(c)
+	if cols.dot < containerWaveWidth {
+		wave = statusWave(containerStateWaveKind(a, c), maxInt(2, cols.dot*2), a.animFrame)
 	}
-	state := a.containerStateCell(c, selected)
-	parts := []string{
-		lipgloss.NewStyle().Width(1).Render(""),
-		state,
-		gap,
+
+	nameStyle := StyleNormal.Bold(true)
+	if !a.containerBelongsToOpenProject(c) {
+		nameStyle = StyleNormal
 	}
-	if cols.project > 0 {
-		projStyle := style
-		if !selected {
-			if p := a.currentProject(); p != nil && c.ProjectPath != "" && pathsMatch(p.Path, c.ProjectPath) {
-				projStyle = StyleAccent
-			} else {
-				projStyle = StyleWarning
-			}
-		}
-		parts = append(parts, projStyle.Width(cols.project).MaxWidth(cols.project).Render(truncate(a.containerProjectLabel(c), cols.project)), gap)
-	}
-	nameCell := cell(cols.name, c.Name)
+	// A faixa azul já marca a política; o ∞ no nome só confirma sem repintar.
+	name := c.Name
 	if containerRestartAlways(c) {
-		nameStyle := StyleAccent
-		if selected {
-			nameStyle = StyleSelected
+		name = "∞ " + name
+	}
+
+	cells := []dashCell{
+		{text: wave, width: cols.dot, style: waveStyle},
+		{text: stateLabel, width: cols.state, style: stateStyle},
+		{text: a.containerProjectLabel(c), width: cols.project, style: a.containerProjectStyle(c)},
+		{text: name, width: cols.name, style: nameStyle},
+		{text: elideLeft(c.Image, maxInt(1, cols.image)), width: cols.image, style: StyleMuted},
+		{text: containerPortsLabel(c), width: cols.ports, style: lipgloss.NewStyle().Foreground(ColorAccent)},
+		{text: containerCPULabel(c), width: cols.cpu, style: StyleMuted, right: true},
+		{text: formatContainerMem(c.Memory), width: cols.mem, style: StyleMuted, right: true},
+		// Era o State cru ("running") sob o título UPTIME; agora é o tempo de
+		// fato, tirado do Status do docker.
+		{text: containerUptimeLabel(c), width: cols.uptime, style: StyleMuted, right: true},
+	}
+	return " " + renderCells(selected, cells)
+}
+
+// containerWaveCols são as COLUNAS DE PONTO da faixa de status: cada caractere
+// Braille tem 2, então 10 pontos ocupam 5 caracteres no terminal. Com 2 pontos
+// (um caractere só) não havia forma suficiente para separar seis estados.
+const (
+	containerWaveCols  = 10
+	containerWaveWidth = containerWaveCols / 2 // largura em caracteres
+)
+
+// containerStateVisual devolve a faixa de status, a palavra e a cor.
+//
+// A FORMA diz o estado:
+//
+//	running     onda que sobe e desce, caminhando  (está trabalhando)
+//	unhealthy   linha plana que respira baixo      (está no ar, mas mal)
+//	restarting  linha baixa com um pico caminhando (algo atravessando)
+//	paused      todas as colunas iguais, paradas   (congelado)
+//	exited      todas rasteiras, paradas           (sem energia)
+//
+// A COR diz a gravidade: verde no ar, amarelo atenção, vermelho parado,
+// cinza nunca subiu. E azul quando a política é `always`, que se sobrepõe.
+func (a *App) containerStateVisual(c core.Container) (wave string, waveStyle lipgloss.Style, label string, labelStyle lipgloss.Style) {
+	kind, label, style := a.containerStateKindLabel(c)
+	wave = statusWave(kind, containerWaveCols, a.animFrame)
+	waveStyle = style
+	// `always` repinta só a FAIXA: a política é propriedade do container, o
+	// estado é do momento. Pintar a palavra também apagaria o estado.
+	if containerRestartAlways(c) {
+		waveStyle = lipgloss.NewStyle().Foreground(ColorAccent).Bold(true)
+	}
+	return wave, waveStyle, label, style
+}
+
+func clampWave(h int) int {
+	if h < 1 {
+		return 1
+	}
+	if h > 4 {
+		return 4
+	}
+	return h
+}
+
+// containerProjectStyle pinta de amarelo o container que NÃO é do projeto
+// aberto. Com Shift+A a lista mistura tudo que roda na máquina, e sem essa
+// distinção não dá para saber em qual projeto você está prestes a agir.
+func (a *App) containerProjectStyle(c core.Container) lipgloss.Style {
+	if a.containerBelongsToOpenProject(c) {
+		return StyleAccent
+	}
+	return StyleWarning
+}
+
+func (a *App) containerBelongsToOpenProject(c core.Container) bool {
+	p := a.currentProject()
+	if p == nil {
+		return true
+	}
+	if c.ProjectPath == "" {
+		// Órfão do docker: não é de projeto nenhum, muito menos deste.
+		return false
+	}
+	return pathsMatch(p.Path, c.ProjectPath)
+}
+
+func containerStateWaveKind(a *App, c core.Container) string {
+	kind, _, _ := a.containerStateKindLabel(c)
+	return kind
+}
+
+func (a *App) containerStateKindLabel(c core.Container) (kind, label string, style lipgloss.Style) {
+	// Ação pendente primeiro: é o retorno do comando que você acabou de dar.
+	if k := a.containerActionKind(c.Name); k != "" {
+		switch k {
+		case "stop":
+			return "stopping", "stopping", StyleWarning
+		case "start":
+			return "starting", "starting", StyleAccent
+		case "restart":
+			return "restarting", "restarting", StyleWarning
+		case "pause":
+			return "stopping", "pausing", StyleWarning
+		case "unpause":
+			return "starting", "resuming", StyleAccent
+		case "always":
+			return "restarting", "∞ always", StyleAccent
+		case "no-always":
+			return "restarting", "∞ off", StyleAccent
+		default:
+			return "restarting", truncate(k, 11), StyleWarning
 		}
-		nameCell = nameStyle.Width(cols.name).MaxWidth(cols.name).Render(truncate("∞ "+c.Name, cols.name))
 	}
-	parts = append(parts,
-		nameCell,
-		gap,
-		cell(cols.image, c.Image),
-	)
-	if cols.ports > 0 {
-		parts = append(parts, gap, cell(cols.ports, c.Ports))
+	if strings.EqualFold(c.Health, "unhealthy") {
+		return "unhealthy", "unhealthy", StyleWarning
 	}
-	if cols.cpu > 0 {
-		parts = append(parts, gap, cell(cols.cpu, fmt.Sprintf("%.1f%%", c.CPU)))
+	switch containerStateKind(c) {
+	case "running":
+		return "running", "running", StyleRunning
+	case "restarting":
+		return "restarting", "restarting", StyleWarning
+	case "paused":
+		return "paused", "paused", StyleWarning
+	case "created":
+		return "created", "created", StyleMuted
+	case "missing":
+		return "paused", "missing", StyleWarning
+	default:
+		return "exited", "exited", StyleStopped
 	}
-	if cols.mem > 0 {
-		parts = append(parts, gap, cell(cols.mem, formatContainerMem(c.Memory)))
+}
+
+// containerWave desenha a faixa de cada estado. As formas são disjuntas: em
+// qualquer quadro dá para separar os três amarelos só pelo desenho.
+func containerWave(kind string, cells, frame int) string {
+	cols := cells * 2
+	if frame < 0 {
+		frame = -frame
 	}
-	if cols.uptime > 0 {
-		parts = append(parts, gap, cell(cols.uptime, compactContainerUptime(c.State)))
+	switch kind {
+	case "running":
+		// Onda caminhando, meia altura: entre 1 e 4, centrada em 2.
+		return brailleWave(cells, func(col int) int {
+			return clampWave(2 + int(math.Round(1.6*math.Sin(float64(col+frame)/1.7))))
+		})
+	case "unhealthy":
+		// Plana e uniforme, respirando junto: está no ar, mas sem saúde.
+		// Fica acima das rasteiras (exited/created) e abaixo da travada.
+		return brailleWave(cells, func(int) int { return 2 + (frame/4)%2 })
+	case "restarting":
+		// Base rasteira com um pico atravessando: algo em trânsito.
+		peak := frame % cols
+		return brailleWave(cells, func(col int) int {
+			switch d := ((col-peak)%cols + cols) % cols; {
+			case d == 0:
+				return 4
+			case d == 1 || d == cols-1:
+				return 2
+			default:
+				return 1
+			}
+		})
+	case "paused":
+		// Todas no mesmo tamanho e imóveis: congelado.
+		return brailleWave(cells, func(int) int { return 4 })
+	case "created":
+		return brailleWave(cells, func(int) int { return 1 })
+	default: // exited
+		return brailleWave(cells, func(int) int { return 1 })
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+func containerCPULabel(c core.Container) string {
+	if containerStateKind(c) != "running" {
+		return emDash
+	}
+	return fmt.Sprintf("%.1f%%", c.CPU)
+}
+
+func containerPortsLabel(c core.Container) string {
+	maps := collectors.ParseContainerPortMappings(c.Ports)
+	if len(maps) == 0 {
+		if strings.TrimSpace(c.Ports) == "" {
+			return emDash
+		}
+		return c.Ports
+	}
+	seen := make(map[int]bool, len(maps))
+	parts := make([]string, 0, 3)
+	for _, m := range maps {
+		if seen[m.HostPort] {
+			continue
+		}
+		seen[m.HostPort] = true
+		if len(parts) == 3 {
+			parts = append(parts, fmt.Sprintf("+%d", len(maps)-3))
+			break
+		}
+		parts = append(parts, fmt.Sprintf(":%d", m.HostPort))
+	}
+	return strings.Join(parts, " ")
+}
+
+// containerUptimeLabel extrai o tempo do Status do docker, que vem em vários
+// formatos: "Up 2 days", "Up 2 days (healthy)", "Exited (0) 3 hours ago",
+// "Restarting (1) 12 seconds ago", "About a minute".
+func containerUptimeLabel(c core.Container) string {
+	s := strings.TrimSpace(c.Status)
+	if s == "" {
+		return emDash
+	}
+	// "Exited (0) 3 hours ago" → "3 hours ago"
+	if i := strings.Index(s, ") "); i > 0 && strings.Contains(s[:i], "(") {
+		s = s[i+2:]
+	}
+	s = strings.TrimPrefix(s, "Up ")
+	// "2 days (healthy)" → "2 days"
+	if j := strings.Index(s, " ("); j > 0 {
+		s = s[:j]
+	}
+	s = strings.TrimSuffix(s, " ago")
+	s = strings.TrimPrefix(s, "About ")
+	s = strings.TrimPrefix(s, "Less than ")
+	s = strings.TrimSpace(s)
+	for _, one := range []string{"a ", "an ", "A ", "An "} {
+		if strings.HasPrefix(s, one) {
+			s = "1 " + strings.TrimPrefix(s, one)
+			break
+		}
+	}
+	// "Created", "Paused" e afins não carregam duração nenhuma.
+	if !strings.ContainsAny(s, "0123456789") {
+		return emDash
+	}
+	return compactDuration(s)
+}
+
+// compactDuration: "2 days" → "2d", "12 seconds" → "12s". A coluna tem 9
+// colunas; por extenso não cabe nem "3 minutes".
+func compactDuration(s string) string {
+	f := strings.Fields(s)
+	if len(f) != 2 {
+		return truncate(s, 9)
+	}
+	n := f[0]
+	if n == "a" || n == "an" || n == "A" || n == "An" {
+		n = "1"
+	}
+	short := map[string]string{
+		"second": "s", "minute": "min", "hour": "h",
+		"day": "d", "week": "sem", "month": "mes", "year": "a",
+	}
+	if u, ok := short[strings.TrimSuffix(strings.ToLower(f[1]), "s")]; ok {
+		return n + u
+	}
+	return truncate(s, 9)
 }
 
 type containerCols struct {
-	state, project, name, image, ports, cpu, mem, uptime int
+	dot, state, project, name, image, ports, cpu, mem, uptime int
 }
 
+// containerColumns distribui a largura do painel. Antes derivava de a.width
+// (terminal inteiro, com a sidebar), e o texto era dimensionado por uma conta
+// e cortado por outra.
 func (a *App) containerColumns() containerCols {
-	tableWidth := maxInt(38, a.width-8)
-	cols := containerCols{state: 10} // room for "∞always"
-	flexible := tableWidth - 1 - cols.state - 2
+	tableWidth := a.containerTableWidth
+	if tableWidth <= 0 {
+		tableWidth = maxInt(38, a.width-8)
+	}
+	cols := containerCols{dot: containerWaveWidth, state: 12}
+	if tableWidth < 92 {
+		cols.state = 0 // a faixa já diz o estado; a palavra volta quando couber
+	}
+	if tableWidth < 64 {
+		cols.dot = 3 // faixa curta: 3 células ainda mostram a forma
+	}
+	flexible := tableWidth - cols.dot - cols.state - 3
 	if a.containerShowAll {
-		cols.project = maxInt(10, flexible*18/100)
+		cols.project = maxInt(10, flexible*16/100)
 		flexible -= cols.project + 1
 	}
-	if a.width < 90 {
-		cols.name = flexible * 40 / 100
-		cols.image = flexible - cols.name
+	if tableWidth < 82 {
+		cols.name = maxInt(12, flexible*45/100)
+		cols.image = maxInt(10, flexible-cols.name-1)
 		return cols
 	}
-	cols.cpu = 6
-	cols.mem = 6
-	cols.uptime = 8
+	cols.cpu, cols.mem, cols.uptime = 6, 7, 9
 	flexible -= cols.cpu + cols.mem + cols.uptime + 3
-	cols.name = flexible * 28 / 100
-	cols.image = flexible * 28 / 100
-	cols.ports = flexible - cols.name - cols.image
-	if cols.ports < 8 {
+	cols.name = minInt(24, maxInt(12, flexible*30/100))
+	cols.image = minInt(30, maxInt(12, flexible*32/100))
+	cols.ports = flexible - cols.name - cols.image - 2
+	if cols.ports < 10 {
 		cols.ports = 0
-		cols.name = flexible * 40 / 100
-		cols.image = flexible - cols.name
+		cols.name = maxInt(12, flexible*45/100)
+		cols.image = maxInt(12, flexible-cols.name-1)
 	}
 	return cols
 }
 
 func (a *App) renderContainerHeader() string {
 	cols := a.containerColumns()
-	style := StyleTableHeader
-	gap := lipgloss.NewStyle().Width(1).Render("")
-	parts := []string{
-		lipgloss.NewStyle().Width(1).Render(""),
-		style.Width(cols.state).Render("STATE"),
-		gap,
+	head := StyleMuted.Bold(true)
+	cell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padRight(truncate(t, n), n))
 	}
-	if cols.project > 0 {
-		parts = append(parts, style.Width(cols.project).Render("PROJECT"), gap)
+	rcell := func(t string, n int) string {
+		if n <= 0 {
+			return ""
+		}
+		return head.Render(padLeft(truncate(t, n), n))
 	}
-	parts = append(parts,
-		style.Width(cols.name).Render("NAME"),
-		gap,
-		style.Width(cols.image).Render("IMAGE"),
-	)
-	if cols.ports > 0 {
-		parts = append(parts, gap, style.Width(cols.ports).Render("PORTS"))
-	}
-	if cols.cpu > 0 {
-		parts = append(parts, gap, style.Width(cols.cpu).Render("CPU"))
-	}
-	if cols.mem > 0 {
-		parts = append(parts, gap, style.Width(cols.mem).Render("MEM"))
-	}
-	if cols.uptime > 0 {
-		parts = append(parts, gap, style.Width(cols.uptime).Render("UPTIME"))
-	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return " " + joinNonEmpty(" ",
+		cell("", cols.dot), cell("ESTADO", cols.state), cell("PROJETO", cols.project),
+		cell("NOME", cols.name), cell("IMAGEM", cols.image), cell("PORTAS", cols.ports),
+		rcell("CPU", cols.cpu), rcell("MEM", cols.mem), rcell("TEMPO", cols.uptime))
 }
 
 func compactContainerUptime(state string) string {
@@ -901,81 +1195,6 @@ func compactContainerUptime(state string) string {
 
 func containerRestartAlways(c core.Container) bool {
 	return strings.EqualFold(strings.TrimSpace(c.Restart), "always")
-}
-
-func (a *App) containerStateCell(c core.Container, selected bool) string {
-	width := a.containerColumns().state
-	if kind := a.containerActionKind(c.Name); kind != "" {
-		var label string
-		switch kind {
-		case "stop":
-			label = "◌ stop"
-		case "start":
-			label = "▶ start"
-		case "restart":
-			label = "⟳ rest"
-		case "always":
-			label = "∞ always"
-		case "no-always":
-			label = "○ no"
-		case "pause":
-			label = "⏸ pause"
-		case "unpause":
-			label = "▶ resume"
-		default:
-			label = kind
-		}
-		s := StyleWarning.Bold(true)
-		if selected {
-			s = StyleWarning.Bold(true).Background(lipgloss.Color("#78350F"))
-		}
-		return s.Width(width).MaxWidth(width).Render(truncate(label, width))
-	}
-	if containerRestartAlways(c) {
-		s := StyleAccent.Bold(true)
-		if selected {
-			s = StyleSelected.Foreground(ColorAccent).Bold(true)
-		}
-		return s.Width(width).MaxWidth(width).Render(truncate("∞always", width))
-	}
-	if selected {
-		return styleSelectedState(c.Status, width)
-	}
-	return containerStateStyled(c.Status, width)
-}
-
-func styleSelectedState(status string, width int) string {
-	switch strings.ToLower(status) {
-	case "running":
-		return StyleSelected.Width(width).MaxWidth(width).Render("RUNNING")
-	case "exited", "stopped":
-		return StyleSelected.Width(width).MaxWidth(width).Render("EXITED")
-	case "paused":
-		return StyleSelected.Width(width).MaxWidth(width).Render("PAUSED")
-	case "missing":
-		return StyleSelected.Width(width).MaxWidth(width).Render("MISSING")
-	case "created":
-		return StyleSelected.Width(width).MaxWidth(width).Render("CREATED")
-	default:
-		return StyleSelected.Width(width).MaxWidth(width).Render(strings.ToUpper(truncate(status, width)))
-	}
-}
-
-func containerStateStyled(status string, width int) string {
-	switch strings.ToLower(status) {
-	case "running":
-		return StyleRunning.Width(width).Render("running")
-	case "exited", "stopped":
-		return StyleStopped.Width(width).Render("exited")
-	case "paused":
-		return StyleWarning.Width(width).Render("paused")
-	case "missing":
-		return StyleWarning.Width(width).Render("missing")
-	case "created":
-		return StyleMuted.Width(width).Render("created")
-	default:
-		return StyleMuted.Width(width).Render(truncate(status, width))
-	}
 }
 
 func (a *App) containerListViewport() int {

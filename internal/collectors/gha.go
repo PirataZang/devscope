@@ -785,26 +785,6 @@ func GHABillingEstimate(runs []GHARun, n int) []GHAMinuteBucket {
 	return out
 }
 
-func FormatGHAFailHeatmap(buckets []GHAFailBucket, width int) string {
-	if len(buckets) == 0 {
-		return "0 fails"
-	}
-	max := 1
-	for _, b := range buckets {
-		if b.Fails > max {
-			max = b.Fails
-		}
-	}
-	parts := make([]string, 0, len(buckets))
-	for _, b := range buckets {
-		parts = append(parts, fmt.Sprintf("%s %s%d",
-			truncateRunes(b.Process, maxIntGHA(6, width/len(buckets)-4)),
-			BrailleBar(float64(b.Fails)/float64(max), 6),
-			b.Fails))
-	}
-	return strings.Join(parts, "  ")
-}
-
 func FormatGHABilling(buckets []GHAMinuteBucket) string {
 	if len(buckets) == 0 {
 		return "0m"
