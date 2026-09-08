@@ -19,13 +19,21 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - `K` encerra de uma vez todo túnel vivo que não é deste projeto — útil depois de um restart do devscope que deixa o `cloudflared` filho rodando sozinho, ocupando a faixa de porta de métricas (20241+) e travando novos túneis
   - Túneis de outros projetos/do host aparecem por padrão na lista (antes só apertando `A`); `A` agora serve pra filtrar de volta pra só o projeto atual
 - **Credenciais manuais de banco** (aba Database) — permite informar host/porta/usuário/senha de um banco que não roda em container Docker local do projeto (salvo em `.devscope/database.json`); `collectors/database.go` roda `psql`/`mysql` direto contra o host quando não há container, além do caminho existente via `docker exec`
+- **`docs/DESIGN.md`** — padrão de telas de módulo (cabeçalho de identificação, régua de abas numerada, corpo em painéis, barra de comandos larga no rodapé), extraído das telas já convertidas e usado como referência para toda tela nova ou reformulada
+- **Sparkline em Braille** (`spark.go`) — histórico de CPU/RAM/disco do host e ondas de status animadas, compartilhados entre os módulos
 
 ### Changed
 - `.devscope/` agora é criado por um helper compartilhado (`devscopeutil.EnsureDir`), reaproveitado por `cfutil`, `jenkinsutil`, `ngrokutil`, `sshutil`, `wsutil` e o novo `dbutil`
 - `.gitignore` passa a ignorar `.devscope/` (evita versionar config e credenciais locais do projeto)
+- **Todas as telas de módulo redesenhadas** para o padrão do `docs/DESIGN.md` — Git, Containers, GH Actions, ngrok, Cloudflare Tunnel, SSH, Kubernetes, Swarm, Nginx, Database, Rotas, WebSocket, API e Overview. Cabeçalho de identificação + régua de abas numerada + corpo + barra de comandos larga no rodapé substituem o cabeçalho/rodapé particular de cada tela, a coluna vertical "AÇÕES" e os cards de um número só
+- Abas Health e Metrics removidas; o sinal delas foi incorporado na faixa de alertas do Overview e nas linhas de status de cada módulo
+- Integração com LazyGit (`L` na aba Git) removida
+- Wizards de túnel (ngrok, SSH, Cloudflare) mostram o comando CLI exato que vão executar, como preview, antes de confirmar
 
 ### Fixed
 - Detecção de processos `cloudflared` não reconhecia binário de release baixado sem renomear (`cloudflared-linux-amd64`)
+- Túneis ngrok/SSH/Cloudflare reiniciados perdiam domain/region e trocavam de URL; os argumentos agora carregam essa configuração entre reinícios
+- `joinWithSpacer` (cabeçalho e régua de várias telas) podia desenhar uma linha mais larga que o terminal quando nome de projeto comprido e vários chips de status não cabiam juntos; agora encolhe o lado esquerdo em vez de estourar a largura
 
 ## [1.6.3] - 2026-08-25
 
