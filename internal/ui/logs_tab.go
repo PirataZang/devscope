@@ -31,29 +31,33 @@ func (a *App) renderLogsTab(p *core.Project) string {
 		status = a.projectLogSource
 	}
 	ctx := a.renderModuleContext(p, w, "Logs", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
 
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	center := a.renderLogsBodyBox(p, centerW, bodyH)
-	details := []string{
-		StyleMuted.Render("Source   ") + StyleNormal.Render(truncate(a.projectLogSource, rightW-12)),
-		StyleMuted.Render("Container") + " " + StyleMuted.Render(truncate(a.projectLogContainerID, rightW-12)),
-		StyleMuted.Render("Follow   ") + followLabel(a.projectLogsFollow, a.projectLogsPaused),
-		StyleMuted.Render("Ctrs     ") + StyleNormal.Render(fmt.Sprintf("%d", p.ContainerCount)),
-		StyleMuted.Render("Compose  ") + StyleNormal.Render(boolLabel(p.HasDockerCompose)),
+	// Padrão de tela lista+detalhe (docs/DESIGN.md §1.3): os fatos ficam sem
+	// moldura e só o conteúdo que rola ganha caixa. Era um trilho vertical de
+	// DETALHES + AÇÕES roubando 36 colunas do log.
+	head := []string{
+		ctx,
+		factLine("origem", []string{
+			StyleNormal.Render(firstNonEmpty(a.projectLogSource, emDash)),
+			StyleMuted.Render(truncate(a.projectLogContainerID, 20)),
+		}, w),
+		factLine("follow", []string{
+			followLabel(a.projectLogsFollow, a.projectLogsPaused),
+			StyleMuted.Render(fmt.Sprintf("%d containers", p.ContainerCount)),
+			StyleMuted.Render("compose " + boolLabel(p.HasDockerCompose)),
+		}, w),
 	}
-	actions := moduleActionLines(
-		[2]string{"f", "follow (container)"},
-		[2]string{"p", "pause/resume"},
-		[2]string{"r", "refresh"},
+	cmdBar := StyleStatusBar.Width(w).Render(fitKeybindsWrap(maxInt(10, w-2), 2,
+		[2]string{"f", "follow"},
+		[2]string{"p", "pausar"},
+		[2]string{"r", "recarregar"},
+		[2]string{"↑↓", "rolar"},
 		[2]string{"3", "containers"},
-		[2]string{"5", "health"},
-		[2]string{"↑↓", "scroll"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+		[2]string{"esc", "voltar"},
+	))
+	bodyH := maxInt(5, h-len(head)-lipgloss.Height(cmdBar))
+	body := a.renderLogsBodyBox(p, w, bodyH)
+	return lipgloss.JoinVertical(lipgloss.Left, append(head, body, cmdBar)...)
 }
 
 func followLabel(on, paused bool) string {
@@ -68,9 +72,9 @@ func followLabel(on, paused bool) string {
 
 func boolLabel(v bool) string {
 	if v {
-		return "yes"
+		return "sim"
 	}
-	return "no"
+	return "não"
 }
 
 func (a *App) renderLogsBodyBox(p *core.Project, width, height int) string {
@@ -125,7 +129,7 @@ func (a *App) renderLogsBodyBox(p *core.Project, width, height int) string {
 	for _, line := range raw[start:end] {
 		lines = append(lines, a.colorLogLine(truncate(sanitizeTerminalLine(line), innerW)))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewH), width, height, true)
+	return panelBox(title, fitExactLines(lines, viewH), width, height, true)
 }
 
 func (a *App) colorLogLine(line string) string {

@@ -1,3 +1,6 @@
+# Preferências de uso (tema, atalhos de programas e agente de IA) ficam em
+# ~/.config/devscope/user_config.txt, editável dentro do DevScope com Shift+C.
+
 scan:
   paths:
     - /var/www

@@ -241,7 +241,6 @@ func rebuildStyles() {
 	StyleDashboard = lipgloss.NewStyle().Padding(1, 2)
 	StyleInnerPanel = lipgloss.NewStyle().Border(lipgloss.NormalBorder()).BorderForeground(ColorBorder).Padding(0, 1)
 	StyleTableHeader = lipgloss.NewStyle().Bold(true).Foreground(ColorAccent).Background(ColorBgPanel)
-	StyleHeader = lipgloss.NewStyle().Bold(true).Foreground(ColorText).Border(lipgloss.NormalBorder()).BorderForeground(ColorBorder).Padding(0, 1)
 	StyleStatusBar = lipgloss.NewStyle().Foreground(ColorSubtext).Background(ColorBgPanel).Padding(0, 1)
 	StyleSelected = lipgloss.NewStyle().Bold(true).Foreground(ColorHighlight).Background(ColorSelBg)
 	StyleApiSel = lipgloss.NewStyle().Foreground(ColorBg).Background(ColorAccent)
@@ -257,13 +256,10 @@ func rebuildStyles() {
 	StyleUnhealthy = lipgloss.NewStyle().Foreground(ColorDanger).Bold(true)
 	StyleStopped = lipgloss.NewStyle().Foreground(ColorDanger).Bold(true)
 	StyleRunning = lipgloss.NewStyle().Foreground(ColorSuccess).Bold(true)
-	StyleMetric = lipgloss.NewStyle().Foreground(ColorSubtext)
 	StyleMetricCPU = lipgloss.NewStyle().Foreground(ColorSuccess).Bold(true)
 	StyleMetricRAM = lipgloss.NewStyle().Foreground(ColorWarning).Bold(true)
-	StyleMetricDisk = lipgloss.NewStyle().Foreground(ColorAccent).Bold(true)
 	StylePanel = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(ColorBorder).Padding(1, 2)
 	StyleTabActive = lipgloss.NewStyle().Bold(true).Foreground(ColorPrimary).Underline(true)
-	StyleTab = lipgloss.NewStyle().Foreground(ColorMuted)
 	StyleWarning = lipgloss.NewStyle().Foreground(ColorWarning)
 	StyleDiffAdd = lipgloss.NewStyle().Foreground(ColorSuccess).Background(colorDiffAddBg)
 	StyleDiffRemove = lipgloss.NewStyle().Foreground(ColorPink).Background(colorDiffRemoveBg)
@@ -273,7 +269,6 @@ func rebuildStyles() {
 	StyleDiffMatch = lipgloss.NewStyle().Foreground(ColorText).Background(colorDiffMatchBg).Bold(true)
 	StyleSection = lipgloss.NewStyle().Bold(true).Foreground(ColorAccent)
 	StyleKey = lipgloss.NewStyle().Foreground(ColorPrimary).Bold(true)
-	StyleKeyDesc = lipgloss.NewStyle().Foreground(ColorSubtext)
 	StyleAccent = lipgloss.NewStyle().Foreground(ColorAccent).Italic(true)
 	StyleGitSelected = lipgloss.NewStyle().Foreground(ColorHighlight).Bold(true)
 	StyleGitCherry = lipgloss.NewStyle().Foreground(ColorText).Bold(true).Background(ColorSelBg)
@@ -281,7 +276,6 @@ func rebuildStyles() {
 	StyleGitBranchHead = lipgloss.NewStyle().Foreground(ColorSuccess).Bold(true)
 	StyleGitMarked = lipgloss.NewStyle().Foreground(ColorDanger).Bold(true)
 	StyleGitMarkedCursor = lipgloss.NewStyle().Foreground(ColorText).Bold(true).Background(ColorDanger)
-	StyleGitColumn = lipgloss.NewStyle().Border(lipgloss.NormalBorder()).BorderForeground(ColorBorder).Padding(0, 1)
 }
 
 func applyTerminalChrome() {
@@ -345,4 +339,16 @@ func cropBlock(s string, width, height int) string {
 
 func swatch(hex string) string {
 	return lipgloss.NewStyle().Foreground(lipgloss.Color(hex)).Render("██")
+}
+
+// ThemeExists diz se o nome corresponde a um tema real — o seletor só oferece
+// os válidos, mas o user_config.txt é digitado à mão.
+func ThemeExists(id string) bool {
+	id = normalizeTheme(id)
+	for _, t := range Themes {
+		if t.ID == id {
+			return true
+		}
+	}
+	return false
 }

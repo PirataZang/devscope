@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -55,22 +56,23 @@ func TestProjectRowNeverExceedsTableWidth(t *testing.T) {
 	}
 }
 
-// As colunas opcionais entram por faixa de largura, nunca às custas de NOME e
-// CAMINHO.
+// Sem colunas opcionais, as quatro entram sempre — e a largura que sobra vai
+// para CAMINHO, nunca às custas de NOME nem de BRANCH.
 func TestTableColumnsScaleWithWidth(t *testing.T) {
-	narrow := tableColumns(safeTableWidth(60))
-	if narrow.ports != 0 {
-		t.Fatalf("60 col: PORTAS não cabe: %+v", narrow)
-	}
-	wide := tableColumns(safeTableWidth(200))
-	if wide.stack == 0 || wide.commit == 0 || wide.ports == 0 {
-		t.Fatalf("200 col: todas as colunas deviam aparecer: %+v", wide)
-	}
 	for _, termW := range []int{60, 80, 100, 120, 160, 200} {
-		c := tableColumns(safeTableWidth(termW))
-		if c.name < 12 || c.path < 14 {
-			t.Fatalf("%d col: NOME/CAMINHO ilegíveis: %+v", termW, c)
+		tableW := safeTableWidth(termW)
+		c := tableColumns(tableW)
+		if c.name < 12 || c.path < 14 || c.branch < 9 || c.dot < 1 {
+			t.Fatalf("%d col: coluna ilegível: %+v", termW, c)
 		}
+		// STACK, CTR, COMMIT e PORTAS saíram para o painel do selecionado.
+		if c.dot+c.name+c.branch+c.path+3 > tableW {
+			t.Fatalf("%d col: colunas somam mais que a tabela (%d): %+v", termW, tableW, c)
+		}
+	}
+	// Largura extra vai para o caminho, que é quem mais apanhava.
+	if tableColumns(safeTableWidth(200)).path <= tableColumns(safeTableWidth(100)).path {
+		t.Fatal("CAMINHO deveria crescer com a largura do terminal")
 	}
 }
 
@@ -315,7 +317,7 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	plain := stripANSI(got)
 
 	for _, want := range []string{
-		"PROJETO", "SCOPE", "AUTOMATION", "MANAGER", "TUNNEL", "TOOLS",
+		"PROJETO", "CÓDIGO", "EXECUÇÃO", "REDE", "DADOS",
 		"Visão Geral",
 		"Git", "Containers",
 		"GH Actions", "Jenkins",
@@ -367,7 +369,7 @@ func TestProjectSidebarShowsLiveMeta(t *testing.T) {
 	if !strings.Contains(got, "demo") {
 		t.Fatalf("project name missing: %q", got)
 	}
-	if !strings.Contains(got, "Deg") {
+	if !strings.Contains(got, "degradado") {
 		t.Fatalf("status missing in brand: %q", got)
 	}
 	if !strings.Contains(got, "develop") {
@@ -497,7 +499,7 @@ func TestTinySidebarFitsPanelHeight(t *testing.T) {
 		t.Fatalf("tiny sidebar should drop RESUMO: %q", plain)
 	}
 	got := stripANSI(a.renderProject())
-	if !strings.Contains(got, "SCOPE") {
+	if !strings.Contains(got, "CÓDIGO") {
 		t.Fatal("tiny project view should keep nav groups")
 	}
 }
@@ -573,19 +575,26 @@ func TestRenderContainersMainShowsBottomBoxes(t *testing.T) {
 		snapshot:                core.Snapshot{Projects: []core.Project{project}},
 	}
 	got := stripANSI(a.renderContainersTab(&project))
-	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "STATS · ALL", "PORTAS", "laradock-workspace-1", "CPU ", "MEM ", "NET "} {
+	// Lista + identidade do selecionado + portas + recursos + logs. Tudo o que
+	// as quatro caixas mostravam continua na tela, sem as quatro molduras.
+	for _, want := range []string{"CONTAINERS", "LISTA", "LOGS", "portas", "recursos", "laradock-workspace-1", "CPU ", "MEM ", "NET "} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("containers main missing %q in:\n%s", want, got)
 		}
 	}
+	// `g` continua ciclando a métrica — e agora COMPRA RESOLUÇÃO: uma métrica
+	// só, histórico na largura toda, com média e pico da janela.
 	a.containerStatsMode = 1
 	got = stripANSI(a.renderContainersBottom(120, 20))
-	if !strings.Contains(got, "STATS · CPU") {
-		t.Fatalf("cpu focus title missing: %s", got)
+	if !strings.Contains(got, "cpu") || !strings.Contains(got, "média") || !strings.Contains(got, "pico") {
+		t.Fatalf("foco em CPU deve trazer média e pico da janela: %s", got)
+	}
+	if strings.Contains(got, "MEM ") || strings.Contains(got, "NET ") {
+		t.Fatalf("no foco em CPU as outras métricas saem: %s", got)
 	}
 	// Os atalhos saíram do rodapé para a barra larga de comandos.
 	bar := stripANSI(a.renderContainersCommandBar(120))
-	if !strings.Contains(bar, "S-U") || !strings.Contains(bar, "compose") {
+	if !strings.Contains(bar, "shift+U") || !strings.Contains(bar, "compose") {
 		t.Fatalf("barra deve listar os atalhos de compose:\n%s", bar)
 	}
 }
@@ -949,5 +958,110 @@ func TestThemePickerOnlyOnDashboard(t *testing.T) {
 	_, _ = filt.updateFilter(tKey)
 	if filt.themeOn || filt.filterInput != "T" {
 		t.Fatalf("filtro deve receber o T: on=%v input=%q", filt.themeOn, filt.filterInput)
+	}
+}
+
+// ─── painel do projeto selecionado ──────────────────────────────────────────
+
+func selectedStripProject() core.Project {
+	return core.Project{
+		Name: "digiliza", Path: "/home/igor/Área de trabalho/digiliza",
+		Status: core.StatusRunning, ContainerCount: 13, HasDockerCompose: true,
+		Framework: core.FrameworkInfo{Name: "Laravel", Version: "11.2"},
+		Frameworks: []core.FrameworkInfo{
+			{Name: "Laravel", Version: "11.2"}, {Name: "Vue", Version: "3.4"}, {Name: "PHP", Version: "8.3"},
+		},
+		Ports: []int{8080, 3306},
+		Git: &core.GitInfo{IsRepo: true, Branch: "endpoint_mobile", Ahead: 2, Modified: 4,
+			LastCommitMsg: "corrige o cálculo de saldo", LastCommitDate: time.Now().Add(-3 * time.Hour)},
+	}
+}
+
+// O painel mostra TODAS as stacks — era a informação que a coluna STACK perdia
+// ao caber só uma.
+func TestSelectedStripListsEveryStack(t *testing.T) {
+	a := &App{width: 140, height: 40}
+	got := stripANSI(strings.Join(a.renderSelectedStrip([]core.Project{selectedStripProject()}, 130), "\n"))
+	for _, want := range []string{"Laravel 11.2", "Vue 3.4", "PHP 8.3"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("stack %q não aparece no painel:\n%s", want, got)
+		}
+	}
+}
+
+// Quem veio pelo caminho rápido do scanner (BuildProjectStub) só tem Framework;
+// sem o fallback o painel ficaria vazio justamente na primeira varredura.
+func TestSelectedStripFallsBackToMainFramework(t *testing.T) {
+	p := selectedStripProject()
+	p.Frameworks = nil
+	a := &App{width: 140, height: 40}
+	got := stripANSI(strings.Join(a.renderSelectedStrip([]core.Project{p}, 130), "\n"))
+	if !strings.Contains(got, "Laravel") {
+		t.Fatalf("sem Frameworks o painel deveria cair na principal:\n%s", got)
+	}
+	if strings.Contains(got, "Unknown") {
+		t.Fatalf("'Unknown' não é stack:\n%s", got)
+	}
+	semStack := core.Project{Name: "out", Path: "/tmp/out", Framework: core.FrameworkInfo{Name: "Unknown"}}
+	got = stripANSI(strings.Join(a.renderSelectedStrip([]core.Project{semStack}, 130), "\n"))
+	if strings.Contains(got, "Unknown") {
+		t.Fatalf("projeto sem stack devia mostrar %q:\n%s", emDash, got)
+	}
+}
+
+// O painel mostra o que saiu da tabela: containers, portas e a MENSAGEM do
+// commit (a coluna COMMIT só tinha espaço para a idade).
+func TestSelectedStripCarriesWhatLeftTheTable(t *testing.T) {
+	a := &App{width: 160, height: 44}
+	got := stripANSI(strings.Join(a.renderSelectedStrip([]core.Project{selectedStripProject()}, 150), "\n"))
+	for _, want := range []string{"13 containers", ":8080", "compose", "endpoint_mobile", "↑2", "4 alterados", "corrige o cálculo de saldo"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("painel perdeu %q:\n%s", want, got)
+		}
+	}
+}
+
+// Altura fixa: dashboardProjectsViewport reserva as linhas antes de saber o que
+// há no projeto sob o cursor, e painel que encolhe faz a tela piscar.
+func TestSelectedStripHasStableHeightAndWidth(t *testing.T) {
+	cheio := selectedStripProject()
+	vazio := core.Project{Name: "out", Path: "/tmp/x/y/z/out", Status: core.StatusUnknown}
+	semGit := selectedStripProject()
+	semGit.Git = nil
+
+	for _, p := range []core.Project{cheio, vazio, semGit} {
+		for _, termW := range []int{80, 100, 120, 160, 200} {
+			w := safeTableWidth(termW)
+			a := &App{width: termW, height: 40}
+			rows := a.renderSelectedStrip([]core.Project{p}, w)
+			if len(rows) != selectedStripHeight {
+				t.Fatalf("%s em %d col: painel com %d linhas, esperado %d", p.Name, termW, len(rows), selectedStripHeight)
+			}
+			for i, r := range rows {
+				if lipgloss.Width(r) > w {
+					t.Fatalf("%s em %d col: linha %d mede %d > %d", p.Name, termW, i, lipgloss.Width(r), w)
+				}
+			}
+		}
+	}
+	// Fora da lista não há painel.
+	a := &App{width: 120, height: 40, cursor: 9}
+	if rows := a.renderSelectedStrip([]core.Project{cheio}, 110); rows != nil {
+		t.Fatalf("cursor fora da lista deveria devolver nil, veio %d linhas", len(rows))
+	}
+}
+
+// A viewport precisa reservar exatamente as linhas do painel, senão a lista
+// come o espaço e o detalhe some.
+func TestViewportReservesRoomForSelectedStrip(t *testing.T) {
+	for _, h := range []int{32, 40, 50, 60} {
+		curto := (&App{width: 140, height: h - 1}).dashboardProjectsViewport()
+		alto := (&App{width: 140, height: h}).dashboardProjectsViewport()
+		if h == 32 && alto >= curto {
+			t.Fatalf("altura %d: a viewport devia encolher para abrir espaço ao painel (%d → %d)", h, curto, alto)
+		}
+		if alto <= 0 {
+			t.Fatalf("altura %d: viewport inválida %d", h, alto)
+		}
 	}
 }

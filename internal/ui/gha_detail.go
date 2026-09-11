@@ -411,7 +411,7 @@ func (a *App) renderGHAProcessDetail(p *core.Project) string {
 	body := a.renderGHAProcTabBody(mainW, bodyH, live)
 	side := renderActionsBox(cmdW, bodyH,
 		[2]string{"[]", "abas"},
-		[2]string{"t", "trigger"},
+		[2]string{"t", "disparar"},
 		[2]string{"3", "timeline"},
 		[2]string{"s", "parar job"},
 		[2]string{"S", "parar todos"},
@@ -420,7 +420,7 @@ func (a *App) renderGHAProcessDetail(p *core.Project) string {
 		[2]string{"i", "incidente"},
 		[2]string{"R", "re-run"},
 		[2]string{"o", "github"},
-		[2]string{"r", "refresh"},
+		[2]string{"r", "atualizar"},
 		[2]string{"esc", "voltar"},
 	)
 	main := body
@@ -504,7 +504,7 @@ func (a *App) renderGHAProcJobs(width, height int) string {
 	if a.ghaProcRunID != "" {
 		title += " · #" + a.ghaProcRunID
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+	return panelBox(title, fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) renderGHAProcOverview(width, height int, live ghaProcLive) string {
@@ -532,7 +532,7 @@ func (a *App) renderGHAProcOverview(width, height int, live ghaProcLive) string 
 	if live.Label == "triggered" {
 		lines = append(lines, "", StyleAccent.Render("Trigger manual enviado — aguardando aparecer em Runs…"))
 	}
-	return renderApiTitledBox("OVERVIEW", fitExactLines(lines, inner), width, height, true)
+	return panelBox("OVERVIEW", fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) ghaUsageOverviewLines(width int, procMin, projMin float64) []string {
@@ -569,14 +569,14 @@ func (a *App) ghaUsageOverviewLines(width int, procMin, projMin float64) []strin
 func (a *App) renderGHAProcRuns(width, height int) string {
 	inner := maxInt(3, height-2)
 	runs := a.ghaRunsForProcess(a.ghaProcName, a.ghaProcFile)
-	title := fmt.Sprintf("RUNS (%d)", len(runs))
+	title := panelTitle("RUNS", fmt.Sprint(len(runs)))
 	lines := []string{
 		StyleTableHeader.Render(truncate("STATUS     CONCLUSION  EVENT              TITLE", width-4)),
-		StyleMuted.Render(strings.Repeat("─", maxInt(8, width-6))),
+		rule(maxInt(8, width-6)),
 	}
 	if len(runs) == 0 {
 		lines = append(lines, StyleMuted.Render("  nenhum run deste processo"))
-		return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+		return panelBox(title, fitExactLines(lines, inner), width, height, true)
 	}
 	if a.ghaProcRunCursor >= len(runs) {
 		a.ghaProcRunCursor = len(runs) - 1
@@ -611,7 +611,7 @@ func (a *App) renderGHAProcRuns(width, height int) string {
 		_ = text
 		lines = append(lines, style.Width(width-4).MaxWidth(width-4).Render(truncate(plain, width-4)))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+	return panelBox(title, fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) renderGHAProcLogs(width, height int) string {
@@ -643,7 +643,7 @@ func (a *App) renderGHAProcLogs(width, height int) string {
 	if a.ghaProcRunID != "" {
 		title += " · #" + a.ghaProcRunID
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+	return panelBox(title, fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) renderGHAProcYAML(width, height int) string {
@@ -666,5 +666,5 @@ func (a *App) renderGHAProcYAML(width, height int) string {
 	if a.ghaProcFile != "" {
 		title += " · " + filepath.Base(a.ghaProcFile)
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+	return panelBox(title, fitExactLines(lines, inner), width, height, true)
 }

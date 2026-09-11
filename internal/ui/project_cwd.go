@@ -58,5 +58,9 @@ func (a *App) openProjectFromCwd() {
 	a.view = ViewProject
 	a.tab = TabGit
 	a.tabCursor = 0
+	// Projeto novo, medida nova. Quem sonda é o Init(): aqui não há tea.Cmd
+	// para devolver, e sondagem não roda dentro do construtor.
+	a.moduleCaps = moduleCaps{}
+	a.showAllModules = false
 	a.initGitTab(&cp)
 }

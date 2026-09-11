@@ -292,7 +292,24 @@ func editorApplyKey(msg tea.KeyMsg, text string, e *editorState, multiline bool)
 }
 
 // renderEditorLines renders text with cursor, selection, optional JSON highlight and HScroll.
+// renderEditorLines mantém o realce de JSON de sempre.
 func renderEditorLines(text string, e *editorState, width, height int, editing, highlightJSON bool) []string {
+	var paint func(int, string) string
+	if highlightJSON {
+		kinds := jsonKindsForRunes(text)
+		paint = func(abs int, s string) string {
+			if abs < len(kinds) {
+				return styleJSONRune(kinds[abs], s)
+			}
+			return s
+		}
+	}
+	return renderEditorLinesPainted(text, e, width, height, editing, paint)
+}
+
+// renderEditorLinesPainted é o mesmo editor com a pintura entregue de fora —
+// cada tela sabe o que suas linhas significam melhor que o componente.
+func renderEditorLinesPainted(text string, e *editorState, width, height int, editing bool, paint func(abs int, s string) string) []string {
 	runes := []rune(text)
 	cursor := e.Cursor
 	if cursor < 0 {
@@ -302,10 +319,6 @@ func renderEditorLines(text string, e *editorState, width, height int, editing, 
 		cursor = len(runes)
 	}
 	selLo, selHi, hasSel := e.selRange(editing)
-	var kinds []uint8
-	if highlightJSON {
-		kinds = jsonKindsForRunes(text)
-	}
 
 	type lineSpan struct{ start, end int }
 	var spans []lineSpan
@@ -373,8 +386,8 @@ func renderEditorLines(text string, e *editorState, width, height int, editing, 
 			switch {
 			case hasSel && abs >= selLo && abs < selHi:
 				s = StyleApiSel.Render(s)
-			case highlightJSON && abs < len(kinds):
-				s = styleJSONRune(kinds[abs], s)
+			case paint != nil:
+				s = paint(abs, s)
 			}
 			b.WriteString(s)
 		}

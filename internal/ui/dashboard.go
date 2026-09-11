@@ -43,15 +43,23 @@ func (a *App) renderDashboard() string {
 
 	body := strings.Join(sections, "\n")
 	footer := a.renderDashboardFooter(tableW)
+	if apps := a.renderAppsStrip(tableW); apps != "" {
+		footer = apps + "\n" + footer
+	}
 	// Empurra o rodapé para a última linha; StyleDashboard come 2 no padding.
 	fill := 1
 	if a.height > 0 {
 		fill = maxInt(0, a.height-2-lipgloss.Height(body)-lipgloss.Height(footer))
 	}
-	// Só ocupa o vão que sobrou — o detalhe nunca tira linha da lista.
+	// O painel do selecionado vem LOGO ABAIXO da lista, não colado no rodapé.
+	//
+	// Com doze projetos numa tela de sessenta linhas, ancorá-lo embaixo abria
+	// vinte linhas de vazio NO MEIO da tela — e vazio no meio lê como layout
+	// quebrado, enquanto o mesmo vazio embaixo lê como página que terminou.
+	// Uma sobra só, num lugar só, acima do rodapé.
 	if strip := a.renderSelectedStrip(projects, tableW); strip != nil && fill >= len(strip)+1 {
-		body += strings.Repeat("\n", fill-len(strip)) + strings.Join(strip, "\n")
-		fill = 0
+		body += "\n" + strings.Join(strip, "\n")
+		fill -= len(strip)
 	}
 	body += strings.Repeat("\n", fill+1) + footer
 	body = a.railed(body, projects)
@@ -113,6 +121,10 @@ func (a *App) renderScanAge() string {
 func (a *App) renderHostStrip(m core.HostMetrics, width int) string {
 	meter := func(label string, pct float64, hist sparkHistory) string {
 		st := metricUsageStyle(pct)
+		if len(hist.samples) == 0 {
+			// Antes da primeira amostra o histórico é uma faixa em branco.
+			return StyleMuted.Render(label+" ") + st.Render(fmt.Sprintf("%.0f%%", pct))
+		}
 		return StyleMuted.Render(label+" ") +
 			st.Render(fmt.Sprintf("%.0f%%", pct)) + " " +
 			st.Render(brailleSpark(hist.samples, sparkCells))
@@ -281,7 +293,7 @@ func (a *App) renderProjectsList(projects []core.Project, tableW int) string {
 
 	lines := []string{
 		renderTableHeader(cols),
-		StyleMuted.Render(strings.Repeat("─", tableW)),
+		rule(tableW),
 	}
 
 	if len(projects) == 0 {
@@ -329,19 +341,11 @@ func (a *App) renderProjectRow(c tableCols, p core.Project, selected bool) strin
 	if p.Git != nil && p.Git.IsRepo && p.Git.Branch != "" {
 		branch = p.Git.Branch
 	}
-	ctrs := emDash
-	if p.ContainerCount > 0 {
-		ctrs = strconv.Itoa(p.ContainerCount)
-	}
 
 	row := renderCells(selected, []dashCell{
 		{text: glyph, width: c.dot, style: dotStyle},
 		{text: p.Name, width: c.name, style: StyleNormal.Bold(true)},
-		{text: stackLabel(p), width: c.stack, style: stackStyle(p.Framework.Name)},
 		{text: branch, width: c.branch, style: lipgloss.NewStyle().Foreground(ColorAccent)},
-		{text: ctrs, width: c.ctrs, style: StyleMuted, right: true},
-		{text: endpointLabel(p), width: c.ports, style: StyleMuted},
-		{text: commitAge(p), width: c.commit, style: StyleMuted, right: true},
 		// A cauda do caminho é a parte que identifica; corta pela esquerda.
 		{text: elideLeft(shortenPath(p.Path), c.path), width: c.path, style: StyleMuted},
 	})
@@ -357,11 +361,7 @@ func renderTableHeader(c tableCols) string {
 	return "  " + renderCells(false, []dashCell{
 		{text: "", width: c.dot},
 		{text: "NOME", width: c.name, style: head},
-		{text: "STACK", width: c.stack, style: head},
 		{text: "BRANCH", width: c.branch, style: head},
-		{text: "CTR", width: c.ctrs, style: head, right: true},
-		{text: "PORTAS", width: c.ports, style: head},
-		{text: "COMMIT", width: c.commit, style: head, right: true},
 		{text: "CAMINHO", width: c.path, style: head},
 	})
 }
@@ -405,8 +405,62 @@ func renderCells(selected bool, cells []dashCell) string {
 
 // ─── detalhe do selecionado ─────────────────────────────────────────────────
 
-// renderSelectedStrip preenche o vão entre a lista e o rodapé com o projeto sob
-// o cursor. Em tela alta esse espaço ficava vazio.
+// selectedStripHeight é o piso do painel do selecionado: régua + identidade +
+// stack + runtime + git. Fixo porque dashboardProjectsViewport reserva as
+// linhas antes de saber o que há no projeto sob o cursor.
+const selectedStripHeight = 5
+
+// selectedStripHeightFor é a ESCADA DE EXPANSÃO do painel (docs/DESIGN.md §1.6).
+//
+// Uma tela grande não é a pequena esticada. Em 200×60 a lista de doze projetos
+// ocupava vinte e duas linhas e deixava trinta e oito em branco: a altura extra
+// virava vão, não informação. Aqui ela vira detalhe do projeto sob o cursor —
+// que é secundário (visível quando relevante), não terciário.
+//
+//	altura      o painel ganha
+//	──────────  ────────────────────────────────────────────
+//	< 32        nada — o painel não aparece, a lista leva tudo
+//	>= 32       os três fatos: stack · runtime · git
+//	>= 44       + os containers do projeto, um por linha
+//	>= 54       + as probes de saúde
+//
+// A lista continua tendo prioridade: ela pega a altura primeiro, e o painel só
+// cresce com o que sobrar depois dela.
+func selectedStripHeightFor(termH, projectCount int) int {
+	h := selectedStripHeight
+	if termH < 32 {
+		return 0
+	}
+	// A lista pede uma linha por projeto mais o cromo fixo; só o que passar
+	// disso é que o painel pode tomar.
+	slack := termH - projectCount - 15
+	if termH >= 44 && slack >= selectedContainerRows+4 {
+		h += selectedContainerRows + 1 // cabeçalho de seção + linhas
+	}
+	if termH >= 54 && slack >= selectedContainerRows+selectedProbeRows+8 {
+		h += selectedProbeRows + 1
+	}
+	return h
+}
+
+const (
+	selectedContainerRows = 4
+	selectedProbeRows     = 3
+)
+
+// renderSelectedStrip é o painel do projeto sob o cursor — o "preview
+// contextual". Ele é o outro lado da lista enxuta: as colunas STACK, CTR e
+// COMMIT saíram da tabela e chegaram aqui, onde cabem inteiras.
+//
+// Três linhas rotuladas, sempre as mesmas três, nesta ordem:
+//
+//	stack    o que este projeto É        todas as stacks, não só a principal
+//	runtime  o que está NO AR            containers, portas/domínios, compose
+//	git      em que ponto ELE ESTÁ       branch, divergência, alterações, commit
+//
+// A altura é fixa de propósito: ausência vira "—" em vez de sumir com a linha.
+// Painel que muda de tamanho conforme o cursor anda pisca a tela inteira e
+// obriga o olho a reencontrar cada rótulo.
 func (a *App) renderSelectedStrip(projects []core.Project, width int) []string {
 	if a.cursor < 0 || a.cursor >= len(projects) {
 		return nil
@@ -414,86 +468,250 @@ func (a *App) renderSelectedStrip(projects []core.Project, width int) []string {
 	p := projects[a.cursor]
 	glyph, dotStyle := statusDot(p.Status, a.animFrame)
 
-	facts := make([]string, 0, 5)
-	if p.Framework.Name != "" {
-		facts = append(facts, stackStyle(p.Framework.Name).Render(p.Framework.Name))
+	// Identidade: estado + nome + saúde à esquerda, caminho colado à direita.
+	// O caminho corta pela esquerda — a cauda é o que identifica o projeto.
+	left := dotStyle.Render(glyph) + " " + StyleNormal.Bold(true).Render(p.Name) +
+		StyleMuted.Render("  ") + projectStatusStyle(p.Status).Render(projectStatusWord(p.Status))
+	pathW := maxInt(12, width-lipgloss.Width(left)-3)
+	head := joinWithSpacer(left, StyleMuted.Render(elideLeft(shortenPath(p.Path), pathW)), width)
+
+	rows := []string{
+		rule(width),
+		head,
+		factLine("stack", selectedStackFacts(p), width),
+		factLine("runtime", selectedRuntimeFacts(p), width),
+		factLine("git", selectedGitFacts(p, width), width),
 	}
-	if p.Git != nil && p.Git.IsRepo && p.Git.Branch != "" {
-		branch := p.Git.Branch
-		if p.Git.Ahead > 0 {
-			branch += fmt.Sprintf(" ↑%d", p.Git.Ahead)
-		}
-		if p.Git.Behind > 0 {
-			branch += fmt.Sprintf(" ↓%d", p.Git.Behind)
-		}
-		facts = append(facts, lipgloss.NewStyle().Foreground(ColorAccent).Render(branch))
-		if n := p.Git.Modified + p.Git.Staged + p.Git.Untracked; n > 0 {
-			facts = append(facts, StyleWarning.Render(fmt.Sprintf("%d alterados", n)))
+	// Degraus de expansão: só entram quando a altura sobra depois da lista.
+	want := selectedStripHeightFor(a.height, len(projects))
+	if want > len(rows) {
+		rows = append(rows, a.selectedContainerBlock(p, width, want-len(rows))...)
+	}
+	if want > len(rows) {
+		rows = append(rows, a.selectedProbeBlock(p, width, want-len(rows))...)
+	}
+	for len(rows) < want {
+		rows = append(rows, "")
+	}
+	return rows
+}
+
+// selectedContainerBlock: os containers do projeto sob o cursor, no mesmo
+// vocabulário da tela de Containers — quem aprendeu a ler lá lê aqui.
+func (a *App) selectedContainerBlock(p core.Project, width, budget int) []string {
+	if budget < 2 {
+		return nil
+	}
+	rows := []string{"  " + sectionHeader("CONTAINERS", maxInt(10, width-2), ColorDocker)}
+	if len(p.Containers) == 0 {
+		return append(rows, "  "+StyleMuted.Render("nenhum container — shift+U sobe o compose"))
+	}
+	// A coluna do nome sai do nome MAIS LONGO, não de uma fração da largura.
+	// Com width/3 numa tela de 140, quatro nomes de 28 colunas ficavam numa
+	// coluna de 44 e abriam dezesseis colunas mortas antes do estado.
+	nameW := 12
+	for _, c := range p.Containers {
+		if n := lipgloss.Width(sanitizeTerminalLine(c.Name)); n > nameW {
+			nameW = n
 		}
 	}
+	nameW = minInt(nameW, maxInt(12, width/3))
+	for i, c := range p.Containers {
+		if len(rows) >= budget {
+			break
+		}
+		if i == budget-2 && len(p.Containers) > budget-1 {
+			rows = append(rows, "  "+StyleMuted.Render(fmt.Sprintf("+%d", len(p.Containers)-i)))
+			break
+		}
+		wave, waveStyle, label, labelStyle := a.containerStateVisual(c)
+		rows = append(rows, "  "+waveStyle.Render(wave)+" "+
+			StyleNormal.Render(padRight(truncate(sanitizeTerminalLine(c.Name), nameW), nameW))+"  "+
+			labelStyle.Render(padRight(label, 11))+"  "+
+			StyleMuted.Render(truncate(sanitizeTerminalLine(c.Image), maxInt(10, width/4))))
+	}
+	return rows
+}
+
+// selectedProbeBlock: o que o DevScope mediu do projeto — probes de saúde e
+// workers. É a resposta a "está degradado por quê?" sem abrir o módulo.
+func (a *App) selectedProbeBlock(p core.Project, width, budget int) []string {
+	if budget < 2 {
+		return nil
+	}
+	rows := []string{"  " + sectionHeader("SAÚDE", maxInt(10, width-2), ColorSuccess)}
+	var lines []string
+	for _, hc := range p.HealthChecks {
+		glyph, st := healthGlyph(hc.Status, a.animFrame)
+		lat := emDash
+		if hc.LatencyMS > 0 {
+			lat = fmt.Sprintf("%dms", hc.LatencyMS)
+		}
+		lines = append(lines, st.Render(glyph)+" "+
+			StyleNormal.Render(truncate(hc.URL, maxInt(16, width/2)))+
+			StyleMuted.Render("   "+lat))
+	}
+	for _, wk := range p.Workers {
+		lines = append(lines, StyleMuted.Render("⚙ ")+StyleNormal.Render(truncate(wk.Name, maxInt(16, width/2)))+
+			StyleMuted.Render("   "+wk.Status))
+	}
+	if len(lines) == 0 {
+		lines = []string{StyleMuted.Render("nenhuma probe configurada neste projeto")}
+	}
+	for i, l := range lines {
+		if len(rows) >= budget {
+			break
+		}
+		if i == budget-2 && len(lines) > budget-1 {
+			rows = append(rows, "  "+StyleMuted.Render(fmt.Sprintf("+%d", len(lines)-i)))
+			break
+		}
+		rows = append(rows, "  "+l)
+	}
+	return rows
+}
+
+// selectedStackFacts lista TODAS as stacks detectadas, cada uma na sua cor.
+// A tabela mostrava só a principal — um Laravel com Vue no front aparecia
+// como "Laravel" e nada dizia que havia um front junto.
+func selectedStackFacts(p core.Project) []string {
+	fws := projectFrameworks(p)
+	if len(fws) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(fws))
+	for _, fw := range fws {
+		name := fw.Name
+		if fw.Version != "" {
+			name += " " + fw.Version
+		}
+		out = append(out, stackStyle(fw.Name).Render(name))
+	}
+	return out
+}
+
+// selectedRuntimeFacts é o que está no ar: containers, por onde se chega e como
+// sobe.
+func selectedRuntimeFacts(p core.Project) []string {
+	var out []string
 	if p.ContainerCount > 0 {
-		facts = append(facts, StyleNormal.Render(fmt.Sprintf("%d containers", p.ContainerCount)))
+		word := "containers"
+		if p.ContainerCount == 1 {
+			word = "container"
+		}
+		out = append(out, StyleNormal.Render(fmt.Sprintf("%d %s", p.ContainerCount, word)))
 	}
 	if e := endpointLabel(p); e != emDash {
-		facts = append(facts, StyleNormal.Render(e))
+		out = append(out, StyleAccent.Render(e))
 	}
+	switch {
+	case p.HasDockerCompose:
+		out = append(out, StyleMuted.Render("compose"))
+	case p.HasDockerfile:
+		out = append(out, StyleMuted.Render("Dockerfile"))
+	}
+	return out
+}
 
-	commit := ""
-	if p.Git != nil && strings.TrimSpace(p.Git.LastCommitMsg) != "" {
-		commit = StyleMuted.Render(truncate(p.Git.LastCommitMsg, maxInt(12, width/3)) + "  " + commitAge(p))
+// selectedGitFacts: onde a branch está em relação ao remoto, o que há por
+// commitar e qual foi o último commit — com a MENSAGEM, que a coluna COMMIT da
+// tabela não tinha espaço para mostrar (só cabia a idade).
+func selectedGitFacts(p core.Project, width int) []string {
+	g := p.Git
+	if g == nil || !g.IsRepo {
+		return nil
 	}
-	details := strings.Join(facts, StyleMuted.Render(" · "))
-	if lipgloss.Width(details)+lipgloss.Width(commit)+2 > width {
-		commit = ""
+	var out []string
+	if g.Branch != "" {
+		branch := g.Branch
+		if g.Ahead > 0 {
+			branch += fmt.Sprintf(" ↑%d", g.Ahead)
+		}
+		if g.Behind > 0 {
+			branch += fmt.Sprintf(" ↓%d", g.Behind)
+		}
+		out = append(out, lipgloss.NewStyle().Foreground(ColorAccent).Render(branch))
 	}
+	if n := g.Modified + g.Staged + g.Untracked; n > 0 {
+		word := "alterados"
+		if n == 1 {
+			word = "alterado"
+		}
+		out = append(out, StyleWarning.Render(fmt.Sprintf("%d %s", n, word)))
+	}
+	if msg := strings.TrimSpace(g.LastCommitMsg); msg != "" {
+		// O que sobra da linha depois dos outros fatos — a mensagem é o fato
+		// mais longo e o único que pode encolher sem virar outra informação.
+		room := maxInt(16, width-factLabelW-32)
+		out = append(out, StyleMuted.Render(truncate(msg, room)+"  "+commitAge(p)))
+	}
+	return out
+}
 
-	return []string{
-		StyleMuted.Render(strings.Repeat("─", width)),
-		truncateVisible(dotStyle.Render(glyph)+" "+StyleNormal.Bold(true).Render(p.Name)+
-			StyleMuted.Render("   "+shortenPath(p.Path)), width),
-		joinWithSpacer(truncateVisible(details, width), commit, width),
+// projectStatusWord é a ÚNICA fonte da palavra de estado do app.
+//
+// Havia duas: statusLabel escrevia "Running/Degraded/Stopped/Unknown" na
+// sidebar e no cabeçalho de módulo, e esta escrevia "rodando/degradado/parado"
+// no dashboard. O mesmo projeto, na mesma tela, com dois nomes para o mesmo
+// estado — e um deles em inglês, num app em português (§10).
+//
+// Sem o texto, dois estados dependeriam só da cor (§1).
+func projectStatusWord(s core.ProjectStatus) string {
+	switch s {
+	case core.StatusRunning:
+		return "rodando"
+	case core.StatusStopped:
+		return "parado"
+	case core.StatusDegraded:
+		return "degradado"
+	default:
+		return "sem status"
 	}
 }
 
 // ─── colunas ────────────────────────────────────────────────────────────────
 
 type tableCols struct {
-	dot, name, stack, branch, ctrs, ports, commit, path int
-	total                                               int
+	dot, name, branch, path int
+	total                   int
 }
 
-// tableColumns liga as colunas opcionais por faixa de largura: primeiro STACK,
-// depois COMMIT, depois PORTAS — sempre preservando NOME e CAMINHO legíveis.
+// tableColumns distribui as colunas da lista. STACK, CTR, COMMIT e PORTAS
+// saíram daqui: nenhuma das quatro muda a decisão de "em qual projeto eu entro
+// agora" — elas respondem "o que é este projeto" e "por onde eu chego nele",
+// que são perguntas do detalhe. As quatro vivem no painel do selecionado
+// (renderSelectedStrip), onde cabem inteiras: TODAS as stacks em vez de só a
+// principal, a mensagem do commit em vez de só a idade, e a lista de portas
+// sem o "+14" de quando não cabia.
+//
+// Restam as quatro que DECIDEM, e só elas:
+//
+//	glifo    como está          é o que faz o olho parar na linha
+//	NOME     qual é             é como se procura
+//	BRANCH   em que estou       é o que muda entre duas janelas do mesmo projeto
+//	CAMINHO  qual dos homônimos  três "digiliza" só se separam pelo caminho
+//
+// Sem as opcionais não há mais faixas de largura: as quatro entram sempre, e
+// a largura que sobra vai para CAMINHO, que era quem mais apanhava.
 func tableColumns(tableW int) tableCols {
 	const (
 		minName       = 16
-		maxName       = 28
+		maxName       = 32
 		minPath       = 14
 		goodPath      = 40
-		maxBranchGrow = 8
+		maxBranchGrow = 12
 	)
-	c := tableCols{dot: projectWaveWidth, branch: 18, ctrs: 3, total: tableW}
+	c := tableCols{dot: projectWaveWidth, branch: 18, total: tableW}
 
 	// 2 colunas p/ a barra de seleção, 1 espaço + 1 p/ a scrollbar.
 	avail := maxInt(24, tableW-4)
 	if avail < 70 {
 		c.branch = maxInt(9, avail/5)
 	}
-	// 4 gaps entre as 5 colunas sempre visíveis (dot, nome, branch, ctr, path).
-	flex := avail - c.dot - c.branch - c.ctrs - 4
+	// 3 gaps entre as 4 colunas.
+	flex := avail - c.dot - c.branch - 3
 
-	// keep = o que precisa sobrar para NOME + CAMINHO depois de ligar a coluna.
-	for _, opt := range []struct {
-		w, keep int
-		dst     *int
-	}{{9, 36, &c.stack}, {6, 32, &c.commit}, {19, 44, &c.ports}} {
-		if flex-(opt.w+1) >= opt.keep {
-			*opt.dst = opt.w
-			flex -= opt.w + 1
-		}
-	}
-
-	// NOME tem teto: acima de ~28 colunas ele só acumula espaço em branco, e
+	// NOME tem teto: acima de ~32 colunas ele só acumula espaço em branco, e
 	// quem ainda precisa de largura é BRANCH (feature/…) e CAMINHO.
 	c.name = minInt(maxName, maxInt(minName, flex*48/100))
 	grow := maxInt(0, minInt(maxBranchGrow, flex-c.name-goodPath))
@@ -560,12 +778,13 @@ func (a *App) renderDashboardFooter(width int) string {
 		[2]string{"ENTER", "git"},
 		[2]string{"c", "containers"},
 		[2]string{"/", "filtrar"},
-		[2]string{"^p", "fuzzy"},
-		[2]string{"S-E", "terminal"},
-		[2]string{"S-O", "opencode"},
-		[2]string{"r", "refresh"},
-		[2]string{"T", "tema"},
-		[2]string{"^t", "relax"},
+		[2]string{"ctrl+p", "fuzzy"},
+		[2]string{"shift+E", "terminal"},
+		[2]string{"ctrl+o", a.aiToolLabel()},
+		[2]string{"shift+C", "preferências"},
+		[2]string{"r", "atualizar"},
+		[2]string{"shift+T", "tema"},
+		[2]string{"ctrl+t", "relax"},
 	)
 	if head == "" {
 		return StyleStatusBar.Width(width).Render(tail)
@@ -614,7 +833,7 @@ func fitKeybindsCount(width int, items ...[2]string) (string, int) {
 		if used > 0 {
 			b.WriteString(StyleMuted.Render(" · "))
 		}
-		b.WriteString(renderKeybind(it[0], it[1]))
+		b.WriteString(keyHint(it[0], it[1]))
 		used += need
 		n++
 	}
@@ -662,13 +881,6 @@ func statusLevel(s core.ProjectStatus) (pulseLevel, lipgloss.Style) {
 	default:
 		return pulseIdle, StyleMuted
 	}
-}
-
-func stackLabel(p core.Project) string {
-	if p.Framework.Name == "" {
-		return emDash
-	}
-	return p.Framework.Name
 }
 
 func stackStyle(name string) lipgloss.Style {
@@ -739,18 +951,7 @@ func elideLeft(s string, width int) string {
 	return "…" + runewidth.TruncateLeft(s, w-(width-1), "")
 }
 
-func truncateVisible(s string, width int) string {
-	if lipgloss.Width(s) <= width {
-		return s
-	}
-	return padRightVisible(s, width)
-}
-
 // ─── layout / estado ────────────────────────────────────────────────────────
-
-func (a *App) dashboardCompact() bool {
-	return a.height > 0 && a.height < 28
-}
 
 func (a *App) dashboardProjectsViewport() int {
 	h := a.height
@@ -764,11 +965,10 @@ func (a *App) dashboardProjectsViewport() int {
 	if a.dashboardCompact() {
 		reserved = 9 // sem faixa do host: os medidores voltam para o canto
 	}
-	// Em tela alta o detalhe do selecionado é fixo: layout que muda de forma
-	// conforme a lista cresce lê pior do que 3 linhas sempre reservadas.
-	if h >= 32 {
-		reserved += 3
-	}
+	// Em tela alta o painel do selecionado é fixo: layout que muda de forma
+	// conforme a lista cresce lê pior do que linhas sempre reservadas. São as
+	// 5 de renderSelectedStrip — régua, identidade e os três fatos rotulados.
+	reserved += selectedStripHeightFor(h, len(a.snapshot.Projects))
 	if v := h - reserved; v > 3 {
 		return v
 	}
@@ -811,16 +1011,7 @@ func projectStatusStyle(s core.ProjectStatus) lipgloss.Style {
 // vocabulário do dashboard: o pulso em Braille virava "⋯ Stop" em fonte pequena.
 func statusLabel(s core.ProjectStatus, frame int) string {
 	glyph, _ := statusDot(s, frame)
-	switch s {
-	case core.StatusRunning:
-		return glyph + " Running"
-	case core.StatusStopped:
-		return glyph + " Stopped"
-	case core.StatusDegraded:
-		return glyph + " Degraded"
-	default:
-		return glyph + " Unknown"
-	}
+	return glyph + " " + projectStatusWord(s)
 }
 
 // barSolid é a barra de progresso das telas novas: blocos cheios leem em
@@ -891,19 +1082,21 @@ func isNestedProject(path string, projects []core.Project) bool {
 	return false
 }
 
-// joinWithSpacer nunca estoura totalWidth: quando os dois lados não cabem
-// juntos (nome de projeto comprido + vários chips de status), encolhe a
-// esquerda em vez de deixar a linha mais larga que a tela.
-func joinWithSpacer(left, right string, totalWidth int) string {
-	rightW := lipgloss.Width(right)
-	if rightW > totalWidth {
-		right = truncateVisible(right, totalWidth)
-		rightW = lipgloss.Width(right)
+// renderAppsStrip lista os programas externos cadastrados no config, com a
+// tecla que os abre. Só aparece se houver algum: sem atalho cadastrado, uma
+// faixa vazia dizendo "configure atalhos" seria ocupar linha à toa.
+func (a *App) renderAppsStrip(width int) string {
+	if a.cfg == nil {
+		return ""
 	}
-	spacer := totalWidth - lipgloss.Width(left) - rightW
-	if spacer < 1 {
-		left = truncateVisible(left, maxInt(0, totalWidth-rightW-1))
-		return lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right)
+	apps := a.cfg.AppShortcuts()
+	if len(apps) == 0 {
+		return ""
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, left, strings.Repeat(" ", spacer), right)
+	cells := make([][2]string, 0, len(apps))
+	for _, app := range apps {
+		cells = append(cells, [2]string{app.Key, app.Name})
+	}
+	inner := maxInt(10, width-2)
+	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(inner, 2, cells...))
 }

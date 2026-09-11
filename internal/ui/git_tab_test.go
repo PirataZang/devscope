@@ -52,9 +52,9 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 		snapshot:         core.Snapshot{Projects: []core.Project{project}},
 	}
 	got := stripANSI(a.renderGitTab(&project))
+	// A tela padrão é a prioridade da sessão 5: BRANCHES + COMMITS + WORKTREE.
 	for _, want := range []string{
-		"BRANCHES", "COMMITS", "ALTERAÇÕES", "LOG DE COMANDOS",
-		"STASHES", "DES-2834", "stash@{0}",
+		"BRANCHES", "COMMITS", "ALTERAÇÕES", "DES-2834",
 		"github.com/org/repo", // o remoto vive no cabeçalho agora
 		// comandos por extenso na barra larga, no lugar da coluna AÇÕES
 		"commit", "checkout", "cherry-pick",
@@ -63,6 +63,29 @@ func TestRenderGitMainShowsBottomBoxes(t *testing.T) {
 			t.Fatalf("git main missing %q in:\n%s", want, got)
 		}
 	}
+	// Log de comandos e stashes saíram do rodapé permanente para a gaveta:
+	// um é evento, o outro é consulta. Ver git_drawer.go.
+	for _, gone := range []string{"LOG DE COMANDOS", "STASHES", "stash@{0}"} {
+		if strings.Contains(got, gone) {
+			t.Fatalf("%q não deveria ocupar a tela por padrão:\n%s", gone, got)
+		}
+	}
+	// Mas a barra de comandos diz onde eles estão.
+	for _, want := range []string{"ctrl+l", "log de comandos", "stash 2"} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("a barra não anuncia a gaveta (%q):\n%s", want, got)
+		}
+	}
+	// E a gaveta os traz inteiros.
+	a.openGitDrawer(gitDrawerStash)
+	if drawer := stripANSI(a.renderGitTab(&project)); !strings.Contains(drawer, "STASHES") || !strings.Contains(drawer, "stash@{0}") {
+		t.Fatalf("a gaveta de stash não abriu:\n%s", drawer)
+	}
+	a.openGitDrawer(gitDrawerLog)
+	if drawer := stripANSI(a.renderGitTab(&project)); !strings.Contains(drawer, "LOG DE COMANDOS") {
+		t.Fatalf("a gaveta de log não abriu:\n%s", drawer)
+	}
+	a.closeGitDrawer()
 	// ACTIVITY mostrava o mesmo que o LOG DE COMANDOS logo abaixo; a coluna
 	// AÇÕES e a caixa REMOTOS viraram barra de comandos e cabeçalho.
 	for _, gone := range []string{"ACTIVITY", "┌─AÇÕES", "┌─REMOTOS"} {

@@ -356,7 +356,7 @@ func (a *App) renderPullStrategyBox(source string, width, height int) string {
 	innerW := maxInt(28, boxW-6)
 	lines := tunnelModalChrome("GIT", color, "Pull divergente", "fast-forward impossível — escolha a estratégia", "", innerW)
 	lines = append(lines, "")
-	nameBox := renderApiTitledBox("origem",
+	nameBox := panelBox("origem",
 		[]string{StyleWarning.Bold(true).Render(truncate("origin/"+firstNonEmpty(source, "—"), innerW-2))},
 		innerW, 3, true,
 	)
@@ -404,17 +404,17 @@ func (a *App) renderGitPrompt() string {
 	lines := []string{
 		brand + StyleMuted.Render("  ·  ") + StyleNormal.Render(title),
 		StyleMuted.Render(subtitle),
-		StyleMuted.Render(strings.Repeat("─", minInt(innerW, 48))),
+		rule(minInt(innerW, 48)),
 	}
 	if proj != "" {
 		lines = append(lines, StyleMuted.Render("projeto  ")+StyleNormal.Render(truncate(proj, maxInt(12, innerW-10))))
 	}
 
-	baseBox := renderApiTitledBox(baseLabel,
+	baseBox := panelBox(baseLabel,
 		[]string{StyleWarning.Bold(true).Render(truncate(baseBranch, innerW-2))},
 		innerW, 3, false,
 	)
-	nameBox := renderApiTitledBox("nome",
+	nameBox := panelBox("nome",
 		[]string{StyleSelected.Render(truncate(typed, innerW-2))},
 		innerW, 3, true,
 	)

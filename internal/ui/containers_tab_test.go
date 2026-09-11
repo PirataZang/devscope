@@ -76,7 +76,7 @@ func TestContainerRestartAlwaysIndicator(t *testing.T) {
 		t.Fatal("db should not show always marker")
 	}
 	// A barra de comandos larga precisa continuar oferecendo a troca de política.
-	if !strings.Contains(got, "S-R") || !strings.Contains(strings.ToLower(got), "reinício") {
+	if !strings.Contains(got, "shift+R") || !strings.Contains(strings.ToLower(got), "reinício") {
 		t.Fatalf("barra de comandos deve listar S-R reinício:\n%s", truncate(got, 600))
 	}
 }
@@ -223,9 +223,12 @@ func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
 	if strings.Contains(plain, "\r") || strings.Contains(plain, "\t") {
 		t.Fatal("control chars must be sanitized before render")
 	}
-	// AÇÕES saiu do rodapé: virou barra larga de comandos no fim da tela.
-	if !strings.Contains(plain, "LOGS") || !strings.Contains(plain, "PORTAS") {
-		t.Fatalf("bottom panels missing:\n%s", truncate(plain, 300))
+	// AÇÕES saiu do rodapé (virou barra larga) e as três caixas lado a lado
+	// viraram fatos rotulados + UMA caixa de logs.
+	for _, want := range []string{"LOGS", "portas", "recursos"} {
+		if !strings.Contains(plain, want) {
+			t.Fatalf("detalhe do container sem %q:\n%s", want, truncate(plain, 300))
+		}
 	}
 	if strings.Contains(plain, "AÇÕES") {
 		t.Fatalf("AÇÕES não deveria mais ocupar coluna no rodapé:\n%s", truncate(plain, 300))
@@ -285,36 +288,39 @@ func TestContainerOnlyDockerHidesMissing(t *testing.T) {
 	}
 }
 
-func TestContainersActionsBoxListsAllShortcuts(t *testing.T) {
-	a := &App{containerOnlyDocker: true, containerShowAll: false}
-	items := a.containerActionItems()
-	if len(items) < 12 {
-		t.Fatalf("too few actions: %d", len(items))
-	}
-	box := renderContainersActionsBox(30, 8, items...)
-	plain := stripANSI(box)
-	for _, key := range []string{"enter", "m", "v", "S-U", "S-D", "g", "/"} {
+// A coluna vertical AÇÕES virou barra de comandos larga: é ela que precisa
+// listar os atalhos agora. Antes este teste guardava uma caixa que só era
+// desenhada dentro de um `if false`.
+func TestContainersCommandBarListsAllShortcuts(t *testing.T) {
+	a := &App{width: 160, height: 40, containerOnlyDocker: true}
+	plain := stripANSI(a.renderContainersCommandBar(160))
+	for _, key := range []string{"enter", "m", "e", "r", "s", "p", "d", "i", "n", "shift+R", "shift+U", "shift+D", "A", "v"} {
 		if !strings.Contains(plain, key) {
-			t.Fatalf("missing action %q in:\n%s", key, truncate(plain, 500))
+			t.Fatalf("atalho %q sumiu da barra de comandos:\n%s", key, plain)
 		}
 	}
 }
 
-func TestContainerPreviewPortLines(t *testing.T) {
-	p := core.Project{
-		Path: "/apps/one", Name: "alpha",
-		Containers: []core.Container{
-			{ID: "c1", Name: "web", Status: "running", Ports: "127.0.0.1:8080->80/tcp", ProjectPath: "/apps/one"},
-		},
+// As portas eram um painel com moldura; agora são uma linha de fatos no detalhe
+// do container. A tela dedicada (enter) continua inteira.
+func TestContainerPortFacts(t *testing.T) {
+	a := &App{width: 120, height: 40}
+	facts := a.containerPortFacts(core.Container{Ports: "0.0.0.0:8080->80/tcp, 0.0.0.0:5432->5432/tcp"})
+	joined := stripANSI(strings.Join(facts, " "))
+	for _, want := range []string{":8080", "80/tcp", ":5432"} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("porta %q perdida: %q", want, joined)
+		}
 	}
-	a := &App{selectedProject: &p, snapshot: core.Snapshot{Projects: []core.Project{p}}}
-	lines := a.containerPreviewPortLines(5, 40)
-	plain := stripANSI(strings.Join(lines, "\n"))
-	if !strings.Contains(plain, ":8080") {
-		t.Fatalf("expected host port in bottom panel:\n%s", plain)
+	if got := a.containerPortFacts(core.Container{}); len(got) != 0 {
+		t.Fatalf("sem portas a linha vira %q via factLine, não %v", emDash, got)
+	}
+	// Muitas portas: corta com "+N" em vez de estourar a linha.
+	many := a.containerPortFacts(core.Container{Ports: "0.0.0.0:1->1/tcp, 0.0.0.0:2->2/tcp, 0.0.0.0:3->3/tcp, 0.0.0.0:4->4/tcp, 0.0.0.0:5->5/tcp, 0.0.0.0:6->6/tcp"})
+	if !strings.Contains(stripANSI(strings.Join(many, " ")), "+2") {
+		t.Fatalf("o excedente devia virar +N: %q", stripANSI(strings.Join(many, " ")))
 	}
 }
-
 func TestContainerShowAllIncludesProjectColumn(t *testing.T) {
 	p1 := core.Project{
 		Path: "/apps/one", Name: "alpha-app",
@@ -479,5 +485,163 @@ func TestShowAllPaintsForeignProjectDifferently(t *testing.T) {
 	}
 	if got := a.containerProjectLabel(core.Container{Name: "c"}); got != "órfão" {
 		t.Fatalf("sem projeto: %q", got)
+	}
+}
+
+// ─── sessão 4: lista dominante, detalhe sem quatro molduras ─────────────────
+
+func containersFixture(n int) []core.Container {
+	out := make([]core.Container, 0, n)
+	for i := 0; i < n; i++ {
+		out = append(out, core.Container{
+			ID: fmt.Sprintf("c%d", i), Name: fmt.Sprintf("svc-%d", i),
+			Image: "img:latest", State: "running", Status: "Up 2 hours",
+			CPU: 3.5, Memory: 120 << 20,
+		})
+	}
+	return out
+}
+
+// A lista PEDE o que precisa. Antes a divisão era fixa em 66/34 e sete
+// containers deixavam dez linhas em branco dentro da caixa LISTA.
+func TestContainerSplitGivesListWhatItNeeds(t *testing.T) {
+	const bodyH = 30
+	small, smallDetail := containerSplitHeight(bodyH, 5)
+	if small > 5+4 {
+		t.Fatalf("com 5 containers a lista não deveria passar de %d linhas, pegou %d", 5+4, small)
+	}
+	if small+smallDetail != bodyH {
+		t.Fatalf("a soma tem de fechar a altura: %d+%d != %d", small, smallDetail, bodyH)
+	}
+	// Muitos containers: a lista cresce, o detalhe cede até o piso.
+	big, bigDetail := containerSplitHeight(bodyH, 40)
+	if big <= small {
+		t.Fatalf("com 40 containers a lista deveria crescer (%d → %d)", small, big)
+	}
+	if bigDetail < 9 {
+		t.Fatalf("o detalhe não pode cair abaixo do piso legível: %d", bigDetail)
+	}
+	if big+bigDetail != bodyH {
+		t.Fatalf("a soma tem de fechar a altura: %d+%d != %d", big, bigDetail, bodyH)
+	}
+	// Terminal curto: os dois ainda existem.
+	for _, h := range []int{12, 14, 16, 20, 24, 40, 60} {
+		tb, dt := containerSplitHeight(h, 30)
+		if tb < 6 || dt < 5 || tb+dt != h {
+			t.Fatalf("altura %d: lista=%d detalhe=%d", h, tb, dt)
+		}
+	}
+}
+
+// O aviso de "há mais containers" ficava numa linha DEPOIS da janela, e o
+// fitExactLines cortava exatamente ela — nunca chegou à tela.
+func TestContainerListAnnouncesOffscreenRows(t *testing.T) {
+	p := &core.Project{Path: "/p", Name: "app", Containers: containersFixture(20)}
+	a := &App{width: 120, height: 40, selectedProject: p, tab: TabContainers,
+		snapshot: core.Snapshot{Projects: []core.Project{*p}}}
+	plain := stripANSI(a.renderContainersTable(p.Containers, 100, 10))
+	if !strings.Contains(plain, "↓") {
+		t.Fatalf("a lista não avisa que há mais containers abaixo:\n%s", plain)
+	}
+	a.containerScroll, a.tabCursor = 10, 10
+	plain = stripANSI(a.renderContainersTable(p.Containers, 100, 10))
+	if !strings.Contains(plain, "↑") {
+		t.Fatalf("rolada, a lista não avisa que há containers acima:\n%s", plain)
+	}
+}
+
+// Comparar antes de descrever: CPU/MEM/TEMPO sobrevivem em telas estreitas,
+// IMAGEM e PORTAS cedem primeiro — elas estão no detalhe do selecionado.
+func TestContainerColumnsPrioritizeComparison(t *testing.T) {
+	for _, tw := range []int{52, 60, 73, 90, 117, 160, 200} {
+		a := &App{width: 200, containerTableWidth: tw}
+		c := a.containerColumns()
+		if c.cpu == 0 || c.mem == 0 || c.uptime == 0 {
+			t.Fatalf("largura %d: CPU/MEM/TEMPO deviam sobreviver: %+v", tw, c)
+		}
+		if c.name < 12 {
+			t.Fatalf("largura %d: NOME ilegível (%d)", tw, c.name)
+		}
+		if c.ports > 0 && c.image == 0 {
+			t.Fatalf("largura %d: PORTAS não pode entrar antes de IMAGEM: %+v", tw, c)
+		}
+		// A linha inteira tem de caber na tabela.
+		used := 1 + c.dot + c.name + c.cpu + c.mem + c.uptime + 4
+		for _, opt := range []int{c.state, c.project, c.image, c.ports} {
+			if opt > 0 {
+				used += opt + 1
+			}
+		}
+		if used > tw {
+			t.Fatalf("largura %d: colunas somam %d: %+v", tw, used, c)
+		}
+	}
+}
+
+// `g` continua ciclando a métrica, mas agora compra RESOLUÇÃO em vez de só
+// apagar duas linhas.
+func TestStatsModeFocusBuysResolution(t *testing.T) {
+	p := &core.Project{Path: "/p", Name: "app", Containers: containersFixture(2)}
+	a := &App{width: 140, height: 44, selectedProject: p, tab: TabContainers,
+		snapshot:            core.Snapshot{Projects: []core.Project{*p}},
+		containerCPUHistory: []float64{5, 9, 14, 11, 18, 12},
+		containerMemHistory: []float64{20, 22, 21, 25, 24, 23},
+		containerNetHistory: []float64{100, 120, 90, 140, 110, 130},
+	}
+	all := stripANSI(strings.Join(a.containerResourceFacts(p.Containers[0], 130), " "))
+	for _, want := range []string{"CPU", "MEM", "NET"} {
+		if !strings.Contains(all, want) {
+			t.Fatalf("modo 0 mostra as três: falta %q em %q", want, all)
+		}
+	}
+	for mode, unique := range map[int]string{1: "CPU", 2: "MEM", 3: "NET"} {
+		a.containerStatsMode = mode
+		got := stripANSI(strings.Join(a.containerResourceFacts(p.Containers[0], 130), " "))
+		if !strings.Contains(got, "média") || !strings.Contains(got, "pico") {
+			t.Fatalf("modo %d (%s) devia trazer média e pico: %q", mode, unique, got)
+		}
+		if lbl := a.containerResourceLabel(); !strings.Contains(lbl, "g") {
+			t.Fatalf("modo %d: o rótulo deve anunciar a tecla g, veio %q", mode, lbl)
+		}
+	}
+	a.containerStatsMode = 0
+	if lbl := a.containerResourceLabel(); lbl != "recursos" {
+		t.Fatalf("modo 0 devia ser %q, veio %q", "recursos", lbl)
+	}
+}
+
+// Um log é uma cauda: a última linha encosta na borda de baixo, como num tail.
+func TestPadLinesTopAnchorsTheTail(t *testing.T) {
+	got := padLinesTop([]string{"a", "b"}, 5)
+	if len(got) != 5 || got[4] != "b" || got[3] != "a" || got[0] != "" {
+		t.Fatalf("a cauda devia encostar embaixo: %q", got)
+	}
+	// Mais linhas que espaço: fica com as últimas.
+	got = padLinesTop([]string{"a", "b", "c", "d"}, 2)
+	if len(got) != 2 || got[0] != "c" || got[1] != "d" {
+		t.Fatalf("devia manter as duas últimas: %q", got)
+	}
+}
+
+// O detalhe tem altura fixa e nunca estoura a largura, com ou sem seleção.
+func TestContainerDetailHeadIsStable(t *testing.T) {
+	p := &core.Project{Path: "/p", Name: "app", Containers: containersFixture(3)}
+	for _, sel := range []bool{true, false} {
+		a := &App{width: 160, height: 44, tab: TabContainers,
+			snapshot: core.Snapshot{Projects: []core.Project{*p}}}
+		if sel {
+			a.selectedProject = p
+		}
+		for _, w := range []int{40, 60, 80, 100, 120, 160, 200} {
+			head := a.containerDetailHeadLines(w)
+			if len(head) != 4 {
+				t.Fatalf("sel=%v w=%d: detalhe com %d linhas, esperado 4", sel, w, len(head))
+			}
+			for i, l := range head {
+				if lipgloss.Width(l) > w {
+					t.Fatalf("sel=%v w=%d: linha %d mede %d", sel, w, i, lipgloss.Width(l))
+				}
+			}
+		}
 	}
 }

@@ -412,12 +412,12 @@ func (a *App) renderRelaxSidebar(height int) string {
 	rows := make([]string, 0, contentH)
 	rows = append(rows, relaxBanner(inner, a.relaxRainbowTime())...)
 	rows = append(rows, StyleMuted.Render(truncate("respira · nada roda aqui", inner)))
-	rows = append(rows, sidebarRule(inner, accent))
+	rows = append(rows, ruleColored(inner, accent))
 	rows = append(rows, sidebarGroupLabel("ANIMATIONS", inner, accent))
 	// A lista rola pra manter a cena escolhida à vista: com dezesseis cenas
 	// ela deixa de caber em terminal baixo, e antes as últimas simplesmente
 	// sumiam do menu.
-	foot := []string{sidebarRule(inner, ColorBorder), StyleMuted.Render("ctrl+t · esc")}
+	foot := []string{ruleColored(inner, ColorBorder), StyleMuted.Render("ctrl+t · esc")}
 	listH := maxInt(3, contentH-len(rows)-len(foot))
 	start := 0
 	if len(relaxGames) > listH {
@@ -559,7 +559,7 @@ func (a *App) renderRelaxStage(width, height int) string {
 	}
 	lines = append(lines, block...)
 	lines = append(lines, caption...)
-	return renderApiTitledBox(title, fitExactLines(lines, bodyH), width, height, true)
+	return panelBox(title, fitExactLines(lines, bodyH), width, height, true)
 }
 
 func relaxCenterLine(line string, width int) string {

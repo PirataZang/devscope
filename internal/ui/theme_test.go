@@ -55,7 +55,7 @@ func TestThemesCatalog(t *testing.T) {
 func TestThemePickerSaves(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("HOME", dir)
-	cfgPath := filepath.Join(dir, ".config", "devscope", "config.yaml")
+	cfgPath := filepath.Join(dir, ".config", "devscope", "user_config.txt")
 
 	a := &App{width: 80, height: 24, cfg: &config.Config{UI: config.UIConfig{Theme: "dark"}}}
 	ApplyTheme("dark")
@@ -76,8 +76,8 @@ func TestThemePickerSaves(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(b), "devscope") {
-		t.Fatalf("config missing theme: %s", b)
+	if !strings.Contains(string(b), "Theme: devscope") {
+		t.Fatalf("user_config sem o tema: %s", b)
 	}
 	loaded, err := config.Load("")
 	if err != nil {

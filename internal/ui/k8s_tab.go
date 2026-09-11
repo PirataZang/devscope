@@ -142,68 +142,29 @@ func (a *App) leaveK8sTab() tea.Cmd {
 }
 
 func (a *App) renderK8sLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	available := a.landingK8sAvail
-	kctx := a.landingK8sCtx
-	manifestsN := a.landingK8sManifests
-	status := "…"
-	if a.landingK8sOK {
-		status = "offline"
-		if available {
-			status = "ready"
+	available, kctx, n := a.landingK8sAvail, a.landingK8sCtx, a.landingK8sManifests
+	state := landingToolState(a.landingK8sOK, available, "kubectl", "")
+	if a.landingK8sOK && available && kctx != "" {
+		state = StyleHealthy.Render(a.okPulse() + " kubectl conectado")
+	}
+	var facts [][2]string
+	if a.landingK8sOK && available {
+		facts = [][2]string{
+			{"contexto", StyleNormal.Render(firstNonEmpty(truncate(kctx, 40), emDash))},
+			{"manifest", StyleNormal.Render(fmt.Sprintf("%d", n)) + StyleMuted.Render("  em k8s/ do projeto")},
 		}
 	}
-	ctx := a.renderModuleContext(p, w, "KUBERNETES", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-	openH := maxInt(7, bodyH*40/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("explorer · workloads · logs · yaml · events"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingK8sOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !available:
-		openLines = append(openLines, "", StyleUnhealthy.Render("kubectl não encontrado no PATH"))
-	default:
-		if kctx == "" {
-			kctx = "(sem context)"
-		}
-		openLines = append(openLines, "", StyleMuted.Render("context  ")+StyleWarning.Render(kctx))
-	}
-	featLines := []string{
-		StyleMuted.Render("pods · deployments · services"),
-		StyleMuted.Render("logs live · yaml · apply/edit"),
-		StyleMuted.Render("manifests do projeto (k8s/)"),
-	}
-	if a.landingK8sOK && manifestsN > 0 {
-		featLines = append(featLines, StyleMuted.Render(fmt.Sprintf("%d manifests detectados", manifestsN)))
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("KUBERNETES", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, ctxLabel, yamlLabel := "…", "…", "…"
-	if a.landingK8sOK {
-		cliLabel = boolLabel(available)
-		ctxLabel = truncate(kctx, 18)
-		yamlLabel = fmt.Sprintf("%d", manifestsN)
-	}
-	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Context ") + StyleMuted.Render(ctxLabel),
-		StyleMuted.Render("YAML    ") + StyleNormal.Render(yamlLabel),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"r", "refresh"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "KUBERNETES",
+		tagline:      "pods, deployments e services do contexto atual — logs, yaml e apply",
+		state:        state,
+		facts:        facts,
+		previewTitle: "MANIFESTS DESTE PROJETO",
+		preview:      a.landingFileRows(a.landingK8sNames),
+		previewEmpty: "nenhum .yaml em k8s/, kubernetes/, manifests/ ou deploy/",
+		previewFoot:  k8sManifestFoot(n),
+		actions:      [][2]string{{"enter", "abrir console"}, {"r", "refresh"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) loadK8sMeta() tea.Cmd {
@@ -634,7 +595,7 @@ func (a *App) renderK8sTable(width, height int) string {
 
 	lines := []string{
 		"  " + a.k8sTableHeader(inner-2),
-		StyleMuted.Render(strings.Repeat("─", inner)),
+		rule(inner),
 	}
 	if n == 0 {
 		if a.k8sLoading {
@@ -649,7 +610,7 @@ func (a *App) renderK8sTable(width, height int) string {
 			lines = append(lines, a.renderK8sRow(i, inner-2, i == a.k8sCursor, focus))
 		}
 	}
-	return renderApiTitledBox(a.k8sTableTitle(n), fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
+	return panelBox(a.k8sTableTitle(n), fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
 type k8sCols struct{ dot, name, status, ready, restarts, node, ip, age int }
@@ -850,13 +811,13 @@ func k8sRestartStyle(restarts string) lipgloss.Style {
 func (a *App) k8sTableTitle(n int) string {
 	switch a.k8sKind {
 	case k8sKindPods:
-		return fmt.Sprintf("PODS (%d)", n)
+		return panelTitle("PODS", fmt.Sprint(n))
 	case k8sKindDeploys:
-		return fmt.Sprintf("DEPLOYMENTS (%d)", n)
+		return panelTitle("DEPLOYMENTS", fmt.Sprint(n))
 	case k8sKindServices:
-		return fmt.Sprintf("SERVICES (%d)", n)
+		return panelTitle("SERVICES", fmt.Sprint(n))
 	default:
-		return fmt.Sprintf("MANIFESTS (%d)", n)
+		return panelTitle("MANIFESTS", fmt.Sprint(n))
 	}
 }
 
@@ -896,7 +857,7 @@ func (a *App) renderK8sLogsPane(width, height int) string {
 	if focus {
 		title = "> POD LOGS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) k8sColorLogLine(line string, focus bool) string {
@@ -935,7 +896,7 @@ func (a *App) renderK8sYAMLPane(width, height int) string {
 	if focus {
 		title = "> YAML"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) renderK8sDetailPane(width, height int) string {
@@ -973,7 +934,7 @@ func (a *App) renderK8sDetailPane(width, height int) string {
 	if focus {
 		title = "> DETAILS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) k8sResourceSummary(r collectors.K8sResource) string {
@@ -1014,7 +975,7 @@ func (a *App) renderK8sEventsView(width, height int) string {
 	for _, line := range raw[start:end] {
 		lines = append(lines, StyleNormal.Render(truncate(sanitizeTerminalLine(line), width-2)))
 	}
-	return renderApiTitledBox(fmt.Sprintf("EVENTS · %s", a.k8sNamespace), fitExactLines(lines, height-2), width, height, true)
+	return panelBox(panelTitle("EVENTS", a.k8sNamespace), fitExactLines(lines, height-2), width, height, true)
 }
 
 func (a *App) renderK8sRelation(width int) string {
@@ -1054,7 +1015,7 @@ func (a *App) renderK8sEditor(width, height int) string {
 	for _, line := range raw[start:end] {
 		lines = append(lines, StyleSelected.Render(truncate(sanitizeTerminalLine(line), width-2)))
 	}
-	return renderApiTitledBox("[yaml edit]", fitExactLines(lines, height-2), width, height, true)
+	return panelBox("[yaml edit]", fitExactLines(lines, height-2), width, height, true)
 }
 
 func (a *App) handleK8sKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {

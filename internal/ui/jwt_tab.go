@@ -71,45 +71,15 @@ func (a *App) leaveJwtTab() tea.Cmd {
 }
 
 func (a *App) renderJwtLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	ctx := a.renderModuleContext(p, w, "JWT", "utils")
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(5, bodyH*28/100)
-	featH := maxInt(5, bodyH*28/100)
-	keysH := maxInt(6, bodyH-openH-featH)
-	openLines := append([]string{StyleMuted.Render("decode · verify · generate · sign — estilo jwt.io")}, moduleOpenHint()...)
-	featLines := []string{
-		StyleMuted.Render("token colorido (header · payload · sig)"),
-		StyleMuted.Render("claims com times (iat/nbf/exp)"),
-		StyleMuted.Render("HS* / RS* / ES* / EdDSA  ·  [] troca alg"),
-		StyleMuted.Render("export JSON  ·  copy token/result"),
-	}
-	keyLines := []string{
-		StyleMuted.Render("d Decode   v Verify   g Generate   s Sign"),
-		StyleMuted.Render("y Copy token   Y Copy result   c Claims"),
-		StyleMuted.Render("x Export   [] alg   tab painéis"),
-		StyleMuted.Render("e editar · ctrl+y token · ctrl+a/c/x/v"),
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("JWT", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-		renderApiTitledBox("ATALHOS", fitExactLines(keyLines, keysH-2), centerW, keysH, false),
-	)
-	details := []string{
-		StyleMuted.Render("Alg   ") + StyleNormal.Render(firstNonEmpty(a.jwtAlg, "HS256")),
-		StyleMuted.Render("Modos ") + StyleMuted.Render("decode·verify·sign"),
-		StyleMuted.Render("Extra ") + StyleMuted.Render("claims · export"),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir cliente"},
-		[2]string{"tab", "módulo"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:   "JWT",
+		tagline: "decodifica, verifica e assina token — claims com iat/nbf/exp",
+		facts: [][2]string{
+			{"alg", StyleNormal.Render(firstNonEmpty(a.jwtAlg, "HS256")) + StyleMuted.Render("  HS* · RS* · ES* · EdDSA")},
+			{"faz", StyleMuted.Render("decode · verify · generate · sign")},
+		},
+		actions: [][2]string{{"enter", "abrir bancada"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderJwtTab(_ *core.Project) string {
@@ -299,7 +269,7 @@ func (a *App) renderJwtSecretBox(width int) string {
 			line = show // already styled by editor
 		}
 	}
-	return renderApiTitledBox(title, fitExactLines([]string{line}, 1), width, 3, focus)
+	return panelBox(title, fitExactLines([]string{line}, 1), width, 3, focus)
 }
 
 func jwtMaskSecret(s string, width int) string {
@@ -331,18 +301,18 @@ func (a *App) renderJwtActionRail(width, height int) string {
 		summary = append(summary, StyleUnhealthy.Render(truncate(a.jwtErr, width-4)))
 	}
 	actions := moduleActionLines(
-		[2]string{"d", "decode"},
-		[2]string{"v", "verify"},
+		[2]string{"d", "decodificar"},
+		[2]string{"v", "verificar"},
 		[2]string{"g", "generate"},
-		[2]string{"s", "sign"},
+		[2]string{"s", "assinar"},
 		[2]string{"c", "claims"},
-		[2]string{"x", "export"},
-		[2]string{"y/Y", "copy"},
+		[2]string{"x", "exportar"},
+		[2]string{"y/Y", "copiar"},
 		[2]string{"e", "editar"},
 	)
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("TOKEN", fitExactLines(summary, sumH-2), width, sumH, false),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		panelBox("TOKEN", fitExactLines(summary, sumH-2), width, sumH, false),
+		panelBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
 	)
 }
 
@@ -370,7 +340,7 @@ func (a *App) renderJwtInputPane(width, height int) string {
 		ed.Anchor = -1
 		lines = a.renderJwtStaticLines(a.jwtInput, a.jwtScrollIn, a.jwtHScrollIn, innerW, viewport, focus, true)
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, focus)
+	return panelBox(title, fitExactLines(lines, viewport), width, height, focus)
 }
 
 func (a *App) renderJwtOutputPane(width, height int) string {
@@ -386,7 +356,7 @@ func (a *App) renderJwtOutputPane(width, height int) string {
 		content = "(decode / verify / sign para ver resultado)"
 	}
 	lines := a.renderJwtStaticLines(content, a.jwtScrollOut, a.jwtHScrollOut, innerW, viewport, focus, false)
-	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, focus)
+	return panelBox(title, fitExactLines(lines, viewport), width, height, focus)
 }
 
 func (a *App) renderJwtStaticLines(content string, vScroll, hScroll, width, height int, focus, colorJWT bool) []string {

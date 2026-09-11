@@ -65,7 +65,7 @@ func TestDbLandingEnterAndEsc(t *testing.T) {
 func TestSidebarShowsDatabaseTool(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabDatabase}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "TOOLS") || !strings.Contains(got, "Database") {
+	if !strings.Contains(got, "DADOS") || !strings.Contains(got, "Database") {
 		t.Fatalf("sidebar missing Database tool: %q", got)
 	}
 	if !strings.Contains(got, "tab · shift+tab") {

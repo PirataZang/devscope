@@ -497,7 +497,7 @@ func renderGraphScrollPane(title string, lines []graphPaneLine, vScroll, hScroll
 	if maxLine > textW || *hScroll > 0 {
 		title += fmt.Sprintf("  ↔ %d", *hScroll)
 	}
-	return renderApiTitledBox(title, fitExactLines(out, inner), width, height, focused)
+	return panelBox(title, fitExactLines(out, inner), width, height, focused)
 }
 
 func (a *App) renderGitGraph(p *core.Project) string {
@@ -509,7 +509,7 @@ func (a *App) renderGitGraph(p *core.Project) string {
 		if a.gitGraphBranchRef != "" {
 			empty = "Sem commits em " + a.gitGraphBranchRef + " — B para trocar de branch."
 		}
-		view := renderApiTitledBox("GIT GRAPH", fitExactLines([]string{StyleMuted.Render(empty)}, h-2), w, h, true)
+		view := panelBox("GIT GRAPH", fitExactLines([]string{StyleMuted.Render(empty)}, h-2), w, h, true)
 		if a.gitGraphBranchPicker {
 			view = overlayCentered(view, a.renderGitGraphBranchPicker(w, h), w, h)
 		}
@@ -550,13 +550,13 @@ func (a *App) renderGitGraphList(width, height int) string {
 	for i := start; i < end; i++ {
 		lines = append(lines, a.renderGitGraphListRow(nodes[i], i == a.gitGraphCursor, width-2))
 	}
-	title := fmt.Sprintf("COMMITS (%d)", len(nodes))
+	title := panelTitle("COMMITS", fmt.Sprint(len(nodes)))
 	if a.gitGraphBranchRef != "" {
 		title += " · " + a.gitGraphBranchRef
 	} else {
 		title += " · todas"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.gitGraphFocus == gitGraphFocusCommits)
+	return panelBox(title, fitExactLines(lines, inner), width, height, a.gitGraphFocus == gitGraphFocusCommits)
 }
 
 func (a *App) renderGitGraphListRow(node graphNode, selected bool, width int) string {

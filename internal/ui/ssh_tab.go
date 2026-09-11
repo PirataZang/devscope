@@ -190,67 +190,44 @@ func (a *App) handleSSHMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) renderSSHLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	available := a.landingSSHAvail
-	liveN := a.landingSSHLive
-	status := "…"
-	if a.landingSSHOK {
-		status = "offline"
-		if liveN > 0 {
-			status = "connected"
-		}
-	}
-	ctx := a.renderModuleContext(p, w, "SSH TUNNEL", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(6, bodyH*35/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("padrão: remote (−R) — abre porta no servidor → seu PC/projeto"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingSSHOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !available:
-		openLines = append(openLines, "", StyleUnhealthy.Render("ssh não encontrado no PATH"))
-	default:
-		openLines = append(openLines, "", StyleMuted.Render("cliente  ")+StyleNormal.Render(firstNonEmpty(a.landingSSHVer, "OpenSSH")))
-		if liveN > 0 {
-			openLines = append(openLines, a.livePulse(fmt.Sprintf("%d túnel(is) ativo(s) nesta sessão", liveN)))
+	live := a.landingSSHLive
+	state := landingToolState(a.landingSSHOK, a.landingSSHAvail, "ssh", "")
+	if a.landingSSHOK && a.landingSSHAvail {
+		if live > 0 {
+			state = StyleHealthy.Render(fmt.Sprintf("%s %d túnel(is) ativo(s) nesta sessão", a.okPulse(), live))
 		} else {
-			openLines = append(openLines, StyleMuted.Render("○ nenhum túnel ativo — n cria e s inicia"))
+			state = StyleWarning.Render("○ nenhum túnel ativo")
 		}
 	}
-	featLines := []string{
-		StyleMuted.Render("remote (−R) padrão · local (−L) · dynamic SOCKS (−D)"),
-		StyleMuted.Render("porta do projeto no PC exposta no servidor"),
-		StyleMuted.Render("start/stop/restart · logs · copy forward"),
-		StyleMuted.Render("config em .devscope/ssh.json"),
+	note := ""
+	if a.landingSSHOK && a.landingSSHAvail && live == 0 {
+		note = StyleMuted.Render("n cria um túnel, s inicia")
 	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("SSH TUNNEL", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, liveLabel := "…", "…"
-	if a.landingSSHOK {
-		cliLabel, liveLabel = boolLabel(available), fmt.Sprintf("%d", liveN)
+	facts := [][2]string{
+		{"modos", StyleMuted.Render("−R remote  ·  −L local  ·  −D socks")},
+		{"config", StyleMuted.Render(".devscope/ssh.json")},
 	}
-	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Live    ") + StyleNormal.Render(liveLabel),
+	if a.landingSSHOK && a.landingSSHAvail {
+		facts = append([][2]string{
+			{"cliente", StyleNormal.Render(firstNonEmpty(a.landingSSHVer, "OpenSSH"))},
+			{"ativos", StyleNormal.Render(fmt.Sprintf("%d", live))},
+		}, facts...)
 	}
 	if p != nil && len(p.Ports) > 0 {
-		details = append(details, StyleMuted.Render("ports  ")+StyleAccent.Render(fmt.Sprintf("%v", p.Ports)))
+		facts = append(facts, [2]string{"portas", StyleAccent.Render(fmt.Sprintf("%v", p.Ports))})
 	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "SSH TUNNEL",
+		tagline:      "porta do projeto exposta no servidor — remote (−R) por padrão",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "O QUE ESTE PROJETO EXPÕE",
+		preview:      landingPortRows(p),
+		previewEmpty: "nenhuma porta publicada — suba o projeto antes de abrir o túnel",
+		previewFoot:  tunnelPortFoot(p, "uma porta no servidor"),
+		actions:      [][2]string{{"enter", "abrir console"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderSSHTab(p *core.Project) string {
@@ -293,15 +270,15 @@ func (a *App) renderSSHCommands(width, height int) string {
 	return renderActionsBox(width, height,
 		[2]string{"n", "novo túnel"},
 		[2]string{"e", "editar"},
-		[2]string{"s", "start"},
-		[2]string{"x", "stop"},
-		[2]string{"r", "restart"},
-		[2]string{"c", "copy forward"},
-		[2]string{"d", "delete"},
+		[2]string{"s", "iniciar"},
+		[2]string{"x", "parar"},
+		[2]string{"r", "reiniciar"},
+		[2]string{"c", "copiar forward"},
+		[2]string{"d", "excluir"},
 		[2]string{"A", "todos/projeto"},
 		[2]string{"1-2", "abas"},
 		[2]string{"tab", "foco painéis"},
-		[2]string{"ctrl+r", "refresh"},
+		[2]string{"ctrl+r", "atualizar"},
 		[2]string{"esc", "voltar"},
 	)
 }
@@ -456,7 +433,7 @@ func (a *App) renderSSHTunnelTable(width, height int) string {
 		"  " + head.Render(joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
 			cell("MODO", c.mode), cell("ENCAMINHAMENTO", c.forward), cell("SERVIDOR", c.target),
 			rcell("UPTIME", c.uptime), rcell("AUTO", c.auto))),
-		StyleMuted.Render(strings.Repeat("─", inner)),
+		rule(inner),
 	}
 
 	n := len(a.sshTunnels)
@@ -470,7 +447,7 @@ func (a *App) renderSSHTunnelTable(width, height int) string {
 			lines = append(lines, a.renderSSHRow(c, a.sshTunnels[i], i == a.sshCursor, focus))
 		}
 	}
-	return renderApiTitledBox(fmt.Sprintf("TÚNEIS (%d)", n),
+	return panelBox(panelTitle("TÚNEIS", fmt.Sprint(n)),
 		fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
@@ -544,7 +521,7 @@ func (a *App) renderSSHDetailsPane(width, height int) string {
 	innerW := maxInt(20, width-4)
 	t, ok := a.sshSelected()
 	if !ok {
-		return renderApiTitledBox("DETALHES",
+		return panelBox("DETALHES",
 			[]string{StyleMuted.Render("selecione um túnel na lista acima")},
 			width, minInt(height, 3), focus)
 	}
@@ -574,7 +551,7 @@ func (a *App) renderSSHDetailsPane(width, height int) string {
 
 	a.sshDetailsScroll = clampScroll(a.sshDetailsScroll, height-2, len(raw))
 	end := minInt(a.sshDetailsScroll+height-2, len(raw))
-	return renderApiTitledBox("DETALHES", fitExactLines(raw[a.sshDetailsScroll:end], height-2), width, height, focus)
+	return panelBox("DETALHES", fitExactLines(raw[a.sshDetailsScroll:end], height-2), width, height, focus)
 }
 
 // sshModeExplain: -L e -R apontam em direções opostas e trocá-los é o erro
@@ -616,7 +593,7 @@ func (a *App) renderSSHLogsPane(width, height int) string {
 	if start > end {
 		start = 0
 	}
-	return renderApiTitledBox(title, fitExactLines(lines[start:end], height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines[start:end], height-2), width, height, focus)
 }
 
 // renderSSHConfig funde as antigas abas History e Settings.
@@ -624,8 +601,8 @@ func (a *App) renderSSHConfig(p *core.Project, width, height int) string {
 	setup := a.sshSetupLines(p, width-2)
 	hist := a.sshHistoryLines(width - 2)
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("CLIENTE E PROJETO", setup, width, len(setup)+2, false),
-		renderApiTitledBox("HISTÓRICO", hist, width,
+		panelBox("CLIENTE E PROJETO", setup, width, len(setup)+2, false),
+		panelBox("HISTÓRICO", hist, width,
 			minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
 	)
 }
@@ -692,7 +669,7 @@ func (a *App) renderSSHWizard(p *core.Project, width, height int) string {
 	lines = append(lines, "")
 	lines = append(lines, a.sshWizardFields(p, innerW)...)
 	lines = append(lines, "",
-		StyleMuted.Render(strings.Repeat("─", innerW)),
+		rule(innerW),
 		StyleMuted.Render("$ ")+StyleNormal.Render(truncate("ssh "+strings.Join(
 			sshSignificantArgs(sshutil.TunnelArgs(a.sshWizardSpec())), " "), innerW-2)),
 		"",

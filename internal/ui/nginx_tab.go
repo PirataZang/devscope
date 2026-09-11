@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/nginxutil"
 )
@@ -181,77 +180,63 @@ func (a *App) handleNginxMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, nil
 }
 
-func (a *App) renderNginxLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	found := a.landingNginxFound
-	status := "…"
-	if a.landingNginxOK {
-		status = "não detectado"
-		if found {
-			status = "detectado"
-		}
-	}
-	ctx := a.renderModuleContext(p, w, "NGINX ROUTES", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(7, bodyH*40/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("main.conf + .conf (single/hub) — cadastro de rotas sem editar arquivo na mão"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingNginxOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando…"))
-	case !found:
-		openLines = append(openLines, "", StyleWarning.Render("nenhuma config de nginx encontrada"))
-		openLines = append(openLines, StyleMuted.Render("crie main.conf/nginx.conf + uma pasta de .conf na raiz do projeto"))
-	default:
-		openLines = append(openLines, "", StyleHealthy.Render(fmt.Sprintf("%d entrada(s) em %s", a.landingNginxCount, firstNonEmpty(a.landingNginxDir, "?"))))
-	}
-	featLines := []string{
-		StyleMuted.Render("detecta main.conf/nginx.conf na raiz do projeto"),
-		StyleMuted.Render("pasta de .conf pode ter qualquer nome"),
-		StyleMuted.Render("single = rota direta · hub = pasta de .inc"),
-		StyleMuted.Render("enter num hub abre suas .inc pra criar/deletar"),
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("NGINX", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	detected := "…"
-	if a.landingNginxOK {
-		detected = boolLabel(found)
-	}
-	details := []string{
-		StyleMuted.Render("Detectado ") + StyleNormal.Render(detected),
-		StyleMuted.Render("Entradas  ") + StyleNormal.Render(strconv.Itoa(a.landingNginxCount)),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
-}
-
+// nginxSelected devolve a rota sob o cursor — da lista de nível 1 (os .conf)
+// ou das .inc quando um hub está aberto. nginxCurrentList() já resolve qual das
+// duas está na tela.
 func (a *App) nginxSelected() (nginxutil.Site, bool) {
 	list := a.nginxCurrentList()
-	if a.nginxCursor < 0 || a.nginxCursor >= len(list) {
+	if len(list) == 0 {
 		return nginxutil.Site{}, false
 	}
-	return list[a.nginxCursor], true
+	i := clampCursor(a.nginxCursor, len(list))
+	return list[i], true
 }
 
+// resolveProjectPath acha o caminho de um projeto pelo NOME. A visão "todos os
+// projetos" (shift+A) carrega rotas de outros projetos e guarda só o nome em
+// Site.Project; para abrir o hub delas é preciso o caminho de volta.
 func (a *App) resolveProjectPath(name string) string {
-	for _, pr := range a.snapshot.Projects {
-		if pr.Name == name {
-			return pr.Path
+	if name == "" {
+		return ""
+	}
+	for _, sp := range a.snapshot.Projects {
+		if sp.Name == name {
+			return sp.Path
 		}
 	}
 	return ""
+}
+
+func (a *App) renderNginxLanding(p *core.Project) string {
+	found := a.landingNginxFound
+	state, note := landingProbing(), ""
+	if a.landingNginxOK {
+		if found {
+			state = StyleHealthy.Render(fmt.Sprintf("%d entrada(s) em %s", a.landingNginxCount, firstNonEmpty(a.landingNginxDir, "?")))
+		} else {
+			state = StyleWarning.Render("⚠ nenhuma config de nginx encontrada")
+			note = StyleMuted.Render("crie main.conf/nginx.conf e uma pasta de .conf na raiz do projeto")
+		}
+	}
+	facts := [][2]string{{"tipos", StyleMuted.Render("single = rota direta  ·  hub = pasta de .inc")}}
+	if a.landingNginxOK && found {
+		facts = append([][2]string{
+			{"pasta", StyleNormal.Render(firstNonEmpty(a.landingNginxDir, emDash))},
+			{"entradas", StyleNormal.Render(strconv.Itoa(a.landingNginxCount))},
+		}, facts...)
+	}
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "NGINX ROUTES",
+		tagline:      "cadastra rota sem editar arquivo na mão — single ou hub de .inc",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "ROTAS CADASTRADAS",
+		preview:      a.landingFileRows(a.landingNginxNames),
+		previewEmpty: "nenhuma rota ainda — enter abre o console e n cria a primeira",
+		previewFoot:  nginxRouteFoot(a.landingNginxCount),
+		actions:      [][2]string{{"enter", "abrir console"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderNginxWizard(p *core.Project, width, height int) string {
@@ -295,39 +280,39 @@ func (a *App) renderNginxWizardFieldBox(field int, innerW int) string {
 	focused := a.nginxWizardField == field
 	switch field {
 	case nginxWizName:
-		return renderApiTitledBox("nome (arquivo)", []string{a.renderNginxWizardFieldValue(a.nginxNewName, field)}, innerW, 3, focused)
+		return panelBox("nome (arquivo)", []string{a.renderNginxWizardFieldValue(a.nginxNewName, field)}, innerW, 3, focused)
 	case nginxWizKind:
 		shown := a.nginxNewKind
 		if focused {
 			shown += "  ⟨space⟩"
 		}
-		return renderApiTitledBox("tipo (single/hub)", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
+		return panelBox("tipo (single/hub)", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
 	case nginxWizServerName:
-		return renderApiTitledBox("server_name", []string{a.renderNginxWizardFieldValue(a.nginxNewServerName, field)}, innerW, 3, focused)
+		return panelBox("server_name", []string{a.renderNginxWizardFieldValue(a.nginxNewServerName, field)}, innerW, 3, focused)
 	case nginxWizTarget:
 		label := "proxy_pass (destino)"
 		if a.nginxWizardForHub {
 			label = "porta ou proxy_pass (ex: 3000)"
 		}
-		return renderApiTitledBox(label, []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, field)}, innerW, 3, focused)
+		return panelBox(label, []string{a.renderNginxWizardFieldValue(a.nginxNewTarget, field)}, innerW, 3, focused)
 	case nginxWizRoot:
-		return renderApiTitledBox("root (se estático — deixe proxy_pass vazio)", []string{a.renderNginxWizardFieldValue(a.nginxNewRoot, field)}, innerW, 3, focused)
+		return panelBox("root (se estático — deixe proxy_pass vazio)", []string{a.renderNginxWizardFieldValue(a.nginxNewRoot, field)}, innerW, 3, focused)
 	case nginxWizPort:
-		return renderApiTitledBox("porta", []string{a.renderNginxWizardFieldValue(a.nginxNewPortStr, field)}, innerW, 3, focused)
+		return panelBox("porta", []string{a.renderNginxWizardFieldValue(a.nginxNewPortStr, field)}, innerW, 3, focused)
 	case nginxWizSSL:
 		shown := boolLabel(a.nginxNewSSL)
 		if focused {
 			shown += "  ⟨space⟩"
 		}
-		return renderApiTitledBox("ssl", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
+		return panelBox("ssl", []string{a.renderNginxWizardFieldValue(shown, field)}, innerW, 3, focused)
 	case nginxWizHubDirName:
-		return renderApiTitledBox("pasta que vai guardar as .inc", []string{a.renderNginxWizardFieldValue(a.nginxNewHubDirName, field)}, innerW, 3, focused)
+		return panelBox("pasta que vai guardar as .inc", []string{a.renderNginxWizardFieldValue(a.nginxNewHubDirName, field)}, innerW, 3, focused)
 	case nginxWizPath:
-		return renderApiTitledBox("path (ex: /portfolio)", []string{a.renderNginxWizardFieldValue(a.nginxNewPath, field)}, innerW, 3, focused)
+		return panelBox("path (ex: /portfolio)", []string{a.renderNginxWizardFieldValue(a.nginxNewPath, field)}, innerW, 3, focused)
 	case nginxWizLabel:
-		return renderApiTitledBox("label (comentário — opcional)", []string{a.renderNginxWizardFieldValue(a.nginxNewLabel, field)}, innerW, 3, focused)
+		return panelBox("label (comentário — opcional)", []string{a.renderNginxWizardFieldValue(a.nginxNewLabel, field)}, innerW, 3, focused)
 	case nginxWizDist:
-		return renderApiTitledBox("dist (pasta estática — se não for proxy)", []string{a.renderNginxWizardFieldValue(a.nginxNewDist, field)}, innerW, 3, focused)
+		return panelBox("dist (pasta estática — se não for proxy)", []string{a.renderNginxWizardFieldValue(a.nginxNewDist, field)}, innerW, 3, focused)
 	default:
 		return ""
 	}

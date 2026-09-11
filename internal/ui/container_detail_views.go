@@ -106,18 +106,18 @@ func (a *App) renderContainerDetailCommandBar(width int) string {
 func (a *App) renderContainerDetailRichBody(width, height int) string {
 	title := strings.ToUpper(a.containerDetailTab.shortLabel())
 	if a.containerDetailLoading {
-		return renderApiTitledBox(title,
+		return panelBox(title,
 			fitExactLines([]string{a.loadingText("carregando " + strings.ToLower(title) + "…")}, height-2),
 			width, height, true)
 	}
 
 	all := a.containerDetailLines()
 	if len(all) == 0 {
-		return renderApiTitledBox(title,
+		return panelBox(title,
 			fitExactLines([]string{StyleMuted.Render(a.containerDetailEmptyHint())}, height-2),
 			width, height, true)
 	}
-	title = fmt.Sprintf("%s · %d linhas", title, len(all))
+	title = panelTitle(title, fmt.Sprintf("%d linhas", len(all)))
 	if a.containerDetailTab == containerDetailTabLogs {
 		errN, warnN := countLogLevels(all)
 		if errN > 0 {
@@ -156,7 +156,7 @@ func (a *App) renderContainerDetailRichBody(width, height int) string {
 		lines = append(lines, num+StyleMuted.Render(" │ ")+
 			a.renderContainerDetailCodeLine(all[i], textW, matchSet[i], i == current))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, true)
+	return panelBox(title, fitExactLines(lines, viewport), width, height, true)
 }
 
 // renderContainerDetailCodeLine aplica o corte lateral e então o realce. A

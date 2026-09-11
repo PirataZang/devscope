@@ -39,7 +39,7 @@ func renderDeleteConfirmBox(opts deleteConfirmOpts, width, height int) string {
 	innerW := maxInt(28, boxW-6)
 	lines := tunnelModalChrome(opts.Brand, opts.Color, opts.Title, opts.Subtitle, "", innerW)
 	lines = append(lines, "")
-	nameBox := renderApiTitledBox(opts.Label,
+	nameBox := panelBox(opts.Label,
 		[]string{StyleWarning.Bold(true).Render(truncate(firstNonEmpty(opts.Target, "—"), innerW-2))},
 		innerW, 3, true,
 	)

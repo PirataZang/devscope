@@ -298,7 +298,7 @@ func (a *App) renderContainerImages(p *core.Project) string {
 
 	images := a.currentImageList(p)
 	if a.imageLoading && len(a.imageAll) == 0 {
-		box := renderApiTitledBox("IMAGENS", fitExactLines([]string{a.loadingText("Carregando imagens…")}, h-2), w, h, true)
+		box := panelBox("IMAGENS", fitExactLines([]string{a.loadingText("Carregando imagens…")}, h-2), w, h, true)
 		return box
 	}
 
@@ -374,14 +374,14 @@ func (a *App) renderImagesTable(images []core.Image, p *core.Project, width, hei
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2)
 	if len(images) == 0 {
-		return renderApiTitledBox("LISTA", fitExactLines([]string{StyleMuted.Render("nenhuma imagem neste escopo")}, inner), width, height, true)
+		return panelBox("LISTA", fitExactLines([]string{StyleMuted.Render("nenhuma imagem neste escopo")}, inner), width, height, true)
 	}
 	a.imageScroll = ensureVisible(a.imageCursor, a.imageScroll, viewport, len(images))
 	start := a.imageScroll
 	end := minInt(start+viewport, len(images))
 
 	cols := a.imageColumns()
-	lines := []string{a.renderImagesHeaderRow(cols), StyleMuted.Render(strings.Repeat("─", maxInt(20, width-6)))}
+	lines := []string{a.renderImagesHeaderRow(cols), rule(maxInt(20, width-6))}
 	for i := start; i < end; i++ {
 		lines = append(lines, a.renderImageRow(images[i], cols, i == a.imageCursor, p))
 	}
@@ -391,7 +391,7 @@ func (a *App) renderImagesTable(images []core.Image, p *core.Project, width, hei
 	if rem := len(images) - end; rem > 0 {
 		lines = append(lines, StyleMuted.Render(fmt.Sprintf("↓ %d abaixo", rem)))
 	}
-	return renderApiTitledBox(fmt.Sprintf("LISTA (%d)", len(images)), fitExactLines(lines, inner), width, height, true)
+	return panelBox(panelTitle("LISTA", fmt.Sprint(len(images))), fitExactLines(lines, inner), width, height, true)
 }
 
 func (a *App) renderImagesHeaderRow(cols imageCols) string {
@@ -490,7 +490,7 @@ func (a *App) renderImagesActionsBox(width, height int) string {
 	if height < len(lines)+2 {
 		height = len(lines) + 2
 	}
-	return renderApiTitledBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
+	return panelBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
 }
 
 func (a *App) renderImageRemoveModal(p *core.Project, width, height int) string {
@@ -505,7 +505,7 @@ func (a *App) renderImageRemoveModal(p *core.Project, width, height int) string 
 
 	lines := tunnelModalChrome("DOCKER", tabAccentColor(TabContainers), "Remover imagem", "docker rmi — escolha uma opção", "", innerW)
 	lines = append(lines, "")
-	nameBox := renderApiTitledBox("imagem selecionada",
+	nameBox := panelBox("imagem selecionada",
 		[]string{StyleWarning.Bold(true).Render(truncate(target, innerW-2))},
 		innerW, 3, true,
 	)

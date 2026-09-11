@@ -41,7 +41,7 @@ func (a *App) renderContainerStatsScreen() string {
 	bodyH := a.containerDetailBodyHeight()
 	var body string
 	if a.containerDetailLoading && len(a.containerDetailCPUHist) == 0 {
-		body = renderApiTitledBox("MÉTRICAS",
+		body = panelBox("MÉTRICAS",
 			fitExactLines([]string{a.loadingText("coletando métricas do docker…")}, bodyH-2),
 			w, bodyH, true)
 	} else {
@@ -55,7 +55,7 @@ func (a *App) renderContainerStatsDashboard(width, height int) string {
 	rows := []string{a.renderContainerStatsStrip(width, s)}
 	remain := height - 1
 	if s.CPU == 0 && s.MemPct == 0 && s.PIDs == 0 && len(a.containerDetailCPUHist) <= 1 {
-		rows = append(rows, renderApiTitledBox("STATUS", fitExactLines([]string{
+		rows = append(rows, panelBox("STATUS", fitExactLines([]string{
 			StyleWarning.Render("sem amostra útil — container parado ou docker stats indisponível"),
 			StyleMuted.Render("mantenha a aba aberta com o container running · r recarrega"),
 		}, 2), width, 4, false))
@@ -115,7 +115,7 @@ func renderStatsCard(title, value, sub string, valueStyle lipgloss.Style, width,
 		valueStyle.Bold(true).Render(value),
 		sub,
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, false)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, false)
 }
 
 func clampPct(v float64) float64 {
@@ -140,10 +140,10 @@ func (a *App) renderContainerStatsCharts(width, height int, s dockerStatsSample)
 	// gráfico mente sobre a escala.
 	cpuTop := statsScaleTop(a.containerDetailCPUHist)
 	memTop := statsScaleTop(a.containerDetailMemHist)
-	cpuBox := renderApiTitledBox(fmt.Sprintf("CPU %% · 0-%.0f%%", cpuTop),
+	cpuBox := panelBox(fmt.Sprintf("CPU %% · 0-%.0f%%", cpuTop),
 		fitExactLines(statsHistoryLines(a.containerDetailCPUHist, leftW-2, halfH-2, cpuTop, StyleAccent), halfH-2),
 		leftW, halfH, false)
-	memBox := renderApiTitledBox(fmt.Sprintf("MEM %% · 0-%.0f%%", memTop),
+	memBox := panelBox(fmt.Sprintf("MEM %% · 0-%.0f%%", memTop),
 		fitExactLines(statsHistoryLines(a.containerDetailMemHist, rightW-2, halfH-2, memTop, StyleHealthy), halfH-2),
 		rightW, halfH, false)
 	top := lipgloss.JoinHorizontal(lipgloss.Top, cpuBox, memBox)
@@ -167,7 +167,7 @@ func (a *App) renderContainerStatsCharts(width, height int, s dockerStatsSample)
 		StyleMuted.Render("mem   ") + StyleNormal.Render(firstNonEmpty(s.MemLabel, emDash)) +
 			StyleMuted.Render("   id  ") + StyleNormal.Render(truncate(firstNonEmpty(a.containerDetailID, emDash), 12)),
 	}
-	bottom := renderApiTitledBox("I/O · PROCESSOS", fitExactLines(botLines, botH-2), width, botH, false)
+	bottom := panelBox("I/O · PROCESSOS", fitExactLines(botLines, botH-2), width, botH, false)
 	return lipgloss.JoinVertical(lipgloss.Left, top, bottom)
 }
 

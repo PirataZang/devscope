@@ -14,41 +14,47 @@ import (
 // renderGHALanding: uma caixa com dado real no lugar das duas de documentação
 // ("POR PROJETO") e do rail DETALHES que só mostrava "CLI …  Auth …  Procs …".
 func (a *App) renderGHALanding(p *core.Project) string {
-	w, h := a.moduleSize()
 	info := a.landingGHA
-
-	status := "detectando…"
+	state, note := landingProbing(), ""
 	if a.landingGHAOK {
 		switch {
 		case !info.Available:
-			status = "gh não instalado"
+			state = StyleUnhealthy.Render("⚠ gh não encontrado no PATH")
+			note = StyleMuted.Render("instale o GitHub CLI para ver runs e workflows")
 		case !info.Authed:
-			status = "sem login"
+			state = StyleWarning.Render("○ gh sem login")
+			note = StyleMuted.Render("L faz o login sem sair daqui")
 		default:
-			status = "pronto"
+			state = StyleHealthy.Render(a.okPulse() + " conectado ao GitHub")
 		}
 	}
-	ctx := a.renderModuleContext(p, w, "ACTIONS", status)
-	bodyH := maxInt(8, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	lines := a.ghaLandingLines(centerW-2, info)
-	boxH := minInt(bodyH, len(lines)+2)
-	center := renderApiTitledBox("GITHUB ACTIONS", lines, centerW, boxH, true)
-	if hint := bodyH - boxH; hint > 1 && a.landingGHAOK && info.Authed {
-		center = lipgloss.JoinVertical(lipgloss.Left, center, "",
-			"  "+StyleNormal.Render("pressione ")+StyleKey.Render("enter")+
-				StyleNormal.Render(" para abrir o control center"))
+	// Fato que só repete o aviso é ruído: sem o gh no PATH, "gh não" já foi
+	// dito na linha de estado.
+	var facts [][2]string
+	if a.landingGHAOK && info.Available {
+		facts = [][2]string{
+			{"repo", StyleNormal.Render(firstNonEmpty(info.Repo, emDash))},
+			{"login", StyleNormal.Render(boolLabel(info.Authed))},
+			{"fluxos", StyleNormal.Render(probedCount(a.landingGHAOK, a.landingGHAProcs))},
+		}
 	}
-
-	right := renderActionsBox(rightW, bodyH,
-		[2]string{"enter", "control center"},
-		[2]string{"L", "login gh"},
-		[2]string{"!", "aviso setup"},
-		[2]string{"esc", "voltar"},
-	)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "GITHUB ACTIONS",
+		tagline:      "runs, workflows e logs do repositório — trigger e re-run",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "WORKFLOWS DESTE REPOSITÓRIO",
+		preview:      a.landingFileRows(a.landingGHANames),
+		previewEmpty: "nenhum arquivo em .github/workflows",
+		previewFoot:  ghaWorkflowFoot(a.landingGHAProcs),
+		actions: [][2]string{
+			{"enter", "control center"},
+			{"L", "login gh"},
+			{"!", "aviso setup"},
+			{"esc", "voltar"},
+		},
+	})
 }
 
 func (a *App) ghaLandingLines(width int, info collectors.GHAInfo) []string {
@@ -419,19 +425,19 @@ func (a *App) renderGHATable(width, height int) string {
 	if a.ghaKind == ghaKindRuns {
 		total := len(a.ghaRuns)
 		if n != total || a.ghaRunScope != ghaRunScopeAll || a.ghaRunProcFilter != "" {
-			title = fmt.Sprintf("RUNS (%d/%d) · %s", n, total, a.ghaRunsFilterLabel())
+			title = panelTitle("RUNS", fmt.Sprintf("%d/%d", n, total), a.ghaRunsFilterLabel())
 		} else if n > 0 {
-			title = fmt.Sprintf("RUNS (%d)", n)
+			title = panelTitle("RUNS", fmt.Sprint(n))
 		}
 	} else if n > 0 {
-		title = fmt.Sprintf("%s (%d)", title, n)
+		title = panelTitle(title, fmt.Sprint(n))
 	}
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2)
 	inner4 := maxInt(8, width-2)
 	lines := []string{
 		a.ghaTableHeader(inner4),
-		StyleMuted.Render(strings.Repeat("─", inner4)),
+		rule(inner4),
 	}
 	if n == 0 {
 		msg := "nenhum item"
@@ -442,13 +448,13 @@ func (a *App) renderGHATable(width, height int) string {
 			msg = "nenhum run com estes filtros — f status · p processo · 0 limpar"
 		}
 		lines = append(lines, StyleMuted.Render("  "+msg))
-		return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusTable)
+		return panelBox(title, fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusTable)
 	}
 	a.ghaScroll = ensureVisible(a.ghaCursor, a.ghaScroll, viewport, n)
 	for i := a.ghaScroll; i < minInt(a.ghaScroll+viewport, n); i++ {
 		lines = append(lines, a.renderGHARow(i, inner4, i == a.ghaCursor && a.ghaFocus == ghaFocusTable))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusTable)
+	return panelBox(title, fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusTable)
 }
 
 // ghaCols distribui as colunas da tabela pela largura útil. Antes o cabeçalho
@@ -653,7 +659,7 @@ func (a *App) renderGHASummary(width, height int) string {
 	}
 	if strings.TrimSpace(body) == "" {
 		// Sem YAML a caixa encolhe para uma linha em vez de ficar oca.
-		return renderApiTitledBox(title,
+		return panelBox(title,
 			[]string{StyleMuted.Render("enter foca aqui  ·  ↑↓ rola o YAML do processo")},
 			width, 3, a.ghaFocus == ghaFocusResumo)
 	}
@@ -665,7 +671,7 @@ func (a *App) renderGHASummary(width, height int) string {
 	if total > viewport {
 		pos := a.ghaDetailScroll + 1
 		maxPos := total - viewport + 1
-		title = fmt.Sprintf("%s  %d/%d", title, pos, maxPos)
+		title = panelTitle(title, fmt.Sprintf("%d/%d", pos, maxPos))
 	}
 	lines := make([]string, 0, viewport)
 	focused := a.ghaFocus == ghaFocusResumo
@@ -677,7 +683,7 @@ func (a *App) renderGHASummary(width, height int) string {
 			lines = append(lines, StyleMuted.Render(ln))
 		}
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, focused)
+	return panelBox(title, fitExactLines(lines, inner), width, height, focused)
 }
 
 // renderGHARightRail: CONTEXTO + USO + AÇÕES. A caixa RUNS RECENTES saiu —
@@ -688,7 +694,7 @@ func (a *App) renderGHARightRail(width, height int) string {
 	usageH := maxInt(8, (height-ctxH)*55/100)
 	actH := maxInt(5, height-ctxH-usageH)
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("CONTEXTO", ctx, width, ctxH, false),
+		panelBox("CONTEXTO", ctx, width, ctxH, false),
 		a.renderGHAUsagePanel(width, usageH),
 		a.renderGHAActionsPanel(width, actH),
 	)
@@ -777,7 +783,7 @@ func (a *App) renderGHAUsagePanel(width, height int) string {
 			lines = append(lines, line)
 		}
 	}
-	return renderApiTitledBox("USO", fitExactLines(lines, inner), width, height, false)
+	return panelBox("USO", fitExactLines(lines, inner), width, height, false)
 }
 
 func (a *App) renderGHAActionsPanel(width, height int) string {
@@ -796,7 +802,7 @@ func (a *App) renderGHAActionsPanel(width, height int) string {
 		}
 		lines = append(lines, prefix+StyleKey.Render(it[0])+" "+style.Render(it[1]))
 	}
-	return renderApiTitledBox("AÇÕES RÁPIDAS", fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusActions)
+	return panelBox("AÇÕES RÁPIDAS", fitExactLines(lines, inner), width, height, a.ghaFocus == ghaFocusActions)
 }
 
 func (a *App) ghaConfirmHint() string {
@@ -895,7 +901,7 @@ func (a *App) renderGHASetupBox() string {
 		}
 	}
 	inner := fitExactLines(lines, len(lines))
-	return renderApiTitledBox(title, inner, w, len(inner)+2, true)
+	return panelBox(title, inner, w, len(inner)+2, true)
 }
 
 func (a *App) renderGHACreateBox() string {
@@ -920,7 +926,7 @@ func (a *App) renderGHACreateBox() string {
 		StyleMuted.Render("enter cria  ·  esc cancela"),
 	}
 	inner := fitExactLines(lines, len(lines))
-	return renderApiTitledBox("CREATE PROCESS", inner, w, len(inner)+2, true)
+	return panelBox("CREATE PROCESS", inner, w, len(inner)+2, true)
 }
 
 func (a *App) renderGHATriggerBox() string {
@@ -943,7 +949,7 @@ func (a *App) renderGHATriggerBox() string {
 		StyleMuted.Render("Branches no origin (pushed)"),
 		"",
 		StyleTableHeader.Render(truncate("  BRANCH", w-6)),
-		StyleMuted.Render(strings.Repeat("─", maxInt(8, w-8))),
+		rule(maxInt(8, w-8)),
 	}
 	if n == 0 {
 		lines = append(lines,
@@ -977,7 +983,7 @@ func (a *App) renderGHATriggerBox() string {
 	if len(a.ghaTriggerInputs) > 0 {
 		lines = append(lines, "",
 			StyleTableHeader.Render("INPUTS (tab)"),
-			StyleMuted.Render(strings.Repeat("─", maxInt(8, w-8))),
+			rule(maxInt(8, w-8)),
 		)
 		for i, in := range a.ghaTriggerInputs {
 			val := ""
@@ -1007,7 +1013,7 @@ func (a *App) renderGHATriggerBox() string {
 		StyleMuted.Render("↑↓ branch  tab inputs  enter dispara  P push  r  esc"),
 	)
 	inner := fitExactLines(lines, len(lines))
-	return renderApiTitledBox("TRIGGER · BRANCH + INPUTS", inner, w, len(inner)+2, true)
+	return panelBox("TRIGGER · BRANCH + INPUTS", inner, w, len(inner)+2, true)
 }
 
 func (a *App) renderGHAYAMLBox(termW, termH int) string {
@@ -1030,7 +1036,7 @@ func (a *App) renderGHAYAMLBox(termW, termH int) string {
 	}
 	footer := StyleMuted.Render("↑↓ scroll  ·  esc fechar  ·  o github")
 	body := append(fitExactLines(lines, maxInt(1, inner-1)), footer)
-	return renderApiTitledBox(title, body, w, h, true)
+	return panelBox(title, body, w, h, true)
 }
 
 func (a *App) renderGHALogsBox(termW, termH int) string {
@@ -1062,7 +1068,7 @@ func (a *App) renderGHALogsBox(termW, termH int) string {
 			}
 		}
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), w, h, true)
+	return panelBox(title, fitExactLines(lines, inner), w, h, true)
 }
 
 func (a *App) renderGHADetailBox(termW, termH int) string {
@@ -1076,5 +1082,5 @@ func (a *App) renderGHADetailBox(termW, termH int) string {
 	for i := a.ghaDetailScroll; i < end; i++ {
 		lines = append(lines, StyleMuted.Render(truncate(sanitizeTerminalLine(raw[i]), w-4)))
 	}
-	return renderApiTitledBox("DETAILS", fitExactLines(lines, inner), w, h, true)
+	return panelBox("DETAILS", fitExactLines(lines, inner), w, h, true)
 }

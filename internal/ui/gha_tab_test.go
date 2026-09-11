@@ -28,11 +28,11 @@ func TestAllTabsIncludesActions(t *testing.T) {
 	}
 }
 
-func TestSidebarShowsActionsInAutomation(t *testing.T) {
+func TestSidebarShowsActionsInCodigo(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabActions}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "AUTOMATION") || !strings.Contains(got, "GH Actions") {
-		t.Fatalf("sidebar missing GH Actions in AUTOMATION: %q", got)
+	if !strings.Contains(got, "CÓDIGO") || !strings.Contains(got, "GH Actions") {
+		t.Fatalf("sidebar missing GH Actions in CÓDIGO: %q", got)
 	}
 }
 

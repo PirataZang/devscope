@@ -60,14 +60,18 @@ func (a *App) handleProjectGitLoaded(msg projectGitLoadedMsg) tea.Cmd {
 	}
 	a.projectGitLoading = false
 	a.snapshot = a.store.Get()
+	var reprobe tea.Cmd
 	if p := a.currentProject(); p != nil {
 		cp := *p
 		a.selectedProject = &cp
 		if p.Git != nil && p.Git.IsRepo {
 			a.initGitTab(p)
 		}
+		// Agora sim dá para medir: antes disso p.Git era nil e o Git seria
+		// classificado como irrelevante num repositório que existe.
+		reprobe = a.probeModuleCaps(&cp)
 	}
-	return loadProjectDockerDetail(msg.path, msg.gen, a.store, a.cfg.Health)
+	return tea.Batch(reprobe, loadProjectDockerDetail(msg.path, msg.gen, a.store, a.cfg.Health))
 }
 
 func (a *App) handleProjectDockerLoaded(msg projectDockerLoadedMsg) {

@@ -65,17 +65,24 @@ func TestWatchTabsFollowModuleShell(t *testing.T) {
 		selectedProject: &p,
 		snapshot:        core.Snapshot{Projects: []core.Project{p}},
 	}
+	// Logs é tela de trabalho, não landing — segue o §1.3 (fatos + uma caixa).
+	logs := stripANSI(a.renderLogsTab(&p))
+	for _, want := range []string{"/p", "rodando", "origem", "follow", "f follow"} {
+		if !strings.Contains(logs, want) {
+			t.Fatalf("logs missing %q in:\n%s", want, logs)
+		}
+	}
 	for name, view := range map[string]string{
-		"logs":   stripANSI(a.renderLogsTab(&p)),
 		"api":    stripANSI(a.renderApiLanding(&p)),
 		"db":     stripANSI(a.renderDbLanding(&p)),
 		"json":   stripANSI(a.renderJsonLanding(&p)),
 		"jwt":    stripANSI(a.renderJwtLanding(&p)),
 		"routes": stripANSI(a.renderRoutesLanding(&p)),
 	} {
-		// A barra de topo identifica módulo + projeto aberto; "Projeto X
-		// Ambiente Y Servidor Z" saiu porque a sidebar já mostra tudo isso.
-		for _, want := range []string{"/p", "Running", "DETALHES", "AÇÕES"} {
+		// A barra de topo identifica módulo + projeto aberto. DETALHES e AÇÕES
+		// eram duas caixas no trilho da direita; viraram fatos rotulados e uma
+		// linha de teclas (docs/DESIGN.md §1.5).
+		for _, want := range []string{"/p", "rodando", "enter", "esc"} {
 			if !strings.Contains(view, want) {
 				t.Fatalf("%s missing %q in:\n%s", name, want, view)
 			}

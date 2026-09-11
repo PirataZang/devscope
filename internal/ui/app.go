@@ -36,8 +36,26 @@ type App struct {
 
 	helpOn     bool
 	helpScroll int
+	helpTab    int
 
 	themeOn bool
+
+	userCfgOn     bool
+	userCfgPath   string
+	userCfgMsg    string
+	userCfgDirty  bool
+	userCfgPrefs  config.UserPrefs
+	userCfgAIs    []string
+	userCfgField  int
+	userCfgCursor int
+	userCfgScroll int
+
+	userCfgConfirmReset bool
+
+	aiPickerOn   bool
+	aiPickerOpts []string
+	aiPickerIdx  int
+	aiPickerPath string
 
 	// Histórico das métricas do host para as sparklines do dashboard.
 	hostCPUHist   sparkHistory
@@ -46,10 +64,18 @@ type App struct {
 	themeCursor   int
 	themePrevious string // restore on esc
 
-	selectedProject             *core.Project
-	tab                         Tab
-	tabCursor                   int
-	gitFocus                    gitFocus
+	selectedProject *core.Project
+	// Módulos relevantes para o projeto aberto (module_caps.go). showAllModules
+	// é o escape: `t` traz de volta os que a sondagem deixou de fora.
+	moduleCaps     moduleCaps
+	showAllModules bool
+	tab            Tab
+	tabCursor      int
+	gitFocus       gitFocus
+	// Gaveta do Git (git_drawer.go): log de comandos e stashes deixaram de ser
+	// caixas permanentes no rodapé e passaram a aparecer sob demanda.
+	gitDrawer                   gitDrawer
+	gitStashCursor              int
 	gitSubview                  gitSubview
 	gitCommitReturnTo           gitSubview
 	gitBranchCursor             int
@@ -703,6 +729,9 @@ type App struct {
 	landingNgrokAvail   bool
 	landingNgrokAgent   ngrokutil.AgentInfo
 	landingNgrokVer     string
+	landingGHANames     []string
+	landingK8sNames     []string
+	landingNginxNames   []string
 	landingGHAOK        bool
 	landingGHA          collectors.GHAInfo
 	landingGHAProcs     int
@@ -754,7 +783,12 @@ func (a *App) Init() tea.Cmd {
 		cmds = append(cmds, cmd)
 	}
 	if a.selectedProject != nil {
-		cmds = append(cmds, a.startProjectLoad(a.selectedProject.Path))
+		cmds = append(cmds,
+			a.startProjectLoad(a.selectedProject.Path),
+			// `devscope` dentro de um projeto entra direto no módulo, sem
+			// passar pelo openProject — e sem esta sondagem a sidebar abria
+			// com os quinze módulos, em todo projeto, para sempre.
+			a.probeModuleCaps(a.selectedProject))
 	}
 	return tea.Batch(cmds...)
 }
@@ -795,6 +829,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if a.themeOn {
 			return a.updateThemePicker(msg)
+		}
+		if a.aiPickerOn {
+			return a.updateAIPicker(msg)
+		}
+		if a.userCfgOn {
+			return a.updateUserConfig(msg)
 		}
 		if a.helpOn {
 			return a.updateHelp(msg)
@@ -901,6 +941,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case toolLandingMsg:
 		a.handleToolLandingMsg(msg)
+		return a, nil
+
+	case moduleCapsMsg:
+		a.handleModuleCapsMsg(msg)
 		return a, nil
 
 	case tickMsg:
@@ -1120,6 +1164,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleProjectShellDone(msg)
 		return a, nil
 
+	case appLaunchedMsg:
+		a.handleAppLaunched(msg)
+		return a, nil
+
 	case containerShellFallbackMsg:
 		return a, a.containerExecShellFallback(msg)
 
@@ -1228,6 +1276,7 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case msg.String() == "?":
 		a.helpOn = true
 		a.helpScroll = 0
+		a.helpTab = 0
 		return a, nil
 
 	// Só no dashboard: como atalho global, T maiúsculo era engolido em todo
@@ -1265,37 +1314,40 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) updateHelp(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
 	viewport := a.helpViewport()
-	maxScroll := len(helpLines) - viewport
-	if maxScroll < 0 {
-		maxScroll = 0
-	}
-
-	switch msg.String() {
-	case "esc", "?":
+	switch key := msg.String(); key {
+	case "esc", "?", "q":
 		a.helpOn = false
 		a.helpScroll = 0
-	case "up", "k":
-		if a.helpScroll > 0 {
-			a.helpScroll--
-		}
-	case "down", "j":
-		if a.helpScroll < maxScroll {
-			a.helpScroll++
-		}
-	case "pgup":
-		a.helpScroll -= viewport
-		if a.helpScroll < 0 {
+	case "1", "2", "3", "4", "5", "6", "7", "8", "9":
+		if i := int(key[0] - '1'); i < helpGroupCount() {
+			a.helpTab = i
 			a.helpScroll = 0
 		}
+	case "left", "h", "shift+tab":
+		a.helpShiftGroup(-1)
+	case "right", "l", "tab":
+		a.helpShiftGroup(1)
+	case "up", "k":
+		a.helpScroll = maxInt(0, a.helpScroll-1)
+	case "down", "j":
+		a.helpScroll++
+	case "pgup":
+		a.helpScroll = maxInt(0, a.helpScroll-viewport)
 	case "pgdown":
 		a.helpScroll += viewport
-		if a.helpScroll > maxScroll {
-			a.helpScroll = maxScroll
-		}
+	case "home", "g":
+		a.helpScroll = 0
 	}
 	return a, nil
+}
+
+// helpShiftGroup circula entre os grupos: são poucos, e dar a volta evita a
+// sensação de que a seta travou na ponta.
+func (a *App) helpShiftGroup(delta int) {
+	n := helpGroupCount()
+	a.helpTab = (a.helpTab + delta + n) % n
+	a.helpScroll = 0
 }
 
 func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -1343,10 +1395,18 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if len(projects) > 0 && a.cursor < len(projects) {
 			return a, a.projectExecShell(projects[a.cursor].Path)
 		}
-	case "O", "shift+o":
+	case "O", "shift+o", "ctrl+o":
 		if len(projects) > 0 && a.cursor < len(projects) {
-			return a, a.projectExecOpenCode(projects[a.cursor].Path)
+			return a, a.openProjectAI(projects[a.cursor].Path)
 		}
+	case "C", "shift+c":
+		a.openUserConfig()
+	case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
+		dir := ""
+		if len(projects) > 0 && a.cursor < len(projects) {
+			dir = projects[a.cursor].Path
+		}
+		return a, a.runAppShortcut(msg.String(), dir)
 	case "g":
 		if len(projects) > 0 && a.cursor < len(projects) {
 			return a, a.openProject(projects[a.cursor], TabGit)
@@ -1407,11 +1467,21 @@ func tabIndex(t Tab) int {
 	return 0
 }
 
+// cycleProjectTab anda pelos módulos VISÍVEIS. Ciclar por módulo que não está
+// na sidebar faria a seleção sumir da tela — `t` é quem traz o resto.
 func (a *App) cycleProjectTab(delta int, p *core.Project) tea.Cmd {
 	a.closeToolClients()
-	n := len(AllTabs)
-	i := (tabIndex(a.tab) + delta%n + n) % n
-	return a.switchProjectTab(AllTabs[i], p)
+	tabs := a.visibleTabs()
+	n := len(tabs)
+	i := 0
+	for idx, t := range tabs {
+		if t == a.tab {
+			i = idx
+			break
+		}
+	}
+	i = (i + delta%n + n) % n
+	return a.switchProjectTab(tabs[i], p)
 }
 
 func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
@@ -1550,8 +1620,13 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabNginx {
 		a.nginxOpen = false
 	}
+	// Projeto novo: a sondagem anterior não vale mais, e até a nova voltar a
+	// sidebar mostra tudo (moduleCaps.relevant devolve true enquanto !ready).
+	a.moduleCaps = moduleCaps{}
+	a.showAllModules = false
+
 	var cmds []tea.Cmd
-	cmds = append(cmds, a.startProjectLoad(cp.Path))
+	cmds = append(cmds, a.startProjectLoad(cp.Path), a.probeModuleCaps(&cp))
 	if tab == TabLogs {
 		cmds = append(cmds, a.initLogsTab(&cp))
 	}
@@ -1565,6 +1640,7 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if msg.String() == "?" {
 		a.helpOn = true
 		a.helpScroll = 0
+		a.helpTab = 0
 		return a, nil
 	}
 
@@ -1650,6 +1726,10 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.containerDetailCache = nil
 			return a, nil
 		}
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitDrawer != gitDrawerNone {
+			a.closeGitDrawer()
+			return a, nil
+		}
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitBranchFilter != "" {
 			a.gitBranchFilter = ""
 			a.gitBranchFilterInput = ""
@@ -1669,6 +1749,14 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, a.cycleProjectTab(1, p)
 	case "shift+tab":
 		return a, a.cycleProjectTab(-1, p)
+	case "t":
+		a.showAllModules = !a.showAllModules
+		if a.showAllModules {
+			a.statusMsg = "todos os módulos"
+		} else {
+			a.statusMsg = "só os módulos deste projeto"
+		}
+		return a, nil
 	case "pgup":
 		if a.tab == TabGit && a.gitSubview == gitSubviewMain && a.gitFocus == gitFocusFiles {
 			return a, a.updateGitCursor(-5, p, false)
@@ -1824,6 +1912,16 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				return a, a.openContainerImages(c)
 			}
 		}
+	case "ctrl+o":
+		// A IA abre na pasta do projeto — dentro dele o atalho vale igual à
+		// tela inicial, senão é preciso sair para pedir ajuda sobre o que
+		// está na frente.
+		return a, a.openProjectAI(p.Path)
+	case "ctrl+l":
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
+			a.toggleGitDrawer(gitDrawerLog)
+			return a, nil
+		}
 	case "ctrl+g":
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			return a, a.openContainerDeps(p)
@@ -1919,6 +2017,14 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 	case "s":
+		if a.tab == TabGit && a.gitSubview == gitSubviewMain {
+			if g := a.projectGitInfo(p); g != nil && g.StashCount > 0 {
+				a.toggleGitDrawer(gitDrawerStash)
+				return a, nil
+			}
+			a.gitStatusMsg = "nenhum stash neste repositório"
+			return a, nil
+		}
 		if a.tab == TabContainers && a.containerSubview == containerSubviewList {
 			if c, ok := a.selectedContainer(p); ok {
 				if !a.requireDockerContainer(c) {
@@ -2156,8 +2262,12 @@ func (a *App) View() string {
 	switch {
 	case a.themeOn:
 		content = a.renderThemePopup(a.renderCurrentView())
+	case a.aiPickerOn:
+		content = a.renderAIPickerPopup(a.renderCurrentView())
+	case a.userCfgOn:
+		content = a.renderUserConfigScreen(a.renderCurrentView())
 	case a.helpOn:
-		content = a.renderHelpPopup(a.renderCurrentView())
+		content = a.renderHelpScreen(a.renderCurrentView())
 	case a.fuzzyOn:
 		content = a.renderFuzzyPrompt()
 	case a.containerDetailSearchOn:
@@ -2199,10 +2309,9 @@ func (a *App) renderHeader() string {
 	m := a.snapshot.HostMetrics
 	title := StyleTitle.Render("DevScope")
 	metrics := renderMetricPills(m)
-	line := strings.Repeat("─", maxInt(a.width-2, 40))
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, title, "  ", metrics),
-		StyleMuted.Render(line),
+		rule(maxInt(a.width-2, 40)),
 	)
 }
 
@@ -2303,117 +2412,8 @@ func (a *App) renderProject() string {
 		content = a.renderProjectPanel(content, contentWidth, panelH)
 	}
 
-	hints := "tab módulo  shift+tab anterior  enter abrir  r refresh  esc back  q sair"
-	if a.tab != TabOverview {
-		hints = "tab/shift+tab módulo  pgup/pgdown scroll  esc back  q quit"
-	}
-	if a.tab == TabGit {
-		if a.gitBranchFilterOn {
-			hints = "filtro branch: digite  enter aplicar  esc limpar"
-		} else {
-			hints = "←→ painéis  enter detail/diff  space checkout  shift+↑↓ range  x cherry  b filter  " + hints
-		}
-	}
-	if a.tab == TabContainers {
-		switch a.containerSubview {
-		case containerSubviewDetail:
-			hints = "←→ tabs  ↑↓ scroll  esc back  " + hints
-		case containerSubviewPorts:
-			hints = "↑↓ porta  enter preview  o browser  x fechar  esc back  " + hints
-		default:
-			// Os comandos do módulo estão na barra larga da própria tela; aqui
-			// fica só a navegação entre módulos.
-			hints = "↑↓ lista  ·  " + hints
-		}
-	}
-	if a.tab == TabAPI && !a.apiOpen {
-		hints = "enter abrir API  " + hints
-	}
-	if a.tab == TabDatabase && !a.dbOpen {
-		hints = "enter abrir Database  " + hints
-	}
-	if a.tab == TabKubernetes && !a.k8sOpen {
-		hints = "enter abrir Kubernetes  " + hints
-	}
-	if a.tab == TabSwarm && !a.swarmOpen {
-		hints = "enter abrir Swarm  " + hints
-	}
-	if a.tab == TabJSON && !a.jsonOpen {
-		hints = "enter abrir JSON  " + hints
-	}
-	if a.tab == TabJWT && !a.jwtOpen {
-		hints = "enter abrir JWT  " + hints
-	}
-	if a.tab == TabRoutes && !a.routesOpen {
-		hints = "enter abrir Rotas  " + hints
-	}
-	if a.tab == TabWebSocket && !a.wsOpen {
-		hints = "enter abrir WebSocket  " + hints
-	}
-	if a.tab == TabNgrok && !a.ngrokOpen {
-		hints = "enter abrir Ngrok  " + hints
-	}
-	if a.tab == TabCFTunnel && !a.cfOpen {
-		hints = "enter abrir CF Tunnel  " + hints
-	}
-	if a.tab == TabSSH && !a.sshOpen {
-		hints = "enter abrir SSH Tunnel  " + hints
-	}
-	if a.tab == TabJenkins && !a.jenkinsOpen {
-		hints = "enter abrir Jenkins  " + hints
-	}
-	if a.tab == TabNginx && !a.nginxOpen {
-		hints = "enter abrir Nginx  " + hints
-	}
-	if a.tab == TabActions && !a.ghaOpen {
-		hints = "enter abrir Actions  " + hints
-	}
 	compact := a.projectCompact()
-	if compact {
-		hints = "tab switch  ↑↓/pg scroll  esc back  ? help"
-		if a.tab == TabAPI && !a.apiOpen {
-			hints = "enter abrir API  " + hints
-		}
-		if a.tab == TabDatabase && !a.dbOpen {
-			hints = "enter abrir Database  " + hints
-		}
-		if a.tab == TabKubernetes && !a.k8sOpen {
-			hints = "enter abrir Kubernetes  " + hints
-		}
-		if a.tab == TabSwarm && !a.swarmOpen {
-			hints = "enter abrir Swarm  " + hints
-		}
-		if a.tab == TabActions && !a.ghaOpen {
-			hints = "enter abrir Actions  " + hints
-		}
-		if a.tab == TabJSON && !a.jsonOpen {
-			hints = "enter abrir JSON  " + hints
-		}
-		if a.tab == TabJWT && !a.jwtOpen {
-			hints = "enter abrir JWT  " + hints
-		}
-		if a.tab == TabRoutes && !a.routesOpen {
-			hints = "enter abrir Rotas  " + hints
-		}
-		if a.tab == TabWebSocket && !a.wsOpen {
-			hints = "enter abrir WebSocket  " + hints
-		}
-		if a.tab == TabNgrok && !a.ngrokOpen {
-			hints = "enter abrir Ngrok  " + hints
-		}
-		if a.tab == TabCFTunnel && !a.cfOpen {
-			hints = "enter abrir CF Tunnel  " + hints
-		}
-		if a.tab == TabSSH && !a.sshOpen {
-			hints = "enter abrir SSH Tunnel  " + hints
-		}
-		if a.tab == TabJenkins && !a.jenkinsOpen {
-			hints = "enter abrir Jenkins  " + hints
-		}
-		if a.tab == TabNginx && !a.nginxOpen {
-			hints = "enter abrir Nginx  " + hints
-		}
-	}
+	hints := a.projectHints(compact)
 
 	// Dual-pane shell: brand e métricas ficam no rail e no dashboard — sem
 	// barra de topo aqui.
@@ -2444,15 +2444,6 @@ func (a *App) projectPanelHeight() int {
 	}
 	// Sem barra de topo: sobra só o espaçador e a status bar.
 	return maxInt(10, a.height-3)
-}
-
-func (a *App) projectCompact() bool {
-	return (a.height > 0 && a.height < 34) || (a.width > 0 && a.width < 110)
-}
-
-// projectTiny is VS Code / short split-terminal mode (very little vertical room).
-func (a *App) projectTiny() bool {
-	return a.height > 0 && a.height < 22
 }
 
 func (a *App) renderProjectPanel(content string, width, height int) string {
@@ -2603,7 +2594,7 @@ func (a *App) updateThemePicker(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.cfg != nil {
 			a.cfg.UI.Theme = name
 		}
-		if err := config.SaveTheme(name); err != nil {
+		if err := config.SaveUserTheme(name); err != nil {
 			a.statusMsg = "theme save falhou: " + err.Error()
 		} else {
 			a.statusMsg = "theme salvo → " + name
@@ -2632,59 +2623,10 @@ func (a *App) renderThemePopup(background string) string {
 		sw := swatch(t.pal.Bg) + swatch(t.pal.Primary) + swatch(t.pal.Accent) + swatch(t.pal.Pink) + swatch(t.pal.Success)
 		lines = append(lines, mark+sw+"  "+label)
 	}
-	lines = append(lines, "", StyleMuted.Render("salvo em ~/.config/devscope/config.yaml"))
+	lines = append(lines, "", StyleMuted.Render("salvo em ~/.config/devscope/config.yaml  ·  Shift+C edita o arquivo"))
 	boxWidth := minInt(72, maxInt(48, a.width-6))
 	box := StylePanel.Width(boxWidth).Background(ColorBgPanel).Render(strings.Join(lines, "\n"))
 	return overlayCentered(background, box, a.width, a.height)
-}
-
-func (a *App) renderHelpPopup(background string) string {
-	helpLines := strings.Split(strings.TrimSpace(getHelpText()), "\n")
-	viewport := minInt(a.helpViewport(), len(helpLines))
-
-	maxScroll := len(helpLines) - viewport
-	if maxScroll < 0 {
-		maxScroll = 0
-	}
-	if a.helpScroll > maxScroll {
-		a.helpScroll = maxScroll
-	}
-	if a.helpScroll < 0 {
-		a.helpScroll = 0
-	}
-
-	var visibleLines []string
-	start := a.helpScroll
-	end := minInt(start+viewport, len(helpLines))
-
-	if start > 0 {
-		visibleLines = append(visibleLines, StyleMuted.Render(fmt.Sprintf("  ↑ %d comandos acima", start)))
-	} else {
-		visibleLines = append(visibleLines, "")
-	}
-
-	for i := start; i < end; i++ {
-		visibleLines = append(visibleLines, helpLines[i])
-	}
-
-	for len(visibleLines) < viewport+1 {
-		visibleLines = append(visibleLines, "")
-	}
-
-	if end < len(helpLines) {
-		visibleLines = append(visibleLines, StyleMuted.Render(fmt.Sprintf("  ↓ %d comandos abaixo", len(helpLines)-end)))
-	} else {
-		visibleLines = append(visibleLines, "")
-	}
-
-	title := StyleSection.Render("Ajuda — Atalhos do DevScope")
-	footer := StyleMuted.Render("↑/↓ scroll  │  esc ou ? fechar")
-	boxWidth := minInt(76, maxInt(44, a.width-8))
-	helpBox := StylePanel.
-		Width(boxWidth).
-		Background(ColorBgPanel).
-		Render(title + "\n\n" + strings.Join(visibleLines, "\n") + "\n\n" + footer)
-	return overlayCentered(background, helpBox, a.width, a.height)
 }
 
 func overlayCentered(background, popup string, width, height int) string {
@@ -2730,209 +2672,118 @@ func cellSlice(s string, start, end int) string {
 	return out.String()
 }
 
-func getHelpText() string {
-	return `Navigation:
-  ↑/k, ↓/j     Navegar na lista
-  Enter        Abrir projeto / Ver detalhes
-  Esc          Voltar / Fechar
-  Tab          Próxima aba (na view de projeto)
-  /            Filtrar projetos (só na lista; ao vivo, estilo rotas)
-  ctrl+p       Filtro fuzzy de projetos (só na lista)
-  ctrl+t       Relax — animações de terminal (↑↓ troca o game)
-  ?            Alternar exibição de ajuda
-  T            Escolher tema (só na tela inicial de projetos)
-  q            Sair do DevScope
-
-Dashboard:
-  shift+e      Abrir terminal no diretório do projeto
-  shift+o      Abrir OpenCode no diretório do projeto
-  g            Abrir direto na aba Git
-  c            Abrir direto na aba Containers
-  r            Forçar atualização rápida
-
-Abas de Projeto:
-  tab          Próximo módulo (sidebar)
-  shift+tab    Módulo anterior
-  h            Ir para Status (probes / portas / SSL)
-  l            Ir para Containers (logs no detalhe)
-  D            Executar Deploy script (confirmação y/n)
-  shift+u      Docker compose up -d
-  shift+d      Docker compose down
-  R            Docker compose restart
-  o            Abrir URL do projeto no navegador
-
-Aba Rotas (TOOLS):
-  enter        Detectar stack + escanear rotas (OpenAPI/parsers)
-  ↑↓ / j k     Navegar rotas
-  b            Filtrar rotas por palavra no path (ex: users)
-  enter        Abrir na aba API (method + URL)
-  r            Reescanear
-  esc          Voltar para a landing / limpar filtro
-
-Aba WebSocket (TOOLS):
-  enter        Abrir a conversa
-  0 / 1        Conversa / Ajustes
-  c            Conectar
-  d            Desligar
-  n            Novo endereço
-  m            Nova mensagem (editor · tab tipo · Enviar)
-  ↑↓           Servidores (esquerda) / conversa
-  enter        Trocar de servidor / conectar
-  n            Novo servidor
-  e            Editar servidor
-  tab          Servidores ↔ conversa
-  /            Buscar no texto
-  f            Filtrar
-  r            Reconectar
-  A            Servidores de todos os projetos (no menu)
-  esc          Voltar (desconecta)
-
-Aba Kubernetes:
-  enter        Abrir cliente (pods/deploy/svc/manifests)
-  esc          Voltar para a landing
-  []           Alternar kind (pods / deploy / svc / yaml)
-  n/N          Namespace seguinte / anterior
-  enter        Describe / ver yaml
-  a            Apply YAML do editor (create/edit) ou arquivo (kind yaml)
-  c            Criar (template → modo edição)
-  e            Editar recurso/manifest selecionado
-  enter        Nova linha (na edição YAML)
-  ctrl+s       Apply do YAML em edição (Ctrl+Enter costuma = Enter no terminal)
-  d            Delete (confirmação y)
-  l            Logs do pod
-  +/-          Scale deployment
-  r            Refresh
-
-Aba Swarm (Control Center):
-  enter        Abrir Control Center / detalhes do recurso
-  esc          Voltar (detalhe → cluster → landing)
-  [] / 1-8     Alternar Services · Nodes · Tasks · Stacks · Networks · Secrets · Configs · Events
-  tab          Painel tabela · nodes · ações
-  s            Scale service (form)
-  u            Update image/replicas
-  c            Create service
-  d            Deploy stack do projeto
-  l            Logs do service
-  t / T        Join token worker / manager
-  i            Swarm init
-  p / m        Promote / demote node
-  a            Availability (active/pause/drain)
-  R / b        Force update / rollback
-  D/x          Remove (y confirma)
-  P            Prune networks (y confirma)
-  r            Refresh (auto 5s)
-
-Aba Actions (GitHub Actions):
-  enter        Abrir Control Center / detalhe do processo (Overview·Runs·Logs·YAML)
-  esc          Voltar detalhe → lista → landing
-  tab          Painéis lista: Lista → RESUMO → Ações
-  [] / 1-3     Processes · Runs · Workflows (só na Lista)
-  No detalhe:  [] abas  t trigger  l logs  R re-run  o github
-  Status:      idle · triggered · queued · running · success · failure · stopped
-  L            Login gh
-  c / d / t    Criar / deletar / trigger
-  r            Refresh (auto 8s)
-
-Aba API:
-  tab          Request → URL → Headers → Auth
-  []           Body │ Response
-  ↑↓           Método (no Request) / scroll
-  digitar      Edita URL / Headers / Auth / Body
-  enter        Enviar request
-  /            Buscar (só em Body/Response)
-  u            Porta do projeto (no Request/URL)
-  a            Tipo de Auth (no Auth)
-
-Aba Database:
-  enter        Abrir cliente (tabelas + SQL)
-  esc          Voltar para a landing
-  tab          Tables │ SQL │ Result
-  enter        Preview SELECT * LIMIT 50 na tabela
-  e            Editar SQL
-  ctrl+enter   Executar SQL
-  []           Trocar banco detectado
-  ←→ / h l     Scroll lateral no result
-  r            Recarregar tabelas
-
-Aba Git:
-  c            Novo commit (editor · tab → Commitar)
-  a            Toggle stage do arquivo (add / unstage)
-  A            Toggle stage de todos (add -A / unstage all)
-  space        Checkout de branch (ou toggle commit)
-  shift+↑/↓    Selecionar range de commits
-  x            Toggle de seleção de commit individual
-  shift+c      Copiar commits selecionados (cherry-pick)
-  shift+v      Colar commits (cherry-pick) na branch destino
-  b            Filtrar lista de branches
-  enter        Detalhe (branch/commit) ou diff do arquivo (tela cheia)
-  n            Criar nova branch
-  d            Apagar branch (confirmação y/esc)
-  D            Marcar branch de origem
-  shift+R / R  Renomear branch
-  o            Abrir Pull Request no GitHub
-  shift+m / M  Mesclar branch na atual (confirmação y/esc)
-  p            Pull origin da branch pai
-  shift+P / P  Push
-  ←/→ or h/l   Alternar foco entre colunas (Branches / Commits)
-  ctrl+g       Abrir o Git Graph (DAG de commits)
-
-Git Graph:
-  tab / S-tab  Alternar painel (Commits · Commit Detail · Changed Files)
-  ↑/↓ or j/k   Mover o cursor (Commits) / rolar o painel focado
-  ←/→ or h/l   Scroll lateral do painel focado (H/L = 10x, home volta ao 0)
-  pgup/pgdown  Rolar uma página no painel focado
-  B            Filtrar por branch — o grafo repercorre só essa branch
-  enter        Abrir o detalhe completo do commit
-  r            Recarregar mantendo o filtro de branch
-  esc          Voltar
-
-Aba Containers:
-  n            Novo serviço (Docker Hub ou YAML manual → compose)
-  A            Todos os projetos + órfãos docker / só do projeto
-  v            Só containers docker (running/exited/created) — esconde missing
-  enter        Telinha de portas do container
-  m / l        Logs, stats, env, config e demais detalhes
-  shift+e      Abrir shell interativo dentro do container
-  s            Parar container (stop)
-  r            Iniciar/Reiniciar container
-  shift+R      Toggle restart=always / no (∞ no STATE)
-  p            Pausar/Retomar container
-  d            Remover container (confirmação y/n)
-  shift+u      Docker compose up -d
-  shift+d      Docker compose down
-
-Imagens do Container (i):
-  ●/verde      Imagem do projeto atual (compose label ou container rodando)
-  ·/amarelo    Imagem de outro projeto  ·  cinza = sem tag (dangling)
-  A            Escopo: container → projeto → todas
-  D            Remover (com/sem force, só a selecionada ou as sem tag)
-  r            Atualizar  ·  esc  Voltar
-
-Portas do Container:
-  ↑/↓          Selecionar porta
-  enter        Preview HTTP (telinha)
-  o            Abrir no browser
-  x            Fechar porta (recria sem publicar)
-  esc          Fechar preview / voltar à lista
-
-Detalhes do Container:
-  ←/→          Alternar abas (Logs, Stats, Env, Config, etc.)
-  ↑/↓          Rolar conteúdo do log / stats
-  esc          Voltar para a lista de containers
-
-CLI & Configuração:
-  devscope scan --json
-  devscope watch
-  Configuração em: ~/.config/devscope/config.yaml`
+func (a *App) renderStatusBar(hints string) string {
+	// A idade da varredura saiu daqui: era um número em inglês mudando a cada
+	// segundo no canto de TODA tela, custando dezoito colunas de dicas. Ele já
+	// vive no cabeçalho da tela inicial ("varrido há N"), que é onde a
+	// frescura do dado decide alguma coisa.
+	text := hints
+	if a.statusMsg != "" {
+		text = a.statusMsg + StyleMuted.Render("   ·   ") + hints
+	}
+	// Corta aqui, com reticência. Sem isso quem cortava era o cropBlock da
+	// moldura do app, que fatia na coluna exata da tela e deixa a última dica
+	// pela metade ("esc ba"): parece bug, não parece fim de linha.
+	if a.width > 2 {
+		text = truncate(text, a.width-2)
+	}
+	return StyleStatusBar.Render(text)
 }
 
-func (a *App) renderStatusBar(hints string) string {
-	scanInfo := ""
-	if !a.snapshot.ScannedAt.IsZero() {
-		scanInfo = fmt.Sprintf("scanned %s ago | ", time.Since(a.snapshot.ScannedAt).Round(time.Second))
+// ─── dicas da barra de status ───────────────────────────────────────────────
+
+// moduleClientOpen diz se o cliente do módulo já está aberto — quando não está,
+// a landing anuncia o `enter` que entra nele.
+func (a *App) moduleClientOpen(t Tab) bool {
+	switch t {
+	case TabAPI:
+		return a.apiOpen
+	case TabDatabase:
+		return a.dbOpen
+	case TabKubernetes:
+		return a.k8sOpen
+	case TabSwarm:
+		return a.swarmOpen
+	case TabJSON:
+		return a.jsonOpen
+	case TabJWT:
+		return a.jwtOpen
+	case TabRoutes:
+		return a.routesOpen
+	case TabWebSocket:
+		return a.wsOpen
+	case TabNgrok:
+		return a.ngrokOpen
+	case TabCFTunnel:
+		return a.cfOpen
+	case TabSSH:
+		return a.sshOpen
+	case TabJenkins:
+		return a.jenkinsOpen
+	case TabNginx:
+		return a.nginxOpen
+	case TabActions:
+		return a.ghaOpen
 	}
-	if a.statusMsg != "" {
-		return StyleStatusBar.Render(scanInfo + a.statusMsg + "  |  " + hints)
+	return true
+}
+
+// projectHints monta a barra de status da visão de projeto.
+//
+// Eram cento e trinta linhas com a MESMA cadeia de catorze `if` escrita duas
+// vezes — uma para a tela larga e outra para a compacta — e as duas usavam
+// palavras diferentes para a mesma tecla: "pgup/pgdown scroll" virava "↑↓/pg
+// scroll", "tab/shift+tab módulo" virava "tab módulo", "q quit" virava "? help".
+// Trocar de terminal trocava o nome dos atalhos.
+//
+// Agora é UMA lista, ordenada por importância, e a tela estreita DESCARTA do
+// fim em vez de reescrever (docs/DESIGN.md §2.3). O que se lê em 200 colunas é
+// o começo do que se lê em 80.
+func (a *App) projectHints(compact bool) string {
+	var items [][2]string
+
+	// A ação do contexto vem primeiro: é a que o usuário quer agora.
+	switch {
+	case a.gitBranchFilterOn:
+		return fitKeybinds(a.hintWidth(),
+			[2]string{"digite", "filtrar branch"},
+			[2]string{"enter", "aplicar"},
+			[2]string{"esc", "limpar"})
+	case a.tab == TabGit && a.gitSubview == gitSubviewMain:
+		items = append(items,
+			[2]string{"←→", "painéis"},
+			[2]string{"shift+↑↓", "intervalo"},
+			[2]string{"b", "filtrar"})
+	case a.tab == TabContainers && a.containerSubview == containerSubviewDetail:
+		items = append(items, [2]string{"←→", "abas"}, [2]string{"↑↓", "rolar"})
+	case a.tab == TabContainers && a.containerSubview == containerSubviewPorts:
+		items = append(items,
+			[2]string{"↑↓", "porta"}, [2]string{"enter", "prévia"},
+			[2]string{"o", "browser"}, [2]string{"x", "fechar"})
+	case a.tab == TabContainers:
+		items = append(items, [2]string{"↑↓", "lista"})
+	case !a.moduleClientOpen(a.tab):
+		items = append(items, [2]string{"enter", "abrir " + a.tab.String()})
+	case a.tab == TabOverview:
+		items = append(items, [2]string{"enter", "abrir"}, [2]string{"r", "atualizar"})
 	}
-	return StyleStatusBar.Render(scanInfo + hints)
+
+	// Navegação entre módulos e saída fecham a lista, sempre nesta ordem.
+	items = append(items,
+		[2]string{"tab", "módulo"},
+		[2]string{"t", "módulos"},
+		[2]string{"pgup/pgdown", "rolar"},
+		[2]string{"esc", "voltar"},
+		[2]string{"?", "ajuda"},
+		[2]string{"q", "sair"})
+	return fitKeybinds(a.hintWidth(), items...)
+}
+
+// hintWidth é o que sobra para a barra depois do prefixo "scanned Ns ago".
+func (a *App) hintWidth() int {
+	w := a.width
+	if w <= 0 {
+		w = 80
+	}
+	return maxInt(20, w-24)
 }

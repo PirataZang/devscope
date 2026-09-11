@@ -15,7 +15,7 @@ func tunnelModalChrome(brand string, brandColor lipgloss.Color, title, subtitle,
 	lines := []string{
 		brandS + StyleMuted.Render("  ·  ") + StyleNormal.Render(title),
 		StyleMuted.Render(subtitle),
-		StyleMuted.Render(strings.Repeat("─", minInt(ruleW, 52))),
+		rule(minInt(ruleW, 52)),
 	}
 	if project != "" {
 		lines = append(lines, StyleMuted.Render("projeto  ")+StyleNormal.Render(truncate(project, maxInt(12, ruleW-10))))
@@ -65,7 +65,7 @@ func tunnelMetricRow(cells [][2]string, width int) string {
 		if i > 0 {
 			parts = append(parts, " ")
 		}
-		parts = append(parts, renderApiTitledBox(c[0],
+		parts = append(parts, panelBox(c[0],
 			[]string{StyleNormal.Bold(true).Render(truncate(c[1], cellW-2))},
 			cellW, 3, false,
 		))

@@ -8,7 +8,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
@@ -172,7 +171,7 @@ func (a *App) renderContainerList(p *core.Project) string {
 
 	containers := a.filteredContainers(p)
 	if a.projectDockerLoading && len(containers) == 0 {
-		return renderApiTitledBox("CONTAINERS", fitExactLines([]string{a.loadingText("Carregando containers…")}, h-2), w, h, true)
+		return panelBox("CONTAINERS", fitExactLines([]string{a.loadingText("Carregando containers…")}, h-2), w, h, true)
 	}
 	if len(containers) == 0 {
 		msg := []string{
@@ -183,7 +182,7 @@ func (a *App) renderContainerList(p *core.Project) string {
 		if a.containerShowAll {
 			msg = []string{StyleMuted.Render("Nenhum container no docker (ps -a) nem nos projetos."), StyleMuted.Render("A · voltar ao projeto atual")}
 		}
-		return renderApiTitledBox("CONTAINERS", fitExactLines(msg, h-2), w, h, true)
+		return panelBox("CONTAINERS", fitExactLines(msg, h-2), w, h, true)
 	}
 
 	header := a.renderContainersHeader(p, w)
@@ -194,8 +193,7 @@ func (a *App) renderContainerList(p *core.Project) string {
 	cmdBar := a.renderContainersCommandBar(w)
 	chromeH := lipgloss.Height(header) + lipgloss.Height(strip) + lipgloss.Height(notif) + 1
 	bodyH := maxInt(10, h-chromeH-lipgloss.Height(cmdBar))
-	bottomH := maxInt(6, bodyH*34/100)
-	tableH := maxInt(6, bodyH-bottomH)
+	tableH, bottomH := containerSplitHeight(bodyH, len(containers))
 
 	table := a.renderContainersTable(containers, w, tableH)
 	bottom := a.renderContainersBottom(w, bottomH)
@@ -205,6 +203,41 @@ func (a *App) renderContainerList(p *core.Project) string {
 		stack += strings.Repeat("\n", fill)
 	}
 	return lipgloss.JoinVertical(lipgloss.Left, header, strip, notif, stack, cmdBar)
+}
+
+// containerSplitHeight reparte a altura entre a lista e o detalhe.
+//
+// A divisão era fixa em 66/34, e com sete containers a caixa LISTA ficava com
+// dez linhas em branco enquanto LOGS se espremia em oito. A lista é o elemento
+// dominante desta tela, então ela PEDE o que precisa — uma linha por container
+// mais a moldura e o cabeçalho — e só é cortada quando não cabe.
+//
+// O detalhe tem piso (identidade + dois fatos + uma caixa de log legível) e
+// fica com TODO o resto: sobra guardada como linha em branco entre o log e a
+// barra de comandos é o mesmo desperdício da lista com dez linhas vazias, só
+// que do outro lado da tela.
+func containerSplitHeight(bodyH, count int) (tableH, bottomH int) {
+	const (
+		tableChrome  = 4 // moldura (2) + cabeçalho + régua
+		detailChrome = 4 // régua + identidade + portas + recursos
+		minTable     = 6
+		minLogs      = 3
+	)
+	minDetail := detailChrome + minLogs + 2 // +2 = moldura da caixa de logs
+
+	tableH = maxInt(minTable, minInt(count+tableChrome, bodyH-minDetail))
+	// A lista já pediu o que precisa; o que sobra vai INTEIRO para os logs.
+	// Guardar a sobra como linha em branco entre o log e a barra de comandos
+	// era o mesmo desperdício da lista com dez linhas vazias, só que do outro
+	// lado da tela.
+	bottomH = bodyH - tableH
+	if bottomH < minDetail {
+		// Terminal curto demais para os dois: o detalhe cede primeiro, mas
+		// nunca some — sem ele a lista não diz o que está selecionado.
+		bottomH = maxInt(detailChrome+1, bodyH-tableH)
+		tableH = maxInt(minTable, bodyH-bottomH)
+	}
+	return tableH, bottomH
 }
 
 func (a *App) renderContainersHeader(p *core.Project, width int) string {
@@ -348,37 +381,14 @@ func (a *App) renderContainersCommandBar(width int) string {
 		{"d", "remover"},
 		{"i", "imagens"},
 		{"n", "novo svc"},
-		{"S-R", "reinício ∞/off"},
-		{"S-U", "compose ↑"},
-		{"S-D", "compose ↓"},
-		{"^g", "deps"},
+		{"shift+R", "reinício ∞/off"},
+		{"shift+U", "compose ↑"},
+		{"shift+D", "compose ↓"},
+		{"ctrl+g", "deps"},
 		{"A", scope},
 		{"v", only},
 	}
 	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
-}
-
-func (a *App) containerNetSummary() string {
-	for _, line := range strings.Split(a.containerPreviewStats, "\n") {
-		if strings.Contains(line, "Net I/O") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				return strings.TrimSpace(parts[1])
-			}
-		}
-	}
-	return "—"
-}
-
-func (a *App) renderContainersSearch(width int) string {
-	label := StyleMuted.Render("Buscar containers…  /")
-	if a.containerFilterOn {
-		label = StyleAccent.Render(truncate(a.containerFilterInput+"▌", width-8))
-	} else if a.containerFilter != "" {
-		label = StyleAccent.Render(truncate("/"+a.containerFilter, width-8))
-	}
-	pad := maxInt(1, width-lipgloss.Width(stripANSI(label))-4)
-	return StyleMuted.Render("╱ ") + label + strings.Repeat(" ", pad)
 }
 
 func (a *App) renderContainersNotif() string {
@@ -398,137 +408,245 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2) // header + separator
 	if len(containers) == 0 {
-		return renderApiTitledBox("LISTA", fitExactLines([]string{StyleMuted.Render("nenhum resultado")}, inner), width, height, true)
+		return panelBox("LISTA", fitExactLines([]string{StyleMuted.Render("nenhum resultado")}, inner), width, height, true)
 	}
 	a.containerScroll = ensureVisible(a.tabCursor, a.containerScroll, viewport, len(containers))
 	start := a.containerScroll
 	end := minInt(start+viewport, len(containers))
 
-	lines := []string{a.renderContainerHeader(), StyleMuted.Render(strings.Repeat("─", maxInt(20, width-2)))}
-	if start > 0 {
-		lines[1] = StyleMuted.Render(fmt.Sprintf("↑ %d  ", start) + strings.Repeat("─", maxInt(10, width-10)))
-	}
+	lines := []string{a.renderContainerHeader(), rule(maxInt(20, width-2))}
 	for i := start; i < end; i++ {
 		lines = append(lines, a.renderContainerRow(containers[i], i == a.tabCursor))
 	}
 	for i := end - start; i < viewport; i++ {
 		lines = append(lines, "")
 	}
+
+	// O que ficou fora da janela vai no TÍTULO, não numa linha extra.
+	// A linha "↓ N abaixo" ficava DEPOIS das `viewport` linhas, e o
+	// fitExactLines logo abaixo cortava exatamente ela: o aviso de que havia
+	// mais containers nunca chegou à tela. No título ele custa zero linha e
+	// aparece sempre — que é a regra dos contadores do DESIGN.md §4.3.
+	name := "LISTA"
+	if a.containerShowAll {
+		name = "LISTA · TODOS"
+	}
+	counters := []string{fmt.Sprint(len(containers))}
+	if start > 0 {
+		counters = append(counters, fmt.Sprintf("↑%d", start))
+	}
 	if rem := len(containers) - end; rem > 0 {
-		lines = append(lines, StyleMuted.Render(fmt.Sprintf("↓ %d abaixo", rem)))
+		counters = append(counters, fmt.Sprintf("↓%d", rem))
 	}
-	title := fmt.Sprintf("LISTA (%d)", len(containers))
-	if a.containerShowAll {
-		title = fmt.Sprintf("LISTA · TODOS (%d)", len(containers))
-	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, true)
+	return panelBox(panelTitle(name, counters...), fitExactLines(lines, inner), width, height, true)
 }
 
-func (a *App) containerActionItems() [][2]string {
-	scope := "todos"
-	if a.containerShowAll {
-		scope = "projeto"
-	}
-	only := "só docker"
-	if a.containerOnlyDocker {
-		only = "c/ missing"
-	}
-	return [][2]string{
-		{"enter", "portas"},
-		{"m", "detalhe"},
-		{"i", "imagens"},
-		{"C-g", "deps"},
-		{"n", "novo svc"},
-		{"s", "stop"},
-		{"r", "start/rest"},
-		{"S-R", "∞/off"},
-		{"p", "pause"},
-		{"d", "remove"},
-		{"e", "shell"},
-		{"A", scope},
-		{"v", only},
-		{"g", "métrica"},
-		{"S-U", "compose↑"},
-		{"S-D", "compose↓"},
-		{"/", "buscar"},
-	}
-}
-
-func containersActionsWidth(total int) int {
-	if total < 70 {
-		return 0
-	}
-	w := 28
-	if total >= 120 {
-		w = 30
-	}
-	if total >= 160 {
-		w = 32
-	}
-	if w > total*34/100 {
-		w = maxInt(24, total*34/100)
-	}
-	return w
-}
-
+// renderContainersBottom é o DETALHE do container sob o cursor.
+//
+// Eram quatro caixas na tela ao mesmo tempo — LISTA, LOGS, STATS e PORTAS —
+// para falar de UM container. Três molduras lado a lado para um contexto só, e
+// PORTAS quase sempre com duas linhas dentro de uma caixa de oito: metade dos
+// containers não publica porta nenhuma.
+//
+// Agora é identidade + fatos rotulados (sem moldura, como o painel do projeto
+// no dashboard) e UMA caixa para os logs, que é o único conteúdo aqui que
+// realmente rola e merece um dentro e um fora.
+//
+//	⣴⣾⣦⡀ laradock-nginx-1  no ar   nginx:alpine                     ↑ 2h
+//	  portas   :80 → 80/tcp · :443 → 443/tcp
+//	  recursos CPU 12.6% ⣤⣶ · MEM 400M 2.4% ⣀⣄ · NET 1.2MB/800KB
+//	┌─LOGS─────────────────────────────────────────────────────────────┐
+//
+// Portas e stats continuam inteiras nas telas dedicadas (enter e g/m) — aqui
+// vai o que responde "é este mesmo?" sem sair da lista.
 func (a *App) renderContainersBottom(width, height int) string {
-	rest := maxInt(12, width)
-	w1 := maxInt(10, rest*46/100)
-	w2 := maxInt(10, rest*28/100)
-	w3 := maxInt(10, rest-w1-w2)
-	// Keep columns exact so JoinHorizontal never wraps the terminal line.
-	if w1+w2+w3 > rest {
-		w3 = maxInt(8, rest-w1-w2)
+	head := a.containerDetailHeadLines(width)
+	logsH := maxInt(3, height-len(head))
+	// A caixa tem a altura do log que existe, com piso legível e teto no que
+	// sobrou. Esticá-la até o fim do painel punha vinte linhas de moldura vazia
+	// em volta de duas linhas de log.
+	avail := maxInt(3, logsH-2)
+	logs := a.containerPreviewLogLines(avail, maxInt(10, width-4))
+	inner := maxInt(minInt(len(logs), avail), minInt(3, avail))
+	box := panelBox(a.containerLogsTitle(), padLinesTop(logs, inner), width, inner+2, false)
+	return lipgloss.JoinVertical(lipgloss.Left, append(head, box)...)
+}
+
+// padLinesTop enche a caixa por CIMA. Um log é uma cauda: a última linha
+// escrita tem de encostar na borda de baixo, como num `tail -f`. Com o
+// preenchimento embaixo (fitExactLines) a linha mais recente ficava no meio da
+// caixa e o olho tinha de procurá-la a cada atualização.
+func padLinesTop(lines []string, height int) []string {
+	if len(lines) >= height {
+		return lines[len(lines)-height:]
 	}
-	inner := maxInt(2, height-2)
+	out := make([]string, 0, height)
+	for i := len(lines); i < height; i++ {
+		out = append(out, "")
+	}
+	return append(out, lines...)
+}
 
-	logs := a.containerPreviewLogLines(inner, maxInt(4, w1-4))
-	stats := a.containerPreviewStatLines(inner, maxInt(4, w2-4))
-	ports := a.containerPreviewPortLines(inner, maxInt(4, w3-4))
-
-	title := "LOGS"
-	if a.containerPreviewID != "" {
-		if c, ok := a.selectedContainer(a.currentProject()); ok {
-			title = "LOGS · " + truncate(sanitizeTerminalLine(c.Name), 18)
+// containerDetailHeadLines: identidade + os dois fatos que respondem "é este
+// mesmo?". Altura fixa (3) — bloco que encolhe conforme o cursor anda faz o
+// olho reencontrar os rótulos a cada seta.
+func (a *App) containerDetailHeadLines(width int) []string {
+	c, ok := a.selectedContainer(a.currentProject())
+	if !ok {
+		// Mesma altura do estado cheio: o bloco não pode encolher quando não há
+		// seleção, senão a caixa de logo abaixo pula uma linha.
+		return []string{
+			rule(width),
+			StyleMuted.Render("  selecione um container"),
+			factLine("portas", nil, width),
+			factLine("recursos", nil, width),
 		}
 	}
-	actions := a.containerActionItems()
-	parts := []string{
-		renderApiTitledBox(title, fitExactLines(logs, inner), w1, height, false),
-		renderApiTitledBox(a.containerStatsTitle(), fitExactLines(stats, inner), w2, height, false),
-		renderApiTitledBox("PORTAS", fitExactLines(ports, inner), w3, height, false),
+	wave, waveStyle, label, labelStyle := a.containerStateVisual(c)
+	left := waveStyle.Render(wave) + " " +
+		StyleNormal.Bold(true).Render(truncate(sanitizeTerminalLine(c.Name), maxInt(10, width/3))) +
+		StyleMuted.Render("  ") + labelStyle.Render(label) +
+		StyleMuted.Render("  "+truncate(sanitizeTerminalLine(c.Image), maxInt(8, width/4)))
+	right := ""
+	if up := containerUptimeLabel(c); up != "" && up != emDash {
+		right = StyleMuted.Render("⧗ " + up)
 	}
-	if false {
-		parts = append(parts, renderContainersActionsBox(0, height, actions...))
+	if containerRestartAlways(c) {
+		right = StyleAccent.Render("∞") + StyleMuted.Render("  ") + right
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+	return []string{
+		rule(width),
+		joinWithSpacer(truncateVisible(left, maxInt(10, width-lipgloss.Width(right)-2)), right, width),
+		factLine("portas", a.containerPortFacts(c), width),
+		factLine(a.containerResourceLabel(), a.containerResourceFacts(c, width), width),
+	}
 }
 
-// renderContainersActionsBox like renderActionsBox but keeps the given height so
-// every shortcut stays visible (shared helper shrinks to item count).
-func renderContainersActionsBox(width, height int, items ...[2]string) string {
-	if width < 12 {
-		return ""
+// containerPortFacts: as portas numa linha. A tela de portas (enter) continua
+// existindo inteira — com preview HTTP, abrir no navegador e fechar a porta.
+func (a *App) containerPortFacts(c core.Container) []string {
+	ports := collectors.ParseContainerPortMappings(c.Ports)
+	if len(ports) == 0 {
+		return nil
 	}
-	innerW := maxInt(4, width-2)
-	lines := moduleActionLinesWidth(innerW, items...)
-	if height < len(lines)+2 {
-		height = len(lines) + 2
+	out := make([]string, 0, len(ports))
+	for i, p := range ports {
+		if i == 4 {
+			out = append(out, StyleMuted.Render(fmt.Sprintf("+%d", len(ports)-i)))
+			break
+		}
+		out = append(out, StyleAccent.Render(fmt.Sprintf(":%d → %d/%s", p.HostPort, p.ContainerPort, p.Proto)))
 	}
-	return renderApiTitledBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
+	return out
 }
 
-func (a *App) containerStatsTitle() string {
+// containerResourceFacts é a régua de números do DESIGN.md §5: valor primeiro,
+// tendência em Braille depois, tudo numa linha. Eram seis linhas dentro de uma
+// caixa, com o valor repetido logo abaixo da própria sparkline.
+//
+// A tecla `g` continua ciclando a métrica, mas agora ela COMPRA RESOLUÇÃO em
+// vez de só apagar duas linhas: focado, o histórico ocupa a largura toda e
+// ganha média e pico. Antes, focar em CPU escondia MEM e NET e não mostrava
+// nada a mais sobre CPU.
+func (a *App) containerResourceFacts(c core.Container, width int) []string {
+	cpu := c.CPU
+	if n := len(a.containerCPUHistory); n > 0 {
+		cpu = a.containerCPUHistory[n-1]
+	}
+	memPct := 0.0
+	if n := len(a.containerMemHistory); n > 0 {
+		memPct = a.containerMemHistory[n-1]
+	}
+	net := ""
+	if n := len(a.containerNetHistory); n > 0 {
+		net = formatNetKB(a.containerNetHistory[n-1])
+	}
+
+	// Focado: uma métrica só, com o histórico ocupando a linha inteira.
+	if a.containerStatsMode != 0 {
+		wide := maxInt(8, width-factLabelW-34)
+		switch a.containerStatsMode {
+		case 1:
+			return []string{
+				metricUsageStyle(cpu).Render(fmt.Sprintf("%.1f%%", cpu)) + " " +
+					StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, wide, statsScaleTop(a.containerCPUHistory))),
+				statsWindowLabel(a.containerCPUHistory, "%"),
+			}
+		case 2:
+			return []string{
+				StyleNormal.Render(formatContainerMem(c.Memory)) + StyleMuted.Render(fmt.Sprintf(" %.1f%%", memPct)) + " " +
+					StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, wide, statsScaleTop(a.containerMemHistory))),
+				statsWindowLabel(a.containerMemHistory, "%"),
+			}
+		default:
+			return []string{
+				StyleNormal.Render(orDash(net)) + " " +
+					StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, wide, 0)),
+				statsWindowLabel(a.containerNetHistory, "KB"),
+			}
+		}
+	}
+
+	spark := maxInt(3, minInt(8, width/12))
+	facts := []string{
+		StyleMuted.Render("CPU ") + metricUsageStyle(cpu).Render(fmt.Sprintf("%.1f%%", cpu)) + " " +
+			StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, spark, statsScaleTop(a.containerCPUHistory))),
+	}
+	mem := StyleMuted.Render("MEM ") + StyleNormal.Render(formatContainerMem(c.Memory))
+	if len(a.containerMemHistory) > 0 {
+		mem += StyleMuted.Render(fmt.Sprintf(" %.1f%%", memPct)) + " " +
+			StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, spark, statsScaleTop(a.containerMemHistory)))
+	}
+	facts = append(facts, mem)
+	if net != "" {
+		facts = append(facts, StyleMuted.Render("NET ")+StyleNormal.Render(net)+" "+
+			StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, spark, 0)))
+	}
+	return facts
+}
+
+// containerResourceLabel é o rótulo da linha de recursos — ele é quem diz em
+// que modo o `g` deixou a métrica.
+func (a *App) containerResourceLabel() string {
 	switch a.containerStatsMode {
 	case 1:
-		return "STATS · CPU  g"
+		return "cpu  g"
 	case 2:
-		return "STATS · MEM  g"
+		return "mem  g"
 	case 3:
-		return "STATS · NET  g"
+		return "net  g"
 	default:
-		return "STATS · ALL  g"
+		return "recursos"
 	}
+}
+
+// statsWindowLabel é o resumo da janela do DESIGN.md §5.1: agora · média · pico.
+func statsWindowLabel(hist []float64, unit string) string {
+	if len(hist) == 0 {
+		return StyleMuted.Render(emDash)
+	}
+	f := func(v float64) string {
+		if unit == "KB" {
+			return formatNetKB(v)
+		}
+		return fmt.Sprintf("%.1f%%", v)
+	}
+	return StyleMuted.Render(fmt.Sprintf("média %s · pico %s · %d amostras",
+		f(avgFloats(hist)), f(maxFloats(hist)), len(hist)))
+}
+
+func orDash(s string) string {
+	if strings.TrimSpace(s) == "" {
+		return emDash
+	}
+	return s
+}
+
+func (a *App) containerLogsTitle() string {
+	if c, ok := a.selectedContainer(a.currentProject()); ok {
+		return panelTitle("LOGS", truncate(sanitizeTerminalLine(c.Name), 24))
+	}
+	return "LOGS"
 }
 
 func (a *App) containerPreviewLogLines(maxLines, width int) []string {
@@ -557,61 +675,6 @@ func (a *App) containerPreviewLogLines(maxLines, width int) []string {
 	return lines
 }
 
-func (a *App) containerPreviewStatLines(maxLines, width int) []string {
-	sparkW := maxInt(8, width-5)
-	showCPU := a.containerStatsMode == 0 || a.containerStatsMode == 1
-	showMem := a.containerStatsMode == 0 || a.containerStatsMode == 2
-	showNet := a.containerStatsMode == 0 || a.containerStatsMode == 3
-
-	fit := func(s string) string {
-		if width <= 0 {
-			return s
-		}
-		if lipgloss.Width(s) > width {
-			return ansi.Truncate(s, width, "…")
-		}
-		return s
-	}
-	lines := make([]string, 0, maxLines)
-	if showCPU {
-		lines = append(lines, fit(StyleMuted.Render("CPU ")+StyleAccent.Render(renderMetricSparkline(a.containerCPUHistory, sparkW, 100))))
-	}
-	if showMem {
-		lines = append(lines, fit(StyleMuted.Render("MEM ")+StyleHealthy.Render(renderMetricSparkline(a.containerMemHistory, sparkW, 100))))
-	}
-	if showNet {
-		lines = append(lines, fit(StyleMuted.Render("NET ")+StyleWarning.Render(renderMetricSparkline(a.containerNetHistory, sparkW, 0))))
-	}
-
-	if c, ok := a.selectedContainer(a.currentProject()); ok {
-		cpu := c.CPU
-		if n := len(a.containerCPUHistory); n > 0 {
-			cpu = a.containerCPUHistory[n-1]
-		}
-		mem := formatContainerMem(c.Memory)
-		memPct := ""
-		if n := len(a.containerMemHistory); n > 0 {
-			memPct = fmt.Sprintf(" (%.1f%%)", a.containerMemHistory[n-1])
-		}
-		net := "—"
-		if n := len(a.containerNetHistory); n > 0 {
-			net = formatNetKB(a.containerNetHistory[n-1])
-		}
-		lines = append(lines,
-			fit(StyleNormal.Render(fmt.Sprintf("CPU %.1f%%", cpu))),
-			fit(StyleNormal.Render("MEM "+mem+memPct)),
-			fit(StyleNormal.Render("NET "+net)),
-		)
-	} else if len(lines) == 0 {
-		lines = append(lines, StyleMuted.Render("selecione um container"))
-	}
-	lines = append(lines, StyleMuted.Render("g cicla métrica"))
-	if len(lines) > maxLines {
-		lines = lines[:maxLines]
-	}
-	return lines
-}
-
 // renderMetricSparkline: maxHint>0 scales against that ceiling; 0 = relative to window max.
 // renderMetricSparkline usa o Braille do resto do app: cada célula carrega duas
 // amostras, então mostra o dobro de histórico das barras de bloco que havia
@@ -619,7 +682,16 @@ func (a *App) containerPreviewStatLines(maxLines, width int) []string {
 func renderMetricSparkline(hist []float64, width int, maxHint float64) string {
 	cells := maxInt(4, width)
 	if len(hist) == 0 {
-		return brailleSpark(nil, cells)
+		// Sem amostra não há tendência: uma faixa de células vazias é
+		// decoração, e ausência no DevScope é "—" (§10).
+		return StyleMuted.Render(emDash)
+	}
+	// A faixa tem a largura do que foi MEDIDO. brailleSpark preenche a
+	// esquerda com vazio quando faltam amostras — honesto sobre a janela, mas
+	// com seis leituras numa faixa de oito células desenhava dez metades em
+	// branco antes do primeiro dado.
+	if measured := (len(hist) + 1) / 2; measured < cells {
+		cells = maxInt(2, measured)
 	}
 	// NET não tem teto fixo: normaliza pelo pico da própria janela.
 	maxV := maxHint
@@ -707,41 +779,6 @@ func parseDockerBytesToKB(s string) float64 {
 	default:
 		return v
 	}
-}
-
-func (a *App) containerPreviewVolumeLines(maxLines, width int) []string {
-	if len(a.containerPreviewVolumes) == 0 {
-		return []string{StyleMuted.Render("(sem volumes)")}
-	}
-	lines := make([]string, 0, maxLines)
-	for i, v := range a.containerPreviewVolumes {
-		if i >= maxLines {
-			break
-		}
-		v = sanitizeTerminalLine(v)
-		lines = append(lines, StyleNormal.Render("● "+truncate(v, maxInt(1, width-2))))
-	}
-	return lines
-}
-
-func (a *App) containerPreviewPortLines(maxLines, width int) []string {
-	c, ok := a.selectedContainer(a.currentProject())
-	if !ok {
-		return []string{StyleMuted.Render("selecione um container")}
-	}
-	ports := collectors.ParseContainerPortMappings(c.Ports)
-	if len(ports) == 0 {
-		return []string{StyleMuted.Render("(sem portas)"), StyleMuted.Render("enter · abrir")}
-	}
-	lines := make([]string, 0, maxLines)
-	for i, p := range ports {
-		if i >= maxLines-1 {
-			lines = append(lines, StyleMuted.Render(fmt.Sprintf("+%d  enter abrir", len(ports)-i)))
-			break
-		}
-		lines = append(lines, StyleAccent.Render(truncate(fmt.Sprintf("● :%d → %d/%s", p.HostPort, p.ContainerPort, p.Proto), maxInt(1, width))))
-	}
-	return lines
 }
 
 func formatContainerMem(b int64) string {
@@ -1131,32 +1168,57 @@ func (a *App) containerColumns() containerCols {
 	if tableWidth <= 0 {
 		tableWidth = maxInt(38, a.width-8)
 	}
-	cols := containerCols{dot: containerWaveWidth, state: 12}
-	if tableWidth < 92 {
-		cols.state = 0 // a faixa já diz o estado; a palavra volta quando couber
-	}
+	cols := containerCols{dot: containerWaveWidth}
 	if tableWidth < 64 {
 		cols.dot = 3 // faixa curta: 3 células ainda mostram a forma
 	}
-	flexible := tableWidth - cols.dot - cols.state - 3
+	// -2 = o espaço da esquerda + o vão entre a faixa e o NOME. Cada coluna
+	// opcional paga o seu próprio vão logo abaixo.
+	avail := tableWidth - cols.dot - 2
 	if a.containerShowAll {
-		cols.project = maxInt(10, flexible*16/100)
-		flexible -= cols.project + 1
+		cols.project = maxInt(10, avail*16/100)
+		avail -= cols.project + 1
 	}
-	if tableWidth < 82 {
-		cols.name = maxInt(12, flexible*45/100)
-		cols.image = maxInt(10, flexible-cols.name-1)
-		return cols
+
+	// A ordem AQUI é a ordem de sacrifício: a última da lista é a primeira a
+	// sair quando falta largura.
+	//
+	// Comparar vem antes de descrever. Numa lista de containers o que se faz é
+	// varrer a coluna de CPU atrás do que está queimando a máquina, e a de
+	// TEMPO atrás do que subiu agora — IMAGEM e PORTAS são fatos de UM item, e
+	// desde a reforma do rodapé eles estão no detalhe do selecionado, logo
+	// abaixo. Antes era o contrário: em 100 colunas a tabela mostrava NOME e
+	// IMAGEM esticados e escondia CPU, MEM e TEMPO.
+	//
+	// `keep` é o que precisa sobrar para NOME depois de ligar a coluna.
+	for _, opt := range []struct {
+		w, keep int
+		dst     *int
+	}{
+		{6, 14, &cols.cpu},
+		{7, 14, &cols.mem},
+		{9, 14, &cols.uptime},
+		{16, 20, &cols.image},
+		{16, 30, &cols.ports},
+		{12, 40, &cols.state}, // a faixa já diz o estado; a palavra é luxo
+	} {
+		if avail-(opt.w+1) >= opt.keep {
+			*opt.dst = opt.w
+			avail -= opt.w + 1
+		}
 	}
-	cols.cpu, cols.mem, cols.uptime = 6, 7, 9
-	flexible -= cols.cpu + cols.mem + cols.uptime + 3
-	cols.name = minInt(24, maxInt(12, flexible*30/100))
-	cols.image = minInt(30, maxInt(12, flexible*32/100))
-	cols.ports = flexible - cols.name - cols.image - 2
-	if cols.ports < 10 {
-		cols.ports = 0
-		cols.name = maxInt(12, flexible*45/100)
-		cols.image = maxInt(12, flexible-cols.name-1)
+
+	// NOME tem teto — acima disso só acumula espaço em branco. O que passar do
+	// teto engorda IMAGEM, que é a coluna elástica (tags longas de registry).
+	cols.name = minInt(28, maxInt(12, avail))
+	if extra := avail - cols.name; extra > 0 {
+		if cols.image > 0 {
+			cols.image += extra // IMAGEM é a elástica: tags de registry são longas
+		} else {
+			// Sem IMAGEM, a sobra ainda cabe em NOME — mas com teto: acima de
+			// ~34 colunas ela vira faixa de espaço em branco no meio da tabela.
+			cols.name = minInt(34, avail)
+		}
 	}
 	return cols
 }

@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"path/filepath"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/devscope/devscope/internal/cfutil"
 	"github.com/devscope/devscope/internal/collectors"
@@ -22,6 +24,9 @@ type toolLandingMsg struct {
 
 	ghaInfo  collectors.GHAInfo
 	ghaProcs int
+	// A sondagem já monta a lista; guardar só a contagem era jogar fora
+	// justamente o que a abertura do módulo tem para mostrar.
+	ghaProcNames []string
 
 	cfAuth cfutil.AuthInfo
 
@@ -33,15 +38,17 @@ type toolLandingMsg struct {
 	swarmInfo    collectors.SwarmInfo
 	swarmCompose string
 
-	k8sAvail     bool
-	k8sCtx       string
-	k8sManifests int
+	k8sAvail         bool
+	k8sCtx           string
+	k8sManifests     int
+	k8sManifestNames []string
 
 	jenkinsCfg jenkinsutil.ProjectConfig
 
 	nginxFound bool
 	nginxDir   string
 	nginxCount int
+	nginxNames []string
 }
 
 func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
@@ -65,6 +72,9 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 			msg.ghaInfo = collectors.GHARepoInfo(path, remote)
 			if procs, err := collectors.GHAListLocalWorkflowFiles(path); err == nil {
 				msg.ghaProcs = len(procs)
+				for _, pr := range procs {
+					msg.ghaProcNames = append(msg.ghaProcNames, firstNonEmpty(pr.Name, pr.File))
+				}
 			}
 		case TabCFTunnel:
 			msg.cfAuth = cfutil.Auth()
@@ -81,13 +91,20 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 		case TabKubernetes:
 			msg.k8sAvail = collectors.K8sAvailable()
 			msg.k8sCtx = collectors.K8sCurrentContext()
-			msg.k8sManifests = len(collectors.DiscoverProjectManifests(path))
+			manifests := collectors.DiscoverProjectManifests(path)
+			msg.k8sManifests = len(manifests)
+			for _, m := range manifests {
+				msg.k8sManifestNames = append(msg.k8sManifestNames, filepath.Base(m))
+			}
 		case TabJenkins:
 			msg.jenkinsCfg = jenkinsutil.LoadProject(path)
 		case TabNginx:
 			layout, sites, err := nginxutil.Discover(path)
 			msg.nginxFound = err == nil
 			msg.nginxCount = len(sites)
+			for _, site := range sites {
+				msg.nginxNames = append(msg.nginxNames, site.Name)
+			}
 			if layout.SitesDir != "" {
 				msg.nginxDir = layout.SitesDir
 			}
@@ -109,6 +126,7 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 	case TabActions:
 		a.landingGHA = msg.ghaInfo
 		a.landingGHAProcs = msg.ghaProcs
+		a.landingGHANames = msg.ghaProcNames
 		a.landingGHAOK = true
 	case TabCFTunnel:
 		a.landingCF = msg.cfAuth
@@ -127,6 +145,7 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 		a.landingK8sAvail = msg.k8sAvail
 		a.landingK8sCtx = msg.k8sCtx
 		a.landingK8sManifests = msg.k8sManifests
+		a.landingK8sNames = msg.k8sManifestNames
 		a.landingK8sOK = true
 	case TabJenkins:
 		a.landingJenkins = msg.jenkinsCfg
@@ -135,6 +154,7 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 		a.landingNginxFound = msg.nginxFound
 		a.landingNginxDir = msg.nginxDir
 		a.landingNginxCount = msg.nginxCount
+		a.landingNginxNames = msg.nginxNames
 		a.landingNginxOK = true
 	}
 }

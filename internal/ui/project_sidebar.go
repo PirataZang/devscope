@@ -2,6 +2,7 @@ package ui
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -33,13 +34,13 @@ func (a *App) renderProjectSidebarH(height int) string {
 
 	top := make([]string, 0, 24)
 	top = append(top, a.sidebarBrandBlock(p, inner)...)
-	top = append(top, sidebarRule(inner, accent))
+	top = append(top, ruleColored(inner, accent))
 	top = append(top, a.sidebarNavBlock(p, inner)...)
 
-	foot := a.sidebarFooterLines(p, accent)
+	foot := a.sidebarFooterLines(p, inner)
 	// Prefer nav over meters when vertical space is scarce (VS Code terminal).
 	if len(top)+1+len(foot) > contentH {
-		foot = []string{StyleMuted.Render("tab · esc")}
+		foot = []string{StyleMuted.Render(truncate("tab · esc", inner))}
 	}
 	if len(top)+1+len(foot) > contentH {
 		foot = nil
@@ -48,7 +49,7 @@ func (a *App) renderProjectSidebarH(height int) string {
 	if len(top)+len(foot) > contentH {
 		top = a.sidebarBrandBlock(p, inner)
 		if !a.projectTiny() {
-			top = append(top, sidebarRule(inner, accent))
+			top = append(top, ruleColored(inner, accent))
 		}
 		top = append(top, a.sidebarNavBlockDense(p, inner)...)
 	}
@@ -69,7 +70,7 @@ func (a *App) renderProjectSidebarH(height int) string {
 		rows = append(rows, "")
 	}
 	if foot != nil {
-		rows = append(rows, sidebarRule(inner, ColorBorder))
+		rows = append(rows, ruleColored(inner, ColorBorder))
 		rows = append(rows, foot...)
 	}
 	if len(rows) > contentH {
@@ -121,11 +122,15 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	if p == nil {
 		return rows
 	}
+	// Estado + saúde numa linha só — truncada na largura do trilho. Sem o
+	// corte, lipgloss QUEBRA a linha em duas e o rodapé cai para fora da caixa.
+	state := projectStatusStyle(p.Status).Render(statusLabel(p.Status, a.animFrame))
+	if chip := healthChip(p.Health, a.animFrame); lipgloss.Width(state)+lipgloss.Width(chip)+2 <= width {
+		state += StyleMuted.Render("  ") + chip
+	}
 	rows = append(rows,
 		StyleMuted.Render(truncate(p.Name, width)),
-		projectStatusStyle(p.Status).Render(statusLabel(p.Status, a.animFrame))+
-			StyleMuted.Render("  ")+
-			healthChip(p.Health, a.animFrame),
+		truncateVisible(state, width),
 	)
 	if !a.projectCompact() {
 		if branch := sidebarBranchLine(p, width); branch != "" {
@@ -157,31 +162,77 @@ func sidebarBranchLine(p *core.Project, width int) string {
 }
 
 func (a *App) sidebarNavBlock(p *core.Project, width int) []string {
-	groups := sidebarGroups()
-	var rows []string
-	for gi, g := range groups {
-		if gi > 0 && !a.projectTiny() {
-			rows = append(rows, "")
-		}
-		rows = append(rows, sidebarGroupLabel(g.title, width, g.color))
-		for _, t := range g.tabs {
-			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
-		}
-	}
-	return rows
+	return a.sidebarNav(p, width, !a.projectTiny())
 }
 
 // sidebarNavBlockDense drops blank separators between groups (short terminals).
 func (a *App) sidebarNavBlockDense(p *core.Project, width int) []string {
-	groups := sidebarGroups()
+	return a.sidebarNav(p, width, false)
+}
+
+// sidebarNav monta a navegação com só os módulos que fazem sentido para este
+// projeto. Grupo que ficou inteiro de fora não vira um rótulo órfão: some
+// junto — era o "MANAGER" vazio embaixo de projeto sem Docker.
+func (a *App) sidebarNav(p *core.Project, width int, spaced bool) []string {
 	var rows []string
-	for _, g := range groups {
-		rows = append(rows, sidebarGroupLabel(g.title, width, g.color))
+	for _, g := range sidebarGroups() {
+		visible := make([]Tab, 0, len(g.tabs))
 		for _, t := range g.tabs {
+			if a.tabVisible(t) {
+				visible = append(visible, t)
+			}
+		}
+		if len(visible) == 0 {
+			continue
+		}
+		if len(rows) > 0 && spaced {
+			rows = append(rows, "")
+		}
+		rows = append(rows, sidebarGroupLabel(g.title, width, g.color))
+		for _, t := range visible {
 			rows = append(rows, a.renderProjectSidebarRow(t, width, p))
 		}
 	}
+	if hint := a.sidebarHiddenHint(width, spaced); hint != nil {
+		rows = append(rows, hint...)
+	}
 	return rows
+}
+
+// sidebarHiddenHint é a promessa de que nada sumiu: uma linha dizendo quantos
+// módulos estão fora e qual tecla os traz de volta. Sem ela, esconder módulo
+// seria perder funcionalidade — com ela é hierarquia.
+func (a *App) sidebarHiddenHint(width int, spaced bool) []string {
+	var line string
+	if a.showAllModules {
+		line = sidebarHintLine("todos os módulos", "t", width)
+	} else {
+		n := a.hiddenTabCount()
+		if n == 0 {
+			return nil
+		}
+		label := "⋯ " + strconv.Itoa(n) + " módulos ocultos"
+		if lipgloss.Width(label) > width-3 {
+			label = "⋯ " + strconv.Itoa(n) + " ocultos"
+		}
+		line = sidebarHintLine(label, "t", width)
+	}
+	if spaced && !a.projectTiny() {
+		return []string{"", line}
+	}
+	return []string{line}
+}
+
+// sidebarHintLine encaixa "rótulo … tecla" na largura do trilho. A conta é
+// obrigatória: lipgloss QUEBRA a linha que passa da caixa em vez de cortar, e
+// uma linha a mais empurra o rodapé para fora do painel — foi assim que a
+// sidebar estourou em 100×30 com o modo "todos" ligado.
+func sidebarHintLine(label, key string, width int) string {
+	if width < 6 {
+		return StyleKey.Render(key)
+	}
+	room := width - lipgloss.Width(key) - 2 // " " antes do rótulo + " " antes da tecla
+	return " " + StyleMuted.Render(padRightVisible(truncate(label, room), room)) + StyleKey.Render(key)
 }
 
 type sidebarGroup struct {
@@ -190,14 +241,27 @@ type sidebarGroup struct {
 	tabs  []Tab
 }
 
+// sidebarGroups são as cinco categorias da navegação. Os nomes antigos —
+// SCOPE, AUTOMATION, MANAGER, TUNNEL, TOOLS — não diziam o que havia dentro:
+// "MANAGER" era Swarm e Kubernetes, e "TOOLS" era um saco com cinco coisas sem
+// relação. Agora cada rótulo responde a uma pergunta do usuário:
+//
+//	PROJETO   o que é isto aqui?
+//	CÓDIGO    o que mudou e o que roda em cima do código?
+//	EXECUÇÃO  o que está no ar?
+//	REDE      por onde se chega?
+//	DADOS     com o que eu falo?
+//
+// A cor do grupo é a cor de destaque do módulo no app inteiro
+// (tabAccentColor): cabeçalho do módulo, borda da sidebar, foco do painel. São
+// cinco, uma por categoria — não uma por módulo.
 func sidebarGroups() []sidebarGroup {
 	return []sidebarGroup{
 		{"PROJETO", ColorAccent, []Tab{TabOverview}},
-		{"SCOPE", ColorWarning, []Tab{TabGit, TabContainers}},
-		{"AUTOMATION", ColorPrimary, []Tab{TabActions, TabJenkins}},
-		{"MANAGER", ColorDocker, []Tab{TabSwarm, TabKubernetes}},
-		{"TUNNEL", ColorSuccess, []Tab{TabNgrok, TabSSH, TabCFTunnel}},
-		{"TOOLS", ColorPink, []Tab{TabRoutes, TabNginx, TabAPI, TabDatabase, TabWebSocket}},
+		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabActions, TabJenkins}},
+		{"EXECUÇÃO", ColorDocker, []Tab{TabContainers, TabSwarm, TabKubernetes}},
+		{"REDE", ColorPrimary, []Tab{TabNginx, TabRoutes, TabNgrok, TabSSH, TabCFTunnel}},
+		{"DADOS", ColorPink, []Tab{TabAPI, TabDatabase, TabWebSocket}},
 	}
 }
 
@@ -212,16 +276,25 @@ func sidebarGroupColorForTab(t Tab) lipgloss.Color {
 	return ColorHighlight
 }
 
-func (a *App) sidebarFooterLines(p *core.Project, accent lipgloss.Color) []string {
+// sidebarFooterLines fecha o trilho: onde estou (servidor) e como saio daqui.
+//
+// A largura é obrigatória. Antes as duas linhas eram fixas — hostname cortado
+// em 22 colunas e "tab · shift+tab · esc" com 21 — dentro de um trilho que em
+// modo compacto tem 18: as duas quebravam em quatro linhas e empurravam o
+// rodapé para fora da caixa.
+func (a *App) sidebarFooterLines(p *core.Project, width int) []string {
 	_ = p
-	_ = accent
 	if a.projectTiny() {
-		return []string{StyleMuted.Render("tab · esc")}
+		return []string{StyleMuted.Render(truncate("tab · esc", width))}
+	}
+	keys := "tab · shift+tab · esc"
+	if lipgloss.Width(keys) > width {
+		keys = "tab · esc"
 	}
 	// Servidor mora aqui — saiu da barra de topo, onde repetia a cada módulo.
 	return []string{
-		StyleMuted.Render(truncate(moduleHostname(), 22)),
-		StyleMuted.Render("tab · shift+tab · esc"),
+		StyleMuted.Render(truncate(moduleHostname(), width)),
+		StyleMuted.Render(truncate(keys, width)),
 	}
 }
 
@@ -253,10 +326,6 @@ func sidebarGroupLabel(title string, width int, accent lipgloss.Color) string {
 		gap = 1
 	}
 	return label + " " + StyleMuted.Render(strings.Repeat("·", gap))
-}
-
-func sidebarRule(width int, accent lipgloss.Color) string {
-	return lipgloss.NewStyle().Foreground(accent).Faint(true).Render(strings.Repeat("─", width))
 }
 
 func tabAccentColor(t Tab) lipgloss.Color {
@@ -347,5 +416,12 @@ func (a *App) renderProjectSidebarRow(t Tab, width int, _ *core.Project) string 
 	if pad < 0 {
 		pad = 0
 	}
-	return " " + accent.Render(tabGlyph(t)) + " " + StyleMuted.Render(name) + strings.Repeat(" ", pad)
+	nameStyle := StyleMuted
+	// Módulo que só está na tela porque o `t` está ligado aparece apagado: é o
+	// que ensina, sem legenda, por que ele não estava ali antes.
+	if a.showAllModules && !a.moduleCaps.relevant(t) && t != a.tab {
+		accent = accent.Faint(true)
+		nameStyle = nameStyle.Faint(true)
+	}
+	return " " + accent.Render(tabGlyph(t)) + " " + nameStyle.Render(name) + strings.Repeat(" ", pad)
 }

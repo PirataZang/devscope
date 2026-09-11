@@ -11,82 +11,38 @@ import (
 )
 
 func (a *App) renderSwarmLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	info := a.landingSwarm
-	compose := a.landingSwarmCompose
-	status := "…"
-	if a.landingSwarmOK {
-		status = "offline"
-		if a.landingSwarmAvail {
-			switch {
-			case info.State == "unavailable":
-				status = "unavailable"
-			case info.Active:
-				status = "active"
-			default:
-				status = "inactive"
-			}
+	info, compose := a.landingSwarm, a.landingSwarmCompose
+	state, note := landingToolState(a.landingSwarmOK, a.landingSwarmAvail, "docker", ""), ""
+	if a.landingSwarmOK && a.landingSwarmAvail {
+		switch {
+		case info.Error != "":
+			state = StyleUnhealthy.Render("⚠ " + truncate(info.Error, 48))
+		case info.Active:
+			state = StyleHealthy.Render(fmt.Sprintf("%s cluster ativo · %d mgr · %d nodes", a.okPulse(), info.Managers, info.Nodes))
+		default:
+			state = StyleWarning.Render("○ swarm inativo")
+			note = StyleMuted.Render("i inicia o cluster neste host")
 		}
 	}
-	ctx := a.renderModuleContext(p, w, "SWARM", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-	openH := maxInt(7, bodyH*42/100)
-	featH := maxInt(6, bodyH-openH)
-
-	openLines := []string{
-		StyleMuted.Render("cluster · services · nodes · tasks · stacks"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingSwarmOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !a.landingSwarmAvail:
-		openLines = append(openLines, "", StyleUnhealthy.Render("docker não encontrado no PATH"))
-	case info.Error != "":
-		openLines = append(openLines, "", StyleUnhealthy.Render(truncate(info.Error, 40)))
-	case info.Active:
-		openLines = append(openLines, "",
-			StyleHealthy.Render(a.pulse()+" ACTIVE")+
-				StyleMuted.Render(fmt.Sprintf("  ·  %d mgr  ·  %d nodes", info.Managers, info.Nodes)))
-	default:
-		openLines = append(openLines, "", StyleWarning.Render("○ INACTIVE — i inicia o cluster"))
-	}
-
-	featLines := []string{
-		StyleMuted.Render("Control Center: observe → operate → deploy"),
-		StyleMuted.Render("scale · update · logs · promote · join-token"),
-		StyleMuted.Render("stack deploy ligado ao compose do projeto"),
+	var facts [][2]string
+	if a.landingSwarmOK && a.landingSwarmAvail && info.Active {
+		facts = append(facts, [2]string{"nodes", StyleNormal.Render(fmt.Sprintf("%d", info.Nodes))})
 	}
 	if compose != "" {
-		featLines = append(featLines, StyleMuted.Render("compose  "+swarmComposeBase(compose)))
+		facts = append(facts, [2]string{"stack", StyleMuted.Render(swarmComposeBase(compose))})
 	}
-
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("DOCKER SWARM", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, nodesLabel := "…", "…"
-	if a.landingSwarmOK {
-		cliLabel = boolLabel(a.landingSwarmAvail)
-		nodesLabel = fmt.Sprintf("%d", info.Nodes)
-	}
-	details := []string{
-		StyleMuted.Render("CLI    ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Swarm  ") + StyleMuted.Render(status),
-		StyleMuted.Render("Nodes  ") + StyleNormal.Render(nodesLabel),
-	}
-	if compose != "" {
-		details = append(details, StyleMuted.Render("Stack  ")+StyleMuted.Render(swarmComposeBase(compose)))
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "control center"},
-		[2]string{"i", "swarm init"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "DOCKER SWARM",
+		tagline:      "services, nodes e stacks do cluster — scale, update, logs e deploy",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "SERVICES DESTE PROJETO",
+		preview:      a.landingContainerRows(p, 84),
+		previewEmpty: "nenhum container neste projeto — o stack sobe a partir de um compose",
+		previewFoot:  swarmDeployFoot(p, compose),
+		actions:      [][2]string{{"enter", "control center"}, {"i", "swarm init"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderSwarmTab(p *core.Project) string {
@@ -350,14 +306,14 @@ func (a *App) renderSwarmTable(width, height int) string {
 	title := strings.ToUpper(swarmKindLabel(a.swarmKind))
 	n := a.swarmRowCount()
 	if n > 0 {
-		title = fmt.Sprintf("%s (%d)", title, n)
+		title = panelTitle(title, fmt.Sprint(n))
 	}
 	inner := maxInt(3, height-2)
 	viewport := maxInt(1, inner-2)
 	inner2 := maxInt(8, width-2)
 	lines := []string{
 		a.swarmTableHeader(inner2),
-		StyleMuted.Render(strings.Repeat("─", inner2)),
+		rule(inner2),
 	}
 	if n == 0 {
 		msg := "nenhum item"
@@ -365,7 +321,7 @@ func (a *App) renderSwarmTable(width, height int) string {
 			msg = "swarm inactive — pressione i para init"
 		}
 		lines = append(lines, StyleMuted.Render("  "+msg))
-		return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 0)
+		return panelBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 0)
 	}
 	a.swarmScroll = ensureVisible(a.swarmCursor, a.swarmScroll, viewport, n)
 	start := a.swarmScroll
@@ -373,7 +329,7 @@ func (a *App) renderSwarmTable(width, height int) string {
 	for i := start; i < end; i++ {
 		lines = append(lines, a.renderSwarmRow(i, inner2, i == a.swarmCursor && a.swarmFocus == 0))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 0)
+	return panelBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 0)
 }
 
 // swarmCols distribui as colunas pela largura útil. Antes o cabeçalho era uma
@@ -585,7 +541,7 @@ func (a *App) renderSwarmSummary(width, height int) string {
 			lines = append(lines, StyleMuted.Render(truncate(line, width-4)))
 		}
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, false)
+	return panelBox(title, fitExactLines(lines, inner), width, height, false)
 }
 
 func (a *App) renderSwarmRightRail(width, height int) string {
@@ -606,7 +562,7 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 			online++
 		}
 	}
-	title := fmt.Sprintf("NÓS %d/%d PRONTOS", online, len(a.swarmNodes))
+	title := panelTitle("NÓS", fmt.Sprintf("%d/%d prontos", online, len(a.swarmNodes)))
 	inner := maxInt(2, height-2)
 	lines := []string{}
 	managers := []collectors.SwarmNode{}
@@ -647,7 +603,7 @@ func (a *App) renderSwarmNodesPanel(width, height int) string {
 	if len(lines) == 0 {
 		lines = append(lines, StyleMuted.Render("sem nodes"))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 1)
+	return panelBox(title, fitExactLines(lines, inner), width, height, a.swarmFocus == 1)
 }
 
 func (a *App) renderSwarmEventsPanel(width, height int) string {
@@ -662,7 +618,7 @@ func (a *App) renderSwarmEventsPanel(width, height int) string {
 	if len(lines) == 0 {
 		lines = append(lines, StyleMuted.Render("sem eventos recentes"))
 	}
-	return renderApiTitledBox("EVENTS", fitExactLines(lines, inner), width, height, false)
+	return panelBox("EVENTS", fitExactLines(lines, inner), width, height, false)
 }
 
 func (a *App) renderSwarmActionsPanel(width, height int) string {
@@ -681,7 +637,7 @@ func (a *App) renderSwarmActionsPanel(width, height int) string {
 		}
 		lines = append(lines, prefix+StyleKey.Render(it[0])+" "+style.Render(it[1]))
 	}
-	return renderApiTitledBox("AÇÕES RÁPIDAS", fitExactLines(lines, inner), width, height, a.swarmFocus == 2)
+	return panelBox("AÇÕES RÁPIDAS", fitExactLines(lines, inner), width, height, a.swarmFocus == 2)
 }
 
 func (a *App) swarmHints() string {
@@ -795,7 +751,7 @@ func (a *App) renderSwarmFormBox() string {
 		}
 	}
 	inner := fitExactLines(lines, maxInt(6, len(lines)))
-	return renderApiTitledBox(title, inner, w, len(inner)+2, true)
+	return panelBox(title, inner, w, len(inner)+2, true)
 }
 
 func swarmFormFieldLine(idx, cur int, label, value string) string {
@@ -835,7 +791,7 @@ func (a *App) renderSwarmLogsBox(termW, termH int) string {
 	if name != "" {
 		title += " · " + name
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), w, h, true)
+	return panelBox(title, fitExactLines(lines, inner), w, h, true)
 }
 
 func (a *App) renderSwarmDetailBox(termW, termH int) string {
@@ -854,7 +810,7 @@ func (a *App) renderSwarmDetailBox(termW, termH int) string {
 	if name != "" {
 		title = strings.ToUpper(a.swarmKind.String()) + " · " + name
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, inner), w, h, true)
+	return panelBox(title, fitExactLines(lines, inner), w, h, true)
 }
 
 func (a *App) swarmNodeDotStyled(n collectors.SwarmNode) string {

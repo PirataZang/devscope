@@ -136,6 +136,12 @@ func (a *App) pulse() string {
 	return animPulse(a.animFrame)
 }
 
+// okPulse é o pulso de "saudável". a.pulse() usa animPulseFrames, que começa
+// em ⣀ — o MESMO glifo de animStoppedGlyph, ou seja "parado". Num screenshot
+// parado ou em terminal sem cor os dois viravam a mesma coisa, que é o que o
+// §6 proíbe. pulseOK nunca encosta na base.
+func (a *App) okPulse() string { return pulseGlyph(pulseOK, a.animFrame) }
+
 func (a *App) livePulse(label string) string {
 	g := a.pulse()
 	if label == "" {

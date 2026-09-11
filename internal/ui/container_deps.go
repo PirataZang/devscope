@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -150,13 +149,13 @@ func (a *App) renderContainerDeps(p *core.Project) string {
 	forest := buildDepForest(a.containerDeps)
 	lines := flattenDepTree(forest)
 
-	title := fmt.Sprintf("DEPENDÊNCIAS · %s", p.Name)
+	title := panelTitle("DEPENDÊNCIAS", p.Name)
 	if len(lines) == 0 {
 		msg := []string{
 			StyleMuted.Render("Nenhum depends_on encontrado no compose deste projeto."),
 			StyleMuted.Render("(ou o projeto não tem docker-compose.yml)"),
 		}
-		body := renderApiTitledBox(title, fitExactLines(msg, h-4), w, h-2, true)
+		body := panelBox(title, fitExactLines(msg, h-4), w, h-2, true)
 		bottom := a.renderDepsActionsBox(w, 3)
 		return lipgloss.JoinVertical(lipgloss.Left, body, bottom)
 	}
@@ -176,7 +175,7 @@ func (a *App) renderContainerDeps(p *core.Project) string {
 		rendered = append(rendered, "")
 	}
 
-	body := renderApiTitledBox(title, fitExactLines(rendered, inner), w, h-2, true)
+	body := panelBox(title, fitExactLines(rendered, inner), w, h-2, true)
 	bottom := a.renderDepsActionsBox(w, 3)
 	return lipgloss.JoinVertical(lipgloss.Left, body, bottom)
 }
@@ -216,5 +215,5 @@ func (a *App) renderDepsActionsBox(width, height int) string {
 	if height < len(lines)+2 {
 		height = len(lines) + 2
 	}
-	return renderApiTitledBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
+	return panelBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
 }

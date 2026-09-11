@@ -153,7 +153,7 @@ func (a *App) renderWsCompose() string {
 	if editing {
 		msgTitle = "mensagem · enter nova linha"
 	}
-	msgBox := renderApiTitledBox(msgTitle, bodyLines, innerW, editorH+2, editing)
+	msgBox := panelBox(msgTitle, bodyLines, innerW, editorH+2, editing)
 	lines = append(lines, strings.Split(msgBox, "\n")...)
 	lines = append(lines, "")
 

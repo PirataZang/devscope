@@ -40,7 +40,7 @@ func TestK8sLandingEnterAndEsc(t *testing.T) {
 		t.Fatalf("4 should open landing, tab=%v open=%v", a.tab, a.k8sOpen)
 	}
 	landing := stripANSI(a.renderK8sLanding(&p))
-	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "KUBERNETES") || !strings.Contains(landing, "AÇÕES") {
+	if !strings.Contains(landing, "enter") || !strings.Contains(landing, "KUBERNETES") || !strings.Contains(landing, "contexto") {
 		t.Fatalf("landing missing prompt: %q", landing)
 	}
 
@@ -56,11 +56,11 @@ func TestK8sLandingEnterAndEsc(t *testing.T) {
 	}
 }
 
-func TestSidebarShowsKubernetesInScope(t *testing.T) {
+func TestSidebarShowsKubernetesInExecucao(t *testing.T) {
 	a := &App{width: 120, height: 40, tab: TabKubernetes}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "MANAGER") || !strings.Contains(got, "Kubernetes") {
-		t.Fatalf("sidebar missing Kubernetes in MANAGER: %q", got)
+	if !strings.Contains(got, "EXECUÇÃO") || !strings.Contains(got, "Kubernetes") {
+		t.Fatalf("sidebar missing Kubernetes in EXECUÇÃO: %q", got)
 	}
 	if !strings.Contains(got, "tab · shift+tab") {
 		t.Fatalf("footer should mention tab · shift+tab: %q", got)

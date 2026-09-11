@@ -330,10 +330,6 @@ func metricUsageStyle(pct float64) lipgloss.Style {
 	}
 }
 
-func renderKeybind(keys, desc string) string {
-	return StyleKey.Render(keys) + " " + StyleKeyDesc.Render(desc)
-}
-
 // tunnelCmdWidth keeps the tunnel-table call sites; same as actionsCmdWidth.
 func tunnelCmdWidth(total int) int { return actionsCmdWidth(total) }
 
@@ -367,4 +363,21 @@ func tunnelTableCols(width int) tunnelCols {
 		c.name -= take
 	}
 	return c
+}
+
+// projectFrameworks devolve TODAS as stacks detectadas no projeto, com o
+// fallback para a principal.
+//
+// O scanner tem dois caminhos: BuildProject roda os detectores todos e preenche
+// Frameworks; BuildProjectStub é o caminho rápido da varredura e preenche só
+// Framework. Quem lê Frameworks direto mostra vazio para todo projeto que ainda
+// veio pelo stub — foi por isso que a lista mostrava só a stack principal.
+func projectFrameworks(p core.Project) []core.FrameworkInfo {
+	if len(p.Frameworks) > 0 {
+		return p.Frameworks
+	}
+	if p.Framework.Name != "" && p.Framework.Name != "Unknown" {
+		return []core.FrameworkInfo{p.Framework}
+	}
+	return nil
 }

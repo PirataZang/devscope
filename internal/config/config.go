@@ -3,18 +3,28 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Scan    ScanConfig    `mapstructure:"scan" yaml:"scan"`
-	Refresh RefreshConfig `mapstructure:"refresh" yaml:"refresh"`
-	UI      UIConfig      `mapstructure:"ui" yaml:"ui"`
-	Health  HealthConfig  `mapstructure:"health" yaml:"health"`
-	Pinned  []string      `mapstructure:"pinned" yaml:"pinned"`
+	Scan    ScanConfig             `mapstructure:"scan" yaml:"scan"`
+	Refresh RefreshConfig          `mapstructure:"refresh" yaml:"refresh"`
+	UI      UIConfig               `mapstructure:"ui" yaml:"ui"`
+	Health  HealthConfig           `mapstructure:"health" yaml:"health"`
+	Tools   ToolsConfig            `mapstructure:"tools" yaml:"tools"`
+	Apps    map[string]AppShortcut `mapstructure:"apps" yaml:"apps"`
+	Pinned  []string               `mapstructure:"pinned" yaml:"pinned"`
+}
+
+// ToolsConfig aponta para os programas externos que o DevScope abre no lugar
+// dele mesmo. Vazio significa "descubra": qual agente de IA está no PATH, qual
+// editor o $EDITOR indica.
+type ToolsConfig struct {
+	AI     string `mapstructure:"ai" yaml:"ai"`
+	Editor string `mapstructure:"editor" yaml:"editor"`
 }
 
 type ScanConfig struct {
@@ -37,6 +47,60 @@ type UIConfig struct {
 type HealthConfig struct {
 	Timeout    time.Duration `mapstructure:"timeout" yaml:"timeout"`
 	Concurrent int           `mapstructure:"concurrent" yaml:"concurrent"`
+}
+
+// AppShortcut é um programa externo aberto por uma tecla da tela inicial.
+// Command vai para o shell, então aceita argumentos, ~, variáveis e o "&" do
+// final, que é o que diferencia app de janela (solta e volta pro DevScope) de
+// comando de terminal (assume a tela até sair).
+type AppShortcut struct {
+	Name    string `mapstructure:"name" yaml:"name"`
+	Command string `mapstructure:"command" yaml:"command"`
+}
+
+// AppSlots é a ordem das teclas na tela inicial: 1 a 9 e o 0 por último, como
+// na fileira do teclado. Dez atalhos é o limite — são dez teclas.
+var AppSlots = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
+
+type AppEntry struct {
+	Key     string
+	Name    string
+	Command string
+}
+
+// AppShortcuts devolve os atalhos configurados na ordem das teclas, ignorando
+// slot fora de 1-0 e entrada sem comando. Sem nome, a tecla mostra o comando.
+func (c *Config) AppShortcuts() []AppEntry {
+	if c == nil || len(c.Apps) == 0 {
+		return nil
+	}
+	var out []AppEntry
+	for _, key := range AppSlots {
+		app, ok := c.Apps[key]
+		if !ok {
+			continue
+		}
+		cmd := strings.TrimSpace(app.Command)
+		if cmd == "" {
+			continue
+		}
+		name := strings.TrimSpace(app.Name)
+		if name == "" {
+			name = strings.Fields(cmd)[0]
+		}
+		out = append(out, AppEntry{Key: key, Name: name, Command: cmd})
+	}
+	return out
+}
+
+// AppShortcut acha o atalho de uma tecla.
+func (c *Config) AppShortcutFor(key string) (AppEntry, bool) {
+	for _, e := range c.AppShortcuts() {
+		if e.Key == key {
+			return e, true
+		}
+	}
+	return AppEntry{}, false
 }
 
 func Default() *Config {
@@ -143,6 +207,10 @@ func Load(cfgFile string) (*Config, error) {
 	if err := v.Unmarshal(cfg); err != nil {
 		return nil, err
 	}
+	// user_config.txt é a palavra final sobre tema, atalhos e IA — é ele que a
+	// pessoa edita com Shift+C.
+	prefs, _ := LoadUserPrefs()
+	cfg.ApplyUserPrefs(prefs)
 	return cfg, nil
 }
 
@@ -157,27 +225,8 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("health.concurrent", 10)
 }
 
-// SaveTheme merges ui.theme into the user config so it survives restarts.
-func SaveTheme(theme string) error {
-	path := ConfigPath()
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return err
-	}
+// SaveValue faz merge de uma chave no config do usuário sem tocar no resto do
+// arquivo: quem editou o YAML à mão não perde comentário de outra seção.
 
-	raw := map[string]any{}
-	if b, err := os.ReadFile(path); err == nil {
-		_ = yaml.Unmarshal(b, &raw)
-	}
-	ui, _ := raw["ui"].(map[string]any)
-	if ui == nil {
-		ui = map[string]any{}
-	}
-	ui["theme"] = theme
-	raw["ui"] = ui
-
-	b, err := yaml.Marshal(raw)
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(path, b, 0o644)
-}
+// EnsureConfigFile cria o arquivo com os defaults comentados quando ele ainda
+// não existe. Abrir um arquivo vazio no editor não diz o que pode ser escrito.

@@ -134,10 +134,10 @@ func (a *App) renderGitTab(p *core.Project) string {
 	h := maxInt(8, a.projectPanelHeight())
 
 	if a.projectGitLoading && (g == nil || !g.IsRepo || len(g.Branches) == 0) {
-		return renderApiTitledBox("GIT", fitExactLines([]string{StyleMuted.Render("Carregando informações do Git...")}, h-2), w, h, true)
+		return panelBox("GIT", fitExactLines([]string{StyleMuted.Render("Carregando informações do Git...")}, h-2), w, h, true)
 	}
 	if g == nil || !g.IsRepo {
-		return renderApiTitledBox("GIT", fitExactLines([]string{StyleMuted.Render("Este diretório não é um repositório git.")}, h-2), w, h, true)
+		return panelBox("GIT", fitExactLines([]string{StyleMuted.Render("Este diretório não é um repositório git.")}, h-2), w, h, true)
 	}
 	viewBranch := a.gitViewBranch
 	if viewBranch == "" {
@@ -163,34 +163,34 @@ func (a *App) renderGitTab(p *core.Project) string {
 	cmdBar := a.renderGitCommandBar(g, w)
 	bodyH := maxInt(9, h-chromeH-lipgloss.Height(cmdBar))
 
-	logH := maxInt(3, bodyH*22/100)
-	// A altura de ALTERAÇÕES é medida antes: quando ela colapsa numa dica, a
-	// sobra vai para branches e commits, que são a prioridade da tela.
-	proposedMid := maxInt(4, bodyH*30/100)
+	// A gaveta (log de comandos / stashes) só toma espaço quando está aberta.
+	// Eram duas caixas permanentes no pé da tela: uma para um EVENTO (a saída
+	// do último git) e outra para uma CONSULTA (os stashes). Ver git_drawer.go.
+	drawerH := a.gitDrawerHeight(bodyH)
+
+	// ALTERAÇÕES pede o que precisa — como a lista de containers. Quando ela
+	// colapsa numa dica ("working tree limpo"), a sobra vai inteira para
+	// branches e commits, que são a prioridade da tela.
+	proposedMid := maxInt(4, (bodyH-drawerH)*34/100)
 	filesH := a.gitWorkingRowHeight(g, viewBranch, proposedMid)
+	topH := maxInt(4, bodyH-drawerH-filesH)
 
-	// Stashes ao lado das alterações: com dezenas deles a lista precisa de
-	// largura para a mensagem, e no rail vertical ela saía toda truncada.
-	stashW, stashH := 0, 0
-	if g.StashCount > 0 && w >= 96 {
-		stashW = minInt(46, maxInt(30, w*34/100))
-		// O painel não herda a altura colapsada das alterações: com dezenas de
-		// stashes, mostrar um só desperdiça a caixa.
-		stashH = minInt(proposedMid, len(g.Stashes)+2)
-	}
-	midH := maxInt(filesH, stashH)
-	topH := maxInt(4, bodyH-logH-midH)
-
-	mid := a.renderGitWorkingRow(g, viewBranch, w-stashW, filesH)
-	if stashW > 0 {
-		mid = lipgloss.JoinHorizontal(lipgloss.Top, mid, a.renderGitStashPanel(g, stashW, stashH))
-	}
-
+	mid := a.renderGitWorkingRow(g, viewBranch, w, filesH)
 	// Branches e commits ocupam a largura inteira — são o que se usa.
 	top := a.renderGitMainColumnsSized(g, viewBranch, w, topH)
-	log := a.renderGitCommandLog(w, logH)
-	a.gitCmdLogRelY = chromeH + topH + midH
-	stack := lipgloss.JoinVertical(lipgloss.Left, top, mid, log)
+
+	parts := []string{top, mid}
+	a.gitCmdLogRelY = -1
+	if drawerH > 0 {
+		switch a.gitDrawer {
+		case gitDrawerLog:
+			a.gitCmdLogRelY = chromeH + topH + filesH
+			parts = append(parts, a.renderGitCommandLog(w, drawerH))
+		case gitDrawerStash:
+			parts = append(parts, a.renderGitStashPanel(g, w, drawerH))
+		}
+	}
+	stack := lipgloss.JoinVertical(lipgloss.Left, parts...)
 	// A barra de comandos fecha a tela; sem isso ela flutuava logo abaixo do
 	// log e sobrava um vão embaixo.
 	if fill := h - chromeH - lipgloss.Height(stack) - lipgloss.Height(cmdBar); fill > 0 {
@@ -217,7 +217,8 @@ func (a *App) renderGitCommandBar(g *core.GitInfo, width int) string {
 		))
 	}
 
-	// Ordem por frequência de uso, não alfabética.
+	// Ordem por frequência de uso, não alfabética — e fitKeybindsWrap descarta
+	// pelo FIM quando não cabe, então o que não pode sumir vem antes.
 	items := [][2]string{
 		{"c", "commit"},
 		{"a", "stage"},
@@ -226,14 +227,17 @@ func (a *App) renderGitCommandBar(g *core.GitInfo, width int) string {
 		{"enter", "detalhe"},
 		{"p", "pull"},
 		{"P", "push"},
-		{"n", "nova branch"},
-		{"x", "cherry-pick"},
-		{"d", "excluir"},
-		{"o", "abrir no site"},
 	}
-	if g.StashCount > 0 {
-		items = append(items, [2]string{"s", "stash"})
-	}
+	// A gaveta é a única porta para o stash e para o log: essas teclas entram
+	// antes das ações raras, senão são as primeiras a ser cortadas e o recurso
+	// fica sem forma de descoberta.
+	items = append(items, a.gitDrawerHints(g)...)
+	items = append(items,
+		[2]string{"n", "nova branch"},
+		[2]string{"x", "cherry-pick"},
+		[2]string{"d", "excluir"},
+		[2]string{"o", "abrir no site"},
+	)
 	// Até duas linhas: a barra estreita não pode esconder comando.
 	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
@@ -255,7 +259,7 @@ func (a *App) renderGitStashPanel(g *core.GitInfo, width, height int) string {
 	if len(lines) == 0 {
 		lines = append(lines, StyleMuted.Render("(nenhum stash)"))
 	}
-	return renderApiTitledBox(fmt.Sprintf("STASHES (%d)", g.StashCount),
+	return panelBox(panelTitle("STASHES", fmt.Sprint(g.StashCount)),
 		fitExactLines(lines, viewport), width, height, false)
 }
 
@@ -372,7 +376,12 @@ func (a *App) renderGitStatsRow(g *core.GitInfo, width int) string {
 	add(StyleHealthy, g.Staged, "staged")
 	add(StyleWarning, g.Modified, "modificados")
 	add(StyleAccent, g.Untracked, "novos")
-	add(StyleMuted, g.StashCount, "stash")
+	// A tecla vai colada ao número, não só na barra de comandos: em 80 colunas
+	// a barra só tem duas linhas e `s` era a primeira a cair — e ela é a única
+	// porta para a gaveta de stashes.
+	if g.StashCount > 0 {
+		chips = append(chips, StyleMuted.Render(fmt.Sprintf("%d stash · ", g.StashCount))+StyleKey.Render("s"))
+	}
 	left := "  "
 	if len(chips) == 0 {
 		left += StyleHealthy.Render("✓ árvore limpa")
@@ -381,7 +390,7 @@ func (a *App) renderGitStatsRow(g *core.GitInfo, width int) string {
 	}
 
 	right := StyleMuted.Render("←→ painéis  ·  ") + StyleKey.Render("b") + StyleMuted.Render(" filtra branch  ·  ") +
-		StyleKey.Render("^g") + StyleMuted.Render(" grafo ")
+		StyleKey.Render("ctrl+g") + StyleMuted.Render(" grafo ")
 	if lipgloss.Width(left)+lipgloss.Width(right)+2 > width {
 		return padRightVisible(left, width)
 	}
@@ -482,27 +491,27 @@ func (a *App) renderGitMainColumnsSized(g *core.GitInfo, viewBranch string, widt
 	_ = prevH
 	bfocus := a.gitFocus == gitFocusBranches
 	cfocus := a.gitFocus == gitFocusCommits
-	branchBody := branchLines
-	if len(branchBody) > 0 {
-		branchBody = branchBody[1:] // drop internal section title; box has its own
-	}
-	commitBody := commitLines
-	if len(commitBody) > 0 {
-		commitBody = commitBody[1:]
-	}
+	// Fora o título (a caixa tem o seu), some com as linhas vazias das bordas:
+	// devolver "" em gitScrollUpLine ainda emite uma linha, e eram quatro
+	// linhas de nada — topo e pé das duas colunas.
+	branchBody := trimEdgeBlanks(branchLines)
+	commitBody := trimEdgeBlanks(commitLines)
 	return lipgloss.JoinHorizontal(lipgloss.Top,
-		renderApiTitledBox("BRANCHES", fitExactLines(branchBody, height-2), branchW, height, bfocus),
-		renderApiTitledBox("COMMITS · "+truncate(viewBranch, 16), fitExactLines(commitBody, height-2), commitW, height, cfocus),
+		panelBox("BRANCHES", fitExactLines(branchBody, height-2), branchW, height, bfocus),
+		panelBox("COMMITS · "+truncate(viewBranch, 16), fitExactLines(commitBody, height-2), commitW, height, cfocus),
 	)
 }
 
-// gitWorkingRowHeight devolve a altura real da caixa de alterações: 3 quando
-// só há uma dica para mostrar, o proposto quando há lista para rolar.
+// gitWorkingRowHeight devolve a altura real da caixa de alterações. Ela PEDE o
+// que precisa — uma linha por arquivo mais a moldura — com teto no proposto.
+// Antes era o proposto sempre, e cinco arquivos alterados deixavam a caixa com
+// metade das linhas em branco enquanto branches e commits apertavam.
 func (a *App) gitWorkingRowHeight(g *core.GitInfo, viewBranch string, proposed int) int {
-	if len(a.gitFileLines(g, viewBranch, maxInt(1, proposed-2))) == 1 {
-		return 3
+	n := len(a.gitFileLines(g, viewBranch, maxInt(1, proposed-2)))
+	if n <= 1 {
+		return 3 // uma dica de uma linha não justifica uma caixa de nove
 	}
-	return proposed
+	return maxInt(4, minInt(proposed, n+2))
 }
 
 func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, height int) string {
@@ -529,7 +538,7 @@ func (a *App) renderGitWorkingRow(g *core.GitInfo, viewBranch string, width, hei
 	if filesFocus {
 		filesTitle = "> " + filesTitle
 	}
-	return renderApiTitledBox(filesTitle, fitExactLines(fileLines, bodyH), width, height, filesFocus)
+	return panelBox(filesTitle, fitExactLines(fileLines, bodyH), width, height, filesFocus)
 }
 
 func wtFileTreeFrom(files []core.GitFileStatus) []gitFileTreeRow {
@@ -694,7 +703,7 @@ func (a *App) gitFileLines(g *core.GitInfo, viewBranch string, maxLines int) []s
 		}
 		line := style.Render(indent + mark + code + " " + r.label)
 		if gitFileUnmerged(f) {
-			line += "  " + StyleGitConflictBadge.Render("⚡ CONFLICT")
+			line += "  " + StyleGitConflictBadge.Render("⚠ CONFLICT")
 		} else if gitFileStaged(f) {
 			line += "  " + StyleHealthy.Render("● staged")
 		}
@@ -827,7 +836,7 @@ func (a *App) renderGitCommandLog(width, height int) string {
 		}
 		lines = append(lines, rendered)
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, innerH), width, height, focus)
+	return panelBox(title, fitExactLines(lines, innerH), width, height, focus)
 }
 
 func (a *App) openGitCmdLogURLAt(line int) bool {
@@ -886,18 +895,35 @@ func fitGitPanelLines(content string, lines int) string {
 	return strings.Join(parts, "\n")
 }
 
+// gitScrollUpLine/DownLine devolvem "" quando não há nada fora da janela.
+// Antes devolviam " ", que custava uma linha morta no topo E no pé de BRANCHES
+// e de COMMITS — quatro linhas de nada, sempre, nas duas caixas.
+// trimEdgeBlanks tira o título interno e as linhas em branco das pontas.
+func trimEdgeBlanks(lines []string) []string {
+	if len(lines) > 0 {
+		lines = lines[1:] // o título é da caixa, não do corpo
+	}
+	for len(lines) > 0 && strings.TrimSpace(stripANSI(lines[0])) == "" {
+		lines = lines[1:]
+	}
+	for len(lines) > 0 && strings.TrimSpace(stripANSI(lines[len(lines)-1])) == "" {
+		lines = lines[:len(lines)-1]
+	}
+	return lines
+}
+
 func gitScrollUpLine(n int) string {
 	if n > 0 {
 		return StyleMuted.Render(fmt.Sprintf("  ↑ %d", n))
 	}
-	return " "
+	return ""
 }
 
 func gitScrollDownLine(n int) string {
 	if n > 0 {
 		return StyleMuted.Render(fmt.Sprintf("  ↓ %d", n))
 	}
-	return " "
+	return ""
 }
 
 func (a *App) renderGitBranchHistory(p *core.Project) string {
@@ -1006,7 +1032,7 @@ func (a *App) renderGitBranchHistoryTable(commits []core.GitCommit, width, heigh
 			lines = append(lines, a.renderGitBranchCommitLine(commits[i], i, width-2))
 		}
 	}
-	return renderApiTitledBox("COMMITS", fitExactLines(lines, viewport), width, height, true)
+	return panelBox("COMMITS", fitExactLines(lines, viewport), width, height, true)
 }
 
 func (a *App) renderGitBranchCommitLine(c core.GitCommit, idx, width int) string {
@@ -1088,9 +1114,9 @@ func (a *App) renderGitBranchHistoryInspector(p *core.Project, branch string, co
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
-		renderApiTitledBox("AUTHORS", fitExactLines(authLines, authH-2), width, authH, false),
+		panelBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
+		panelBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		panelBox("AUTHORS", fitExactLines(authLines, authH-2), width, authH, false),
 	)
 }
 
@@ -1297,31 +1323,6 @@ func renderGitFixedBox(lines []string, width, height int) string {
 		BorderForeground(ColorBorder).
 		Width(width)
 	return border.Render(strings.Join(body, "\n"))
-}
-
-func padRightVisible(s string, width int) string {
-	if width <= 0 {
-		return ""
-	}
-	if lipgloss.Width(s) > width {
-		s = ansi.Truncate(s, width, "…")
-	}
-	w := lipgloss.Width(s)
-	if w >= width {
-		return s
-	}
-	return s + strings.Repeat(" ", width-w)
-}
-
-func clampRenderedHeight(content string, height int) string {
-	lines := strings.Split(content, "\n")
-	if len(lines) > height {
-		lines = lines[:height]
-	}
-	for len(lines) < height {
-		lines = append(lines, "")
-	}
-	return strings.Join(lines, "\n")
 }
 
 func (a *App) renderGitCommitHeaderLines(width int) []string {
@@ -1547,16 +1548,6 @@ func (a *App) renderGitCommitFilesSidebarLines(height, width int) []string {
 		}
 	}
 	return fitExactLines(lines, height)
-}
-
-func fitExactLines(lines []string, height int) []string {
-	if len(lines) > height {
-		return lines[:height]
-	}
-	for len(lines) < height {
-		lines = append(lines, "")
-	}
-	return lines
 }
 
 func commitChangeStylePlain(status string) string {
@@ -2195,7 +2186,13 @@ func (a *App) gitFocusNext() tea.Cmd {
 	case gitFocusCommits:
 		a.gitFocus = gitFocusFiles
 	case gitFocusFiles:
-		a.gitFocus = gitFocusCmdLog
+		// O log só entra no ciclo quando a gaveta está aberta: focar um painel
+		// que não está na tela é perder o cursor.
+		if a.gitDrawer == gitDrawerLog {
+			a.gitFocus = gitFocusCmdLog
+		} else {
+			a.gitFocus = gitFocusBranches
+		}
 	default:
 		a.gitFocus = gitFocusBranches
 	}
@@ -2214,7 +2211,11 @@ func (a *App) gitFocusPrev() tea.Cmd {
 	case gitFocusCommits:
 		a.gitFocus = gitFocusBranches
 	default:
-		a.gitFocus = gitFocusCmdLog
+		if a.gitDrawer == gitDrawerLog {
+			a.gitFocus = gitFocusCmdLog
+		} else {
+			a.gitFocus = gitFocusFiles
+		}
 	}
 	return nil
 }

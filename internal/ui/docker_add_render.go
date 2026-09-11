@@ -45,7 +45,7 @@ func dockerAddModalChrome(subtitle string, step dockerAddStep, ruleW int) []stri
 	return []string{
 		brand + StyleMuted.Render("  ·  ") + StyleNormal.Render(subtitle),
 		dockerAddStepBar(step),
-		StyleMuted.Render(strings.Repeat("─", ruleW)),
+		rule(ruleW),
 	}
 }
 
@@ -166,7 +166,7 @@ func (a *App) renderDockerAddResultsBox() string {
 	}
 
 	listLines := a.renderDockerAddResultList(leftW-2, bodyH-2)
-	leftBox := renderApiTitledBox("Resultados", listLines, leftW, bodyH, a.dockerAddResultsFocus == dockerAddResultsList)
+	leftBox := panelBox("Resultados", listLines, leftW, bodyH, a.dockerAddResultsFocus == dockerAddResultsList)
 	rightCol := a.renderDockerAddRightColumn(repo, hasRepo, rightW, bodyH)
 	joined := lipgloss.JoinHorizontal(lipgloss.Top, leftBox, strings.Repeat(" ", gap), rightCol)
 	lines = append(lines, "")
@@ -221,9 +221,9 @@ func (a *App) renderDockerAddImageBox(width, height int) string {
 	if a.dockerAddTagsLoading && a.dockerAddTagsRepo != "" {
 		title = a.spinner() + " Imagem · carregando tags…"
 	} else if n := len(a.dockerAddTags); n > 0 {
-		title = fmt.Sprintf("Imagem · %d tags", n)
+		title = panelTitle("IMAGEM", fmt.Sprintf("%d tags", n))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, innerH), width, height, focused)
+	return panelBox(title, fitExactLines(lines, innerH), width, height, focused)
 }
 
 func (a *App) renderDockerAddTagList(width, height int, focused bool) []string {
@@ -297,14 +297,14 @@ func (a *App) renderDockerAddMetricsBoxes(repo collectors.DockerHubRepo, hasRepo
 		line := StyleMuted.Render(truncate(
 			fmt.Sprintf("★ %s  ↓ %s  %s  %s", stars, pulls, size, updated), width-2,
 		))
-		return renderApiTitledBox("Métricas", []string{line}, width, height, false)
+		return panelBox("Métricas", []string{line}, width, height, false)
 	}
 	rest := width - (boxW+gap)*(n-1)
 	boxes := []string{
-		renderApiTitledBox("STARS", []string{StyleAccent.Bold(true).Render(truncate(stars, boxW-2)), StyleMuted.Render("favoritos")}, boxW, height, false),
-		renderApiTitledBox("PULLS", []string{StyleAccent.Bold(true).Render(truncate(pulls, boxW-2)), StyleMuted.Render("downloads")}, boxW, height, false),
-		renderApiTitledBox("SIZE", []string{StyleAccent.Bold(true).Render(truncate(size, boxW-2)), StyleMuted.Render(truncate("tag "+tag, boxW-2))}, boxW, height, false),
-		renderApiTitledBox("UPDATE", []string{StyleAccent.Bold(true).Render(truncate(updated, rest-2)), StyleMuted.Render("último push")}, rest, height, false),
+		panelBox("STARS", []string{StyleAccent.Bold(true).Render(truncate(stars, boxW-2)), StyleMuted.Render("favoritos")}, boxW, height, false),
+		panelBox("PULLS", []string{StyleAccent.Bold(true).Render(truncate(pulls, boxW-2)), StyleMuted.Render("downloads")}, boxW, height, false),
+		panelBox("SIZE", []string{StyleAccent.Bold(true).Render(truncate(size, boxW-2)), StyleMuted.Render(truncate("tag "+tag, boxW-2))}, boxW, height, false),
+		panelBox("UPDATE", []string{StyleAccent.Bold(true).Render(truncate(updated, rest-2)), StyleMuted.Render("último push")}, rest, height, false),
 	}
 	return lipgloss.JoinHorizontal(lipgloss.Top,
 		boxes[0], strings.Repeat(" ", gap),
@@ -345,7 +345,7 @@ func (a *App) renderDockerAddDetailsBox(repo collectors.DockerHubRepo, hasRepo b
 	if focused {
 		title += " · ↑↓"
 	}
-	return renderApiTitledBox(title, fitExactLines(view, innerH), width, height, focused)
+	return panelBox(title, fitExactLines(view, innerH), width, height, focused)
 }
 
 func (a *App) dockerAddDetailsContent(repo collectors.DockerHubRepo, hasRepo bool, innerW int) []string {
@@ -487,7 +487,7 @@ func (a *App) renderDockerAddEditBox() string {
 	ed := a.dockerAddEditState
 	body := renderEditorLines(a.dockerAddEdit, &ed, maxInt(20, innerW-2), maxInt(4, editorH-2), editing, false)
 	a.dockerAddEditState = ed
-	editorBox := renderApiTitledBox("docker-compose YAML", body, innerW, editorH, editing)
+	editorBox := panelBox("docker-compose YAML", body, innerW, editorH, editing)
 
 	saveBtn := StyleMuted.Render("  Salvar no compose  ")
 	cancelBtn := StyleMuted.Render("  Cancelar  ")

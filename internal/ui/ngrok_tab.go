@@ -165,65 +165,43 @@ func (a *App) handleNgrokMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) renderNgrokLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	available := a.landingNgrokAvail
 	agent := a.landingNgrokAgent
-	status := "…"
-	if a.landingNgrokOK {
-		status = "offline"
+	state := landingToolState(a.landingNgrokOK, a.landingNgrokAvail, "ngrok", "")
+	if a.landingNgrokOK && a.landingNgrokAvail {
 		if agent.Connected {
-			status = "connected"
-		}
-	}
-	ctx := a.renderModuleContext(p, w, "NGROK", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(6, bodyH*35/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("central de exposição de ambientes locais"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingNgrokOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !available:
-		openLines = append(openLines, "", StyleUnhealthy.Render("ngrok não encontrado no PATH"))
-	default:
-		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(a.landingNgrokVer))
-		if agent.Connected {
-			openLines = append(openLines, a.livePulse("agente local online (:4040)"))
+			state = StyleHealthy.Render(a.okPulse() + " agente local no ar")
 		} else {
-			openLines = append(openLines, StyleMuted.Render("○ agente local offline — start cria o processo"))
+			state = StyleWarning.Render("○ agente local offline")
 		}
 	}
-	featLines := []string{
-		StyleMuted.Render("túneis por projeto · start/stop/restart"),
-		StyleMuted.Render("requests live · logs · copy URL"),
-		StyleMuted.Render("config em .devscope/ngrok.json"),
-		StyleMuted.Render("detecta porta do stack (Node/Laravel/…)"),
+	// Fato que só repete a linha de estado é ruído: com o cli ausente, "cli
+	// não" já foi dito no aviso logo acima.
+	note := ""
+	if a.landingNgrokOK && a.landingNgrokAvail && !agent.Connected {
+		note = StyleMuted.Render("enter abre o console; start sobe o agente")
 	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("NGROK", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, agentLabel := "…", "…"
-	if a.landingNgrokOK {
-		cliLabel, agentLabel = boolLabel(available), boolLabel(agent.Connected)
+	facts := [][2]string{{"config", StyleMuted.Render(".devscope/ngrok.json")}}
+	if a.landingNgrokOK && a.landingNgrokAvail {
+		facts = append([][2]string{
+			{"versão", StyleNormal.Render(firstNonEmpty(a.landingNgrokVer, emDash))},
+			{"api", StyleMuted.Render(":4040")},
+		}, facts...)
 	}
-	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Agent   ") + StyleNormal.Render(agentLabel),
-		StyleMuted.Render("API     ") + StyleMuted.Render(":4040"),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "NGROK",
+		tagline:      "expõe o ambiente local — túnel por projeto, requests ao vivo",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "O QUE ESTE PROJETO EXPÕE",
+		preview:      landingPortRows(p),
+		previewEmpty: "nenhuma porta publicada — suba o projeto antes de abrir o túnel",
+		previewFoot:  tunnelPortFoot(p, "um túnel público"),
+		actions: [][2]string{
+			{"enter", "abrir console"},
+			{"esc", "voltar"},
+		},
+	})
 }
 
 func (a *App) renderNgrokTab(p *core.Project) string {
@@ -421,7 +399,7 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 		"  " + head.Render(joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
 			cell("PROTO", c.proto), cell("LOCAL", c.local), cell("URL PÚBLICA", c.url),
 			rcell("REQS", c.reqs), rcell("UPTIME", c.uptime), rcell("AUTO", c.auto))),
-		StyleMuted.Render(strings.Repeat("─", inner)),
+		rule(inner),
 	}
 
 	n := len(a.ngrokTunnels)
@@ -435,8 +413,8 @@ func (a *App) renderNgrokTunnelTable(width, height int) string {
 			lines = append(lines, a.renderNgrokRow(c, a.ngrokTunnels[i], i == a.ngrokCursor, focus))
 		}
 	}
-	title := fmt.Sprintf("TÚNEIS (%d)", n)
-	return renderApiTitledBox(title, fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
+	title := panelTitle("TÚNEIS", fmt.Sprint(n))
+	return panelBox(title, fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
 func (a *App) renderNgrokRow(c ngrokCols, t ngrokutil.Tunnel, cursor, focus bool) string {
@@ -494,16 +472,16 @@ func ngrokTunnelDot(t ngrokutil.Tunnel, frame int) (string, lipgloss.Style) {
 
 func (a *App) renderNgrokCommands(width, height int) string {
 	return renderActionsBox(width, height,
-		[2]string{"s", "start"},
-		[2]string{"x", "stop"},
-		[2]string{"r", "restart"},
-		[2]string{"n", "new"},
-		[2]string{"e", "edit"},
-		[2]string{"c", "copy"},
-		[2]string{"o", "open"},
+		[2]string{"s", "iniciar"},
+		[2]string{"x", "parar"},
+		[2]string{"r", "reiniciar"},
+		[2]string{"n", "novo"},
+		[2]string{"e", "editar"},
+		[2]string{"c", "copiar"},
+		[2]string{"o", "abrir"},
 		[2]string{"A", "todos"},
 		[2]string{"y", "dup"},
-		[2]string{"d", "delete"},
+		[2]string{"d", "excluir"},
 	)
 }
 
@@ -515,7 +493,7 @@ func (a *App) renderNgrokDetailsPane(width, height int) string {
 	innerW := maxInt(20, width-4)
 	t, ok := a.ngrokSelected()
 	if !ok {
-		return renderApiTitledBox("DETALHES",
+		return panelBox("DETALHES",
 			[]string{StyleMuted.Render("selecione um túnel na lista acima")},
 			width, minInt(height, 3), focus)
 	}
@@ -556,7 +534,7 @@ func (a *App) renderNgrokDetailsPane(width, height int) string {
 
 	a.ngrokDetailsScroll = clampScroll(a.ngrokDetailsScroll, height-2, len(raw))
 	end := minInt(a.ngrokDetailsScroll+height-2, len(raw))
-	return renderApiTitledBox("DETALHES", fitExactLines(raw[a.ngrokDetailsScroll:end], height-2), width, height, focus)
+	return panelBox("DETALHES", fitExactLines(raw[a.ngrokDetailsScroll:end], height-2), width, height, focus)
 }
 
 // renderNgrokRequestsPane: ganhou TÚNEL (com três túneis abertos, saber qual
@@ -589,7 +567,7 @@ func (a *App) renderNgrokRequestsPane(width, height int) string {
 	lines := []string{
 		"  " + head.Render(joinNonEmpty(" ", cell("HORA", 8), cell("MÉT", 4), cell("ST", 3),
 			cell("TÚNEL", hostW), cell("CAMINHO", pathW), padLeft("LAT", latW), cell("IP", ipW))),
-		StyleMuted.Render(strings.Repeat("─", inner)),
+		rule(inner),
 	}
 
 	if len(a.ngrokRequests) == 0 {
@@ -621,7 +599,7 @@ func (a *App) renderNgrokRequestsPane(width, height int) string {
 			}
 		}
 	}
-	return renderApiTitledBox(fmt.Sprintf("REQUISIÇÕES (%d)", len(a.ngrokRequests)),
+	return panelBox(panelTitle("REQUISIÇÕES", fmt.Sprint(len(a.ngrokRequests))),
 		fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
@@ -725,7 +703,7 @@ func (a *App) renderNgrokLogsPane(width, height int) string {
 	if focus {
 		title = "> LOGS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) renderNgrokRequestsFull(width, height int) string {
@@ -742,16 +720,16 @@ func (a *App) renderNgrokConfig(p *core.Project, width, height int) string {
 	setup := a.ngrokSetupLines(p, leftW-2)
 	hist := a.ngrokHistoryLines(leftW - 2)
 	left := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("AGENTE E PROJETO", setup, leftW, len(setup)+2, false),
-		renderApiTitledBox("HISTÓRICO", hist, leftW, minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
+		panelBox("AGENTE E PROJETO", setup, leftW, len(setup)+2, false),
+		panelBox("HISTÓRICO", hist, leftW, minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
 	)
 	dom := a.ngrokDomainLines(rightW - 2)
 	right := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("DOMÍNIOS", dom, rightW, len(dom)+2, false),
+		panelBox("DOMÍNIOS", dom, rightW, len(dom)+2, false),
 		renderActionsBox(rightW, maxInt(3, height-len(dom)-2),
 			[2]string{"n", "novo túnel"},
 			[2]string{"e", "editar"},
-			[2]string{"r", "refresh"},
+			[2]string{"r", "atualizar"},
 			[2]string{"A", "todos os projetos"},
 			[2]string{"1", "voltar aos túneis"},
 		),
@@ -865,7 +843,7 @@ func (a *App) renderNgrokWizard(p *core.Project, width, height int) string {
 	lines = append(lines, "")
 	lines = append(lines, a.ngrokWizardFields(p, innerW)...)
 	lines = append(lines, "",
-		StyleMuted.Render(strings.Repeat("─", innerW)),
+		rule(innerW),
 		// O que se vê é o que roda: mesma linha que StartArgs monta.
 		StyleMuted.Render("$ ")+StyleNormal.Render(truncate("ngrok "+strings.Join(
 			ngrokutil.StartArgs(a.ngrokWizardSpec()), " "), innerW-2)),

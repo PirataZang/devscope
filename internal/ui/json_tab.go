@@ -55,45 +55,16 @@ func (a *App) leaveJsonTab() tea.Cmd {
 }
 
 func (a *App) renderJsonLanding(p *core.Project) string {
-	w, h := a.moduleSize()
-	ctx := a.renderModuleContext(p, w, "JSON", "utils")
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(5, bodyH*28/100)
-	featH := maxInt(5, bodyH*28/100)
-	keysH := maxInt(6, bodyH-openH-featH)
-	openLines := append([]string{StyleMuted.Render("workspace de JSON — format, convert, validate, diff")}, moduleOpenHint()...)
-	featLines := []string{
-		StyleMuted.Render("pretty / minify / validate / sort keys"),
-		StyleMuted.Render("YAML · TOML · XML  ·  strip nulls"),
-		StyleMuted.Render("diff lado a lado  ·  busca por chave"),
-		StyleMuted.Render("syntax highlight no editor e no output"),
-	}
-	keyLines := []string{
-		StyleMuted.Render("p Pretty   m Minify   v Validate   s Sort"),
-		StyleMuted.Render("w YAML     t TOML     x XML        d Diff"),
-		StyleMuted.Render("n strip nulls   / buscar   c copiar"),
-		StyleMuted.Render("e editar   tab painel   esc sair"),
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("JSON", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-		renderApiTitledBox("ATALHOS", fitExactLines(keyLines, keysH-2), centerW, keysH, false),
-	)
-	details := []string{
-		StyleMuted.Render("In   ") + StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonInput))),
-		StyleMuted.Render("Out  ") + StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonOutput))),
-		StyleMuted.Render("Fmt  ") + StyleMuted.Render("JSON/YAML/TOML/XML"),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir cliente"},
-		[2]string{"tab", "módulo"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:   "JSON",
+		tagline: "formata, valida e converte — JSON, YAML, TOML e XML",
+		facts: [][2]string{
+			{"entrada", StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonInput)))},
+			{"saída", StyleNormal.Render(fmt.Sprintf("%d B", len(a.jsonOutput)))},
+			{"faz", StyleMuted.Render("pretty · minify · validate · sort · diff")},
+		},
+		actions: [][2]string{{"enter", "abrir bancada"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderJsonTab(_ *core.Project) string {
@@ -233,8 +204,8 @@ func (a *App) renderJsonActionRail(width, height int) string {
 		tips = append([]string{StyleUnhealthy.Render(truncate(a.jsonErr, width-4))}, tips...)
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
-		renderApiTitledBox("DICAS", fitExactLines(tips, tipH-2), width, tipH, false),
+		panelBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		panelBox("DICAS", fitExactLines(tips, tipH-2), width, tipH, false),
 	)
 }
 
@@ -247,7 +218,7 @@ func (a *App) renderJsonPane(title, content string, width, height int, focus boo
 	}
 	if editing {
 		lines := a.renderJsonMultilineEdit(content, innerW, viewport)
-		return renderApiTitledBox(label, lines, width, height, focus)
+		return panelBox(label, lines, width, height, focus)
 	}
 	raw := strings.Split(strings.ReplaceAll(content, "\r\n", "\n"), "\n")
 	if len(raw) == 1 && raw[0] == "" {
@@ -275,7 +246,7 @@ func (a *App) renderJsonPane(title, content string, width, height int, focus boo
 		_ = focus
 		lines = append(lines, num+colored)
 	}
-	return renderApiTitledBox(label, fitExactLines(lines, viewport), width, height, focus)
+	return panelBox(label, fitExactLines(lines, viewport), width, height, focus)
 }
 
 func (a *App) renderJsonMultilineEdit(content string, width, height int) []string {

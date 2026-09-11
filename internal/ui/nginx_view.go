@@ -198,7 +198,7 @@ func (a *App) renderNginxCommandBar(width int) string {
 		}
 		items = append(items, [2]string{"A", scope})
 	}
-	items = append(items, [2]string{"R", "rescan"}, [2]string{"esc", "voltar"})
+	items = append(items, [2]string{"R", "reescanear"}, [2]string{"esc", "voltar"})
 	return StyleStatusBar.Width(width).Render(fitKeybindsWrap(maxInt(10, width-2), 2, items...))
 }
 
@@ -309,7 +309,7 @@ func (a *App) renderNginxTable(width, height int) string {
 	if !topLevel && a.nginxHub != nil {
 		title = "ROTAS DE " + strings.ToUpper(a.nginxHub.Name)
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, true)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, true)
 }
 
 func (a *App) renderNginxTableHeader(c nginxCols, topLevel bool) string {
@@ -421,13 +421,13 @@ func (a *App) nginxEmptyHint() string {
 func (a *App) renderNginxFilePanel(width, height int, full bool) string {
 	s, ok := a.nginxSelected()
 	if !ok {
-		return renderApiTitledBox("ARQUIVO",
+		return panelBox("ARQUIVO",
 			fitExactLines([]string{StyleMuted.Render("selecione uma rota na lista")}, height-2),
 			width, height, full)
 	}
 
 	all := nginxFileLines(s)
-	title := fmt.Sprintf("%s · %d linhas", truncate(s.File, maxInt(12, width-24)), len(all))
+	title := panelTitle(truncate(s.File, maxInt(12, width-24)), fmt.Sprintf("%d linhas", len(all)))
 
 	viewport := maxInt(1, height-2)
 	a.nginxFileScroll = clampScroll(a.nginxFileScroll, viewport, len(all))
@@ -444,7 +444,7 @@ func (a *App) renderNginxFilePanel(width, height int, full bool) string {
 			StyleMuted.Render(padLeft(strconv.Itoa(i+1), gutter))+StyleMuted.Render(" │ ")+
 				highlightNginxLine(sliceColumns(sanitizeTerminalLine(all[i]), a.nginxFileHScroll, textW)))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewport), width, height, full)
+	return panelBox(title, fitExactLines(lines, viewport), width, height, full)
 }
 
 func nginxFileLines(s nginxutil.Site) []string {

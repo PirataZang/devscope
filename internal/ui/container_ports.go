@@ -39,7 +39,7 @@ func (a *App) renderContainerPorts(p *core.Project) string {
 	h := maxInt(8, a.projectPanelHeight())
 	c, ok := a.selectedContainer(p)
 	if !ok {
-		return renderApiTitledBox("PORTAS", fitExactLines([]string{StyleMuted.Render("container não encontrado")}, h-2), w, h, true)
+		return panelBox("PORTAS", fitExactLines([]string{StyleMuted.Render("container não encontrado")}, h-2), w, h, true)
 	}
 	ports := collectors.ParseContainerPortMappings(c.Ports)
 	listTitle := fmt.Sprintf("PORTAS · %s", truncate(sanitizeTerminalLine(c.Name), 24))
@@ -77,8 +77,8 @@ func (a *App) renderContainerPorts(p *core.Project) string {
 
 	prevLines := a.containerPortPreviewLines(maxInt(1, prevW-4), innerH)
 	return lipgloss.JoinHorizontal(lipgloss.Top,
-		renderApiTitledBox(listTitle, fitExactLines(listLines, innerH), listW, h, true),
-		renderApiTitledBox(a.containerPortPreviewTitle(), fitExactLines(prevLines, innerH), prevW, h, true),
+		panelBox(listTitle, fitExactLines(listLines, innerH), listW, h, true),
+		panelBox(a.containerPortPreviewTitle(), fitExactLines(prevLines, innerH), prevW, h, true),
 	)
 }
 

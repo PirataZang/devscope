@@ -82,12 +82,17 @@ func (t Tab) String() string {
 	}
 }
 
-// AllTabs follows sidebar order (WATCH → SCOPE → AUTOMATION → MANAGER → TUNNEL → TOOLS).
+// AllTabs é a ordem de navegação do `tab`, e tem de ser a MESMA da sidebar
+// (PROJETO → CÓDIGO → EXECUÇÃO → REDE → DADOS): quando as duas divergem, o
+// `tab` pula para uma linha que está acima na tela e a navegação vira loteria.
+// project_sidebar_test.go trava as duas juntas.
+//
+// É a lista COMPLETA. Quem decide o que aparece é App.visibleTabs(), que filtra
+// por capacidade do projeto (module_caps.go).
 var AllTabs = []Tab{
 	TabOverview,
-	TabGit, TabContainers,
-	TabActions, TabJenkins,
-	TabSwarm, TabKubernetes,
-	TabNgrok, TabSSH, TabCFTunnel,
-	TabRoutes, TabNginx, TabAPI, TabDatabase, TabWebSocket,
+	TabGit, TabActions, TabJenkins,
+	TabContainers, TabSwarm, TabKubernetes,
+	TabNginx, TabRoutes, TabNgrok, TabSSH, TabCFTunnel,
+	TabAPI, TabDatabase, TabWebSocket,
 }

@@ -267,61 +267,34 @@ func (a *App) jenkinsSelectedBuild() (jenkinsutil.Build, bool) {
 }
 
 func (a *App) renderJenkinsLanding(p *core.Project) string {
-	w, h := a.moduleSize()
 	cfg := a.landingJenkins
-	status := "…"
+	state, note := landingProbing(), ""
 	if a.landingJenkinsOK {
-		status = "offline"
 		if cfg.Configured() {
-			status = "configured"
+			state = StyleHealthy.Render(a.okPulse() + " servidor configurado")
+		} else {
+			state = StyleWarning.Render("⚠ sem configuração de servidor")
+			note = StyleMuted.Render("abra o console e preencha URL, usuário e token em Settings")
 		}
 	}
-	ctx := a.renderModuleContext(p, w, "JENKINS", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(6, bodyH*35/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("CI/CD — pipelines, builds e console"),
+	facts := [][2]string{{"config", StyleMuted.Render(".devscope/jenkins.json")}}
+	if a.landingJenkinsOK && cfg.Configured() {
+		facts = append([][2]string{
+			{"servidor", StyleNormal.Render(cfg.Host())},
+			{"usuário", StyleNormal.Render(firstNonEmpty(cfg.User, emDash))},
+		}, facts...)
 	}
-	openLines = append(openLines, moduleOpenHint()...)
-	switch {
-	case !a.landingJenkinsOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
-	case !cfg.Configured():
-		openLines = append(openLines, "", StyleWarning.Render("configure URL/user/token em Settings"))
-	default:
-		openLines = append(openLines, "", StyleMuted.Render("server  ")+StyleNormal.Render(cfg.Host()))
-		openLines = append(openLines, StyleMuted.Render("user    ")+StyleNormal.Render(cfg.User))
-	}
-	featLines := []string{
-		StyleMuted.Render("overview · saúde do server"),
-		StyleMuted.Render("pipelines · trigger / stop / console"),
-		StyleMuted.Render("builds · logs com scroll"),
-		StyleMuted.Render("config em .devscope/jenkins.json"),
-	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("JENKINS", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cfgLabel, hostLabel := "…", "…"
-	if a.landingJenkinsOK {
-		cfgLabel = boolLabel(cfg.Configured())
-		hostLabel = firstNonEmpty(cfg.Host(), "—")
-	}
-	details := []string{
-		StyleMuted.Render("Config  ") + StyleNormal.Render(cfgLabel),
-		StyleMuted.Render("Host    ") + StyleMuted.Render(hostLabel),
-		StyleMuted.Render("Auth    ") + StyleMuted.Render("Basic token"),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "JENKINS",
+		tagline:      "pipelines, builds e console — trigger, stop e logs",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "O QUE ESTE PROJETO CONSTRÓI",
+		preview:      a.landingContainerRows(p, 84),
+		previewEmpty: "sem containers para relacionar aos builds",
+		actions:      [][2]string{{"enter", "abrir console"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderJenkinsTab(p *core.Project) string {
@@ -471,8 +444,8 @@ func (a *App) renderJenkinsOverview(p *core.Project, width, height int) string {
 	}
 	center := lipgloss.JoinVertical(lipgloss.Left,
 		a.renderJenkinsActivityPane(centerW, chartH, false),
-		renderApiTitledBox("OVERVIEW", fitExactLines(lines, sumH-2), centerW, sumH, false),
-		renderApiTitledBox("RECENT BUILDS", fitExactLines(evLines, listH-2), centerW, listH, false),
+		panelBox("OVERVIEW", fitExactLines(lines, sumH-2), centerW, sumH, false),
+		panelBox("RECENT BUILDS", fitExactLines(evLines, listH-2), centerW, listH, false),
 	)
 	details := []string{
 		StyleHealthy.Render(fmt.Sprintf("ok     %d", success)),
@@ -483,7 +456,7 @@ func (a *App) renderJenkinsOverview(p *core.Project, width, height int) string {
 	actions := moduleActionLines(
 		[2]string{"1", "pipelines"},
 		[2]string{"2", "builds"},
-		[2]string{"r", "refresh"},
+		[2]string{"r", "atualizar"},
 	)
 	right := a.renderModuleRightRail(rightW, height, details, actions)
 	return lipgloss.JoinHorizontal(lipgloss.Top, center, right)
@@ -613,8 +586,8 @@ func (a *App) renderJenkinsSideNav(width, height int) string {
 		title = "> NAV"
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox(title, fitExactLines(lines, navH-2), width, navH, focus),
-		renderApiTitledBox("QUICK STATS", fitExactLines(stats, statsH-2), width, statsH, false),
+		panelBox(title, fitExactLines(lines, navH-2), width, navH, focus),
+		panelBox("QUICK STATS", fitExactLines(stats, statsH-2), width, statsH, false),
 	)
 }
 
@@ -654,7 +627,7 @@ func (a *App) renderJenkinsJobTable(width, height int) string {
 	if focus {
 		title = "> PIPELINES"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) renderJenkinsBuildTable(width, height int) string {
@@ -699,7 +672,7 @@ func (a *App) renderJenkinsBuildTable(width, height int) string {
 	if focus {
 		title = "> BUILDS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 // renderJenkinsActivityPane draws a duration sparkline + status row for recent builds
@@ -753,7 +726,7 @@ func (a *App) renderJenkinsActivityPane(width, height int, compact bool) string 
 	}
 
 	title := "ACTIVITY"
-	return renderApiTitledBox(title, fitExactLines(lines, viewH), width, height, false)
+	return panelBox(title, fitExactLines(lines, viewH), width, height, false)
 }
 
 func (a *App) jenkinsBuildsForChart(maxBars int) []jenkinsutil.Build {
@@ -917,7 +890,7 @@ func (a *App) renderJenkinsLogsPane(width, height int) string {
 	if focus {
 		title = "> LOGS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewH), width, height, focus)
+	return panelBox(title, fitExactLines(lines, viewH), width, height, focus)
 }
 
 func (a *App) renderJenkinsInspector(p *core.Project, width, height int) string {
@@ -955,18 +928,18 @@ func (a *App) renderJenkinsInspector(p *core.Project, width, height int) string 
 		}
 	}
 	actions := moduleActionLines(
-		[2]string{"b", "trigger"},
-		[2]string{"x", "stop last"},
+		[2]string{"b", "disparar"},
+		[2]string{"x", "parar last"},
 		[2]string{"enter", "ver logs"},
-		[2]string{"r", "refresh"},
+		[2]string{"r", "atualizar"},
 	)
 	title := "DETAILS"
 	if focus {
 		title = "> DETAILS"
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox(title, fitExactLines(details, detH-2), width, detH, focus),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		panelBox(title, fitExactLines(details, detH-2), width, detH, focus),
+		panelBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
 	)
 }
 
@@ -992,7 +965,7 @@ func (a *App) renderJenkinsSettings(p *core.Project, width, height int) string {
 	if !a.jenkinsEditing {
 		lines = append(lines, "", StyleMuted.Render("e editar · t testar conexão · enter salvar após editar"))
 	}
-	center := renderApiTitledBox("SETTINGS", fitExactLines(lines, height-2), centerW, height, a.jenkinsEditing)
+	center := panelBox("SETTINGS", fitExactLines(lines, height-2), centerW, height, a.jenkinsEditing)
 	details := []string{
 		StyleMuted.Render("Config  ") + StyleNormal.Render(boolLabel(a.jenkinsCfg.Configured())),
 		StyleMuted.Render("Host    ") + StyleMuted.Render(firstNonEmpty(a.jenkinsCfg.Host(), "—")),
@@ -1032,7 +1005,7 @@ func (a *App) renderJenkinsSetField(label, value string, field int) string {
 func (a *App) renderJenkinsBuildDetail(width, height int) string {
 	job := a.jenkinsSelectedJobName()
 	num := a.jenkinsSelectedBuildNum()
-	title := fmt.Sprintf("BUILD LOG  %s #%d", job, num)
+	title := panelTitle("BUILD LOG", fmt.Sprintf("%s #%d", job, num))
 	raw := strings.Split(strings.ReplaceAll(a.jenkinsConsole, "\r\n", "\n"), "\n")
 	if len(raw) == 1 && raw[0] == "" {
 		raw = []string{"(console vazio)"}
@@ -1055,7 +1028,7 @@ func (a *App) renderJenkinsBuildDetail(width, height int) string {
 		}
 		lines = append(lines, StyleMuted.Render(truncate(line, width-2)))
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, viewH), width, height, true)
+	return panelBox(title, fitExactLines(lines, viewH), width, height, true)
 }
 
 func (a *App) handleJenkinsKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.Cmd) {

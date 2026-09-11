@@ -208,7 +208,9 @@ func (a *App) appendGitCommandLog(msg gitActionDoneMsg) {
 	if len(a.gitCommandLog) > 40 {
 		a.gitCommandLog = a.gitCommandLog[len(a.gitCommandLog)-40:]
 	}
-	a.gitCmdLogScroll = 0
+	// A saída aparece na hora em que interessa. Era esse o único valor da
+	// caixa permanente no rodapé — e ela cobrava a tela inteira por ele.
+	a.noteGitCommandRan()
 }
 
 func timeNowHHMM() string {

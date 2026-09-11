@@ -107,8 +107,8 @@ func (a *App) renderModuleRightRail(width, height int, details, actions []string
 	detH := maxInt(6, height*45/100)
 	actH := maxInt(5, height-detH)
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
-		renderApiTitledBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
+		panelBox("DETALHES", fitExactLines(details, detH-2), width, detH, false),
+		panelBox("AÇÕES", fitExactLines(actions, actH-2), width, actH, false),
 	)
 }
 
@@ -169,7 +169,7 @@ func renderActionsBox(width, height int, items ...[2]string) string {
 	if need < height {
 		height = need
 	}
-	return renderApiTitledBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
+	return panelBox("AÇÕES", fitExactLines(lines, height-2), width, height, false)
 }
 
 // actionsCmdWidth is the column reserved for AÇÕES next to main content.
@@ -206,11 +206,4 @@ func (a *App) screenWidth() int {
 		return 72
 	}
 	return maxInt(40, a.width)
-}
-
-func moduleOpenHint() []string {
-	return []string{
-		StyleNormal.Render("pressione ") + StyleKey.Render("enter") + StyleNormal.Render(" para entrar"),
-		StyleMuted.Render("esc no cliente volta para esta aba"),
-	}
 }

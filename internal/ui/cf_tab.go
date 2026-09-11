@@ -168,68 +168,38 @@ func (a *App) handleCFMsg(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a *App) renderCFLanding(p *core.Project) string {
-	w, h := a.moduleSize()
 	auth := a.landingCF
-	status := "…"
-	if a.landingCFOK {
-		status = "offline"
-		if auth.CLI && auth.LoggedIn {
-			status = "ready"
-		} else if auth.CLI {
-			status = "no-auth"
-		}
-	}
-	ctx := a.renderModuleContext(p, w, "CLOUDFLARE TUNNEL", status)
-	bodyH := maxInt(12, h-lipgloss.Height(ctx))
-	rightW := a.moduleRightWidth(w)
-	centerW := maxInt(36, w-rightW-1)
-
-	openH := maxInt(7, bodyH*40/100)
-	featH := maxInt(6, bodyH-openH)
-	openLines := []string{
-		StyleMuted.Render("exposição local via edge Cloudflare — quick, named & http2"),
-	}
-	openLines = append(openLines, moduleOpenHint()...)
+	state := landingToolState(a.landingCFOK, auth.CLI, "cloudflared", "")
+	note := ""
 	switch {
 	case !a.landingCFOK:
-		openLines = append(openLines, "", StyleMuted.Render("detectando ambiente…"))
 	case !auth.CLI:
-		openLines = append(openLines, "", StyleUnhealthy.Render("cloudflared não encontrado no PATH"))
-		openLines = append(openLines, StyleMuted.Render("abra o console e pressione I para instalar"))
+		note = StyleMuted.Render("abra o console e pressione I para instalar")
+	case auth.LoggedIn:
+		state = StyleHealthy.Render(a.okPulse() + " autenticado (cert.pem)")
 	default:
-		openLines = append(openLines, "", StyleMuted.Render("versão  ")+StyleNormal.Render(auth.Version))
-		if auth.LoggedIn {
-			openLines = append(openLines, a.livePulse("autenticado (cert.pem)"))
-		} else {
-			openLines = append(openLines, StyleWarning.Render("○ sem login — quick tunnels ainda funcionam"))
-			openLines = append(openLines, StyleMuted.Render("named tunnels: pressione L no console"))
-		}
+		state = StyleWarning.Render("○ sem login")
+		note = StyleMuted.Render("quick tunnels já funcionam; named exige L no console")
 	}
-	featLines := []string{
-		StyleMuted.Render("quick tunnel · trycloudflare.com (sem login)"),
-		StyleMuted.Render("named tunnel · hostname no seu domínio"),
-		StyleMuted.Render("install CLI · login · create · route dns"),
-		StyleMuted.Render("config em .devscope/cloudflare.json"),
+	facts := [][2]string{{"config", StyleMuted.Render(".devscope/cloudflare.json")}}
+	if a.landingCFOK && auth.CLI {
+		facts = append([][2]string{
+			{"versão", StyleNormal.Render(firstNonEmpty(auth.Version, emDash))},
+			{"login", StyleNormal.Render(boolLabel(auth.LoggedIn)) + StyleMuted.Render("  só named exige")},
+		}, facts...)
 	}
-	center := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("CLOUDFLARE", fitExactLines(openLines, openH-2), centerW, openH, true),
-		renderApiTitledBox("CAPACIDADES", fitExactLines(featLines, featH-2), centerW, featH, false),
-	)
-	cliLabel, authLabel := "…", "…"
-	if a.landingCFOK {
-		cliLabel, authLabel = boolLabel(auth.CLI), boolLabel(auth.LoggedIn)
-	}
-	details := []string{
-		StyleMuted.Render("CLI     ") + StyleNormal.Render(cliLabel),
-		StyleMuted.Render("Auth    ") + StyleNormal.Render(authLabel),
-		StyleMuted.Render("Edge    ") + StyleMuted.Render("global"),
-	}
-	actions := moduleActionLines(
-		[2]string{"enter", "abrir console"},
-		[2]string{"esc", "voltar"},
-	)
-	right := a.renderModuleRightRail(rightW, bodyH, details, actions)
-	return lipgloss.JoinVertical(lipgloss.Left, ctx, lipgloss.JoinHorizontal(lipgloss.Top, center, right))
+	return a.renderModuleLanding(p, moduleLanding{
+		title:        "CLOUDFLARE TUNNEL",
+		tagline:      "exposição pela edge — quick (sem login) ou named no seu domínio",
+		state:        state,
+		note:         note,
+		facts:        facts,
+		previewTitle: "O QUE ESTE PROJETO EXPÕE",
+		preview:      landingPortRows(p),
+		previewEmpty: "nenhuma porta publicada — suba o projeto antes de abrir o túnel",
+		previewFoot:  tunnelPortFoot(p, "um hostname da edge"),
+		actions:      [][2]string{{"enter", "abrir console"}, {"esc", "voltar"}},
+	})
 }
 
 func (a *App) renderCFTab(p *core.Project) string {
@@ -420,7 +390,7 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 		"  " + head.Render(joinNonEmpty(" ", cell("", c.dot), cell("NOME", c.name),
 			cell("MODO", c.mode), cell("LOCAL", c.local), cell("URL PÚBLICA", c.url),
 			rcell("UPTIME", c.uptime), rcell("AUTO", c.auto))),
-		StyleMuted.Render(strings.Repeat("─", inner)),
+		rule(inner),
 	}
 
 	n := len(a.cfTunnels)
@@ -434,7 +404,7 @@ func (a *App) renderCFTunnelTable(width, height int) string {
 			lines = append(lines, a.renderCFRow(c, a.cfTunnels[i], i == a.cfCursor, focus))
 		}
 	}
-	return renderApiTitledBox(fmt.Sprintf("TÚNEIS (%d)", n),
+	return panelBox(panelTitle("TÚNEIS", fmt.Sprint(n)),
 		fitExactLines(lines, maxInt(1, height-2)), width, height, focus)
 }
 
@@ -504,7 +474,7 @@ func (a *App) renderCFDetailsPane(width, height int) string {
 	innerW := maxInt(20, width-4)
 	t, ok := a.cfSelected()
 	if !ok {
-		return renderApiTitledBox("DETALHES",
+		return panelBox("DETALHES",
 			[]string{StyleMuted.Render("selecione um túnel na lista acima")},
 			width, minInt(height, 3), focus)
 	}
@@ -538,7 +508,7 @@ func (a *App) renderCFDetailsPane(width, height int) string {
 
 	a.cfDetailsScroll = clampScroll(a.cfDetailsScroll, height-2, len(raw))
 	end := minInt(a.cfDetailsScroll+height-2, len(raw))
-	return renderApiTitledBox("DETALHES", fitExactLines(raw[a.cfDetailsScroll:end], height-2), width, height, focus)
+	return panelBox("DETALHES", fitExactLines(raw[a.cfDetailsScroll:end], height-2), width, height, focus)
 }
 
 func (a *App) renderCFLogsPane(width, height int) string {
@@ -581,7 +551,7 @@ func (a *App) renderCFLogsPane(width, height int) string {
 	if focus {
 		title = "> LOGS"
 	}
-	return renderApiTitledBox(title, fitExactLines(lines, height-2), width, height, focus)
+	return panelBox(title, fitExactLines(lines, height-2), width, height, focus)
 }
 
 func (a *App) renderCFAccount(width, height int) string {
@@ -613,7 +583,7 @@ func (a *App) renderCFAccount(width, height int) string {
 			lines = append(lines, style.Render(truncate(prefix+row, width-2)))
 		}
 	}
-	return renderApiTitledBox(fmt.Sprintf("ACCOUNT TUNNELS (%d)", n), fitExactLines(lines, height-2), width, height, true)
+	return panelBox(panelTitle("ACCOUNT TUNNELS", fmt.Sprint(n)), fitExactLines(lines, height-2), width, height, true)
 }
 
 // renderCFConfig funde as antigas abas History, Setup e Settings — três paradas
@@ -625,17 +595,17 @@ func (a *App) renderCFConfig(p *core.Project, width, height int) string {
 	setup := a.cfSetupLines(p, leftW-2)
 	hist := a.cfHistoryLines(leftW - 2)
 	left := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("CLI E PROJETO", setup, leftW, len(setup)+2, false),
-		renderApiTitledBox("HISTÓRICO", hist, leftW,
+		panelBox("CLI E PROJETO", setup, leftW, len(setup)+2, false),
+		panelBox("HISTÓRICO", hist, leftW,
 			minInt(maxInt(3, height-len(setup)-2), len(hist)+2), false),
 	)
 
 	steps := a.cfStepLines()
 	right := lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("PRIMEIROS PASSOS", steps, rightW, len(steps)+2, false),
+		panelBox("PRIMEIROS PASSOS", steps, rightW, len(steps)+2, false),
 		renderActionsBox(rightW, maxInt(3, height-len(steps)-2),
 			[2]string{"I", "instalar cloudflared"},
-			[2]string{"L", "login na conta"},
+			[2]string{"L", "entrar na conta"},
 			[2]string{"C", "criar túnel named"},
 			[2]string{"R", "rota DNS → túnel"},
 			[2]string{"1", "voltar aos túneis"},
@@ -720,7 +690,7 @@ func (a *App) renderCFWizard(p *core.Project, width, height int) string {
 	lines = append(lines, "")
 	lines = append(lines, a.cfWizardFields(p, innerW)...)
 	lines = append(lines, "",
-		StyleMuted.Render(strings.Repeat("─", innerW)),
+		rule(innerW),
 		StyleMuted.Render("$ ")+StyleNormal.Render(truncate("cloudflared "+strings.Join(
 			cfutil.TunnelArgs(a.cfWizardSpec()), " "), innerW-2)),
 	)

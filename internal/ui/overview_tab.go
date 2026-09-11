@@ -95,7 +95,7 @@ type overviewSection struct {
 func overviewBox(title string, lines []string) overviewSection {
 	h := len(lines) + 2
 	return overviewSection{h, func(w int) string {
-		return renderApiTitledBox(title, lines, w, h, false)
+		return panelBox(title, lines, w, h, false)
 	}}
 }
 
@@ -106,8 +106,8 @@ func overviewPair(t1 string, l1 []string, t2 string, l2 []string) overviewSectio
 	return overviewSection{h, func(w int) string {
 		left := w / 2
 		return lipgloss.JoinHorizontal(lipgloss.Top,
-			renderApiTitledBox(t1, l1, left, h, false),
-			renderApiTitledBox(t2, l2, w-left, h, false))
+			panelBox(t1, l1, left, h, false),
+			panelBox(t2, l2, w-left, h, false))
 	}}
 }
 
@@ -156,8 +156,8 @@ func (a *App) renderOverviewCenter(p *core.Project, width, height int, solo bool
 	}
 
 	boxes := []string{
-		renderApiTitledBox("STACK & RUNTIME", stack, width, len(stack)+2, false),
-		renderApiTitledBox(fmt.Sprintf("CONTAINERS (%d)", len(p.Containers)), ctrs, width, len(ctrs)+2, false),
+		panelBox("STACK & RUNTIME", stack, width, len(stack)+2, false),
+		panelBox(panelTitle("CONTAINERS", fmt.Sprint(len(p.Containers))), ctrs, width, len(ctrs)+2, false),
 	}
 	for _, s := range tail {
 		boxes = append(boxes, s.render(width))
@@ -169,10 +169,7 @@ func (a *App) overviewStackRuntimeLines(p *core.Project, width int) []string {
 	label := func(k string) string { return StyleMuted.Render(padRight(k, 9)) }
 	lines := make([]string, 0, 8)
 
-	frameworks := p.Frameworks
-	if len(frameworks) == 0 && p.Framework.Name != "" && p.Framework.Name != "Unknown" {
-		frameworks = []core.FrameworkInfo{p.Framework}
-	}
+	frameworks := projectFrameworks(*p)
 	if len(frameworks) == 0 {
 		lines = append(lines, label("Stack")+StyleMuted.Render("(nenhum detectado)"))
 	} else {
@@ -475,14 +472,14 @@ func relTime(t time.Time) string {
 func (a *App) renderOverviewRail(p *core.Project, width, height int) string {
 	git := a.overviewGitLines(p, maxInt(10, width-2))
 	return lipgloss.JoinVertical(lipgloss.Left,
-		renderApiTitledBox("GIT", git, width, minInt(height, len(git)+2), false),
+		panelBox("GIT", git, width, minInt(height, len(git)+2), false),
 		renderActionsBox(width, maxInt(3, height-len(git)-2),
 			[2]string{"a", "analisar"},
 			[2]string{"l", "containers"},
 			[2]string{"g", "git"},
 			[2]string{"o", "browser"},
 			[2]string{"E", "shell"},
-			[2]string{"r", "refresh"},
+			[2]string{"r", "atualizar"},
 			[2]string{"tab", "próximo módulo"},
 		),
 	)

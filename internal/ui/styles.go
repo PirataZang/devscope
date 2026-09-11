@@ -66,13 +66,6 @@ var (
 				Foreground(ColorAccent).
 				Background(ColorBgPanel)
 
-	StyleHeader = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(ColorText).
-			Border(lipgloss.NormalBorder()).
-			BorderForeground(ColorBorder).
-			Padding(0, 1)
-
 	StyleStatusBar = lipgloss.NewStyle().
 			Foreground(ColorSubtext).
 			Background(ColorBgPanel).
@@ -123,19 +116,12 @@ var (
 			Foreground(ColorSuccess).
 			Bold(true)
 
-	StyleMetric = lipgloss.NewStyle().
-			Foreground(ColorSubtext)
-
 	StyleMetricCPU = lipgloss.NewStyle().
 			Foreground(ColorSuccess).
 			Bold(true)
 
 	StyleMetricRAM = lipgloss.NewStyle().
 			Foreground(ColorWarning).
-			Bold(true)
-
-	StyleMetricDisk = lipgloss.NewStyle().
-			Foreground(ColorAccent).
 			Bold(true)
 
 	StylePanel = lipgloss.NewStyle().
@@ -147,9 +133,6 @@ var (
 			Bold(true).
 			Foreground(ColorPrimary).
 			Underline(true)
-
-	StyleTab = lipgloss.NewStyle().
-			Foreground(ColorMuted)
 
 	StyleWarning = lipgloss.NewStyle().
 			Foreground(ColorWarning)
@@ -196,9 +179,6 @@ var (
 			Foreground(ColorPrimary).
 			Bold(true)
 
-	StyleKeyDesc = lipgloss.NewStyle().
-			Foreground(ColorSubtext)
-
 	StyleAccent = lipgloss.NewStyle().
 			Foreground(ColorAccent).
 			Italic(true)
@@ -230,11 +210,6 @@ var (
 				Bold(true).
 				Background(lipgloss.Color("#7F1D1D"))
 
-	StyleGitColumn = lipgloss.NewStyle().
-			Border(lipgloss.NormalBorder()).
-			BorderForeground(ColorBorder).
-			Padding(0, 1)
-
 	StyleGitConflict = lipgloss.NewStyle().
 				Foreground(ColorText).
 				Bold(true).
@@ -249,29 +224,3 @@ var (
 				Foreground(ColorWarning).
 				Bold(true)
 )
-
-func StatusStyle(status string) lipgloss.Style {
-	switch status {
-	case "Running", "Healthy", "running":
-		return StyleRunning
-	case "Stopped", "stopped", "exited":
-		return StyleStopped
-	case "Degraded", "Unhealthy":
-		return StyleUnhealthy
-	default:
-		return StyleMuted
-	}
-}
-
-func StatusDot(status string) string {
-	switch status {
-	case "Running", "Healthy", "running":
-		return StyleHealthy.Render(animPulse(0))
-	case "Stopped", "stopped", "exited":
-		return StyleUnhealthy.Render(animStoppedGlyph)
-	case "Degraded", "Unhealthy":
-		return StyleWarning.Render(animPulseSlow(0))
-	default:
-		return StyleMuted.Render("◌")
-	}
-}

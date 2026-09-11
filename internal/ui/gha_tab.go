@@ -905,7 +905,7 @@ func (a *App) ghaQuickActionItems() [][2]string {
 	if !a.ghaInfo.Available {
 		setup = append(setup, [2]string{"!", "Setup / instalar gh"})
 	} else if !a.ghaInfo.Authed {
-		setup = append(setup, [2]string{"L", "Login GitHub (gh)"}, [2]string{"!", "Aviso setup"})
+		setup = append(setup, [2]string{"L", "entrar GitHub (gh)"}, [2]string{"!", "Aviso setup"})
 	}
 	var items [][2]string
 	switch a.ghaKind {
