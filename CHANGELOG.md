@@ -19,13 +19,28 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - `K` encerra de uma vez todo túnel vivo que não é deste projeto — útil depois de um restart do devscope que deixa o `cloudflared` filho rodando sozinho, ocupando a faixa de porta de métricas (20241+) e travando novos túneis
   - Túneis de outros projetos/do host aparecem por padrão na lista (antes só apertando `A`); `A` agora serve pra filtrar de volta pra só o projeto atual
 - **Credenciais manuais de banco** (aba Database) — permite informar host/porta/usuário/senha de um banco que não roda em container Docker local do projeto (salvo em `.devscope/database.json`); `collectors/database.go` roda `psql`/`mysql` direto contra o host quando não há container, além do caminho existente via `docker exec`
+- **`docs/DESIGN.md`** — padrão de telas de módulo (cabeçalho de identificação, régua de abas numerada, corpo em painéis, barra de comandos larga no rodapé), extraído das telas já convertidas e usado como referência para toda tela nova ou reformulada
+- **Fundação visual compartilhada** (`foundation.go`) — painel, corte com consciência de ANSI e espaçador que viviam espalhados em `api_tab.go`/`git_tab.go`/`dashboard.go` viram um só lugar, usado por toda tela nova
+- **Sparkline em Braille** (`spark.go`) — histórico de CPU/RAM/disco do host e ondas de status animadas, compartilhados entre os módulos
+- **Painel de preferências** (`Shift+C`) — tema, agente de IA e atalhos de app externo editáveis em campos, gravados em `user_config.txt` (separado do `config.yaml` do scanner, que quase não muda)
+- **Tela de ajuda redesenhada** no padrão do `docs/DESIGN.md` — comandos agrupados pelas mesmas cores/grupos da barra lateral em vez de uma string única de 200 linhas sem separação
 
 ### Changed
 - `.devscope/` agora é criado por um helper compartilhado (`devscopeutil.EnsureDir`), reaproveitado por `cfutil`, `jenkinsutil`, `ngrokutil`, `sshutil`, `wsutil` e o novo `dbutil`
 - `.gitignore` passa a ignorar `.devscope/` (evita versionar config e credenciais locais do projeto)
+- **Todas as telas de módulo redesenhadas** para o padrão do `docs/DESIGN.md` — Git, Containers, GH Actions, ngrok, Cloudflare Tunnel, SSH, Kubernetes, Swarm, Nginx, Database, Rotas, WebSocket, API e Overview. Cabeçalho de identificação + régua de abas numerada + corpo + barra de comandos larga no rodapé substituem o cabeçalho/rodapé particular de cada tela, a coluna vertical "AÇÕES" e os cards de um número só
+- **Abertura de módulo (landing) unificada** — as telas de entrada de treze dos quinze módulos passam a usar o mesmo `moduleLanding`/`panelBox`, cortando o espaço em branco esticado até o fim da tela que sobrava nas quatro caixas antigas
+- **Sidebar reorganizada em 5 grupos por capacidade do projeto** — PROJETO, CÓDIGO, EXECUÇÃO, REDE, DADOS — escondendo automaticamente módulos que não fazem sentido no projeto aberto (ex.: Kubernetes sem manifest no repo); substitui o esquema fixo de 6 grupos da 1.6.2
+- **Git: log de comandos e stashes viram gaveta sob demanda** em vez de duas caixas fixas no rodapé da tela principal (a saída de um `git pull` é um evento pontual, não um painel permanente)
+- Abas Health e Metrics removidas; o sinal delas foi incorporado na faixa de alertas do Overview e nas linhas de status de cada módulo
+- Integração com LazyGit (`L` na aba Git) removida
+- Wizards de túnel (ngrok, SSH, Cloudflare) mostram o comando CLI exato que vão executar, como preview, antes de confirmar
+- README revisado (estrutura, instalação, exemplos de uso) e novas capturas de tela em `docs/images/`
 
 ### Fixed
 - Detecção de processos `cloudflared` não reconhecia binário de release baixado sem renomear (`cloudflared-linux-amd64`)
+- Túneis ngrok/SSH/Cloudflare reiniciados perdiam domain/region e trocavam de URL; os argumentos agora carregam essa configuração entre reinícios
+- `joinWithSpacer` (cabeçalho e régua de várias telas) podia desenhar uma linha mais larga que o terminal quando nome de projeto comprido e vários chips de status não cabiam juntos; agora encolhe o lado esquerdo em vez de estourar a largura
 
 ## [1.6.3] - 2026-08-25
 
