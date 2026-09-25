@@ -234,14 +234,18 @@ func relaxTreePlane(a, b, c float64, w, h int) (sx, cx, sy, cy []float64) {
 	return
 }
 
-func relaxTreeFrames(st *relaxTreeState, width, height int, fade float64) ([]string, string) {
+func relaxTreeFrames(st *relaxTreeState, width, height int, fade, now float64) ([]string, string) {
 	w := maxInt(28, minInt(width, 110))
 	h := maxInt(7, minInt(height, 32))
 	if !st.inited || st.w != w || st.h != h {
 		relaxTreeBuild(st, w, h)
 	}
 	b := newRelaxBraille(w, h)
-	t := float64(st.tick) * 0.1
+	// O balanço anda pelo relógio contínuo de render (~30fps): o mesmo instante
+	// desenha movimento novo em cada quadro em vez de repetir dez vezes o passo
+	// de 100ms. Como a copa é estado estático deformado por senos de tempo, não
+	// há sub-passos a integrar — basta trocar o relógio de st.tick por now.
+	t := now
 	// Os primeiros segundos são quase parados: a brisa entra depois.
 	amp := easeOutCubic(t / 7)
 	// Lufada longa (~55s) por cima da onda que atravessa a copa (~9s da

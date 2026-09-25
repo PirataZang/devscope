@@ -86,9 +86,11 @@ type relaxNovaFall struct {
 type relaxBurstState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick acumuladas rumo ao próximo tick cheio
 	phase  relaxNovaPhase
-	t      int
-	dur    int
+	t      float64
+	dur    float64
 
 	energy float64 // 0–1 durante a queda
 	flash  float64
@@ -98,7 +100,7 @@ type relaxBurstState struct {
 	fall   []relaxNovaFall
 }
 
-func relaxNovaDur(p relaxNovaPhase) int {
+func relaxNovaDur(p relaxNovaPhase) float64 {
 	switch p {
 	case novaSpiral:
 		return 135
@@ -113,22 +115,23 @@ func relaxNovaDur(p relaxNovaPhase) int {
 	}
 }
 
-func stepRelaxBurst(st *relaxBurstState) {
-	if !st.inited {
-		st.inited = true
-		st.dur = relaxNovaDur(novaIdle)
-		st.shock = -1
-	}
+func relaxNovaInit(st *relaxBurstState) {
+	st.inited = true
+	st.dur = relaxNovaDur(novaIdle)
+	st.shock = -1
+}
+
+// relaxNovaDiscreteTick roda os eventos que só acontecem em passo cheio de
+// 100ms: contador de tick, spawns por-tick, máquina de fases e o clarão. Ficam
+// fora do sub-passo pra manter a MESMA taxa média de partículas por segundo.
+func relaxNovaDiscreteTick(st *relaxBurstState) {
 	st.tick++
-	st.t++
-	p := float64(st.t) / float64(maxInt(1, st.dur))
 	st.flash *= 0.66
 
 	switch st.phase {
 	case novaIdle:
 		st.energy, st.star = 0, 0
 	case novaSpiral:
-		st.energy = easeInOut(p)
 		// Começa com uma bolinha ou outra e termina com um enxame: é a
 		// aceleração da chegada que diz que a estrela não vai aguentar.
 		if st.tick%2 == 0 {
@@ -146,7 +149,7 @@ func stepRelaxBurst(st *relaxBurstState) {
 			}
 		}
 	case novaFlash:
-		if st.t == 1 {
+		if st.t < 1 && len(st.parts) == 0 {
 			st.flash, st.shock, st.star = 1, 0, 1
 			st.fall = st.fall[:0] // tudo que estava caindo virou explosão
 			// Casca de velocidade: sem ela o resultado é um disco cheio.
@@ -162,23 +165,54 @@ func stepRelaxBurst(st *relaxBurstState) {
 		}
 	case novaStar:
 		st.star = 1
+	}
+}
+
+// relaxNovaAdvance anda a simulação por `d` ticks (1.0 = passo de 100ms),
+// fracionário. A física contínua (queda, detritos, choque, energia) integra em
+// sub-passos escalados por `d`; os eventos discretos (tick, spawns, fases,
+// clarão) disparam uma vez por tick cheio, via acumulador — assim o número de
+// partículas por segundo fica praticamente igual ao ritmo original.
+func relaxNovaAdvance(st *relaxBurstState, d float64) {
+	// ── Eventos discretos em fronteiras de tick cheio ──
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxNovaDiscreteTick(st)
+	}
+
+	// ── Tempo de fase e energia ── contínuos.
+	st.t += d
+	if st.dur < 1 {
+		st.dur = 1
+	}
+	p := st.t / st.dur
+
+	switch st.phase {
+	case novaSpiral:
+		st.energy = easeInOut(clamp01(p))
 	case novaFade:
 		// A estrela azul apaga devagar; é o rescaldo mais longo que a explosão.
-		st.star = 1 - easeInOut(p)
+		st.star = 1 - easeInOut(clamp01(p))
 	}
+
+	// ── Transição de fase ── mesma condição, agora em tempo contínuo.
 	if st.t >= st.dur && !(st.phase == novaFade && len(st.parts) > 0) {
 		st.phase = (st.phase + 1) % 5
 		st.t = 0
 		st.dur = relaxNovaDur(st.phase)
+		if st.phase == novaIdle {
+			st.energy, st.star = 0, 0
+		}
 	}
 
-	// As bolinhas espiralam: o ângulo anda mais rápido perto do centro, e o
-	// raio despenca mais rápido ainda. É o funil, não uma reta.
+	// ── Física contínua ── escalada por d (somas lineares × d, decaimentos
+	// multiplicativos elevados a d).
 	kf := st.fall[:0]
 	for _, q := range st.fall {
 		q.pr, q.pa = q.r, q.a
-		q.a += q.L / (q.r + 0.08)
-		q.r -= q.vr * (1 + 0.9*(1-q.r))
+		q.a += q.L / (q.r + 0.08) * d
+		q.r -= q.vr * (1 + 0.9*(1-q.r)) * d
 		if q.r > 0.05 {
 			kf = append(kf, q)
 		}
@@ -186,26 +220,39 @@ func stepRelaxBurst(st *relaxBurstState) {
 	st.fall = kf
 
 	if st.shock >= 0 {
-		if st.shock += 0.032; st.shock > 1.6 {
+		if st.shock += 0.032 * d; st.shock > 1.6 {
 			st.shock = -1
 		}
 	}
 	kp := st.parts[:0]
 	for _, q := range st.parts {
-		q.x += q.vx
-		q.y += q.vy
-		q.vx *= 0.983
-		q.vy *= 0.983
-		if q.heat -= q.cool; q.heat > 0.02 {
+		q.x += q.vx * d
+		q.y += q.vy * d
+		q.vx *= math.Pow(0.983, d)
+		q.vy *= math.Pow(0.983, d)
+		if q.heat -= q.cool * d; q.heat > 0.02 {
 			kp = append(kp, q)
 		}
 	}
 	st.parts = kp
 }
 
-func relaxBurstFrames(st *relaxBurstState, width, height int, fade float64) ([]string, string) {
+// stepRelaxBurst é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxBurstFrames.
+func stepRelaxBurst(st *relaxBurstState) {
 	if !st.inited {
-		stepRelaxBurst(st)
+		relaxNovaInit(st)
+	}
+	relaxNovaAdvance(st, 1)
+}
+
+func relaxBurstFrames(st *relaxBurstState, width, height int, fade, now float64) ([]string, string) {
+	if !st.inited {
+		relaxNovaInit(st)
+	}
+	// A física anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxNovaAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 110))
 	h := maxInt(8, minInt(height, 30))
@@ -213,7 +260,7 @@ func relaxBurstFrames(st *relaxBurstState, width, height int, fade float64) ([]s
 	sw, sh := float64(w*2), float64(h*4)
 	cx, cy := sw/2, sh/2
 	rad := math.Min(sw/2, sh)
-	t := float64(st.tick) * 0.1
+	t := now
 
 	put := func(fx, fy, v float64, fam int) {
 		x, y := int(cx+fx*rad), int(cy+fy*rad*0.62)

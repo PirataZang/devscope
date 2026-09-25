@@ -11,7 +11,7 @@ import (
 func TestApiSelectAllAndDeleteURL(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
-	a.apiBlock = apiBlockURL
+	a.apiFocus = apiFocusURL
 	a.apiURL = "https://example.com/path"
 	a.beginApiEdit()
 
@@ -33,8 +33,7 @@ func TestApiSelectAllAndDeleteURL(t *testing.T) {
 func TestApiShiftSelectReplaceBody(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
-	a.apiBlock = apiBlockRight
-	a.apiRightTab = apiRightBody
+	a.apiSetSection(apiSecBody)
 	a.apiBody = "abcdef"
 	a.beginApiEdit()
 	a.apiEditorCursor = 2 // after "ab"
@@ -58,16 +57,18 @@ func TestApiSelectAllHeadersAuth(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
 
-	a.apiBlock = apiBlockHeaders
+	// Headers agora é tabela: ctrl+a seleciona a CÉLULA, não o bloco inteiro.
 	a.apiHeaders = "Accept: application/json\nX-Test: 1"
+	a.apiSetSection(apiSecHeaders)
+	a.apiRowCursor, a.apiRowField = 1, 1
 	a.beginApiEdit()
 	_, _ = a.updateApiEdit(tea.KeyMsg{Type: tea.KeyCtrlA})
 	_, _ = a.updateApiEdit(tea.KeyMsg{Type: tea.KeyDelete})
-	if a.apiHeaders != "" {
-		t.Fatalf("headers select-all delete: %q", a.apiHeaders)
+	if got := apiParseHeaderRows(a.apiHeaders); len(got) != 2 || got[1].Value != "" {
+		t.Fatalf("ctrl+a na célula deveria limpar só o valor: %+v", got)
 	}
 
-	a.apiBlock = apiBlockAuth
+	a.apiSetSection(apiSecAuth)
 	a.apiAuthType = apiAuthBearer
 	a.apiAuthToken = "secret-token-value"
 	a.beginApiEdit()

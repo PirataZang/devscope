@@ -40,6 +40,7 @@ var relaxNebRamp = func() []relaxColor {
 type relaxNebulaState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
 	// Fases sorteadas por cena: a nuvem nunca é a mesma duas vezes.
 	ph    [8]float64
 	tiltA float64
@@ -132,22 +133,35 @@ func relaxNebulaField(st *relaxNebulaState, sw, sh int) {
 	}
 }
 
+// relaxNebulaAdvance anda a nebulosa por `d` ticks. Toda a animação (deriva das
+// ondas, cintilar) é função contínua do relógio de render, não de estado
+// integrado; então aqui só o contador de tempo avança, escalado por d.
+func relaxNebulaAdvance(st *relaxNebulaState, d float64) {
+	_ = d // nada a integrar: a nuvem é desenhada direto do relógio `now`.
+}
+
+// stepRelaxNebula é um passo cheio de simulação (100ms). Mantido pro teste.
 func stepRelaxNebula(st *relaxNebulaState) {
 	if !st.inited {
 		relaxNebulaInit(st)
 	}
 	st.tick++
+	relaxNebulaAdvance(st, 1)
 }
 
-func relaxNebulaFrames(st *relaxNebulaState, width, height int, fade float64) ([]string, string) {
+func relaxNebulaFrames(st *relaxNebulaState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxNebula(st)
+		relaxNebulaInit(st)
+	}
+	// A nuvem anda pelo relógio de render, sub-passos por tempo real (~30fps).
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxNebulaAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 120))
 	h := maxInt(8, minInt(height, 32))
 	b := newRelaxBrailleVote(w, h)
 	sw, sh := w*2, h*4
-	t := float64(st.tick) * 0.1
+	t := now
 
 	// Seis ondas planas: três pro hidrogênio, três pro oxigênio, e duas pra
 	// poeira. Deriva lenta — a nuvem se remexe em minutos, não em segundos.
@@ -231,6 +245,14 @@ func relaxNebulaFrames(st *relaxNebulaState, width, height int, fade float64) ([
 			b.set(x+1, y, relaxNebStar+1)
 			b.set(x, y-1, relaxNebStar+1)
 			b.set(x, y+1, relaxNebStar+1)
+			// No pico do brilho a estrela jovem vira um glifo pontual: ✦ nas
+			// mais fortes, ✧ nas de brilho intermediário. Poucas, cravadas no
+			// gás que elas mesmas ionizam.
+			gl := "✧"
+			if g > 0.95 {
+				gl = "✦"
+			}
+			b.text(x/2, y/4, gl, relaxNebStar+2)
 		}
 	}
 

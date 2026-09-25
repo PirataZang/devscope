@@ -56,6 +56,9 @@ type relaxZzz struct {
 type relaxCatState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo aos eventos discretos
+	now    float64 // relógio contínuo, pro brilho ocasional do zzz
 	phase  relaxCatPhase
 
 	breath     float64
@@ -75,9 +78,16 @@ func relaxCatBreathRate() float64 {
 
 // Os Zzz sobem pelo canto vazio acima da cabeça — o resto do quadro é gato.
 func relaxCatSpawnZ() relaxZzz {
+	// Mistura de 'z' pequenos e grandes e o sobrescrito ᶻ, pra dar textura ao
+	// sono; um ✦ raro é a brilho de "sonho bom", pontual e discreto.
 	glyph := "z"
-	if rand.Intn(3) == 0 {
+	switch rand.Intn(6) {
+	case 0, 1:
 		glyph = "Z"
+	case 2:
+		glyph = "ᶻ"
+	case 3:
+		glyph = "✦"
 	}
 	return relaxZzz{
 		x10:   250 + rand.Intn(200),
@@ -89,18 +99,19 @@ func relaxCatSpawnZ() relaxZzz {
 	}
 }
 
-func stepRelaxCat(st *relaxCatState) {
-	if !st.inited {
-		st.inited = true
-		st.phase = catSleeping
-		st.breathRate = relaxCatBreathRate()
-		st.nextZ = 5 + rand.Intn(12)
-		st.nextTail = 42 + rand.Intn(19)
-	}
+func relaxCatInit(st *relaxCatState) {
+	st.inited = true
+	st.phase = catSleeping
+	st.breathRate = relaxCatBreathRate()
+	st.nextZ = 5 + rand.Intn(12)
+	st.nextTail = 42 + rand.Intn(19)
+}
+
+// relaxCatDiscreteTick roda o que só vale em passo cheio de 100ms: o contador
+// de tick, a corrida do rabo, o nascimento e a subida dos 'zzz'. Fica fora do
+// sub-passo pra manter a MESMA cadência (zzz por segundo, mexidas por segundo).
+func relaxCatDiscreteTick(st *relaxCatState) {
 	st.tick++
-	if st.breath += st.breathRate; st.breath > 2*math.Pi {
-		st.breath -= 2 * math.Pi
-	}
 
 	if st.tailFlick > 0 {
 		st.tailFlick--
@@ -127,6 +138,29 @@ func stepRelaxCat(st *relaxCatState) {
 		}
 	}
 	st.zzz = live
+}
+
+// relaxCatAdvance anda a cena por `d` ticks (1.0 = passo de 100ms), fracionário.
+// O respiro é soma linear escalada por `d` — a mesma frequência, mais quadros;
+// os eventos discretos disparam uma vez por tick cheio via acumulador.
+func relaxCatAdvance(st *relaxCatState, d float64) {
+	if st.breath += st.breathRate * d; st.breath > 2*math.Pi {
+		st.breath -= 2 * math.Pi
+	}
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxCatDiscreteTick(st)
+	}
+}
+
+// stepRelaxCat é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxCatFrames.
+func stepRelaxCat(st *relaxCatState) {
+	if !st.inited {
+		relaxCatInit(st)
+	}
+	relaxCatAdvance(st, 1)
 }
 
 // ── Paleta ────────────────────────────────────────────────────────────────────
@@ -335,9 +369,14 @@ func (p relaxCatPhase) status() string {
 	return "dormindo…"
 }
 
-func relaxCatFrames(st *relaxCatState, width, height int, fade float64) ([]string, string) {
+func relaxCatFrames(st *relaxCatState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxCat(st)
+		relaxCatInit(st)
+	}
+	st.now = now
+	// A cena anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxCatAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 80))
 	h := maxInt(7, minInt(height, 22))

@@ -103,6 +103,8 @@ const (
 type relaxV4State struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo tick cheio
 	stage  int8
 	t      int
 
@@ -170,10 +172,11 @@ func relaxV4Lift(cyc, center float64) float64 {
 	return math.Pow(c, 1.6)
 }
 
-func stepRelaxV4(st *relaxV4State) {
-	if !st.inited {
-		relaxV4Init(st)
-	}
+// relaxV4Stage roda a máquina de estados da partida — arranque, pega, marcha
+// lenta e as aceleradas — em passo cheio de 100ms. São contadores (t, tick,
+// blip, next) e sorteios: mantê-los no tick preserva a mesma cronologia da
+// partida.
+func relaxV4Stage(st *relaxV4State) {
 	st.tick++
 	st.t++
 
@@ -208,16 +211,32 @@ func stepRelaxV4(st *relaxV4State) {
 			st.blip, st.next = 26, 90+rand.Intn(140)
 		}
 	}
+}
+
+// relaxV4Advance anda a simulação por `k` ticks (1.0 = passo de 100ms),
+// fracionário. A máquina da partida dispara uma vez por tick cheio via
+// acumulador; o giro do virabrequim, a detecção de PMS (que acende a queima e
+// solta o escape), o tranco e a fumaça integram escalados por `k` — o alvo de
+// giro e a queima decaem com math.Pow, o ângulo e a fumaça somam × k. Como o
+// PMS é detectado por cruzamento de ângulo, a taxa de explosões por segundo
+// sai sozinha do giro, sem depender do número de sub-passos.
+func relaxV4Advance(st *relaxV4State, k float64) {
+	st.subAcc += k
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxV4Stage(st)
+	}
+
 	// O giro persegue o alvo: inércia de volante, não teletransporte.
-	st.rpm += (st.want - st.rpm) * 0.18
-	st.ang += st.rpm
+	st.rpm += (st.want - st.rpm) * (1 - math.Pow(1-0.18, k))
+	st.ang += st.rpm * k
 
 	burning := st.stage != v4Crank
 	for i := range st.cyl {
 		c := &st.cyl[i]
 		// A queima apaga ANTES de uma nova acender, senão o estouro já nasce
 		// com um passo de decaimento e nunca chega ao branco.
-		c.fire *= 0.62
+		c.fire *= math.Pow(0.62, k)
 		// Ângulo do munhão medido a partir do eixo do cilindro: quando ele
 		// cruza zero, aquele pistão está no ponto morto superior.
 		rel := math.Mod(st.ang+c.off-math.Atan2(c.uy, c.ux)+4*math.Pi, 2*math.Pi)
@@ -230,20 +249,27 @@ func stepRelaxV4(st *relaxV4State) {
 		}
 		c.rel = rel
 	}
-	st.shake *= 0.72
+	st.shake *= math.Pow(0.72, k)
 
 	live := st.puffs[:0]
 	for _, p := range st.puffs {
-		p.x += p.vx
-		p.y += p.vy
-		p.vy += 0.006 // a fumaça sobe, e vai subindo mais rápido
-		p.vx *= 0.94
-		p.size += 0.012
-		if p.life -= 0.05; p.life > 0 {
+		p.x += p.vx * k
+		p.y += p.vy * k
+		p.vy += 0.006 * k // a fumaça sobe, e vai subindo mais rápido
+		p.vx *= math.Pow(0.94, k)
+		p.size += 0.012 * k
+		if p.life -= 0.05 * k; p.life > 0 {
 			live = append(live, p)
 		}
 	}
 	st.puffs = live
+}
+
+func stepRelaxV4(st *relaxV4State) {
+	if !st.inited {
+		relaxV4Init(st)
+	}
+	relaxV4Advance(st, 1)
 }
 
 // relaxV4Puffs solta o escape. Ele sai pela lateral DE FORA do banco, na altura
@@ -269,14 +295,18 @@ func relaxV4Puffs(st *relaxV4State, i int) {
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
-func relaxV4Frames(st *relaxV4State, width, height int, fade float64) ([]string, string) {
+func relaxV4Frames(st *relaxV4State, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxV4(st)
+		relaxV4Init(st)
+	}
+	// O motor anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxV4Advance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(24, minInt(width, 120))
 	h := maxInt(8, minInt(height, 32))
 	b := newRelaxBrailleVote(w, h)
-	relaxV4Draw(st, b)
+	relaxV4Draw(st, b, now)
 
 	status := "marcha lenta"
 	switch {
@@ -290,7 +320,7 @@ func relaxV4Frames(st *relaxV4State, width, height int, fade float64) ([]string,
 	return b.lines(relaxStyles(relaxV4Pal, fade)), StyleMuted.Render(status)
 }
 
-func relaxV4Draw(st *relaxV4State, b *relaxBraille) {
+func relaxV4Draw(st *relaxV4State, b *relaxBraille, now float64) {
 	sw, sh := b.w*2, b.h*4
 	// O motor mede 5,3 de largura por 1,9 de altura; o palco decide qual das
 	// duas aperta primeiro.
@@ -300,14 +330,36 @@ func relaxV4Draw(st *relaxV4State, b *relaxBraille) {
 	top := (relaxV4Deck + relaxV4Head) * math.Cos(relaxV4Tilt)
 	scale := math.Min(float64(sw)/span, float64(sh)/((top+0.70)*1.06))
 	cx, cy := float64(sw)/2, float64(sh)/2+((top-0.64)/2)*scale
-	// Tranco: cada estouro sacode o bloco inteiro por um instante.
-	jx := st.shake * math.Sin(float64(st.tick)*2.1) * 0.9
-	jy := st.shake * math.Sin(float64(st.tick)*1.7) * 0.6
+	// Tranco: cada estouro sacode o bloco inteiro por um instante. O tremor
+	// anda pelo relógio contínuo, não pelo tick de 10fps, pra sacudir liso.
+	jx := st.shake * math.Sin(now*21) * 0.9
+	jy := st.shake * math.Sin(now*17) * 0.6
 	pen := relaxPen{step: 1 / scale, put: func(x, y float64, tone int) {
 		b.set(int(cx+x*scale+jx), int(cy-y*scale+jy), tone)
 	}}
 
 	relaxV4Smoke(st, pen)
+	// Fio de vapor: a fumaça mais leve ganha um glifo redondo que o Braille
+	// não desenha bem — brasa nova é '∘', mais velha e rala '°'/'º'. Pontual,
+	// no miolo de cada nuvem, com o nível saindo da paleta de fumaça (o fade
+	// segue). text() fixa a célula, então só entra em puffs já ralos, que não
+	// disputam silhueta com o motor.
+	for _, f := range st.puffs {
+		if f.life > 0.62 {
+			continue // nuvem cheia: deixa o Braille desenhar o corpo
+		}
+		px := int(cx+f.x*scale+jx) / 2
+		py := int(cy-f.y*scale+jy) / 4
+		glyph := "°"
+		switch {
+		case f.life > 0.42:
+			glyph = "∘"
+		case f.life > 0.24:
+			glyph = "º"
+		}
+		tone := v4Smoke + minInt(int(f.life*3), v4SmokeN-1)
+		b.text(px, py, glyph, tone)
+	}
 	for i := range st.cyl {
 		relaxV4Cylinder(st, pen, i)
 	}

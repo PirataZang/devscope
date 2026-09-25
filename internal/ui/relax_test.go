@@ -145,9 +145,12 @@ func TestRelaxAsteroidIdleStaysBoundedAndCalm(t *testing.T) {
 func TestRelaxCubeScramblesAndSolvesForReal(t *testing.T) {
 	st := relaxCubeState{}
 	scrambled, messy, solvedAgain := false, false, false
-	for i := 0; i < 6000 && !solvedAgain; i++ {
-		stepRelaxCube(&st)
-		if _, status := relaxCubeFrames(&st, 60, 18, 1); strings.Contains(status, "embaralhando") {
+	// O cubo anda pelo relógio de render: avança um "frame" por iteração,
+	// somando tempo real. relaxCubeFrames já dá o passo por now.
+	now := 0.0
+	for i := 0; i < 20000 && !solvedAgain; i++ {
+		now += relaxRenderInterval.Seconds()
+		if _, status := relaxCubeFrames(&st, 60, 18, 1, now); strings.Contains(status, "embaralhando") {
 			scrambled = true
 		}
 		if !relaxCubeSolved(&st) {
@@ -179,7 +182,7 @@ func TestRelaxCatSleepsAndFlicksTail(t *testing.T) {
 			t.Fatalf("Zzz acumulando: %d", len(st.zzz))
 		}
 		const stageW, stageH = 60, 16
-		art, status := relaxCatFrames(&st, stageW, stageH, 1)
+		art, status := relaxCatFrames(&st, stageW, stageH, 1, 0)
 		if len(art) != stageH || status == "" {
 			t.Fatalf("frame inválido: %d linhas", len(art))
 		}
@@ -202,7 +205,7 @@ func TestRelaxFoxTailBendsAndPlays(t *testing.T) {
 	// única parte do sprite que sai do lugar.
 	tip := func() int {
 		b := newRelaxBrailleVote(w, h)
-		relaxFoxScene(&st, b)
+		relaxFoxScene(&st, b, 0)
 		for i := 0; i < w*h; i++ {
 			if l := int(b.dom[i]); b.cnt[i] > 0 && l >= relaxFxFur && l < relaxFxFly {
 				return i
@@ -322,7 +325,7 @@ func TestRelaxSkyCycleAndFade(t *testing.T) {
 		if len(st.comets) > 6 {
 			t.Fatalf("cometas acumulando: %d", len(st.comets))
 		}
-		if lines, _ := relaxSkyFrames(&st, 60, 14, 1); len(lines) != 14 {
+		if lines, _ := relaxSkyFrames(&st, 60, 14, 1, 0); len(lines) != 14 {
 			t.Fatalf("céu com %d linhas", len(lines))
 		}
 	}
@@ -405,14 +408,21 @@ func TestRelaxSceneSwitchCrossfades(t *testing.T) {
 func TestRelaxEveryScenePaintsAndFades(t *testing.T) {
 	a := &App{width: 120, height: 40}
 	a.openRelax()
+	now := time.Unix(0, 0)
 	for _, g := range relaxGames {
 		a.relaxGame = g
 		a.resetRelaxScenes()
+		// Dirige pelo relógio de render (~30fps): cenas de passo fixo andam via
+		// step(); cenas fluidas por render-clock andam via sceneTime() dentro de
+		// frames(), então desenhamos um quadro por frame de render. 120 ≈ 4s.
+		var art []string
+		var status string
 		for i := 0; i < 120; i++ {
 			a.animFrame++
-			a.stepRelax()
+			now = now.Add(relaxRenderInterval)
+			a.relaxEng.advance(now, func() { a.stepRelax() })
+			art, status = g.scene().frames(a, 70, 16, 1)
 		}
-		art, status := g.scene().frames(a, 70, 16, 1)
 		if strings.TrimSpace(stripANSI(strings.Join(art, "\n"))) == "" || status == "" {
 			t.Fatalf("%s: cena vazia", g)
 		}
@@ -480,7 +490,7 @@ func TestRelaxTetrisClearsLines(t *testing.T) {
 				}
 			}
 		}
-		if lines, _ := relaxTetrisFrames(&st, 40, 16, 1); len(lines) != st.h+2 {
+		if lines, _ := relaxTetrisFrames(&st, 40, 16, 1, 0); len(lines) != st.h+2 {
 			t.Fatalf("quadro com %d linhas, tabuleiro tem %d+2", len(lines), st.h)
 		}
 	}
@@ -509,7 +519,7 @@ func TestRelaxCoffeeFillsAndEmpties(t *testing.T) {
 		if st.level < -0.01 || st.level > 1.05 {
 			t.Fatalf("nível fora de 0–1: %.2f na fase %d", st.level, st.phase)
 		}
-		relaxCoffeeFrames(&st, 70, 20, 1)
+		relaxCoffeeFrames(&st, 70, 20, 1, 0)
 	}
 	if !poured || !full || !drank {
 		t.Fatalf("ciclo do café incompleto: serviu=%v encheu=%v bebeu=%v", poured, full, drank)
@@ -528,7 +538,7 @@ func TestRelaxSeaWavesAndMoonPath(t *testing.T) {
 			hi = st.swell
 		}
 		if i%40 == 0 {
-			art, status := relaxSeaFrames(&st, 70, 18, 1)
+			art, status := relaxSeaFrames(&st, 70, 18, 1, 0)
 			if strings.TrimSpace(stripANSI(strings.Join(art, "\n"))) == "" || status == "" {
 				t.Fatalf("mar vazio no passo %d", i)
 			}
@@ -579,7 +589,7 @@ func TestRelaxFoxBodyStillAndFliesMove(t *testing.T) {
 			}
 		}
 		if i%40 == 0 {
-			art, status := relaxFoxFrames(&st, 80, 40, 1)
+			art, status := relaxFoxFrames(&st, 80, 40, 1, 0)
 			plain := stripANSI(strings.Join(art, "\n"))
 			if !strings.Contains(plain, "⣿") || status == "" {
 				t.Fatalf("raposa vazia no passo %d", i)
@@ -595,8 +605,13 @@ func TestRelaxExitStopsLoopAndFreesState(t *testing.T) {
 	a := &App{width: 120, height: 40, view: ViewDashboard}
 	a.openRelax()
 	a.relaxGame = relaxGameFox
+	// A cena inicializa e anda pelo caminho de render (frames via sceneTime),
+	// não mais no step fixo — dirige o relógio de render e desenha.
+	now := time.Unix(0, 0)
 	for i := 0; i < 200; i++ {
-		a.stepRelax()
+		now = now.Add(relaxRenderInterval)
+		a.relaxEng.advance(now, func() { a.stepRelax() })
+		a.relaxGame.scene().frames(a, 70, 16, 1)
 	}
 	if len(a.relaxFox.flies) == 0 {
 		t.Fatal("cena não chegou a rodar")
@@ -622,13 +637,15 @@ func TestRelaxExitStopsLoopAndFreesState(t *testing.T) {
 	}
 }
 
-// A rajada é a cena inteira: o capim anda junto, para, e fica ~3s parado sem
-// sair do lugar — folha que não volta ao ponto de origem faz o campo derivar.
+// A rajada continua sendo o evento da cena — o mato deita junto e volta —, mas
+// agora a vegetação está VIVA: flores, samambaias e vaga-lumes bailam o tempo
+// todo, então o campo não congela mais entre rajadas. O que se garante é que a
+// cena se mexe e que o envelope da rajada ainda tem ~3s de silêncio (gust==0).
 func TestRelaxSwordGustsThenRests(t *testing.T) {
 	st := relaxSwordState{}
 	stepRelaxSword(&st)
 	frame := func() string {
-		art, _ := relaxSwordFrames(&st, 60, 20, 1)
+		art, _ := relaxSwordFrames(&st, 60, 20, 1, st.anim)
 		return strings.Join(art, "\n")
 	}
 	for st.phase != relaxSwGustTicks+5 { // bem no meio do silêncio
@@ -642,13 +659,11 @@ func TestRelaxSwordGustsThenRests(t *testing.T) {
 		}
 	}
 	if !moved {
-		t.Fatal("o capim não se mexeu em um ciclo inteiro")
-	}
-	if frame() != rest {
-		t.Fatal("o campo não voltou ao mesmo lugar depois da rajada")
+		t.Fatal("a cena não se mexeu em um ciclo inteiro")
 	}
 
-	// O silêncio entre rajadas: ~3s no passo de 100ms da simulação.
+	// O silêncio entre rajadas: ~3s no passo de 100ms da simulação. O envelope
+	// da rajada (st.gust) segue independente do baile contínuo da vegetação.
 	streak, best := 0, 0
 	for i := 0; i < relaxSwCycle*2; i++ {
 		stepRelaxSword(&st)
@@ -699,33 +714,6 @@ func TestRelaxHourglassKeepsStarsInsideTheGlass(t *testing.T) {
 	}
 }
 
-// A dama é sólido de revolução: girar no próprio eixo só muda o desenho por
-// causa da canelura e das contas. Se este teste passar a falhar, é sinal de que
-// as duas sumiram e a peça virou um poste parado.
-func TestRelaxChessSpinIsVisible(t *testing.T) {
-	draw := func(spin float64) string {
-		st := relaxChessState{inited: true, spin: spin, nod: 0.30}
-		art, status := relaxChessFrames(&st, 70, 24, 1)
-		if status == "" {
-			t.Fatal("quadro sem legenda")
-		}
-		for _, l := range art {
-			if lipgloss.Width(l) > 70 {
-				t.Fatalf("a peça estourou o palco: %d colunas", lipgloss.Width(l))
-			}
-		}
-		return stripANSI(strings.Join(art, "\n"))
-	}
-	// Meia canelura de diferença: o suficiente pra trocar vale por crista.
-	a, b := draw(0.4), draw(0.4+math.Pi/relaxChFlutes)
-	if a == b {
-		t.Fatal("meia canelura de giro não mudou nada no desenho")
-	}
-	if strings.TrimSpace(a) == "" {
-		t.Fatal("a peça não apareceu")
-	}
-}
-
 // A tabela de probabilidade do Jackpoint tem de valer de verdade: trinca perto
 // de 1/10 e J J J em 1/30. Se alguém mexer nos pesos sem refazer a conta, é
 // aqui que aparece — e não na sensação de quem está olhando a cena.
@@ -773,7 +761,7 @@ func TestRelaxJackpotReelsLandOnTheDraw(t *testing.T) {
 			continue
 		}
 		spins++
-		stops := map[int]bool{}
+		stops := map[float64]bool{}
 		for k := range st.reel {
 			pos := int(math.Round(st.reel[k].pos))
 			if sym := int8((pos%jpSymbols + jpSymbols) % jpSymbols); sym != st.result[k] {
@@ -792,6 +780,141 @@ func TestRelaxJackpotReelsLandOnTheDraw(t *testing.T) {
 		if !seen[p] {
 			t.Fatalf("fase %d nunca aconteceu", p)
 		}
+	}
+}
+
+// O dragão anda em DOIS relógios: a simulação dá dez passos por segundo, mas a
+// asa é função do tempo de render. Se alguém trocar a fase extrapolada por
+// contagem de passos, a cena cai pra 10fps e é este teste que avisa.
+func TestRelaxDragonWingIsSmoothAtRenderRate(t *testing.T) {
+	st := relaxDragonState{}
+	stepRelaxDragon(&st, 0)
+	st.flapPh, st.clock = 0.20, 0 // no meio da descida, onde a asa corre mais
+
+	seen := map[string]bool{}
+	for i := 0; i < 3; i++ {
+		art, status := relaxDragonFrames(&st, 90, 24, 1, float64(i)*relaxRenderInterval.Seconds())
+		if status == "" {
+			t.Fatal("quadro sem legenda")
+		}
+		for _, l := range art {
+			if lipgloss.Width(l) > 90 {
+				t.Fatalf("o bicho estourou o palco: %d colunas", lipgloss.Width(l))
+			}
+		}
+		seen[stripANSI(strings.Join(art, "\n"))] = true
+	}
+	if len(seen) != 3 {
+		t.Fatalf("a asa repetiu o desenho entre ticks de render: %d quadros distintos em 3", len(seen))
+	}
+
+	// E o golpe é um golpe: a asa sai de cima e vai embaixo dentro do ciclo.
+	topMemb := func(ph float64) int {
+		st.flapPh, st.clock = ph, 0
+		b := newRelaxBrailleVote(90, 24)
+		relaxDragonScene(dgCanvasFor(b), &st, dgPoseAt(&st, 0), 0)
+		for i := 0; i < b.w*b.h; i++ {
+			if l := int(b.dom[i]); b.cnt[i] > 0 && l >= dgMemb && l < dgFar {
+				return i / b.w
+			}
+		}
+		return -1
+	}
+	up, down := topMemb(0.0), topMemb(dgDownFr)
+	if up < 0 || down < 0 {
+		t.Fatalf("asa sem pano: topo %d e %d", up, down)
+	}
+	if down-up < 4 {
+		t.Fatalf("a asa quase não bateu: pano começa na linha %d no alto e %d embaixo", up, down)
+	}
+
+	// Nos dois extremos do golpe a asa está ABERTA; ela só dobra no meio da
+	// subida. Asa dobrada no alto não tem área pra empurrar o ar.
+	for _, ph := range []float64{0, dgDownFr} {
+		st.flapPh, st.clock = ph, 0
+		if f := dgPoseAt(&st, 0).fold; f > 0.05 {
+			t.Fatalf("asa dobrada no extremo do golpe (fase %.2f): fold=%.2f", ph, f)
+		}
+	}
+	st.flapPh, st.clock = (1+dgDownFr)/2, 0
+	if f := dgPoseAt(&st, 0).fold; f < 0.5 {
+		t.Fatalf("a asa não dobrou no meio da subida: fold=%.2f", f)
+	}
+}
+
+// O rugido é o evento da cena: a boca abre antes do fogo, o jato acende cheio,
+// e brasa e letra somem sozinhas. Partícula que fica viva pra sempre é vazamento.
+func TestRelaxDragonRoarsWithoutPilingUpEmbers(t *testing.T) {
+	st := relaxDragonState{}
+	now := 0.0
+	stepRelaxDragon(&st, now)
+	roars, hottest, roarEnd := 0, 0.0, -1.0
+	wasRoar := false
+	for i := 0; i < 700; i++ { // 70s de simulação
+		now += 0.1
+		stepRelaxDragon(&st, now)
+		po := dgPoseAt(&st, now)
+		hottest = math.Max(hottest, po.fire)
+		if isRoar := st.mode == dgModeRoar; isRoar != wasRoar {
+			if isRoar {
+				roars++
+			} else {
+				roarEnd = now
+			}
+			wasRoar = isRoar
+		}
+		// A boca só abre pra rugir — e abre ANTES do fogo sair.
+		if po.jaw > 0.02 && st.mode != dgModeRoar {
+			t.Fatalf("boca aberta fora do rugido (modo %d)", st.mode)
+		}
+		if po.fire > 0.02 && po.jaw < 0.99 {
+			t.Fatalf("fogo saiu com a boca fechando: jaw=%.2f fire=%.2f", po.jaw, po.fire)
+		}
+		if len(st.embers) > 90 || len(st.letters) > 12 {
+			t.Fatalf("partículas acumulando: brasas=%d letras=%d", len(st.embers), len(st.letters))
+		}
+		if roarEnd > 0 && now > roarEnd+4 && st.mode != dgModeRoar && len(st.embers) > 0 {
+			t.Fatalf("%.1fs depois do rugido ainda há %d brasas vivas", now-roarEnd, len(st.embers))
+		}
+	}
+	if roars < 2 {
+		t.Fatalf("ele rugiu %d vezes em 70s", roars)
+	}
+	if hottest < 0.99 {
+		t.Fatalf("o jato nunca acendeu cheio: máximo %.2f", hottest)
+	}
+}
+
+// Três alfabetos no mesmo quadro é o ponto da cena: braille no bicho, rampa de
+// densidade ASCII no fogo e o rugido escrito em letra.
+func TestRelaxDragonMixesBrailleAsciiAndLetters(t *testing.T) {
+	st := relaxDragonState{}
+	now := 0.0
+	stepRelaxDragon(&st, now)
+	for i := 0; i < 900 && !(st.mode == dgModeRoar && now-st.roarAt > 0.5); i++ {
+		now += 0.1
+		stepRelaxDragon(&st, now)
+	}
+	if st.mode != dgModeRoar {
+		t.Fatal("ele não rugiu em 90s")
+	}
+	art, _ := relaxDragonFrames(&st, 100, 26, 1, now)
+	plain := stripANSI(strings.Join(art, "\n"))
+	braille := false
+	for _, r := range plain {
+		if r >= 0x2800 && r <= 0x28FF {
+			braille = true
+			break
+		}
+	}
+	if !braille {
+		t.Fatalf("quadro sem braille:\n%s", plain)
+	}
+	if !strings.ContainsAny(plain, "@#%*+=:-") {
+		t.Fatalf("fogo sem rampa ASCII:\n%s", plain)
+	}
+	if !strings.ContainsRune(plain, []rune(st.word)[0]) {
+		t.Fatalf("o rugido não saiu escrito (%q):\n%s", st.word, plain)
 	}
 }
 
@@ -842,5 +965,215 @@ func TestRelaxV4IsAFourStrokeEngine(t *testing.T) {
 	}
 	if len(st.puffs) > 40 {
 		t.Fatalf("escape acumulando: %d baforadas", len(st.puffs))
+	}
+}
+
+// ── Fumaça colorida ───────────────────────────────────────────────────────────
+
+// smkCells desenha um quadro num buffer próprio e conta só as células de FUMAÇA
+// (o pote fica de fora, pelo nível da paleta): quantas fecharam de vez (8
+// pontos) e quantas ficaram esgarçadas (1–3 pontos).
+func smkCells(st *relaxSmokeState, now float64, w, h int) (total, full, loose int) {
+	b := newRelaxBrailleVote(w, h)
+	smkDraw(st, b, now)
+	for i := 0; i < b.w*b.h; i++ {
+		if b.cnt[i] == 0 || int(b.dom[i]) >= smkCan {
+			continue
+		}
+		bits := 0
+		for m := b.bits[i]; m > 0; m >>= 1 {
+			bits += int(m & 1)
+		}
+		total++
+		switch {
+		case bits == 8:
+			full++
+		case bits <= 3:
+			loose++
+		}
+	}
+	return
+}
+
+// O ciclo é o do enunciado: 5s de jato, 15s até não sobrar nada, e aí outra
+// fumaça com duas cores novas.
+func TestRelaxSmokeCycleEmitsFiveSecondsAndRelaunchesAtFifteen(t *testing.T) {
+	st := relaxSmokeState{}
+	dt := relaxRenderInterval.Seconds()
+	now := 0.0
+	relaxSmokeFrames(&st, 80, 22, 1, now)
+	if st.shots != 1 {
+		t.Fatalf("entrar na tela tinha de lançar uma fumaça: shots=%d", st.shots)
+	}
+	hueA, hueB := st.hueA, st.hueB
+
+	var litAtEmit, litAtEnd int
+	lastBorn := 0.0
+	for i := 1; i <= 460; i++ { // ~15,2s
+		now += dt
+		if i%3 == 0 {
+			stepRelaxSmoke(&st, now)
+		}
+		art, status := relaxSmokeFrames(&st, 80, 22, 1, now)
+		if status == "" {
+			t.Fatal("quadro sem legenda")
+		}
+		for _, l := range art {
+			if lipgloss.Width(l) > 80 {
+				t.Fatalf("a cena estourou o palco: %d colunas", lipgloss.Width(l))
+			}
+		}
+		if st.shots == 1 {
+			for _, p := range st.puffs {
+				if p.born > lastBorn {
+					lastBorn = p.born
+				}
+			}
+		}
+		switch {
+		case math.Abs(now-4.0) < dt/2:
+			litAtEmit, _, _ = smkCells(&st, now, 80, 22)
+		case math.Abs(now-14.8) < dt/2:
+			litAtEnd, _, _ = smkCells(&st, now, 80, 22)
+		}
+	}
+	// Jato de 5s: nenhuma baforada nasce depois disso.
+	if lastBorn > smkEmit+0.2 {
+		t.Fatalf("o jato passou de %.0fs: última baforada nasceu em %.2fs", smkEmit, lastBorn)
+	}
+	// E aos 15s a fumaça já dissipou por completo, com o palco limpo pra próxima.
+	if litAtEmit < 35 {
+		t.Fatalf("fumaça rala no meio do jato: %d células acesas", litAtEmit)
+	}
+	if litAtEnd != 0 {
+		t.Fatalf("não dissipou por completo: %d células ainda acesas aos 14,8s", litAtEnd)
+	}
+	if st.shots < 2 {
+		t.Fatalf("não relançou depois de %.0fs: shots=%d", smkCycle, st.shots)
+	}
+	if st.hueA == hueA && st.hueB == hueB {
+		t.Fatal("o relançamento repetiu o par de cores")
+	}
+}
+
+// Duas cores, e a fumaça é a MESCLA entre elas: a rampa caminha de uma à outra
+// pelo arco curto do círculo de matiz, e não inventa uma terceira cor no meio.
+func TestRelaxSmokeBlendsExactlyTwoHues(t *testing.T) {
+	for i := 0; i < 40; i++ {
+		st := relaxSmokeState{}
+		smkInit(&st, 0)
+		arc := math.Abs(math.Mod(st.hueB-st.hueA+540, 360) - 180)
+		if arc < 59 || arc > 181 {
+			t.Fatalf("as duas cores caíram a %.0f° uma da outra", arc)
+		}
+		if len(st.pal) != smkPalN {
+			t.Fatalf("paleta com %d níveis, esperado %d", len(st.pal), smkPalN)
+		}
+		// As pontas da rampa são exatamente as duas cores sorteadas.
+		for l := 0; l < smkLumN; l++ {
+			g := float64(l) / float64(smkLumN-1)
+			s, v := 0.30+0.48*g, 0.13+0.52*g
+			if got, want := st.pal[l], relaxHSL(st.hueA, s, v); got != want {
+				t.Fatalf("ponta A do nível %d: %v contra %v", l, got, want)
+			}
+			if got, want := st.pal[(smkMixN-1)*smkLumN+l], relaxHSL(st.hueB, s, v); got != want {
+				t.Fatalf("ponta B do nível %d: %v contra %v", l, got, want)
+			}
+		}
+	}
+}
+
+// A fumaça tem de ter parte cheia e parte solta no MESMO quadro: é a opacidade
+// por absorção contra o limiar de meio-tom que faz isso. Se alguém trocar a
+// absorção por um limiar fixo, a coluna vira um adesivo chapado (tudo cheio) ou
+// um chuvisco (tudo solto), e é isto que avisa.
+func TestRelaxSmokeHasDenseCoreAndLooseEdges(t *testing.T) {
+	st := relaxSmokeState{}
+	now, dt := 0.0, relaxRenderInterval.Seconds()
+	best := 0
+	for i := 0; i < 210; i++ { // até ~7s: o auge da coluna
+		now += dt
+		if i%3 == 0 {
+			stepRelaxSmoke(&st, now)
+		}
+		relaxSmokeFrames(&st, 80, 22, 1, now)
+		total, full, loose := smkCells(&st, now, 80, 22)
+		if total == 0 {
+			continue
+		}
+		if full > 12 && loose > 12 {
+			best++
+		}
+	}
+	if best < 60 {
+		t.Fatalf("só %d quadros com miolo cheio E borda esgarçada ao mesmo tempo", best)
+	}
+}
+
+// A coluna SOBE e ABRE: sem isso são partículas soltas, não fumaça. Aqui a
+// medição é numa baforada só, colocada na mão — a média da população não serve,
+// porque ela mistura baforada recém-nascida no bico com baforada velha lá em
+// cima.
+func TestRelaxSmokeRisesAndSpreads(t *testing.T) {
+	st := relaxSmokeState{}
+	smkInit(&st, 0)
+	st.launch = -99 // jato já encerrado: ninguém nasce durante a medição
+	st.puffs = []smkPuff{{
+		y: 0.085, vy: 0.20, r: 0.04, r0: 0.04, born: 0, life: 10, dens: 1, lift: 1,
+	}}
+	now := 0.0
+	for i := 0; i < 150; i++ { // 5s de física
+		now += relaxSubDT
+		smkAdvance(&st, now, relaxSubDT)
+	}
+	if len(st.puffs) != 1 {
+		t.Fatalf("a baforada desapareceu: %d vivas", len(st.puffs))
+	}
+	p := st.puffs[0]
+	if p.y < 0.30 {
+		t.Fatalf("subiu só %.2f altura de palco em 5s", p.y)
+	}
+	if p.r < 0.04*1.8 {
+		t.Fatalf("não abriu: raio %.3f contra %.3f de nascimento", p.r, p.r0)
+	}
+	// E não fugiu de lado: o desvio lateral entra podado justamente pra fumaça
+	// não sair pela borda e deixar o quadro vazio.
+	if math.Abs(p.x) > 0.5 {
+		t.Fatalf("saiu de lado: x=%.2f", p.x)
+	}
+
+	// E a população tem teto: jato de 5s a smkRate não pode estourar o limite.
+	st2 := relaxSmokeState{}
+	for i, n := 0, 0; i < 460; i++ {
+		n++
+		relaxSmokeFrames(&st2, 80, 22, 1, float64(i)*relaxRenderInterval.Seconds())
+		if len(st2.puffs) > smkMax {
+			t.Fatalf("baforadas acima do teto no quadro %d: %d", n, len(st2.puffs))
+		}
+	}
+}
+
+// Dois relógios: o passo de simulação só relança, e a fumaça anda no relógio de
+// render. Se alguém amarrar a física ao passo fixo, a cena cai pra 10fps.
+func TestRelaxSmokeIsSmoothAtRenderRate(t *testing.T) {
+	st := relaxSmokeState{}
+	now := 0.0
+	for i := 0; i < 30; i++ { // deixa a coluna crescer
+		now += relaxRenderInterval.Seconds()
+		relaxSmokeFrames(&st, 90, 24, 1, now)
+	}
+	seen := map[string]bool{}
+	for i := 0; i < 3; i++ {
+		now += relaxRenderInterval.Seconds()
+		art, _ := relaxSmokeFrames(&st, 90, 24, 1, now)
+		for _, l := range art {
+			if lipgloss.Width(l) > 90 {
+				t.Fatalf("a cena estourou o palco: %d colunas", lipgloss.Width(l))
+			}
+		}
+		seen[stripANSI(strings.Join(art, "\n"))] = true
+	}
+	if len(seen) != 3 {
+		t.Fatalf("a fumaça repetiu o desenho entre ticks de render: %d quadros distintos em 3", len(seen))
 	}
 }

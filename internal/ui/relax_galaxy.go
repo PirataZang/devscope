@@ -62,7 +62,7 @@ type relaxGalaxyStar struct {
 	a, bfac  float64 // semieixo maior e razão do menor
 	base     float64
 	cth, sth float64 // fase na elipse
-	cO, sO   float64 // rotação por passo
+	om       float64 // velocidade angular por tick (rotação diferencial)
 	cA, sA   float64 // orientação da elipse, a menos da fase global do padrão
 	hii      bool
 }
@@ -70,6 +70,7 @@ type relaxGalaxyStar struct {
 type relaxGalaxyState struct {
 	inited  bool
 	tick    int
+	clock   relaxSubClock
 	stars   []relaxGalaxyStar
 	halo    []relaxSkyPt // aglomerados do halo, em normalizado -1..1
 	twist   float64      // quanto a elipse gira por unidade de raio
@@ -111,7 +112,7 @@ func relaxGalaxyInit(st *relaxGalaxyState) {
 			bfac: 1 - (0.54 + 0.20*a + rand.Float64()*0.08),
 			base: 0.30 + (1-a)*0.34 + rand.Float64()*0.30,
 			cth:  math.Cos(th), sth: math.Sin(th),
-			cO: math.Cos(om), sO: math.Sin(om),
+			om: om,
 			cA: math.Cos(a * st.twist), sA: math.Sin(a * st.twist),
 			// Berçários estelares só existem nos braços, e longe do bulbo.
 			hii: a > 0.30 && rand.Intn(260) == 0,
@@ -127,36 +128,55 @@ func relaxGalaxyInit(st *relaxGalaxyState) {
 	}
 }
 
-func stepRelaxGalaxy(st *relaxGalaxyState) {
-	if !st.inited {
-		relaxGalaxyInit(st)
-	}
-	st.tick++
+// relaxGalaxyAdvance anda a simulação por `d` ticks (1.0 = passo de 100ms),
+// fracionário. As órbitas giram por ângulo `om*dt*d` (uma sincos por estrela
+// por chamada); a precessão do padrão e o relógio da supernova somam × d. Como
+// nada aqui spawna em fronteira de tick, é seguro andar direto por d.
+func relaxGalaxyAdvance(st *relaxGalaxyState, d float64) {
 	const dt = 0.1
-	st.pattern += st.omegaP * dt
+	st.pattern += st.omegaP * dt * d
 	for i := range st.stars {
 		s := &st.stars[i]
-		c, sn := s.cth*s.cO-s.sth*s.sO, s.sth*s.cO+s.cth*s.sO
+		// Rotação por ângulo escalado por d: sincos(om*d) mantém a MESMA
+		// velocidade angular média que a rotação de tick cheio elevada a d.
+		cd, sd := math.Sincos(s.om * d)
+		c, sn := s.cth*cd-s.sth*sd, s.sth*cd+s.cth*sd
 		// Renormaliza: girar por multiplicação milhares de vezes derraparia o
 		// raio, e as estrelas iam encolhendo pro centro.
 		k := 1.5 - 0.5*(c*c+sn*sn)
 		s.cth, s.sth = c*k, sn*k
 	}
 	if st.snT >= 0 {
-		if st.snT += dt; st.snT > relaxGalaxyFlash {
+		if st.snT += dt * d; st.snT > relaxGalaxyFlash {
 			st.snT, st.snIdx = -1, -1
 		}
 		return
 	}
-	if st.snNext -= dt; st.snNext <= 0 && len(st.stars) > 0 {
+	if st.snNext -= dt * d; st.snNext <= 0 && len(st.stars) > 0 {
 		st.snIdx, st.snT = rand.Intn(len(st.stars)), 0
 		st.snNext = 8 + rand.Float64()*14
 	}
 }
 
-func relaxGalaxyFrames(st *relaxGalaxyState, width, height int, fade float64) ([]string, string) {
+// stepRelaxGalaxy é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxGalaxyFrames.
+func stepRelaxGalaxy(st *relaxGalaxyState) {
 	if !st.inited {
-		stepRelaxGalaxy(st)
+		relaxGalaxyInit(st)
+	}
+	st.tick++
+	relaxGalaxyAdvance(st, 1)
+}
+
+func relaxGalaxyFrames(st *relaxGalaxyState, width, height int, fade, now float64) ([]string, string) {
+	if !st.inited {
+		relaxGalaxyInit(st)
+	}
+	// A física anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	// A galáxia não spawna em fronteira de tick, então os sub-passos somam num
+	// único advance — uma sincos por estrela por frame em vez de três.
+	if n := st.clock.tick(now); n > 0 {
+		relaxGalaxyAdvance(st, float64(n)*(relaxSubDT/0.1))
 	}
 	w := maxInt(26, minInt(width, 120))
 	h := maxInt(8, minInt(height, 32))
@@ -164,7 +184,7 @@ func relaxGalaxyFrames(st *relaxGalaxyState, width, height int, fade float64) ([
 	sw, sh := float64(w*2), float64(h*4)
 	cx, cy := (sw-1)/2, (sh-1)/2
 
-	t := float64(st.tick) * 0.1
+	t := now
 	// A "câmera" tomba e roda devagar: o disco respira em vez de ficar chapado.
 	tilt := 0.50 + 0.14*math.Sin(t*0.043)
 	roll := 0.24 * math.Sin(t*0.029)
@@ -193,6 +213,17 @@ func relaxGalaxyFrames(st *relaxGalaxyState, width, height int, fade float64) ([
 			continue
 		}
 		b.set(ix, iy, relaxGxWarm+2)
+	}
+
+	// Núcleo galáctico: um glifo pontual no centro, o ponto de luz que o campo
+	// de brilho por si só não crava. Alterna ◉/✷ num pulso lento; sai da paleta
+	// no nível mais quente, então acompanha o fade como o resto.
+	if !(st.snT >= 0) { // sem clarão por cima do núcleo durante a supernova
+		gl := "◉"
+		if math.Sin(t*0.6) > 0.4 {
+			gl = "✷"
+		}
+		b.text(int(cx)/2, int(cy)/4, gl, relaxGxWarm+relaxGxLevels-1)
 	}
 
 	status := "uma galáxia girando devagar"

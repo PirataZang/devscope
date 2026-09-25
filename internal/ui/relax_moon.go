@@ -45,6 +45,7 @@ type relaxMoonSpot struct {
 type relaxMoonState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
 	phase  float64 // 0 = nova, π = cheia
 	spots  []relaxMoonSpot
 	stars  []relaxSkyPt
@@ -90,15 +91,22 @@ func relaxMoonInit(st *relaxMoonState) {
 	}
 }
 
+// relaxMoonAdvance anda a fase por `d` ticks (1 = 100ms). A fase é soma linear,
+// então escala direto por d; a libração e as nuvens saem do relógio de render.
+func relaxMoonAdvance(st *relaxMoonState, d float64) {
+	st.phase += 2 * math.Pi / 550 * d // volta completa em ~55s
+	if st.phase > 2*math.Pi {
+		st.phase -= 2 * math.Pi
+	}
+}
+
+// stepRelaxMoon é um passo cheio de simulação (100ms). Mantido pro teste.
 func stepRelaxMoon(st *relaxMoonState) {
 	if !st.inited {
 		relaxMoonInit(st)
 	}
 	st.tick++
-	st.phase += 2 * math.Pi / 550 // volta completa em ~55s
-	if st.phase > 2*math.Pi {
-		st.phase -= 2 * math.Pi
-	}
+	relaxMoonAdvance(st, 1)
 }
 
 var relaxMoonNames = []string{
@@ -106,15 +114,19 @@ var relaxMoonNames = []string{
 	"lua cheia", "gibosa minguante", "quarto minguante", "minguante fina",
 }
 
-func relaxMoonFrames(st *relaxMoonState, width, height int, fade float64) ([]string, string) {
+func relaxMoonFrames(st *relaxMoonState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxMoon(st)
+		relaxMoonInit(st)
+	}
+	// Fase e libração andam pelo relógio de render: sub-passos por tempo real.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxMoonAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 110))
 	h := maxInt(8, minInt(height, 30))
 	b := newRelaxBraille(w, h)
 	sw, sh := w*2, h*4
-	t := float64(st.tick) * 0.1
+	t := now
 
 	cx, cy := float64(sw-1)/2, float64(sh-1)*0.46
 	rad := math.Min(float64(sw)*0.34, float64(sh)*0.44)
@@ -142,7 +154,7 @@ func relaxMoonFrames(st *relaxMoonState, width, height int, fade float64) ([]str
 		return clamp01((v/2.2)*1.9 - 0.62)
 	}
 
-	for _, p := range st.stars {
+	for i, p := range st.stars {
 		x, y := p.x*float64(sw-1), p.y*float64(sh-1)
 		if math.Hypot(x-cx, y-cy) < rad+1 {
 			continue // atrás da lua
@@ -152,6 +164,18 @@ func relaxMoonFrames(st *relaxMoonState, width, height int, fade float64) ([]str
 		}
 		if relaxHalftone(int(x), int(y)) < 0.62 {
 			b.set(int(x), int(y), relaxMoonStar)
+			// Umas poucas cintilam como glifo: ✦/✧ no pico, ˙ no vale. O seno
+			// por estrela (fase i) mantém cada uma no seu ritmo.
+			tw := math.Sin(t*0.7 + float64(i)*1.3)
+			if i%7 == 0 && tw > 0.6 {
+				gl := "✧"
+				if tw > 0.9 {
+					gl = "✦"
+				}
+				b.text(int(x)/2, int(y)/4, gl, relaxMoonStar)
+			} else if i%11 == 0 && tw < -0.7 {
+				b.text(int(x)/2, int(y)/4, "˙", relaxMoonStar)
+			}
 		}
 	}
 

@@ -11,7 +11,7 @@ import (
 func TestApiAuthCycleWithA(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
-	a.apiBlock = apiBlockAuth
+	a.apiSetSection(apiSecAuth)
 	a.apiAuthType = apiAuthNone
 
 	_, _ = a.handleApiKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'a'}}, &core.Project{})
@@ -31,7 +31,7 @@ func TestApiAuthCycleWithA(t *testing.T) {
 func TestApiAuthEditBearerToken(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
-	a.apiBlock = apiBlockAuth
+	a.apiSetSection(apiSecAuth)
 	a.apiAuthType = apiAuthBearer
 
 	// Typing without e must NOT edit.
@@ -69,7 +69,7 @@ func TestApiAuthEditAcceptsKQ(t *testing.T) {
 	p := core.Project{Name: "demo", Path: "/tmp/demo"}
 	a := &App{width: 100, height: 30, view: ViewProject, tab: TabAPI, apiOpen: true, selectedProject: &p}
 	a.initApiTab(&p)
-	a.apiBlock = apiBlockAuth
+	a.apiSetSection(apiSecAuth)
 	a.apiAuthType = apiAuthBearer
 	a.beginApiEdit()
 
@@ -90,15 +90,15 @@ func TestApiAuthEditAcceptsKQ(t *testing.T) {
 	if a.apiEditing {
 		t.Fatal("esc should leave edit mode back to Auth view")
 	}
-	if a.apiBlock != apiBlockAuth {
-		t.Fatalf("esc should stay on Auth block, got %v", a.apiBlock)
+	if a.apiSection != apiSecAuth || a.apiFocus != apiFocusSection {
+		t.Fatalf("esc deveria ficar na aba Auth, got sec=%v foco=%v", a.apiSection, a.apiFocus)
 	}
 }
 
 func TestApiAuthBasicTabSwitchesFields(t *testing.T) {
 	a := &App{width: 100, height: 30}
 	a.initApiTab(&core.Project{})
-	a.apiBlock = apiBlockAuth
+	a.apiSetSection(apiSecAuth)
 	a.apiAuthType = apiAuthBasic
 	a.beginApiEdit()
 	_, _ = a.handleApiKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("alice")}, &core.Project{})

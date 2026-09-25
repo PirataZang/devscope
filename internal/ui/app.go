@@ -190,15 +190,14 @@ type App struct {
 	relaxCoffee                 relaxCoffeeState
 	relaxSea                    relaxSeaState
 	relaxBurst                  relaxBurstState
-	relaxCity                   relaxCityState
 	relaxFox                    relaxFoxState
-	relaxFw                     relaxFireworksState
 	relaxTetris                 relaxTetrisState
 	relaxSword                  relaxSwordState
 	relaxHg                     relaxHourglassState
-	relaxChess                  relaxChessState
 	relaxJp                     relaxJackpotState
 	relaxV4                     relaxV4State
+	relaxDragon                 relaxDragonState
+	relaxSmoke                  relaxSmokeState
 	relaxEng                    relaxEngine
 	relaxPending                relaxGame
 	relaxPendingOn              bool
@@ -240,6 +239,9 @@ type App struct {
 	containerScroll             int
 	containerTableWidth         int
 	containerStatusMsg          string
+	composeRunning              bool      // um docker compose está em andamento
+	composeVerb                 string    // build / up / down / restart
+	composeStart                time.Time // início, para a barra de progresso
 	containerActions            map[string]string
 	containerShellExitErr       string
 	containerFilterOn           bool
@@ -308,9 +310,13 @@ type App struct {
 	apiAuthPass                 string
 	apiAuthEditPass             bool
 	apiBody                     string
-	apiBlock                    apiBlock
-	apiRightTab                 apiRightTab
-	apiMethodCursor             int
+	apiSection                  apiSection
+	apiFocus                    apiFocus
+	apiParams                   []apiKV
+	apiRowCursor                int
+	apiRowField                 int // 0 = chave, 1 = valor
+	apiRowScroll                int
+	apiRespView                 apiRespView
 	apiEditing                  bool
 	apiOpen                     bool // true = fullscreen API client; false = tab 8 landing
 	apiEditorCursor             int
@@ -325,8 +331,8 @@ type App struct {
 	apiResponseHeaders          string
 	apiResponseBody             string
 	apiResponseErr              string
-	apiShowResponseHeaders      bool
 	apiHistory                  []apiHistoryItem
+	apiHistoryIdx               int
 	apiPortIndex                int
 	apiSearchOn                 bool
 	apiSearchInput              string
@@ -1846,6 +1852,16 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.composeUp(p.Path)
 		}
 		a.noteCompose("docker-compose não encontrado")
+	case "shift+b", "B":
+		// Terminals usually report Shift+B as "B", not "shift+b".
+		// Só nos containers: sobe reconstruindo as imagens (up -d --build).
+		if a.tab == TabContainers {
+			if p.HasDockerCompose || collectors.ComposeFile(p.Path) != "" {
+				a.noteCompose("compose up --build…")
+				return a, a.composeBuild(p.Path)
+			}
+			a.noteCompose("docker-compose não encontrado")
+		}
 	case "d":
 		if a.gitTabReady(p) {
 			a.startGitDeleteBranch(p)

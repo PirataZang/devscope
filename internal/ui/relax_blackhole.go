@@ -55,6 +55,8 @@ type relaxBhSpot struct {
 type relaxBlackHoleState struct {
 	inited  bool
 	tick    int
+	clock   relaxSubClock
+	subAcc  float64      // frações de tick rumo ao próximo tick cheio
 	stars   []relaxSkyPt // normalizado -1..1, em raios de sombra
 	incl    float64      // inclinação do disco
 	streams []relaxBhStream
@@ -83,15 +85,12 @@ func relaxBhInit(st *relaxBlackHoleState) {
 	st.nextStr = 10
 }
 
-func stepRelaxBlackHole(st *relaxBlackHoleState) {
-	if !st.inited {
-		relaxBhInit(st)
-	}
+// relaxBhDiscreteTick roda o que só acontece em passo cheio de 100ms: o
+// contador de tempo, o snapshot do rastro de cada fluxo e o spawn de novos
+// fluxos. Fica fora do sub-passo pra manter a MESMA densidade de rastro e a
+// mesma taxa de spawn por segundo.
+func relaxBhDiscreteTick(st *relaxBlackHoleState) {
 	st.tick++
-	for i := range st.spots {
-		st.spots[i].ang += st.spots[i].w
-	}
-	st.flare *= 0.90
 
 	if st.nextStr--; st.nextStr <= 0 && len(st.streams) < 3 {
 		st.streams = append(st.streams, relaxBhStream{
@@ -100,17 +99,38 @@ func stepRelaxBlackHole(st *relaxBlackHoleState) {
 		})
 		st.nextStr = 26 + rand.Intn(50)
 	}
-	keep := st.streams[:0]
-	for _, s := range st.streams {
+	for i := range st.streams {
+		s := &st.streams[i]
 		s.trail = append(s.trail, [2]float64{s.r, s.ang})
 		if len(s.trail) > 26 {
 			s.trail = s.trail[1:]
 		}
+	}
+}
+
+// relaxBhAdvance anda a simulação por `d` ticks (1.0 = 100ms), fracionário. Os
+// eventos discretos (tempo, rastro, spawn) disparam em fronteira de tick via
+// acumulador; a física contínua (órbita dos spots, decaimento do clarão, queda
+// dos fluxos) escala por d — somas × d, decaimentos elevados a d.
+func relaxBhAdvance(st *relaxBlackHoleState, d float64) {
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxBhDiscreteTick(st)
+	}
+
+	for i := range st.spots {
+		st.spots[i].ang += st.spots[i].w * d
+	}
+	st.flare *= math.Pow(0.90, d)
+
+	keep := st.streams[:0]
+	for _, s := range st.streams {
 		// Conservação de momento angular de mentirinha: caindo, gira cada vez
 		// mais rápido. É daí que sai a espiral apertando.
-		s.ang += 0.30 / (s.r * math.Sqrt(s.r))
-		s.vr *= 1.045 // e cai cada vez mais depressa
-		s.r += s.vr
+		s.ang += 0.30 / (s.r * math.Sqrt(s.r)) * d
+		s.vr *= math.Pow(1.045, d) // e cai cada vez mais depressa
+		s.r += s.vr * d
 		if s.r <= 1.02 {
 			st.flare = 1 // atravessou o horizonte
 			continue
@@ -120,16 +140,28 @@ func stepRelaxBlackHole(st *relaxBlackHoleState) {
 	st.streams = keep
 }
 
-func relaxBlackHoleFrames(st *relaxBlackHoleState, width, height int, fade float64) ([]string, string) {
+// stepRelaxBlackHole é um passo cheio de simulação (100ms). Mantido pro teste.
+func stepRelaxBlackHole(st *relaxBlackHoleState) {
 	if !st.inited {
-		stepRelaxBlackHole(st)
+		relaxBhInit(st)
+	}
+	relaxBhAdvance(st, 1)
+}
+
+func relaxBlackHoleFrames(st *relaxBlackHoleState, width, height int, fade, now float64) ([]string, string) {
+	if !st.inited {
+		relaxBhInit(st)
+	}
+	// A física anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxBhAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 120))
 	h := maxInt(8, minInt(height, 32))
 	b := newRelaxBraille(w, h)
 	sw, sh := w*2, h*4
 	cx, cy := float64(sw-1)/2, float64(sh-1)/2
-	t := float64(st.tick) * 0.1
+	t := now
 
 	// Raio da sombra em subpixels; o disco vai até ~4 vezes isso.
 	sr := math.Min(float64(sw)/8.0, float64(sh)/4.2)
@@ -158,7 +190,16 @@ func relaxBlackHoleFrames(st *relaxBlackHoleState, width, height int, fade float
 		stretch := clamp01((3.6 - r2) / 1.1)
 		arc := stretch * stretch * 0.11
 		if arc < 0.01 {
-			b.set(int(cx+px*sr), int(cy+py*sr*0.95), lvl)
+			gx, gy := int(cx+px*sr), int(cy+py*sr*0.95)
+			b.set(gx, gy, lvl)
+			// Longe do anel a estrela é um ponto limpo: as mais brilhantes
+			// viram ✦, as fracas um · discreto. Nada perto do horizonte —
+			// arc<0.01 garante r2 grande, bem fora da sombra.
+			if lvl == relaxBhStar && i%5 == 0 {
+				b.text(gx/2, gy/4, "✦", relaxBhStar)
+			} else if i%9 == 0 {
+				b.text(gx/2, gy/4, "·", relaxBhStarDim)
+			}
 			continue
 		}
 		for d := -arc; d <= arc; d += 0.02 {

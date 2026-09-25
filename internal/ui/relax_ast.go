@@ -57,6 +57,8 @@ type relaxSpark struct {
 type relaxAsteroidState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo tick cheio
 	dur    int
 	phase  relaxIdlePhase
 
@@ -181,34 +183,31 @@ func relaxAstAngleTo(fromX, fromY, toX, toY float64) (float64, float64) {
 	return math.Atan2(dy, dx), math.Hypot(dx, dy)
 }
 
-func stepRelaxAsteroid(st *relaxAsteroidState) {
-	if !st.inited {
-		st.inited = true
-		relaxAstNewScene(st)
-	}
+func relaxAstInit(st *relaxAsteroidState) {
+	st.inited = true
+	relaxAstNewScene(st)
+}
+
+// relaxAstDiscreteTick roda os eventos que só acontecem em passo cheio de
+// 100ms: contador de tick, o piloto automático (máquina de estados com
+// contadores e sorteios), a colisão tiro×rocha, spawns por-tick de poeira e
+// reposição de rocha, e a virada de cena. Ficam fora do sub-passo pra manter
+// a MESMA taxa média de eventos por segundo do ritmo original.
+func relaxAstDiscreteTick(st *relaxAsteroidState) {
 	st.tick++
 
 	relaxAstPilot(st)
 
-	// Nave: inércia + wrap-around.
-	st.shipX = relaxAstWrap(st.shipX+st.shipVX, relaxAstW)
-	st.shipY = relaxAstWrap(st.shipY+st.shipVY, relaxAstH)
-
 	for i := range st.rocks {
 		r := &st.rocks[i]
-		r.x = relaxAstWrap(r.x+r.vx, relaxAstW)
-		r.y = relaxAstWrap(r.y+r.vy, relaxAstH)
-		r.rot += r.spin
 		if !r.backdrop && r.size >= 2 && rand.Intn(70) == 0 { // poeira ocasional
 			st.parts = append(st.parts, relaxSpark{x: r.x, y: r.y, ttl: 6 + rand.Intn(6)})
 		}
 	}
 
+	// Vida do tiro é contada em passos cheios: o descarte segue o ritmo de 10fps.
 	shots := st.shots[:0]
 	for _, s := range st.shots {
-		s.px, s.py = s.x, s.y
-		s.x = relaxAstWrap(s.x+s.vx, relaxAstW)
-		s.y = relaxAstWrap(s.y+s.vy, relaxAstH)
 		if s.life--; s.life > 0 {
 			shots = append(shots, s)
 		}
@@ -216,12 +215,9 @@ func stepRelaxAsteroid(st *relaxAsteroidState) {
 	st.shots = shots
 	relaxAstCollide(st)
 
+	// TTL das partículas em passos cheios: mesma duração de antes.
 	parts := st.parts[:0]
 	for _, p := range st.parts {
-		p.x += p.vx
-		p.y += p.vy
-		p.vx *= 0.86 // some expandindo e desacelerando, sem estouro
-		p.vy *= 0.86
 		if p.life++; p.life < p.ttl {
 			parts = append(parts, p)
 		}
@@ -236,6 +232,57 @@ func stepRelaxAsteroid(st *relaxAsteroidState) {
 	if st.tick >= st.dur {
 		relaxAstNewScene(st)
 	}
+}
+
+// relaxAstAdvance anda a simulação por `k` ticks (1.0 = passo de 100ms),
+// fracionário. Os eventos discretos (piloto, colisão, spawns, virada) disparam
+// uma vez por tick cheio via acumulador; a física contínua (posições,
+// velocidades, rotações) integra escalada por `k` — somas lineares × k,
+// decaimentos multiplicativos elevados a k. Depois de 100ms o estado é ~igual,
+// mas com ~3x mais quadros de movimento.
+func relaxAstAdvance(st *relaxAsteroidState, k float64) {
+	// ── Eventos discretos em fronteiras de tick cheio ──
+	st.subAcc += k
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxAstDiscreteTick(st)
+	}
+
+	// ── Física contínua ── escalada por k.
+	// Nave: inércia + wrap-around.
+	st.shipX = relaxAstWrap(st.shipX+st.shipVX*k, relaxAstW)
+	st.shipY = relaxAstWrap(st.shipY+st.shipVY*k, relaxAstH)
+
+	for i := range st.rocks {
+		r := &st.rocks[i]
+		r.x = relaxAstWrap(r.x+r.vx*k, relaxAstW)
+		r.y = relaxAstWrap(r.y+r.vy*k, relaxAstH)
+		r.rot += r.spin * k
+	}
+
+	for i := range st.shots {
+		s := &st.shots[i]
+		s.px, s.py = s.x, s.y
+		s.x = relaxAstWrap(s.x+s.vx*k, relaxAstW)
+		s.y = relaxAstWrap(s.y+s.vy*k, relaxAstH)
+	}
+
+	for i := range st.parts {
+		p := &st.parts[i]
+		p.x += p.vx * k
+		p.y += p.vy * k
+		p.vx *= math.Pow(0.86, k) // some expandindo e desacelerando, sem estouro
+		p.vy *= math.Pow(0.86, k)
+	}
+}
+
+// stepRelaxAsteroid é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxAsteroidFrames.
+func stepRelaxAsteroid(st *relaxAsteroidState) {
+	if !st.inited {
+		relaxAstInit(st)
+	}
+	relaxAstAdvance(st, 1)
 }
 
 func relaxAstLiveRocks(st *relaxAsteroidState) int {
@@ -467,9 +514,13 @@ func relaxAstPoly(shape, size int, rot, cx, cy, rad float64, out [][2]float64) [
 
 var relaxAstRadius = [4]float64{0.85, 1.5, 2.3, 3.5} // em unidades de simulação
 
-func relaxAsteroidFrames(st *relaxAsteroidState, width, height int, gfade float64) ([]string, string) {
+func relaxAsteroidFrames(st *relaxAsteroidState, width, height int, gfade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxAsteroid(st)
+		relaxAstInit(st)
+	}
+	// A física anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxAstAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 110))
 	h := maxInt(8, minInt(height, 30))
@@ -489,8 +540,18 @@ func relaxAsteroidFrames(st *relaxAsteroidState, width, height int, gfade float6
 		return newRelaxBraille(w, h).lines(nil), StyleMuted.Render(st.phase.status(st))
 	}
 
-	for _, p := range st.stars {
-		b.set(int(px(p.x)), int(py(p.y)), relaxAstLvlStar)
+	for i, p := range st.stars {
+		x, y := int(px(p.x)), int(py(p.y))
+		b.set(x, y, relaxAstLvlStar)
+		// Poucas estrelas cintilam: um brilho pontual que o Braille não faz,
+		// em fase própria pra não piscarem juntas. Só uma a cada cinco, e só
+		// no pico do ciclo — enfeite discreto, não constelação animada.
+		if i%5 == 0 {
+			tw := math.Sin(now*1.3 + float64(i)*1.7)
+			if tw > 0.93 {
+				b.text(x/2, y/4, "✦", relaxAstLvlShip)
+			}
+		}
 	}
 
 	poly := make([][2]float64, 0, 13)
@@ -513,10 +574,11 @@ func relaxAsteroidFrames(st *relaxAsteroidState, width, height int, gfade float6
 		b.set(int(px(p.x)), int(py(p.y)), relaxAstLvlSpark)
 	}
 
-	// Chama: pisca e encolhe, saindo pela traseira.
+	// Chama: pisca e encolhe, saindo pela traseira. O tremular anda pelo
+	// relógio contínuo, não pelo tick de 10fps, pra não piscar em degraus.
 	if st.thrust > 0 {
 		back := st.rot + math.Pi
-		fl := (0.9 + 0.5*float64(st.tick%3)) * ux
+		fl := (0.9 + 0.5*(0.5+0.5*math.Sin(now*22))) * ux
 		b.line(px(st.shipX)+math.Cos(back)*ux*0.7, py(st.shipY)+math.Sin(back)*ux*0.7,
 			px(st.shipX)+math.Cos(back)*fl, py(st.shipY)+math.Sin(back)*fl, relaxAstLvlFlame)
 	}

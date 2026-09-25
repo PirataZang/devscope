@@ -1,15 +1,15 @@
 # DevScope · roteiro de gravação do GIF do README
 #
-# Gera docs/images/demo.gif a partir do binário de verdade.
+# Gera docs/demo.gif a partir do binário de verdade.
 # Precisa do VHS (mesma turma do Bubble Tea):
 #
 #   go install github.com/charmbracelet/vhs@latest
 #   vhs docs/demo.tape
 #
 # Depois é só trocar o bloco de texto do topo do README por:
-#   <p align="center"><img src="docs/images/demo.gif" alt="DevScope em uso" width="100%"></p>
+#   <p align="center"><img src="docs/demo.gif" alt="DevScope em uso" width="100%"></p>
 
-Output docs/images/demo.gif
+Output docs/demo.gif
 
 Set Shell        bash
 Set FontSize     14

@@ -28,6 +28,50 @@ const (
 	relaxTransition     = 0.55                   // segundos de troca de cena
 )
 
+// Sub-passos por passo de simulação. Cenas com física de partículas integram em
+// sub-passos fixos de relaxSimStep/relaxSubSteps (~33ms) alimentados por tempo
+// real: depois de 100ms o estado é o mesmo, mas houve ~3x mais quadros de
+// movimento — é o que dá a fluidez de 30fps sem mudar velocidade nem ritmo.
+const relaxSubSteps = 3
+
+// relaxSubDT é a duração de um sub-passo, em segundos.
+const relaxSubDT = 0.1 / relaxSubSteps
+
+// relaxSubClock converte o relógio contínuo (sceneTime, em segundos) em
+// sub-passos fixos. A cena guarda um destes e chama tick(now) uma vez por frame
+// de render; o retorno é quantos sub-passos de relaxSubDT rodar agora. Um teto
+// baixo evita despejar simulação ao voltar de uma pausa longa.
+type relaxSubClock struct {
+	last  float64
+	acc   float64
+	start bool
+}
+
+func (c *relaxSubClock) tick(now float64) int {
+	if !c.start {
+		c.start, c.last = true, now
+		return 0
+	}
+	dt := now - c.last
+	c.last = now
+	if dt <= 0 {
+		return 0
+	}
+	if dt > 0.5 { // volta de suspensão: não acumula minutos
+		dt = 0.1
+	}
+	c.acc += dt
+	n := 0
+	for c.acc >= relaxSubDT && n < relaxSubSteps*relaxMaxCatchUp {
+		c.acc -= relaxSubDT
+		n++
+	}
+	if n == relaxSubSteps*relaxMaxCatchUp {
+		c.acc = 0
+	}
+	return n
+}
+
 type relaxEngine struct {
 	last     time.Time
 	acc      time.Duration
@@ -87,6 +131,17 @@ func (e *relaxEngine) advance(now time.Time, step func()) int {
 		e.acc = 0 // ficou longe demais: descarta em vez de acumular dívida
 	}
 	return n
+}
+
+// sceneTime é o relógio contínuo das cenas: segundos dentro do Relax. Cena que
+// anima por tempo (e não por passo de simulação) desenha movimento novo em cada
+// um dos ~30 frames por segundo, em vez de repetir o mesmo quadro dez vezes.
+// Com movimento reduzido ele anda na metade, igual à simulação.
+func (e *relaxEngine) sceneTime() float64 {
+	if e.reduced {
+		return e.elapsed * 0.5
+	}
+	return e.elapsed
 }
 
 func (e *relaxEngine) beginTransition() {

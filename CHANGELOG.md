@@ -8,6 +8,30 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Aba API repaginada no padrão Postman/Thunder Client** — a tela foi refeita inteira, no padrão de telas do projeto (cabeçalho, régua de abas numerada, painéis e barra de comandos larga)
+  - **Linha de requisição** no topo, como no Postman: método, URL inteira e o botão de enviar numa linha só. Antes a URL aparecia duas vezes (cabeçalho + caixa `[2]-URL`) e em nenhuma das duas dava pra ver a query
+  - **Requisição e resposta visíveis juntas.** Antes `Body` e `Response` disputavam o mesmo painel por `[` e `]` — ver o corpo enviado e a resposta ao mesmo tempo era impossível
+  - **Abas numeradas** `1 PARAMS · 2 HEADERS · 3 AUTH · 4 BODY · 5 RESPOSTA`, com contador no rótulo (params ativos, headers ativos, código da resposta) pra saber o que está ligado sem abrir a aba; a aba 5 abre a resposta em tela cheia
+  - **Tabela de params** nova, ligada à URL nos dois sentidos: colar um link vira linhas na hora, editar a linha reescreve a query, e `space` desliga o parâmetro **sem apagá-lo** (era preciso editar a query à mão dentro da URL)
+  - **Headers também em tabela**, com `n` nova linha, `d` apagar e `space` ligar/desligar; linha desligada é serializada como comentário, que o cliente HTTP já ignorava
+  - **Auth** em controle segmentado (nenhuma · bearer · basic) em vez de caixa empilhada, com o segredo mascarado
+  - Resposta com **tamanho** (`1.2 kB`) além de status e tempo, numeração de linha, realce de JSON, busca e `h` alternando corpo/cabeçalhos
+  - **`y` copia o comando `curl` equivalente** (método, URL, headers ativos, auth e corpo)
+  - Foco em três paradas só (`tab`: URL → aba → resposta), no lugar de quatro caixas à esquerda mais um painel à direita onde `tab` fazia coisas diferentes conforme o lugar
+  - A coluna vertical `AÇÕES` (17 colunas roubadas do conteúdo) deu lugar à barra de comandos larga do padrão, com os atalhos mudando conforme o foco
+  - Edição agora é explícita (`u` na URL, `e` no campo, `enter` na célula da tabela): digitar em cima de um campo para começar a editar conflitava com as teclas de comando, que é a raiz da bagunça anterior
+- **Relax: cena `Smoke`** — um gerador solta fumaça colorida de duas cores, elas se enrolam uma na outra, a coluna sobe, abre e dissipa; aí sai outra, com duas cores novas
+  - Ciclo de 15s: 5s de jato e o resto até não sobrar nada (um desvanecimento de ciclo garante o palco limpo pro lançamento seguinte)
+  - Duas cores sorteadas por lançamento, a 60°–180° uma da outra, e a fumaça é a rampa entre elas pelo caminho curto do círculo de matiz; a válvula alterna em fita, e cada baforada caminha pro meio da rampa conforme envelhece
+  - Turbulência por **curl de ruído** (rotacional de um campo de ruído, livre de divergência): a fumaça enrola em vez de inflar como spray. O eixo vertical entra bem podado — solto, ele vira corrente descendente parada em cima da coluna e a fumaça não sobe
+  - Densidade virando opacidade por absorção (Beer-Lambert) e opacidade virando densidade de pontos por meio-tom: o miolo fecha a célula, o meio fica em meio-tom e a borda esgarça em pontinhos, com um cálculo só
+  - Uma em três baforadas é farrapo (menor, mais leve, mais turbulenta), e cada uma tem empuxo próprio — é o que estica a coluna na vertical em vez de fazê-la subir em bloco
+- **Relax: cena `Dragon`** — um dragão de perfil batendo asa contra a lua, a 30fps
+  - Anatomia procedural (tronco, pescoço, cabeça, cauda, pernas e duas asas com braço, antebraço, quatro dedos e o pano entre eles), não sprite pronto
+  - Golpe assimétrico (38% do ciclo é a descida), asa que dobra no meio da subida, pano que atrasa em relação ao osso e corpo que sobe depois do golpe
+  - Rugido de vez em quando: a boca abre antes do fogo, o jato sai em rampa de densidade ASCII (`. : - = + * # % @`), as brasas sobem como `@ * + . '` e o rugido sai escrito letra por letra
+  - Voo batido e planado se alternando; serra, nuvens, lua e estrelas ao fundo
+  - Movimento contínuo (asa, balanço, cauda, chama, trajetória de brasa) é função do tempo de render, não do passo de simulação — cada um dos ~30 frames por segundo desenha movimento novo
 - **Aba Nginx (TOOLS)** — cadastro de rotas de nginx direto do projeto, sem editar arquivo na mão
   - Detecta o `main.conf`/`nginx.conf` e a pasta de nível 1 (`.conf`) lendo o `include` de verdade — funciona com qualquer nome de pasta, com fallback por conteúdo (varredura de subpastas) e por caminho de dentro do container (docker volume montado com outro nome local)
   - Cada `.conf` de nível 1 é **single** (um `server{}` completo, com `proxy_pass` ou `root`) ou **hub** (um `server{}` de verdade, com seu próprio `listen`/`server_name`/ssl, que só inclui uma pasta de `.inc`)
@@ -19,28 +43,13 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - `K` encerra de uma vez todo túnel vivo que não é deste projeto — útil depois de um restart do devscope que deixa o `cloudflared` filho rodando sozinho, ocupando a faixa de porta de métricas (20241+) e travando novos túneis
   - Túneis de outros projetos/do host aparecem por padrão na lista (antes só apertando `A`); `A` agora serve pra filtrar de volta pra só o projeto atual
 - **Credenciais manuais de banco** (aba Database) — permite informar host/porta/usuário/senha de um banco que não roda em container Docker local do projeto (salvo em `.devscope/database.json`); `collectors/database.go` roda `psql`/`mysql` direto contra o host quando não há container, além do caminho existente via `docker exec`
-- **`docs/DESIGN.md`** — padrão de telas de módulo (cabeçalho de identificação, régua de abas numerada, corpo em painéis, barra de comandos larga no rodapé), extraído das telas já convertidas e usado como referência para toda tela nova ou reformulada
-- **Fundação visual compartilhada** (`foundation.go`) — painel, corte com consciência de ANSI e espaçador que viviam espalhados em `api_tab.go`/`git_tab.go`/`dashboard.go` viram um só lugar, usado por toda tela nova
-- **Sparkline em Braille** (`spark.go`) — histórico de CPU/RAM/disco do host e ondas de status animadas, compartilhados entre os módulos
-- **Painel de preferências** (`Shift+C`) — tema, agente de IA e atalhos de app externo editáveis em campos, gravados em `user_config.txt` (separado do `config.yaml` do scanner, que quase não muda)
-- **Tela de ajuda redesenhada** no padrão do `docs/DESIGN.md` — comandos agrupados pelas mesmas cores/grupos da barra lateral em vez de uma string única de 200 linhas sem separação
 
 ### Changed
 - `.devscope/` agora é criado por um helper compartilhado (`devscopeutil.EnsureDir`), reaproveitado por `cfutil`, `jenkinsutil`, `ngrokutil`, `sshutil`, `wsutil` e o novo `dbutil`
 - `.gitignore` passa a ignorar `.devscope/` (evita versionar config e credenciais locais do projeto)
-- **Todas as telas de módulo redesenhadas** para o padrão do `docs/DESIGN.md` — Git, Containers, GH Actions, ngrok, Cloudflare Tunnel, SSH, Kubernetes, Swarm, Nginx, Database, Rotas, WebSocket, API e Overview. Cabeçalho de identificação + régua de abas numerada + corpo + barra de comandos larga no rodapé substituem o cabeçalho/rodapé particular de cada tela, a coluna vertical "AÇÕES" e os cards de um número só
-- **Abertura de módulo (landing) unificada** — as telas de entrada de treze dos quinze módulos passam a usar o mesmo `moduleLanding`/`panelBox`, cortando o espaço em branco esticado até o fim da tela que sobrava nas quatro caixas antigas
-- **Sidebar reorganizada em 5 grupos por capacidade do projeto** — PROJETO, CÓDIGO, EXECUÇÃO, REDE, DADOS — escondendo automaticamente módulos que não fazem sentido no projeto aberto (ex.: Kubernetes sem manifest no repo); substitui o esquema fixo de 6 grupos da 1.6.2
-- **Git: log de comandos e stashes viram gaveta sob demanda** em vez de duas caixas fixas no rodapé da tela principal (a saída de um `git pull` é um evento pontual, não um painel permanente)
-- Abas Health e Metrics removidas; o sinal delas foi incorporado na faixa de alertas do Overview e nas linhas de status de cada módulo
-- Integração com LazyGit (`L` na aba Git) removida
-- Wizards de túnel (ngrok, SSH, Cloudflare) mostram o comando CLI exato que vão executar, como preview, antes de confirmar
-- README revisado (estrutura, instalação, exemplos de uso) e novas capturas de tela em `docs/images/`
 
 ### Fixed
 - Detecção de processos `cloudflared` não reconhecia binário de release baixado sem renomear (`cloudflared-linux-amd64`)
-- Túneis ngrok/SSH/Cloudflare reiniciados perdiam domain/region e trocavam de URL; os argumentos agora carregam essa configuração entre reinícios
-- `joinWithSpacer` (cabeçalho e régua de várias telas) podia desenhar uma linha mais larga que o terminal quando nome de projeto comprido e vários chips de status não cabiam juntos; agora encolhe o lado esquerdo em vez de estourar a largura
 
 ## [1.6.3] - 2026-08-25
 

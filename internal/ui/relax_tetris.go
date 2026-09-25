@@ -22,6 +22,8 @@ const (
 type relaxTetrisState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo passo de grid
 
 	h    int                        // linhas jogáveis, ajustadas ao palco
 	grid [relaxTetH][relaxTetW]int8 // 0 vazio, senão índice de cor + 1
@@ -162,15 +164,19 @@ func relaxTetSpawn(st *relaxTetrisState) {
 	relaxTetPlan(st)
 }
 
-func stepRelaxTetris(st *relaxTetrisState) {
-	if !st.inited {
-		st.inited = true
-		if st.h == 0 {
-			st.h = relaxTetH
-		}
-		st.next = rand.Intn(7)
-		relaxTetSpawn(st)
+func relaxTetInit(st *relaxTetrisState) {
+	st.inited = true
+	if st.h == 0 {
+		st.h = relaxTetH
 	}
+	st.next = rand.Intn(7)
+	relaxTetSpawn(st)
+}
+
+// relaxTetGridStep é um passo discreto do jogo (100ms). Tetris é grade: a queda
+// e o travamento são discretos por natureza, então isto NÃO é sub-dividido —
+// roda inteiro a cada 100ms de tempo real.
+func relaxTetGridStep(st *relaxTetrisState) {
 	st.tick++
 
 	if st.wipe > 0 { // tabuleiro sumindo de baixo pra cima
@@ -251,6 +257,27 @@ func stepRelaxTetris(st *relaxTetrisState) {
 	st.clearT = 0
 }
 
+// relaxTetAdvance anda o relógio por `d` ticks (1.0 = passo de 100ms) e dá um
+// passo de grid a cada tick cheio acumulado. A grade continua discreta: o
+// sub-relógio só existe pra o render dirigir o tempo de forma consistente com
+// as outras cenas — a cadência de queda/travamento fica idêntica.
+func relaxTetAdvance(st *relaxTetrisState, d float64) {
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxTetGridStep(st)
+	}
+}
+
+// stepRelaxTetris é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxTetrisFrames.
+func stepRelaxTetris(st *relaxTetrisState) {
+	if !st.inited {
+		relaxTetInit(st)
+	}
+	relaxTetGridStep(st)
+}
+
 func relaxTetCollapse(st *relaxTetrisState) {
 	for _, row := range st.clearing {
 		for y := row; y > 0; y-- {
@@ -292,14 +319,19 @@ func relaxTetGhostY(st *relaxTetrisState) int {
 	return y
 }
 
-func relaxTetrisFrames(st *relaxTetrisState, width, height int, fade float64) ([]string, string) {
+func relaxTetrisFrames(st *relaxTetrisState, width, height int, fade, now float64) ([]string, string) {
 	w := maxInt(24, minInt(width, 110))
 	h := maxInt(8, minInt(height, 30))
 	// Duas linhas de célula para a moldura, e cada linha do tabuleiro ocupa
 	// relaxTetBH subpixels.
 	relaxTetResize(st, (h*4-2*relaxTetBH)/relaxTetBH)
 	if !st.inited {
-		stepRelaxTetris(st)
+		relaxTetInit(st)
+	}
+	// O grid anda pelo relógio de render: o sub-relógio conta o tempo real e um
+	// passo de grade dispara a cada 100ms acumulados — mesma cadência de queda.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxTetAdvance(st, relaxSubDT/0.1)
 	}
 	b := newRelaxBrailleVote(w, h)
 

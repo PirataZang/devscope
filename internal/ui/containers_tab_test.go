@@ -215,7 +215,7 @@ func TestContainersBottomSurvivesDirtyDockerLogs(t *testing.T) {
 			"/home/igor/Área de trabalho/projetos/digiliza-chat-v2/cache",
 		},
 	}
-	bottom := a.renderContainersBottom(100, 10)
+	bottom := a.renderContainersBottom(100, 20)
 	if w := lipgloss.Width(bottom); w > 102 {
 		t.Fatalf("bottom width %d exceeds pane (dirty docker output leaked)", w)
 	}
@@ -502,33 +502,31 @@ func containersFixture(n int) []core.Container {
 	return out
 }
 
-// A lista PEDE o que precisa. Antes a divisão era fixa em 66/34 e sete
-// containers deixavam dez linhas em branco dentro da caixa LISTA.
-func TestContainerSplitGivesListWhatItNeeds(t *testing.T) {
-	const bodyH = 30
-	small, smallDetail := containerSplitHeight(bodyH, 5)
-	if small > 5+4 {
-		t.Fatalf("com 5 containers a lista não deveria passar de %d linhas, pegou %d", 5+4, small)
+// O rodapé (DETALHE + LOGS) tem altura FIXA; a lista fica com TODO o resto e
+// rola quando não cabe. A contagem de containers não muda a divisão.
+func TestContainerSplitFixedFooterListTakesRest(t *testing.T) {
+	const fixedFooter = containerDetailBoxH + containerLogsBoxH
+	// Em terminal folgado, o rodapé é fixo independentemente da contagem.
+	for _, count := range []int{2, 5, 40} {
+		tb, bottom := containerSplitHeight(40, count)
+		if bottom != fixedFooter {
+			t.Fatalf("count=%d: rodapé devia ser fixo %d, veio %d", count, fixedFooter, bottom)
+		}
+		if tb+bottom != 40 {
+			t.Fatalf("count=%d: soma tem de fechar: %d+%d != 40", count, tb, bottom)
+		}
 	}
-	if small+smallDetail != bodyH {
-		t.Fatalf("a soma tem de fechar a altura: %d+%d != %d", small, smallDetail, bodyH)
-	}
-	// Muitos containers: a lista cresce, o detalhe cede até o piso.
-	big, bigDetail := containerSplitHeight(bodyH, 40)
+	// Terminal maior: a lista é que cresce (o rodapé continua fixo).
+	small, _ := containerSplitHeight(30, 5)
+	big, _ := containerSplitHeight(60, 5)
 	if big <= small {
-		t.Fatalf("com 40 containers a lista deveria crescer (%d → %d)", small, big)
+		t.Fatalf("a lista deveria crescer com o terminal (%d → %d)", small, big)
 	}
-	if bigDetail < 9 {
-		t.Fatalf("o detalhe não pode cair abaixo do piso legível: %d", bigDetail)
-	}
-	if big+bigDetail != bodyH {
-		t.Fatalf("a soma tem de fechar a altura: %d+%d != %d", big, bigDetail, bodyH)
-	}
-	// Terminal curto: os dois ainda existem.
+	// Terminal curto: os dois ainda existem e a soma fecha.
 	for _, h := range []int{12, 14, 16, 20, 24, 40, 60} {
 		tb, dt := containerSplitHeight(h, 30)
-		if tb < 6 || dt < 5 || tb+dt != h {
-			t.Fatalf("altura %d: lista=%d detalhe=%d", h, tb, dt)
+		if tb < 6 || dt < 6 || tb+dt != h {
+			t.Fatalf("altura %d: lista=%d rodapé=%d", h, tb, dt)
 		}
 	}
 }
@@ -634,8 +632,8 @@ func TestContainerDetailHeadIsStable(t *testing.T) {
 		}
 		for _, w := range []int{40, 60, 80, 100, 120, 160, 200} {
 			head := a.containerDetailHeadLines(w)
-			if len(head) != 4 {
-				t.Fatalf("sel=%v w=%d: detalhe com %d linhas, esperado 4", sel, w, len(head))
+			if len(head) != 5 {
+				t.Fatalf("sel=%v w=%d: detalhe com %d linhas, esperado 5", sel, w, len(head))
 			}
 			for i, l := range head {
 				if lipgloss.Width(l) > w {

@@ -178,7 +178,8 @@ func (a *App) needsAnim() bool {
 	if a.view == ViewRelax {
 		return true
 	}
-	if a.gitBranchLoading || a.gitCommitFilesLoading || a.gitActionLoading || a.gitCommitDiffLoading ||
+	if a.composeRunning ||
+		a.gitBranchLoading || a.gitCommitFilesLoading || a.gitActionLoading || a.gitCommitDiffLoading ||
 		a.dockerAddLoading || a.dockerAddDetailsLoading || a.dockerAddTagsLoading ||
 		a.containerDetailLoading || a.apiLoading || a.dbLoading || a.dbSchemaLoading ||
 		a.k8sLoading || a.swarmLoading || a.routesLoading ||

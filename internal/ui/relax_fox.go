@@ -326,6 +326,8 @@ type relaxFxBlade struct {
 type relaxFoxState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo tick cheio
 	flies  []relaxFxBug
 	blades []relaxFxBlade
 	stars  []relaxSkyPt
@@ -385,29 +387,30 @@ func relaxFxNewBlade(front bool) relaxFxBlade {
 	return b
 }
 
-func stepRelaxFox(st *relaxFoxState) {
-	if !st.inited {
-		st.inited = true
-		st.headX, st.headY, st.pawX = 0.5, 0.5, 0.5
-		st.nextPlay = 60 + rand.Intn(140)
-		for i, n := 0, 14+rand.Intn(6); i < n; i++ {
-			st.flies = append(st.flies, relaxFxNewFly())
-		}
-		for i, n := 0, 44+rand.Intn(22); i < n; i++ {
-			st.stars = append(st.stars, relaxSkyPt{x: rand.Float64(), y: rand.Float64() * 0.55})
-		}
-		for i := range st.hills {
-			st.hills[i] = rand.Float64() * 2 * math.Pi
-		}
-		for i := 0; i < relaxFxBladeN; i++ {
-			st.blades = append(st.blades, relaxFxNewBlade(i%5 < 2))
-		}
+func relaxFxInit(st *relaxFoxState) {
+	st.inited = true
+	st.headX, st.headY, st.pawX = 0.5, 0.5, 0.5
+	st.nextPlay = 60 + rand.Intn(140)
+	for i, n := 0, 14+rand.Intn(6); i < n; i++ {
+		st.flies = append(st.flies, relaxFxNewFly())
 	}
-	st.tick++
+	for i, n := 0, 44+rand.Intn(22); i < n; i++ {
+		st.stars = append(st.stars, relaxSkyPt{x: rand.Float64(), y: rand.Float64() * 0.55})
+	}
+	for i := range st.hills {
+		st.hills[i] = rand.Float64() * 2 * math.Pi
+	}
+	for i := 0; i < relaxFxBladeN; i++ {
+		st.blades = append(st.blades, relaxFxNewBlade(i%5 < 2))
+	}
+}
 
-	st.tailPh += 0.052
+// relaxFxDiscreteTick roda os eventos de passo cheio (100ms): contador de tick
+// e a máquina da brincadeira (contadores play/nextPlay com sorteios). Ficam
+// fora do sub-passo pra manter a MESMA cadência de brincadeiras por segundo.
+func relaxFxDiscreteTick(st *relaxFoxState) {
+	st.tick++
 	if st.play > 0 {
-		st.tailPh += 0.09
 		if st.play--; st.play == 0 {
 			st.nextPlay = 110 + rand.Intn(170)
 		}
@@ -415,11 +418,29 @@ func stepRelaxFox(st *relaxFoxState) {
 		st.playDur = 24 + rand.Intn(14)
 		st.play = st.playDur
 	}
+}
+
+// relaxFxAdvance anda a simulação por `k` ticks (1.0 = passo de 100ms),
+// fracionário. Os eventos discretos (brincadeira, tick) disparam uma vez por
+// tick cheio via acumulador; o resto — fase da cauda, vaga-lumes e o ruído que
+// os leva — integra escalado por `k`. A cauda ganha um extra quando a raposa
+// brinca (play > 0), igual ao passo cheio original.
+func relaxFxAdvance(st *relaxFoxState, k float64) {
+	st.subAcc += k
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxFxDiscreteTick(st)
+	}
+
+	st.tailPh += 0.052 * k
+	if st.play > 0 {
+		st.tailPh += 0.09 * k
+	}
 
 	for i := range st.flies {
 		f := &st.flies[i]
-		f.ph += 0.035
-		f.blink += f.rate
+		f.ph += 0.035 * k
+		f.blink += f.rate * k
 		// Acende e apaga com pausa apagado no meio — daí o max(0, sin). Ao
 		// quadrado porque brasa acende devagar e some rápido; seno puro pisca
 		// feito LED.
@@ -427,8 +448,8 @@ func stepRelaxFox(st *relaxFoxState) {
 		f.glow = g * g
 		// Vagar por ruído contínuo: com seno o bicho anda em figura de
 		// Lissajous, que é bonito e nada parecido com um vaga-lume.
-		f.x += f.vx + relaxNoise(f.ph*0.7, f.seed)*0.0024
-		f.y += f.vy + relaxNoise(f.ph*0.55, f.seed+77)*0.0016
+		f.x += (f.vx + relaxNoise(f.ph*0.7, f.seed)*0.0024) * k
+		f.y += (f.vy + relaxNoise(f.ph*0.55, f.seed+77)*0.0016) * k
 		if f.x < -0.04 || f.x > 1.04 || f.y < 0.30 || f.y > 0.96 {
 			*f = relaxFxNewFly()
 			f.x = math.Mod(f.x+0.5, 1)
@@ -447,14 +468,26 @@ func stepRelaxFox(st *relaxFoxState) {
 	}
 }
 
+func stepRelaxFox(st *relaxFoxState) {
+	if !st.inited {
+		relaxFxInit(st)
+	}
+	relaxFxAdvance(st, 1)
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 
-func relaxFoxFrames(st *relaxFoxState, width, height int, fade float64) ([]string, string) {
+func relaxFoxFrames(st *relaxFoxState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxFox(st)
+		relaxFxInit(st)
+	}
+	// Vaga-lumes e capim andam pelo relógio de render: sub-passos por tempo
+	// real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxFxAdvance(st, relaxSubDT/0.1)
 	}
 	b := newRelaxBrailleVote(maxInt(14, minInt(width, 120)), maxInt(5, minInt(height, 34)))
-	relaxFoxScene(st, b)
+	relaxFoxScene(st, b, now)
 
 	status := "o rabo dela balança devagar"
 	switch {
@@ -473,11 +506,11 @@ func relaxFoxFrames(st *relaxFoxState, width, height int, fade float64) ([]strin
 // relaxFoxScene desenha o quadro inteiro. Ordem da FRENTE pro FUNDO, porque
 // b.set respeita o primeiro que acendeu o subponto — inverter isso é o mesmo
 // que apagar o que está na frente.
-func relaxFoxScene(st *relaxFoxState, b *relaxBraille) {
+func relaxFoxScene(st *relaxFoxState, b *relaxBraille, now float64) {
 	w, h := b.w, b.h
 	sw, sh := w*2, h*4
 	hy := int(float64(sh) * relaxFxGround)
-	t := float64(st.tick) * 0.1
+	t := now
 	// Palco menor pede menos gente nele: a conta mantém a densidade em vez do
 	// número, senão o terminal apertado vira sopa de pontos.
 	dens := clamp01(float64(sw) / 220)
@@ -705,6 +738,22 @@ func relaxFxDrawFlies(b *relaxBraille, st *relaxFoxState, sw, sh int, dens float
 					b.paint(x/2, y/4, lvl)
 				}
 			}
+		}
+		// O ponto de luz no miolo: um glifo que cresce com o brilho — brasa
+		// fraca é '·', acesa é '•', no auge um '✦'. O Braille não faz um ponto
+		// tão nítido, e o nível vem da paleta do vaga-lume, então o fade segue.
+		glyph := ""
+		switch {
+		case f.glow > 0.80:
+			glyph = "✦"
+		case f.glow > 0.45:
+			glyph = "•"
+		case f.glow > 0.20:
+			glyph = "·"
+		}
+		if glyph != "" {
+			lvl := relaxFxFly + minInt(int(f.glow*float64(relaxFxFlyN)), relaxFxFlyN-1)
+			b.text(int(cx)/2, int(cy)/4, glyph, lvl)
 		}
 	}
 }

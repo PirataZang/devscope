@@ -111,6 +111,11 @@ func ComposeUp(projectPath string) error {
 	return runCompose(projectPath, "up", "-d")
 }
 
+// ComposeBuild reconstrói as imagens e sobe: `docker compose up -d --build`.
+func ComposeBuild(projectPath string) error {
+	return runCompose(projectPath, "up", "-d", "--build")
+}
+
 func ComposeDown(projectPath string) error {
 	return runCompose(projectPath, "down")
 }

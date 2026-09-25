@@ -231,7 +231,7 @@ func (p relaxPen) ring(cx, cy, r, th float64, tone int) {
 type relaxJpReel struct {
 	pos, vel float64
 	from, to float64
-	dur      int
+	dur      float64
 	stopped  bool
 }
 
@@ -244,7 +244,7 @@ func relaxJpSettle(u float64) float64 {
 	return 0.26 * math.Sin(math.Pi*clamp01((u-0.78)/0.22))
 }
 
-func (r *relaxJpReel) launch(sym int8, dur int, rng *rand.Rand) {
+func (r *relaxJpReel) launch(sym int8, dur float64, rng *rand.Rand) {
 	r.from, r.dur, r.stopped = r.pos, dur, false
 	turns := 15.0 + rng.Float64()*4
 	to := math.Ceil(r.pos + turns)
@@ -254,8 +254,8 @@ func (r *relaxJpReel) launch(sym int8, dur int, rng *rand.Rand) {
 	r.to = to
 }
 
-func (r *relaxJpReel) step(t int) {
-	u := clamp01(float64(t) / float64(maxInt(1, r.dur)))
+func (r *relaxJpReel) step(t float64) {
+	u := clamp01(t / math.Max(1, r.dur))
 	p := r.from + (r.to-r.from)*relaxJpBrake(u) + relaxJpSettle(u)
 	r.vel, r.pos = p-r.pos, p
 	r.stopped = t >= r.dur
@@ -300,10 +300,11 @@ const (
 type relaxJackpotState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
 	rng    *rand.Rand
 
 	phase  int8
-	t      int
+	t      float64
 	result [3]int8
 	reel   [3]relaxJpReel
 	parts  []relaxJpPart
@@ -312,18 +313,28 @@ type relaxJackpotState struct {
 	shock float64 // raio da onda de choque, em fração da tela
 	laugh int     // quantos "HA" já entraram
 	won   int8    // símbolo da trinca, -1 quando não houve
+
+	// Carry fracionário do spawn de partículas. Sub-passar spawna menos por
+	// quadro, então a fração que sobra fica guardada aqui pra a taxa média por
+	// segundo bater com a do passo cheio.
+	spawnAcc [5]float64
 }
 
-func stepRelaxJackpot(st *relaxJackpotState) {
-	if !st.inited {
-		st.inited = true
-		// Semente do gerador global: cada entrada na cena é um sorteio novo,
-		// mas o gerador da cena é próprio, e é ele que o teste substitui.
-		st.rng = rand.New(rand.NewSource(rand.Int63()))
-		relaxJpNewSpin(st)
-	}
-	st.tick++
-	st.t++
+func relaxJpInit(st *relaxJackpotState) {
+	st.inited = true
+	// Semente do gerador global: cada entrada na cena é um sorteio novo,
+	// mas o gerador da cena é próprio, e é ele que o teste substitui.
+	st.rng = rand.New(rand.NewSource(rand.Int63()))
+	relaxJpNewSpin(st)
+}
+
+// relaxJpAdvance anda a máquina por `d` ticks (1 = passo de 100ms). Fracionário
+// pro frame de render dar sub-passos e o rolo/chuva correrem a 30fps sem mudar
+// duração de fase nem taxa de spawn. k = d é o fator que escala toda integração
+// por-tick: somas lineares (posição, velocidade) ficam idênticas depois de
+// 100ms e as quadráticas, mais precisas.
+func relaxJpAdvance(st *relaxJackpotState, d float64) {
+	st.t += d
 
 	switch st.phase {
 	case jpPhaseSpin:
@@ -344,10 +355,11 @@ func stepRelaxJackpot(st *relaxJackpotState) {
 			st.phase, st.t = jpPhaseShow, 0
 			st.flash, st.shock, st.laugh = 0, 0, 0
 			st.parts = st.parts[:0]
+			st.spawnAcc = [5]float64{}
 		}
 	case jpPhaseShow:
-		relaxJpShowStep(st)
-		if st.t >= relaxJpShowDur(st.won) {
+		relaxJpShowStep(st, d)
+		if st.t >= float64(relaxJpShowDur(st.won)) {
 			st.phase, st.t = jpPhaseRest, 0
 		}
 	default:
@@ -355,7 +367,17 @@ func stepRelaxJackpot(st *relaxJackpotState) {
 			relaxJpNewSpin(st)
 		}
 	}
-	relaxJpStepParts(st)
+	relaxJpStepParts(st, d)
+}
+
+// stepRelaxJackpot é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxJackpotFrames.
+func stepRelaxJackpot(st *relaxJackpotState) {
+	if !st.inited {
+		relaxJpInit(st)
+	}
+	st.tick++
+	relaxJpAdvance(st, 1)
 }
 
 func relaxJpNewSpin(st *relaxJackpotState) {
@@ -363,10 +385,11 @@ func relaxJpNewSpin(st *relaxJackpotState) {
 	st.phase, st.t, st.won = jpPhaseSpin, 0, -1
 	st.parts = st.parts[:0]
 	st.flash, st.shock, st.laugh = 0, 0, 0
+	st.spawnAcc = [5]float64{}
 	for i := range st.reel {
 		// Paradas escalonadas: a primeira para, a segunda ainda gira, a
 		// terceira segura o resultado. É o escalonamento que dá suspense.
-		st.reel[i].launch(st.result[i], 30+i*8+st.rng.Intn(4), st.rng)
+		st.reel[i].launch(st.result[i], float64(30+i*8+st.rng.Intn(4)), st.rng)
 	}
 }
 
@@ -416,19 +439,22 @@ func relaxJpFall(st *relaxJackpotState, kind int8, sw float64) relaxJpPart {
 	return p
 }
 
-func relaxJpStepParts(st *relaxJackpotState) {
+func relaxJpStepParts(st *relaxJackpotState, d float64) {
 	live := st.parts[:0]
 	for _, p := range st.parts {
-		p.vy += 0.16
+		p.vy += 0.16 * d
 		if p.drag > 0 {
-			p.vx *= p.drag
-			p.vy *= p.drag
+			// Arrasto é multiplicativo por tick; em sub-passo vira potência de d
+			// pra o mesmo fator sobrar depois de 100ms.
+			dr := math.Pow(p.drag, d)
+			p.vx *= dr
+			p.vy *= dr
 		}
-		p.x += p.vx
-		p.y += p.vy
-		p.spin += p.spv
+		p.x += p.vx * d
+		p.y += p.vy * d
+		p.spin += p.spv * d
 		if p.kind == jpPartSpark {
-			p.life -= 0.045
+			p.life -= 0.045 * d
 		}
 		// Some quem já passou do palco mais alto que faz sentido: a simulação
 		// não conhece a altura do terminal, e sem esse teto a chuva do jackpot
@@ -442,20 +468,32 @@ func relaxJpStepParts(st *relaxJackpotState) {
 
 // ── Passo de cada prêmio ──────────────────────────────────────────────────────
 
-func relaxJpShowStep(st *relaxJackpotState) {
+func relaxJpShowStep(st *relaxJackpotState, d float64) {
 	// A largura em subpontos só é conhecida no render; 240 é a referência do
 	// palco largo, e o render reescala. Guardar a largura no estado acoplaria
 	// a simulação ao tamanho do terminal.
 	const ref = 240.0
-	spawn := func(kind int8, n int) {
-		for i := 0; i < n && len(st.parts) < 900; i++ {
-			st.parts = append(st.parts, relaxJpFall(st, kind, ref))
+	// spawn acumula uma taxa por tick e só materializa unidades inteiras: em
+	// sub-passo (d<1) spawna menos por quadro, mas a média por segundo bate com
+	// a do passo cheio porque a fração sobra em spawnAcc.
+	spawn := func(kind int8, ratePerTick float64) {
+		st.spawnAcc[kind] += ratePerTick * d
+		for st.spawnAcc[kind] >= 1 {
+			st.spawnAcc[kind]--
+			if len(st.parts) < 900 {
+				st.parts = append(st.parts, relaxJpFall(st, kind, ref))
+			}
 		}
 	}
+	// crossed diz se st.t passou por thr neste passo (dispara evento único,
+	// independente do tamanho do sub-passo).
+	prevT := st.t - d
+	crossed := func(thr float64) bool { return prevT < thr && st.t >= thr }
+
 	switch st.won {
 	case jpCherry:
-		if st.t < 30 && st.tick%2 == 0 {
-			spawn(jpPartCherry, 2)
+		if st.t < 30 {
+			spawn(jpPartCherry, 1) // era 2 a cada 2 ticks → média 1/tick
 		}
 	case jpCoin:
 		if st.t < 32 {
@@ -466,15 +504,13 @@ func relaxJpShowStep(st *relaxJackpotState) {
 		if st.t < 52 {
 			spawn(jpPartCard, 2)
 			spawn(jpPartChip, 3)
-			if st.tick%3 == 0 {
-				spawn(jpPartCoin, 2)
-			}
+			spawn(jpPartCoin, 2.0/3) // era 2 a cada 3 ticks
 		}
 	case jpTNT:
-		switch {
-		case st.t == 6:
+		if crossed(6) {
 			st.flash = 1
-		case st.t == 8:
+		}
+		if crossed(8) {
 			// Estouro: tudo sai do centro com arrasto, então as partículas
 			// desaceleram como se o ar segurasse — explosão sem arrasto vira
 			// chuva de meteoro.
@@ -488,21 +524,27 @@ func relaxJpShowStep(st *relaxJackpotState) {
 				})
 			}
 		}
-		st.flash *= 0.72
+		st.flash *= math.Pow(0.72, d)
 		if st.t >= 8 {
-			st.shock = float64(st.t-8) * 0.055
+			st.shock = (st.t - 8) * 0.055
 		}
 	case jpBanana:
 		// HA, HAHA, HAHAHA: entra de dois em dois.
-		st.laugh = minInt(3, 1+st.t/9)
+		st.laugh = minInt(3, 1+int(st.t)/9)
 	}
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
-func relaxJackpotFrames(st *relaxJackpotState, width, height int, fade float64) ([]string, string) {
+func relaxJackpotFrames(st *relaxJackpotState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxJackpot(st)
+		relaxJpInit(st)
+	}
+	// A máquina anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	// Depois de 100ms o estado é o mesmo do passo cheio, mas houve ~3x mais
+	// quadros de movimento — rolo e chuva ficam fluidos sem mudar o ritmo.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxJpAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(18, minInt(width, 110))
 	h := maxInt(7, minInt(height, 30))
@@ -713,7 +755,7 @@ func relaxJpLaugh(st *relaxJackpotState, b *relaxBraille, sw, sh int, free func(
 	if len(word) == 0 {
 		return
 	}
-	u := float64(st.t) / float64(relaxJpShowDur(jpBanana))
+	u := st.t / float64(relaxJpShowDur(jpBanana))
 	// Nasce, firma e some. O teto de meia densidade é o que separa presença de
 	// fundo de recado na tela: sólido, o HAHAHA vira legenda e engole a máquina.
 	alpha := clamp01(math.Sin(u*math.Pi)*1.6) * 0.52

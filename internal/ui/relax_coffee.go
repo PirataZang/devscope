@@ -70,8 +70,10 @@ type relaxCoffeeRipple struct {
 type relaxCoffeeState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo evento discreto
 	phase  relaxCoffeePhase
-	t      int
+	t      float64 // tempo na fase, em ticks (fracionário pro sub-passo)
 	dur    int
 
 	level  float64 // 0 vazia · 1 cheia
@@ -119,17 +121,22 @@ func relaxCoffeeNext(st *relaxCoffeeState) {
 	}
 }
 
-func stepRelaxCoffee(st *relaxCoffeeState) {
-	if !st.inited {
-		st.inited = true
-		for i := range st.seed {
-			st.seed[i] = rand.Float64() * 10
-		}
-		st.phase, st.dur, st.potX = coffeeEmpty, relaxCoffeeDur(coffeeEmpty), relaxPotAway
+func relaxCoffeeInit(st *relaxCoffeeState) {
+	st.inited = true
+	for i := range st.seed {
+		st.seed[i] = rand.Float64() * 10
 	}
+	st.phase, st.dur, st.potX = coffeeEmpty, relaxCoffeeDur(coffeeEmpty), relaxPotAway
+}
+
+// relaxCoffeeDiscreteTick roda os eventos que só valem em passo cheio de 100ms:
+// contador de tick, a máquina de fases, os goles e o disparo de ondas/gota.
+// Ficam fora do sub-passo pra manter o MESMO ritmo (goles por segundo, ondas
+// por segundo) do passo original de simulação.
+func relaxCoffeeDiscreteTick(st *relaxCoffeeState) {
 	st.tick++
 	st.t++
-	p := float64(st.t) / float64(maxInt(1, st.dur))
+	p := st.t / float64(maxInt(1, st.dur))
 
 	switch st.phase {
 	case coffeeEmpty:
@@ -147,7 +154,7 @@ func stepRelaxCoffee(st *relaxCoffeeState) {
 		st.heat = 1
 	case coffeePotOut:
 		// A última gota: sai do bico quando ele começa a levantar.
-		if st.t == 2 {
+		if int(st.t) == 2 {
 			st.dropY, st.dropV = 0, 0
 		}
 		st.tilt = relaxPotTilt * (1 - easeInOut(clamp01(p/0.4)))
@@ -164,17 +171,31 @@ func stepRelaxCoffee(st *relaxCoffeeState) {
 				st.ripples = append(st.ripples, relaxCoffeeRipple{x: 0, amp: 1.3})
 				st.sipWait = 26 + rand.Intn(26)
 			}
-		} else if st.t > st.dur/2 {
+		} else if st.t > float64(st.dur)/2 {
 			st.target = 0
 		}
 	}
-	if st.t >= st.dur && !(st.phase == coffeeSip && st.level > 0.02) {
+	if st.t >= float64(st.dur) && !(st.phase == coffeeSip && st.level > 0.02) {
 		relaxCoffeeNext(st)
 	}
+}
 
-	st.level = smoothDamp(st.level, st.target, 0.22, 0.1)
-	st.heat = math.Max(st.heat*0.9955, st.level*0.35)
-	st.foam *= 0.982
+// relaxCoffeeAdvance anda a simulação por `d` ticks (1.0 = passo de 100ms),
+// fracionário. Os eventos discretos disparam uma vez por tick cheio via
+// acumulador; a física contínua (nível, calor, espuma, gota, ondas) integra
+// escalada por `d` — somas lineares × d, decaimentos multiplicativos elevados
+// a d.
+func relaxCoffeeAdvance(st *relaxCoffeeState, d float64) {
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxCoffeeDiscreteTick(st)
+	}
+
+	// ── Física contínua ──
+	st.level = smoothDamp(st.level, st.target, 0.22, 0.1*d)
+	st.heat = math.Max(st.heat*math.Pow(0.9955, d), st.level*0.35)
+	st.foam *= math.Pow(0.982, d)
 	// A marca de maré: sobe com o café e nunca desce sozinha — só some quando
 	// a xícara é servida de novo.
 	if st.level > st.stain {
@@ -184,8 +205,8 @@ func stepRelaxCoffee(st *relaxCoffeeState) {
 		st.stain = st.level
 	}
 	if st.dropY >= 0 {
-		st.dropV += 0.16
-		st.dropY += st.dropV
+		st.dropV += 0.16 * d
+		st.dropY += st.dropV * d
 		if st.dropY > 22 {
 			st.dropY = -1
 			st.ripples = append(st.ripples, relaxCoffeeRipple{amp: 0.6})
@@ -194,8 +215,8 @@ func stepRelaxCoffee(st *relaxCoffeeState) {
 
 	keep := st.ripples[:0]
 	for _, r := range st.ripples {
-		r.r += 0.55
-		r.amp *= 0.88
+		r.r += 0.55 * d
+		r.amp *= math.Pow(0.88, d)
 		if r.amp > 0.05 {
 			keep = append(keep, r)
 		}
@@ -203,14 +224,27 @@ func stepRelaxCoffee(st *relaxCoffeeState) {
 	st.ripples = keep
 }
 
-func relaxCoffeeFrames(st *relaxCoffeeState, width, height int, fade float64) ([]string, string) {
+// stepRelaxCoffee é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxCoffeeFrames.
+func stepRelaxCoffee(st *relaxCoffeeState) {
 	if !st.inited {
-		stepRelaxCoffee(st)
+		relaxCoffeeInit(st)
+	}
+	relaxCoffeeAdvance(st, 1)
+}
+
+func relaxCoffeeFrames(st *relaxCoffeeState, width, height int, fade, now float64) ([]string, string) {
+	if !st.inited {
+		relaxCoffeeInit(st)
+	}
+	// A cena anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxCoffeeAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 100))
 	h := maxInt(8, minInt(height, 28))
 	b := newRelaxBrailleVote(w, h)
-	relaxCoffeeDraw(st, b, w, h)
+	relaxCoffeeDraw(st, b, w, h, now)
 
 	status := "a xícara está vazia"
 	switch st.phase {
@@ -226,14 +260,14 @@ func relaxCoffeeFrames(st *relaxCoffeeState, width, height int, fade float64) ([
 	return b.lines(relaxStyles(relaxCoffeeRamp, fade)), StyleMuted.Render(status)
 }
 
-func relaxCoffeeDraw(st *relaxCoffeeState, b *relaxBraille, w, h int) {
+func relaxCoffeeDraw(st *relaxCoffeeState, b *relaxBraille, w, h int, now float64) {
 	sw, sh := float64(w*2), float64(h*4)
 	sc := math.Min(sw/68, sh/40)
 	ox, oy := (sw-68*sc)/2, (sh-40*sc)/2
 	X := func(v float64) float64 { return ox + v*sc }
 	Y := func(v float64) float64 { return oy + v*sc }
 	L := func(v float64) float64 { return v * sc }
-	t := float64(st.tick) * 0.1
+	t := now
 
 	// Vista de cima: a boca é quase um círculo achatado, o pires é bem maior.
 	const (
@@ -291,6 +325,15 @@ func relaxCoffeeDraw(st *relaxCoffeeState, b *relaxBraille, w, h int) {
 						b.set(ix, iy, relaxSteam+minInt(int(v*float64(relaxSteamLvls)), relaxSteamLvls-1))
 					}
 				}
+			}
+			// Um floco de vapor no alto de cada fio: detalhe que o Braille não
+			// desenha bem. Sobe com o tempo e some perto do topo, pontual.
+			if st.heat > 0.28 {
+				s := math.Mod(t*0.22+st.seed[i], 1)
+				gx := int(x0+L(2.0)*s*math.Sin(ph*0.31)+L(1.0+4.6*s*s)*math.Sin(s*3.4+ph)) / 2
+				gy := int(Y(surfY)-L(1.5)-s*L(15)) / 4
+				glyph := []string{"°", "∼", "˘"}[int(st.seed[i]*3+t*0.7)%3]
+				b.text(gx, gy, glyph, relaxSteam+minInt(int(st.heat*(1-s)*float64(relaxSteamLvls)), relaxSteamLvls-1))
 			}
 		}
 	}

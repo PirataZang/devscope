@@ -84,8 +84,8 @@ func TestOpenApiWithPreset(t *testing.T) {
 	if a.apiAuthToken != "tok" {
 		t.Fatal("auth should be preserved")
 	}
-	if a.apiBlock != apiBlockURL {
-		t.Fatalf("block=%v", a.apiBlock)
+	if a.apiFocus != apiFocusURL {
+		t.Fatalf("foco=%v", a.apiFocus)
 	}
 }
 

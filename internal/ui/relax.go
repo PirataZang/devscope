@@ -29,15 +29,14 @@ const (
 	relaxGameCoffee
 	relaxGameSea
 	relaxGameBurst
-	relaxGameCity
 	relaxGameFox
-	relaxGameFireworks
 	relaxGameTetris
 	relaxGameSword
 	relaxGameHourglass
-	relaxGameChess
 	relaxGameJackpot
 	relaxGameV4
+	relaxGameDragon
+	relaxGameSmoke
 )
 
 // relaxScene descreve uma cena: rótulo, passo de simulação e render. Tabela em
@@ -53,184 +52,193 @@ type relaxScene struct {
 }
 
 var relaxScenes = []relaxScene{
+	// O cubo anda pelo relógio de render (frames), não pelo passo fixo: yaw/pit
+	// e o giro de camada avançam por tempo real, fluidos nos ~30fps. O step fica
+	// vazio de propósito — toda a simulação está em relaxCubeFrames via now.
 	relaxGameCube: {
 		name: "Magic Cube", glyph: "▧", subtitle: "embaralha e desfaz, girando no ar", color: ColorWarning,
-		step: func(a *App) { stepRelaxCube(&a.relaxCube) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxCubeFrames(&a.relaxCube, w, h, f)
+			return relaxCubeFrames(&a.relaxCube, w, h, f, a.relaxEng.sceneTime())
 		},
 	},
 	relaxGameAsteroid: {
 		name: "Asteroids", glyph: "➤", subtitle: "uma nave à deriva no espaço", color: ColorAccent,
-		step:    func(a *App) { stepRelaxAsteroid(&a.relaxAst) },
-		frames:  func(a *App, w, h int, f float64) ([]string, string) { return relaxAsteroidFrames(&a.relaxAst, w, h, f) },
+		step: func(a *App) {},
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxAsteroidFrames(&a.relaxAst, w, h, f, a.relaxEng.sceneTime())
+		},
 		objects: func(a *App) int { return len(a.relaxAst.rocks) + len(a.relaxAst.shots) + len(a.relaxAst.parts) },
 	},
 	relaxGameCat: {
 		name: "Cat", glyph: "≽", subtitle: "gatinho tirando um cochilo", color: ColorPink,
-		step:    func(a *App) { stepRelaxCat(&a.relaxCat) },
-		frames:  func(a *App, w, h int, f float64) ([]string, string) { return relaxCatFrames(&a.relaxCat, w, h, f) },
+		step: func(a *App) {},
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxCatFrames(&a.relaxCat, w, h, f, a.relaxEng.sceneTime())
+		},
 		objects: func(a *App) int { return len(a.relaxCat.zzz) },
 	},
 	relaxGameSky: {
 		name: "Starfield", glyph: "✦", subtitle: "céu noturno, cometas raros", color: ColorHighlight,
-		step:    func(a *App) { stepRelaxSky(&a.relaxSky) },
-		frames:  func(a *App, w, h int, f float64) ([]string, string) { return relaxSkyFrames(&a.relaxSky, w, h, f) },
+		step: func(a *App) {},
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxSkyFrames(&a.relaxSky, w, h, f, a.relaxEng.sceneTime())
+		},
 		objects: func(a *App) int { return len(a.relaxSky.stars) + len(a.relaxSky.comets) },
 	},
 	relaxGameGalaxy: {
 		name: "Galaxy", glyph: "◎", subtitle: "estrelas orbitando um centro", color: ColorHighlight,
-		step: func(a *App) { stepRelaxGalaxy(&a.relaxGalaxy) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxGalaxyFrames(&a.relaxGalaxy, w, h, f)
+			return relaxGalaxyFrames(&a.relaxGalaxy, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxGalaxy.stars) },
 	},
 	relaxGameNebula: {
 		name: "Nebula", glyph: "❋", subtitle: "gás e poeira de uma estrela por nascer", color: ColorPink,
-		step: func(a *App) { stepRelaxNebula(&a.relaxNeb) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxNebulaFrames(&a.relaxNeb, w, h, f)
+			return relaxNebulaFrames(&a.relaxNeb, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxNeb.stars) + len(a.relaxNeb.young) },
 	},
 	relaxGameBlackHole: {
 		name: "Black Hole", glyph: "◍", subtitle: "um disco caindo pra dentro", color: ColorWarning,
-		step: func(a *App) { stepRelaxBlackHole(&a.relaxBh) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxBlackHoleFrames(&a.relaxBh, w, h, f)
+			return relaxBlackHoleFrames(&a.relaxBh, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxBh.stars) },
 	},
 	relaxGameMoon: {
 		name: "Moon", glyph: "◐", subtitle: "a lua mudando de fase", color: ColorAccent,
-		step:    func(a *App) { stepRelaxMoon(&a.relaxMoon) },
-		frames:  func(a *App, w, h int, f float64) ([]string, string) { return relaxMoonFrames(&a.relaxMoon, w, h, f) },
+		step: func(a *App) {},
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxMoonFrames(&a.relaxMoon, w, h, f, a.relaxEng.sceneTime())
+		},
 		objects: func(a *App) int { return len(a.relaxMoon.stars) + len(a.relaxMoon.spots) },
 	},
 	relaxGameLeaves: {
 		name: "Leaves", glyph: "◟", subtitle: "folhas caindo devagar", color: ColorWarning,
-		step: func(a *App) { stepRelaxFall(&a.relaxLeaves, relaxFallLeaves) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxFallFrames(&a.relaxLeaves, relaxFallLeaves, w, h, f)
+			return relaxFallFrames(&a.relaxLeaves, relaxFallLeaves, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxLeaves.parts) },
 	},
 	relaxGamePetals: {
 		name: "Petals", glyph: "◦", subtitle: "pétalas levadas pelo vento", color: ColorPink,
-		step: func(a *App) { stepRelaxFall(&a.relaxPetals, relaxFallPetals) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxFallFrames(&a.relaxPetals, relaxFallPetals, w, h, f)
+			return relaxFallFrames(&a.relaxPetals, relaxFallPetals, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxPetals.parts) },
 	},
 	relaxGameTree: {
 		name: "Tree", glyph: "⣿", subtitle: "a brisa passando pela copa", color: ColorSuccess,
-		step: func(a *App) { stepRelaxTree(&a.relaxTree) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxTreeFrames(&a.relaxTree, w, h, f)
+			return relaxTreeFrames(&a.relaxTree, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return a.relaxTree.clusters },
 	},
 	relaxGameFire: {
 		name: "Campfire", glyph: "▲", subtitle: "uma fogueira queimando devagar", color: ColorDanger,
-		step: func(a *App) { stepRelaxFire(&a.relaxFire) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxFireFrames(&a.relaxFire, w, h, f)
+			return relaxFireFrames(&a.relaxFire, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxFire.sparks) },
 	},
 	relaxGameCoffee: {
 		name: "Coffee", glyph: "◒", subtitle: "o bule enche, e alguém bebe", color: ColorWarning,
-		step: func(a *App) { stepRelaxCoffee(&a.relaxCoffee) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxCoffeeFrames(&a.relaxCoffee, w, h, f)
+			return relaxCoffeeFrames(&a.relaxCoffee, w, h, f, a.relaxEng.sceneTime())
 		},
 	},
 	relaxGameSea: {
 		name: "Sea", glyph: "≈", subtitle: "nuvens passando, o mar rolando", color: ColorAccent,
-		step: func(a *App) { stepRelaxSea(&a.relaxSea) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxSeaFrames(&a.relaxSea, w, h, f)
+			return relaxSeaFrames(&a.relaxSea, w, h, f, a.relaxEng.sceneTime())
 		},
 	},
 	relaxGameBurst: {
 		name: "Supernova", glyph: "✷", subtitle: "junta energia até não caber mais", color: ColorWarning,
-		step: func(a *App) { stepRelaxBurst(&a.relaxBurst) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxBurstFrames(&a.relaxBurst, w, h, f)
+			return relaxBurstFrames(&a.relaxBurst, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxBurst.parts) },
 	},
-	relaxGameCity: {
-		name: "Night City", glyph: "▥", subtitle: "janelas acendendo e apagando", color: ColorHighlight,
-		step: func(a *App) { stepRelaxCity(&a.relaxCity) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxCityFrames(&a.relaxCity, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxCity.wins) },
-	},
 	relaxGameFox: {
 		name: "Fox", glyph: "⌁", subtitle: "parada, olhando os vaga-lumes", color: ColorWarning,
-		step: func(a *App) { stepRelaxFox(&a.relaxFox) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxFoxFrames(&a.relaxFox, w, h, f)
+			return relaxFoxFrames(&a.relaxFox, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxFox.flies) },
 	},
-	relaxGameFireworks: {
-		name: "Fireworks", glyph: "✺", subtitle: "o céu abrindo em cores", color: ColorPink,
-		step: func(a *App) { stepRelaxFireworks(&a.relaxFw) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxFireworksFrames(&a.relaxFw, w, h, f)
-		},
-		objects: func(a *App) int { return len(a.relaxFw.parts) + len(a.relaxFw.rockets) },
-	},
 	relaxGameTetris: {
 		name: "Tetris", glyph: "▤", subtitle: "jogando sozinho, sem pressa", color: ColorSuccess,
-		step: func(a *App) { stepRelaxTetris(&a.relaxTetris) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxTetrisFrames(&a.relaxTetris, w, h, f)
+			return relaxTetrisFrames(&a.relaxTetris, w, h, f, a.relaxEng.sceneTime())
 		},
 	},
 	relaxGameSword: {
-		name: "Sword", glyph: "†", subtitle: "a espada na pedra, e o vento no capim", color: ColorHighlight,
-		step: func(a *App) { stepRelaxSword(&a.relaxSword) },
+		name: "Planet", glyph: "◍", subtitle: "um mundo sorteado girando no escuro", color: ColorAccent,
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxSwordFrames(&a.relaxSword, w, h, f)
+			return relaxSwordFrames(&a.relaxSword, w, h, f, a.relaxEng.sceneTime())
 		},
-		objects: func(a *App) int { return len(a.relaxSword.leaves) },
+		objects: func(a *App) int { return len(a.relaxSword.spots) + len(a.relaxSword.ast) },
 	},
 	relaxGameHourglass: {
 		name: "Hourglass", glyph: "⧗", subtitle: "a areia é estrela, e vira galáxia", color: ColorHighlight,
-		step: func(a *App) { stepRelaxHourglass(&a.relaxHg) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxHourglassFrames(&a.relaxHg, w, h, f)
+			return relaxHourglassFrames(&a.relaxHg, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxHg.stars) },
 	},
-	relaxGameChess: {
-		name: "Chess", glyph: "♛", subtitle: "uma dama torneada, girando", color: ColorWarning,
-		step: func(a *App) { stepRelaxChess(&a.relaxChess) },
-		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxChessFrames(&a.relaxChess, w, h, f)
-		},
-	},
 	relaxGameJackpot: {
 		name: "Jackpoint", glyph: "▣", subtitle: "três caixas e a sorte", color: ColorWarning,
-		step: func(a *App) { stepRelaxJackpot(&a.relaxJp) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxJackpotFrames(&a.relaxJp, w, h, f)
+			return relaxJackpotFrames(&a.relaxJp, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxJp.parts) },
 	},
 	relaxGameV4: {
 		name: "V4", glyph: "⋁", subtitle: "quatro pistões, corte ao vivo", color: ColorDanger,
-		step: func(a *App) { stepRelaxV4(&a.relaxV4) },
+		step: func(a *App) {},
 		frames: func(a *App, w, h int, f float64) ([]string, string) {
-			return relaxV4Frames(&a.relaxV4, w, h, f)
+			return relaxV4Frames(&a.relaxV4, w, h, f, a.relaxEng.sceneTime())
 		},
 		objects: func(a *App) int { return len(a.relaxV4.puffs) },
+	},
+	// O dragão anda pelo relógio de render, não pelo passo da simulação: a asa
+	// precisa dos 30fps inteiros, e por isso step e frames recebem o tempo.
+	relaxGameDragon: {
+		name: "Dragon", glyph: "ѫ", subtitle: "asa batendo no escuro, fogo na boca", color: ColorDanger,
+		step: func(a *App) { stepRelaxDragon(&a.relaxDragon, a.relaxEng.sceneTime()) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxDragonFrames(&a.relaxDragon, w, h, f, a.relaxEng.sceneTime())
+		},
+		objects: func(a *App) int { return len(a.relaxDragon.embers) + len(a.relaxDragon.letters) },
+	},
+	// A fumaça tem um ciclo de 15s (5 de jato), e o passo de simulação só existe
+	// pra disparar o relançamento. Emissão, física e desenho andam no relógio de
+	// render, em sub-passos de tempo real.
+	relaxGameSmoke: {
+		name: "Smoke", glyph: "≋", subtitle: "duas cores se enrolando no ar", color: ColorPink,
+		step: func(a *App) { stepRelaxSmoke(&a.relaxSmoke, a.relaxEng.sceneTime()) },
+		frames: func(a *App, w, h int, f float64) ([]string, string) {
+			return relaxSmokeFrames(&a.relaxSmoke, w, h, f, a.relaxEng.sceneTime())
+		},
+		objects: func(a *App) int { return len(a.relaxSmoke.puffs) },
 	},
 }
 
@@ -294,15 +302,14 @@ func (a *App) resetRelaxScenes() {
 	a.relaxCoffee = relaxCoffeeState{}
 	a.relaxSea = relaxSeaState{}
 	a.relaxBurst = relaxBurstState{}
-	a.relaxCity = relaxCityState{}
 	a.relaxFox = relaxFoxState{}
-	a.relaxFw = relaxFireworksState{}
 	a.relaxTetris = relaxTetrisState{}
 	a.relaxSword = relaxSwordState{}
 	a.relaxHg = relaxHourglassState{}
-	a.relaxChess = relaxChessState{}
 	a.relaxJp = relaxJackpotState{}
 	a.relaxV4 = relaxV4State{}
+	a.relaxDragon = relaxDragonState{}
+	a.relaxSmoke = relaxSmokeState{}
 }
 
 // relaxSceneObjects conta o que está vivo na cena atual (só pro debug).
@@ -390,12 +397,7 @@ func (a *App) renderRelax() string {
 
 // relaxRainbowTime é o relógio do título; com movimento reduzido a onda anda na
 // metade da velocidade.
-func (a *App) relaxRainbowTime() float64 {
-	if a.relaxEng.reduced {
-		return a.relaxEng.elapsed * 0.5
-	}
-	return a.relaxEng.elapsed
-}
+func (a *App) relaxRainbowTime() float64 { return a.relaxEng.sceneTime() }
 
 func (a *App) renderRelaxSidebar(height int) string {
 	width := 30

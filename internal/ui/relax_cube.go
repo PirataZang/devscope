@@ -51,7 +51,7 @@ type relaxCubeMove struct{ axis, layer, dir int }
 
 type relaxCubeState struct {
 	inited  bool
-	tick    int
+	clock   float64 // último sceneTime visto (segundos), pro passo por tempo
 	cubies  []relaxCubie
 	history []relaxCubeMove // movimentos do embaralhamento, pra desfazer depois
 
@@ -59,12 +59,28 @@ type relaxCubeState struct {
 	turning  bool
 	turnT    float64 // 0..1 do giro atual
 	solving  bool
-	left     int // movimentos que faltam nesta etapa
-	hold     int
+	left     int     // movimentos que faltam nesta etapa
+	hold     float64 // segundos de pausa antes do próximo movimento
 	yaw, pit float64
 }
 
-const relaxCubeTurnSteps = 9 // passos de simulação por giro de 90°
+const (
+	// O cubo anda pelo relógio de render (~30fps), não pelo passo fixo da
+	// simulação: yaw/pit e o giro de camada avançam por tempo real, então cada
+	// um dos ~30 frames por segundo desenha movimento novo em vez de repetir o
+	// mesmo quadro. Durações em segundos, independentes da taxa de frames.
+	relaxCubeYawRate  = 0.48 // rad/s do giro livre no ar
+	relaxCubeTurnDur  = 0.30 // segundos por giro de camada de 90°
+	relaxCubeHoldMid  = 2.2  // pausa admirando o embaralhado
+	relaxCubeHoldDone = 1.2  // pausa depois de resolver
+
+	// Quantidade de movimentos do embaralhamento: mais movimentos, ciclo mais
+	// longo. O total (embaralhar + desfazer) é o dobro disto, e a ~0,30s por
+	// giro dá o tempo de animação. Faixa aleatória pra não repetir o mesmo
+	// comprimento de sequência a cada volta.
+	relaxCubeScrambleMin = 22
+	relaxCubeScrambleVar = 13 // rand.Intn deste + Min = 22..34 movimentos
+)
 
 func relaxCubeInit(st *relaxCubeState) {
 	st.inited = true
@@ -86,7 +102,7 @@ func relaxCubeInit(st *relaxCubeState) {
 	}
 	st.history = st.history[:0]
 	st.solving = false
-	st.left = 11 + rand.Intn(7)
+	st.left = relaxCubeScrambleMin + rand.Intn(relaxCubeScrambleVar)
 	st.yaw, st.pit = rand.Float64()*6.28, 0.55
 }
 
@@ -128,18 +144,23 @@ func relaxCubeApply(st *relaxCubeState, m relaxCubeMove) {
 	}
 }
 
-func stepRelaxCube(st *relaxCubeState) {
+func stepRelaxCube(st *relaxCubeState, now float64) {
 	if !st.inited {
 		relaxCubeInit(st)
+		st.clock = now
 	}
-	st.tick++
+	// dt de tempo real, limitado pra não teleportar ao voltar de uma pausa.
+	dt := clampF(now-st.clock, 0, 0.1)
+	st.clock = now
+
 	// O cubo gira sozinho no espaço o tempo todo, independente dos giros de
 	// camada — é isso que deixa claro que é um sólido e não um desenho chapado.
-	st.yaw += 0.016
-	st.pit = 0.52 + 0.20*math.Sin(float64(st.tick)*0.011)
+	st.yaw += relaxCubeYawRate * dt
+	st.pit = 0.52 + 0.20*math.Sin(now*0.33)
 
 	if st.turning {
-		if st.turnT += 1.0 / relaxCubeTurnSteps; st.turnT < 1 {
+		// Giro de camada avança por tempo: fluido nos ~30fps de render.
+		if st.turnT += dt / relaxCubeTurnDur; st.turnT < 1 {
 			return
 		}
 		relaxCubeApply(st, st.move)
@@ -148,18 +169,18 @@ func stepRelaxCube(st *relaxCubeState) {
 		return
 	}
 	if st.hold > 0 {
-		st.hold--
+		st.hold = math.Max(0, st.hold-dt)
 		return
 	}
 	if st.left <= 0 {
 		if st.solving {
 			st.solving = false
-			st.left = 11 + rand.Intn(7)
-			st.hold = 12
+			st.left = relaxCubeScrambleMin + rand.Intn(relaxCubeScrambleVar)
+			st.hold = relaxCubeHoldDone
 		} else {
 			st.solving = true
 			st.left = len(st.history)
-			st.hold = 22 // admira o estrago antes de desfazer
+			st.hold = relaxCubeHoldMid // admira o estrago antes de desfazer
 		}
 		return
 	}
@@ -200,10 +221,10 @@ type relaxCubeFace struct {
 	level   int
 }
 
-func relaxCubeFrames(st *relaxCubeState, width, height int, fade float64) ([]string, string) {
-	if !st.inited {
-		stepRelaxCube(st)
-	}
+func relaxCubeFrames(st *relaxCubeState, width, height int, fade, now float64) ([]string, string) {
+	// O cubo anda no relógio de render: avança aqui a cada frame (~30fps), não
+	// só nos passos fixos da simulação — é o que tira o movimento em degraus.
+	stepRelaxCube(st, now)
 	w := maxInt(24, minInt(width, 100))
 	h := maxInt(8, minInt(height, 28))
 	b := newRelaxBrailleVote(w, h)

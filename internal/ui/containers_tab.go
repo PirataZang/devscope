@@ -5,6 +5,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -205,38 +206,25 @@ func (a *App) renderContainerList(p *core.Project) string {
 	return lipgloss.JoinVertical(lipgloss.Left, header, strip, notif, stack, cmdBar)
 }
 
-// containerSplitHeight reparte a altura entre a lista e o detalhe.
-//
-// A divisão era fixa em 66/34, e com sete containers a caixa LISTA ficava com
-// dez linhas em branco enquanto LOGS se espremia em oito. A lista é o elemento
-// dominante desta tela, então ela PEDE o que precisa — uma linha por container
-// mais a moldura e o cabeçalho — e só é cortada quando não cabe.
-//
-// O detalhe tem piso (identidade + dois fatos + uma caixa de log legível) e
-// fica com TODO o resto: sobra guardada como linha em branco entre o log e a
-// barra de comandos é o mesmo desperdício da lista com dez linhas vazias, só
-// que do outro lado da tela.
-func containerSplitHeight(bodyH, count int) (tableH, bottomH int) {
-	const (
-		tableChrome  = 4 // moldura (2) + cabeçalho + régua
-		detailChrome = 4 // régua + identidade + portas + recursos
-		minTable     = 6
-		minLogs      = 3
-	)
-	minDetail := detailChrome + minLogs + 2 // +2 = moldura da caixa de logs
+// Alturas fixas do rodapé. DETALHE e LOGS têm SEMPRE o mesmo tamanho — logs é
+// secundário (só se olha ao entrar num container), então fica pequeno e
+// constante, independente de quantos logs há.
+const (
+	containerDetailBoxH = 8
+	containerLogsBoxH   = 8
+)
 
-	tableH = maxInt(minTable, minInt(count+tableChrome, bodyH-minDetail))
-	// A lista já pediu o que precisa; o que sobra vai INTEIRO para os logs.
-	// Guardar a sobra como linha em branco entre o log e a barra de comandos
-	// era o mesmo desperdício da lista com dez linhas vazias, só que do outro
-	// lado da tela.
-	bottomH = bodyH - tableH
-	if bottomH < minDetail {
-		// Terminal curto demais para os dois: o detalhe cede primeiro, mas
-		// nunca some — sem ele a lista não diz o que está selecionado.
-		bottomH = maxInt(detailChrome+1, bodyH-tableH)
-		tableH = maxInt(minTable, bodyH-bottomH)
+// containerSplitHeight dá à lista TODO o espaço que sobra do rodapé fixo. A
+// lista rola quando há mais containers do que cabe (renderContainersTable já faz
+// isso), em vez de crescer e empurrar o detalhe/logs. Terminal curto: o rodapé
+// cede primeiro, mas nunca some.
+func containerSplitHeight(bodyH, _ int) (tableH, bottomH int) {
+	const minTable = 6
+	bottomH = containerDetailBoxH + containerLogsBoxH
+	if bottomH > bodyH-minTable {
+		bottomH = maxInt(3, bodyH-minTable) // terminal curto: rodapé cede, soma sempre fecha
 	}
+	tableH = bodyH - bottomH
 	return tableH, bottomH
 }
 
@@ -383,6 +371,7 @@ func (a *App) renderContainersCommandBar(width int) string {
 		{"n", "novo svc"},
 		{"shift+R", "reinício ∞/off"},
 		{"shift+U", "compose ↑"},
+		{"shift+B", "build ↑"},
 		{"shift+D", "compose ↓"},
 		{"ctrl+g", "deps"},
 		{"A", scope},
@@ -392,6 +381,10 @@ func (a *App) renderContainersCommandBar(width int) string {
 }
 
 func (a *App) renderContainersNotif() string {
+	if a.composeRunning {
+		bar := composeProgressBar(a.composeVerb, time.Since(a.composeStart), a.animFrame, maxInt(44, a.width-4))
+		return truncateVisible(bar, maxInt(40, a.width-4))
+	}
 	if a.containerStatusMsg == "" {
 		return StyleMuted.Render(" ")
 	}
@@ -460,16 +453,32 @@ func (a *App) renderContainersTable(containers []core.Container, width, height i
 // Portas e stats continuam inteiras nas telas dedicadas (enter e g/m) — aqui
 // vai o que responde "é este mesmo?" sem sair da lista.
 func (a *App) renderContainersBottom(width, height int) string {
-	head := a.containerDetailHeadLines(width)
-	logsH := maxInt(3, height-len(head))
-	// A caixa tem a altura do log que existe, com piso legível e teto no que
-	// sobrou. Esticá-la até o fim do painel punha vinte linhas de moldura vazia
-	// em volta de duas linhas de log.
-	avail := maxInt(3, logsH-2)
-	logs := a.containerPreviewLogLines(avail, maxInt(10, width-4))
-	inner := maxInt(minInt(len(logs), avail), minInt(3, avail))
-	box := panelBox(a.containerLogsTitle(), padLinesTop(logs, inner), width, inner+2, false)
-	return lipgloss.JoinVertical(lipgloss.Left, append(head, box)...)
+	if height < 6 { // espaço só para uma caixa: quem é o container vem primeiro
+		return a.renderContainerDetailBox(width, height)
+	}
+	// Duas caixas de altura fixa: DETALHE em cima, LOGS (secundário) embaixo, no
+	// máximo metade e com teto de containerLogsBoxH — em terminal normal, 8 e 8.
+	logsH := minInt(containerLogsBoxH, maxInt(3, height/2))
+	detailH := height - logsH
+	return lipgloss.JoinVertical(lipgloss.Left,
+		a.renderContainerDetailBox(width, detailH),
+		a.renderContainerLogsBox(width, logsH),
+	)
+}
+
+// renderContainerDetailBox: o detalhe do container agora numa caixa própria (como
+// LOGS), altura fixa e informação distribuída em linhas rotuladas.
+func (a *App) renderContainerDetailBox(width, height int) string {
+	inner := maxInt(1, height-2)
+	return panelBox("DETALHE", fitExactLines(a.containerDetailHeadLines(width-2), inner), width, height, false)
+}
+
+// renderContainerLogsBox: caixa de logs de altura FIXA (tail). O conteúdo é
+// desduplicado (containerPreviewLogLines) e preenche por cima (padLinesTop).
+func (a *App) renderContainerLogsBox(width, height int) string {
+	inner := maxInt(1, height-2)
+	logs := a.containerPreviewLogLines(inner, maxInt(10, width-4))
+	return panelBox(a.containerLogsTitle(), padLinesTop(logs, inner), width, height, false)
 }
 
 // padLinesTop enche a caixa por CIMA. Um log é uma cauda: a última linha
@@ -490,23 +499,25 @@ func padLinesTop(lines []string, height int) []string {
 // containerDetailHeadLines: identidade + os dois fatos que respondem "é este
 // mesmo?". Altura fixa (3) — bloco que encolhe conforme o cursor anda faz o
 // olho reencontrar os rótulos a cada seta.
+// containerDetailHeadLines: o conteúdo da caixa DETALHE, distribuído em linhas
+// rotuladas com um respiro entre a identidade e os fatos. Altura fixa (5 linhas)
+// — bloco que encolhe conforme o cursor anda faria o olho reencontrar os rótulos
+// a cada seta. A moldura e o título "DETALHE" vêm do panelBox.
 func (a *App) containerDetailHeadLines(width int) []string {
 	c, ok := a.selectedContainer(a.currentProject())
 	if !ok {
-		// Mesma altura do estado cheio: o bloco não pode encolher quando não há
-		// seleção, senão a caixa de logo abaixo pula uma linha.
 		return []string{
-			rule(width),
 			StyleMuted.Render("  selecione um container"),
+			"",
+			factLine("imagem", nil, width),
 			factLine("portas", nil, width),
-			factLine("recursos", nil, width),
+			factLine(a.containerResourceLabel(), nil, width),
 		}
 	}
 	wave, waveStyle, label, labelStyle := a.containerStateVisual(c)
-	left := waveStyle.Render(wave) + " " +
-		StyleNormal.Bold(true).Render(truncate(sanitizeTerminalLine(c.Name), maxInt(10, width/3))) +
-		StyleMuted.Render("  ") + labelStyle.Render(label) +
-		StyleMuted.Render("  "+truncate(sanitizeTerminalLine(c.Image), maxInt(8, width/4)))
+	left := "  " + waveStyle.Render(wave) + " " +
+		StyleNormal.Bold(true).Render(truncate(sanitizeTerminalLine(c.Name), maxInt(10, width/2))) +
+		StyleMuted.Render("  ") + labelStyle.Render(label)
 	right := ""
 	if up := containerUptimeLabel(c); up != "" && up != emDash {
 		right = StyleMuted.Render("⧗ " + up)
@@ -514,9 +525,11 @@ func (a *App) containerDetailHeadLines(width int) []string {
 	if containerRestartAlways(c) {
 		right = StyleAccent.Render("∞") + StyleMuted.Render("  ") + right
 	}
+	imgFact := []string{StyleMuted.Render(truncate(sanitizeTerminalLine(c.Image), maxInt(8, width-factLabelW-4)))}
 	return []string{
-		rule(width),
 		joinWithSpacer(truncateVisible(left, maxInt(10, width-lipgloss.Width(right)-2)), right, width),
+		"",
+		factLine("imagem", imgFact, width),
 		factLine("portas", a.containerPortFacts(c), width),
 		factLine(a.containerResourceLabel(), a.containerResourceFacts(c, width), width),
 	}
@@ -654,14 +667,29 @@ func (a *App) containerPreviewLogLines(maxLines, width int) []string {
 		return []string{StyleMuted.Render("selecione um container")}
 	}
 	raw := strings.Split(strings.TrimRight(a.containerPreviewLogs, "\n"), "\n")
-	if len(raw) > maxLines {
-		raw = raw[len(raw)-maxLines:]
-	}
-	lines := make([]string, 0, maxLines)
+	// Colapsa linhas repetidas (o mesmo warning a cada request/compilação) numa
+	// linha só + ×N. Era isso que enchia o box de logs a tela inteira: com o
+	// conteúdo desduplicado, o box (que já se dimensiona pelo conteúdo) encolhe.
+	// ponytail: dedup por linha na janela; a aba de logs (f) mantém a ordem crua.
+	counts := map[string]int{}
+	var order []string
 	for _, line := range raw {
-		line = sanitizeTerminalLine(line)
+		key := strings.TrimSpace(sanitizeTerminalLine(line))
+		if key == "" {
+			continue
+		}
+		if counts[key] == 0 {
+			order = append(order, key)
+		}
+		counts[key]++
+	}
+	if len(order) > maxLines {
+		order = order[len(order)-maxLines:]
+	}
+	lines := make([]string, 0, len(order))
+	for _, key := range order {
 		style := StyleMuted
-		low := strings.ToLower(line)
+		low := strings.ToLower(key)
 		switch {
 		case strings.Contains(low, "error") || strings.Contains(low, "err "):
 			style = StyleUnhealthy
@@ -670,7 +698,11 @@ func (a *App) containerPreviewLogLines(maxLines, width int) []string {
 		case strings.Contains(low, "info"):
 			style = StyleAccent
 		}
-		lines = append(lines, style.Render(truncate(line, width)))
+		suffix := ""
+		if n := counts[key]; n > 1 {
+			suffix = StyleMuted.Render(fmt.Sprintf("  ×%d", n))
+		}
+		lines = append(lines, style.Render(truncate(key, maxInt(8, width-7)))+suffix)
 	}
 	return lines
 }

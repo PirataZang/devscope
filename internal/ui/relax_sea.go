@@ -55,6 +55,8 @@ type relaxSeaPuff struct {
 type relaxSeaState struct {
 	inited bool
 	tick   int
+	clock  relaxSubClock
+	now    float64 // relógio contínuo mais recente, pro swell/deriva
 	ph     [6]float64
 	moonX  float64
 	swell  float64
@@ -62,58 +64,77 @@ type relaxSeaState struct {
 	puffs  []relaxSeaPuff
 }
 
-func stepRelaxSea(st *relaxSeaState) {
-	if !st.inited {
-		st.inited = true
-		for i := range st.ph {
-			st.ph[i] = rand.Float64() * 2 * math.Pi
+func relaxSeaInit(st *relaxSeaState) {
+	st.inited = true
+	for i := range st.ph {
+		st.ph[i] = rand.Float64() * 2 * math.Pi
+	}
+	st.moonX = 0.68 + rand.Float64()*0.14
+	for i, n := 0, 55+rand.Intn(30); i < n; i++ {
+		st.stars = append(st.stars, relaxSkyPt{x: rand.Float64(), y: rand.Float64() * 0.92})
+	}
+	for bnk := 0; bnk < 4; bnk++ {
+		bx, by := rand.Float64(), 0.20+rand.Float64()*0.44
+		vx := 0.0005 + rand.Float64()*0.00085
+		wispy := bnk%2 == 0
+		n := 2 + rand.Intn(2)
+		if wispy {
+			n = 1 + rand.Intn(2)
 		}
-		st.moonX = 0.68 + rand.Float64()*0.14
-		for i, n := 0, 55+rand.Intn(30); i < n; i++ {
-			st.stars = append(st.stars, relaxSkyPt{x: rand.Float64(), y: rand.Float64() * 0.92})
-		}
-		for bnk := 0; bnk < 4; bnk++ {
-			bx, by := rand.Float64(), 0.20+rand.Float64()*0.44
-			vx := 0.0005 + rand.Float64()*0.00085
-			wispy := bnk%2 == 0
-			n := 2 + rand.Intn(2)
-			if wispy {
-				n = 1 + rand.Intn(2)
+		for k := 0; k < n; k++ {
+			p := relaxSeaPuff{
+				x:   math.Mod(bx+(rand.Float64()-0.5)*0.12+1, 1),
+				y:   clamp01(by + (rand.Float64()-0.5)*0.08),
+				rx:  0.11 + rand.Float64()*0.14,
+				ry:  0.06 + rand.Float64()*0.08,
+				vx:  vx,
+				tip: 1.25 + rand.Float64()*0.25,
 			}
-			for k := 0; k < n; k++ {
-				p := relaxSeaPuff{
-					x:   math.Mod(bx+(rand.Float64()-0.5)*0.12+1, 1),
-					y:   clamp01(by + (rand.Float64()-0.5)*0.08),
-					rx:  0.11 + rand.Float64()*0.14,
-					ry:  0.06 + rand.Float64()*0.08,
-					vx:  vx,
-					tip: 1.25 + rand.Float64()*0.25,
-				}
-				if !wispy {
-					p.rx, p.ry, p.tip = 0.07+rand.Float64()*0.08, 0.10+rand.Float64()*0.10, 1.65+rand.Float64()*0.25
-				}
-				st.puffs = append(st.puffs, p)
+			if !wispy {
+				p.rx, p.ry, p.tip = 0.07+rand.Float64()*0.08, 0.10+rand.Float64()*0.10, 1.65+rand.Float64()*0.25
 			}
+			st.puffs = append(st.puffs, p)
 		}
 	}
-	st.tick++
-	st.swell = 0.72 + 0.28*math.Sin(float64(st.tick)*0.1*0.052+st.ph[5])
+}
+
+// relaxSeaAdvance anda a cena por `d` ticks (1.0 = passo de 100ms), fracionário.
+// O swell é função contínua do relógio (não acumula erro); a deriva dos cúmulos
+// é soma linear escalada por `d`, mantendo a mesma velocidade média.
+func relaxSeaAdvance(st *relaxSeaState, d float64) {
+	st.swell = 0.72 + 0.28*math.Sin(st.now*0.052+st.ph[5])
 	for i := range st.puffs {
-		st.puffs[i].x += st.puffs[i].vx
+		st.puffs[i].x += st.puffs[i].vx * d
 		if st.puffs[i].x >= 1 {
 			st.puffs[i].x -= 1
 		}
 	}
 }
 
-func relaxSeaFrames(st *relaxSeaState, width, height int, fade float64) ([]string, string) {
+// stepRelaxSea é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxSeaFrames.
+func stepRelaxSea(st *relaxSeaState) {
 	if !st.inited {
-		stepRelaxSea(st)
+		relaxSeaInit(st)
+	}
+	st.tick++
+	st.now = float64(st.tick) * 0.1
+	relaxSeaAdvance(st, 1)
+}
+
+func relaxSeaFrames(st *relaxSeaState, width, height int, fade, now float64) ([]string, string) {
+	if !st.inited {
+		relaxSeaInit(st)
+	}
+	st.now = now
+	// A cena anda pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxSeaAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(26, minInt(width, 120))
 	h := maxInt(8, minInt(height, 32))
 	b := newRelaxBraille(w, h)
-	relaxSeaDraw(st, b, w, h)
+	relaxSeaDraw(st, b, w, h, now)
 	status := "o mar vai e volta"
 	switch {
 	case st.swell > 0.94:
@@ -154,9 +175,9 @@ func relaxSeaPuffDen(p relaxSeaPuff, x, y, sw, hz int) float64 {
 	return v * v
 }
 
-func relaxSeaDraw(st *relaxSeaState, b *relaxBraille, w, h int) {
+func relaxSeaDraw(st *relaxSeaState, b *relaxBraille, w, h int, now float64) {
 	sw, sh := w*2, h*4
-	t := float64(st.tick) * 0.1
+	t := now
 
 	hz := int(float64(sh) * 0.40)
 	moonR := float64(minInt(sw, sh)) * 0.09

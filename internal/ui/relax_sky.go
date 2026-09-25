@@ -58,7 +58,10 @@ type relaxConstellation struct {
 
 type relaxSkyState struct {
 	inited    bool
-	t         int // frame dentro do ciclo
+	t         int     // frame dentro do ciclo
+	tf        float64 // relógio contínuo do ciclo, em frames (pro render suave)
+	clock     relaxSubClock
+	subAcc    float64 // frações de tick rumo ao próximo tick cheio
 	dur       int
 	stars     []relaxStar
 	comets    []relaxComet
@@ -89,6 +92,7 @@ type relaxSkyState struct {
 // vazias, e o roteiro de eventos deste ciclo.
 func relaxSkyNewCycle(st *relaxSkyState) {
 	st.t = 0
+	st.tf = 0
 	st.dur = 280 + rand.Intn(71) // 28–35s
 	st.stars = st.stars[:0]
 	st.constel = nil
@@ -260,16 +264,21 @@ func relaxSkyShootingStar(st *relaxSkyState) {
 	})
 }
 
-func stepRelaxSky(st *relaxSkyState) {
-	if !st.inited {
-		st.inited = true
-		relaxSkyNewCycle(st)
-	}
+func relaxSkyInit(st *relaxSkyState) {
+	st.inited = true
+	relaxSkyNewCycle(st)
+}
+
+// relaxSkyDiscreteTick roda o que só acontece em passo cheio de 100ms: os
+// contadores de evento e microeventos das estrelas, os countdowns de cometa e
+// estrela cadente, o rastro/idade/descarte dos cometas, o tempo da constelação
+// e a virada de ciclo. Fica fora do sub-passo pra manter as MESMAS taxas por
+// segundo (spawns, microeventos, duração de ciclo).
+func relaxSkyDiscreteTick(st *relaxSkyState) {
 	st.t++
 
 	for i := range st.stars {
 		s := &st.stars[i]
-		s.phase += s.speed
 		if s.evDur > 0 {
 			if s.evT++; s.evT >= s.evDur {
 				s.evDur, s.evT, s.evKind = 0, 0, 0
@@ -304,8 +313,6 @@ func stepRelaxSky(st *relaxSkyState) {
 		if len(c.trail) > c.tail {
 			c.trail = c.trail[len(c.trail)-c.tail:]
 		}
-		c.x += c.vx
-		c.y += c.vy
 		if c.age++; c.age < c.ttl && c.x > -80 && c.x < 1080 && c.y < 1080 {
 			live = append(live, c)
 		}
@@ -327,6 +334,36 @@ func stepRelaxSky(st *relaxSkyState) {
 	if st.t >= st.dur {
 		relaxSkyNewCycle(st) // crossfade: o brilho já está no mínimo aqui
 	}
+}
+
+// relaxSkyAdvance anda o céu por `d` ticks (1 = 100ms), fracionário. O contínuo
+// — cintilar das estrelas (fase) e o voo dos cometas — escala por d; os eventos
+// discretos disparam em fronteira de tick via acumulador. O relógio contínuo do
+// ciclo (tf) também soma d, pro render (deriva, poeira, aurora) ir suave a
+// 30fps sem mudar a velocidade média.
+func relaxSkyAdvance(st *relaxSkyState, d float64) {
+	st.tf += d
+	for i := range st.stars {
+		st.stars[i].phase += st.stars[i].speed * d
+	}
+	for i := range st.comets {
+		c := &st.comets[i]
+		c.x += c.vx * d
+		c.y += c.vy * d
+	}
+
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxSkyDiscreteTick(st)
+	}
+}
+
+func stepRelaxSky(st *relaxSkyState) {
+	if !st.inited {
+		relaxSkyInit(st)
+	}
+	relaxSkyAdvance(st, 1)
 }
 
 // relaxSkyPickConstellation escolhe estrelas vizinhas pra ligar — linhas entre
@@ -380,11 +417,11 @@ func (s relaxStar) brightness() float64 {
 // relaxSkyFade dá o crossfade da virada: escurece no fim do ciclo e volta no
 // começo do seguinte, então o reset parece outro momento do céu, não um reload.
 func (st *relaxSkyState) fade() float64 {
-	if st.t < relaxSkyFadeIn {
-		return relaxSkyDimmest + (1-relaxSkyDimmest)*easeInOut(float64(st.t)/relaxSkyFadeIn)
+	if st.tf < relaxSkyFadeIn {
+		return relaxSkyDimmest + (1-relaxSkyDimmest)*easeInOut(st.tf/relaxSkyFadeIn)
 	}
-	if left := st.dur - st.t; left < relaxSkyFadeIn {
-		return relaxSkyDimmest + (1-relaxSkyDimmest)*easeInOut(float64(left)/relaxSkyFadeIn)
+	if left := float64(st.dur) - st.tf; left < relaxSkyFadeIn {
+		return relaxSkyDimmest + (1-relaxSkyDimmest)*easeInOut(left/relaxSkyFadeIn)
 	}
 	return 1
 }
@@ -438,9 +475,14 @@ func relaxSkyLevel(b float64, tint int) int {
 	return tint*5 + i
 }
 
-func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]string, string) {
+func relaxSkyFrames(st *relaxSkyState, width, height int, gfade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxSky(st)
+		relaxSkyInit(st)
+	}
+	// Estrelas e cometas andam pelo relógio de render: sub-passos por tempo
+	// real (~30fps), mesma velocidade/ritmo médios.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxSkyAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(24, minInt(width, 120))
 	h := maxInt(8, minInt(height, 30))
@@ -480,7 +522,7 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 	// Poeira da Via Láctea.
 	for i, p := range st.dust {
 		x, y := int(p.x*float64(sw-1)/1000), int(p.y*float64(sh-1)/1000)
-		lum := (0.19 + 0.11*math.Sin(float64(st.t)*0.02+float64(i))) * fade
+		lum := (0.19 + 0.11*math.Sin(st.tf*0.02+float64(i))) * fade
 		if lum <= relaxHalftone(x, y)*0.42 {
 			continue
 		}
@@ -505,7 +547,7 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 		if lum < 0.06 {
 			continue
 		}
-		fx := (float64(s.x) + float64(st.t)*relaxSkyDrift*float64(s.layer)) * float64(sw-1) / 1000
+		fx := (float64(s.x) + st.tf*relaxSkyDrift*float64(s.layer)) * float64(sw-1) / 1000
 		x, y := int(fx), int(float64(s.y)*float64(sh-1)/1000)
 		lvl := relaxSkyLevel(lum, s.tint)
 		b.set(x, y, lvl)
@@ -521,6 +563,14 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 			for _, d := range [4][2]int{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}} {
 				b.set(x+d[0], y+d[1], relaxSkyLevel(lum-0.35, s.tint))
 			}
+			// Estrela de primeira grandeza: um glifo pontual crava o brilho que
+			// a cruz de subpontos só sugere. ✦ no auge, ✧ um tico abaixo. O
+			// glifo sai da paleta (lvl), então acompanha o crossfade do céu.
+			gl := "✧"
+			if lum > 0.97 {
+				gl = "✦"
+			}
+			b.text(x/2, y/4, gl, relaxSkyLevel(lum, s.tint))
 		}
 	}
 
@@ -538,6 +588,9 @@ func relaxSkyFrames(st *relaxSkyState, width, height int, gfade float64) ([]stri
 			for _, d := range [4][2]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
 				b.set(cx+d[0], cy+d[1], relaxSkyCometL)
 			}
+			// Núcleo do cometa raro como ✦: a cabeça vira uma estrela nítida e
+			// a cauda continua sendo os subpontos Braille do rastro acima.
+			b.text(cx/2, cy/4, "✦", relaxSkyCometL)
 		}
 	}
 
@@ -602,8 +655,8 @@ func relaxSkyDash(b *relaxBraille, x0, y0, x1, y1 float64) {
 }
 
 func relaxSkyAuroraDraw(st *relaxSkyState, b *relaxBraille, top []int, sw, sh int, fade float64) {
-	t := float64(st.t) * 0.1
-	breath := math.Sin(float64(st.t)/float64(maxInt(1, st.dur))*math.Pi) * fade
+	t := st.tf * 0.1
+	breath := math.Sin(st.tf/float64(maxInt(1, st.dur))*math.Pi) * fade
 	if breath <= 0.05 {
 		return
 	}

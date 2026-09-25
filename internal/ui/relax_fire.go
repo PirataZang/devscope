@@ -52,7 +52,10 @@ type relaxFireSparkP struct {
 type relaxFireState struct {
 	inited bool
 	tick   int
-	w, h   int // em subpixels
+	clock  relaxSubClock
+	subAcc float64 // frações de tick rumo ao próximo autômato de 100ms
+	simT   float64 // tempo contínuo das brasas, em segundos
+	w, h   int     // em subpixels
 	heat   []uint8
 	sparks []relaxFireSparkP
 	// A base respira: a fogueira não queima sempre com a mesma força.
@@ -77,10 +80,19 @@ func relaxFireBuild(st *relaxFireState, w, h int) {
 	}
 }
 
-func stepRelaxFire(st *relaxFireState) {
+// relaxFireInit garante a grade construída antes do primeiro passo. Mantém o
+// tamanho padrão do step (pré-render); o render reconstrói no tamanho real.
+func relaxFireInit(st *relaxFireState) {
 	if !st.inited {
 		relaxFireBuild(st, 160, 88)
 	}
+}
+
+// relaxFireTick roda o autômato de fogo — evento de 100ms por natureza: grade
+// inteira de calor (uint8), decaimento por hash e spawn de brasas com taxa
+// por-tick. Fica fora do sub-passo pra manter a MESMA altura de chama e a
+// MESMA taxa média de brasas por segundo.
+func relaxFireTick(st *relaxFireState) {
 	st.tick++
 	w, h := st.w, st.h
 	t := float64(st.tick) * 0.1
@@ -157,20 +169,37 @@ func stepRelaxFire(st *relaxFireState) {
 			}
 		}
 	}
+}
 
+// relaxFireAdvance anda a simulação por `d` ticks (1.0 = passo de 100ms),
+// fracionário. O autômato dispara uma vez por tick cheio (acumulador), pra
+// preservar altura da chama e taxa de brasas; a física das brasas integra
+// contínua, escalada por d (somas × d, atrito elevado a d).
+func relaxFireAdvance(st *relaxFireState, d float64) {
+	// ── Autômato em fronteiras de tick cheio ──
+	st.subAcc += d
+	for st.subAcc >= 1 {
+		st.subAcc -= 1
+		relaxFireTick(st)
+	}
+
+	// ── Brasas ── contínuas, no relógio de tempo real da simulação.
+	w, h := st.w, st.h
+	st.simT += d * 0.1
+	t := st.simT
 	keep := st.sparks[:0]
 	for _, p := range st.sparks {
 		p.px, p.py = p.x, p.y
 		// Vento: ruído contínuo, então a brasa passeia em vez de tremer.
-		p.vx += relaxNoise(p.y*0.035+t*0.7, 7) * 0.11
-		p.vx *= 0.985
+		p.vx += relaxNoise(p.y*0.035+t*0.7, 7) * 0.11 * d
+		p.vx *= math.Pow(0.985, d)
 		// Empuxo enquanto quente; esfriando, a gravidade assume e ela cai.
-		p.vy += 0.075 - 0.13*p.heat
-		p.x += p.vx + 0.25*math.Sin(p.spin)
-		p.y += p.vy
-		p.spin += 0.22
+		p.vy += (0.075 - 0.13*p.heat) * d
+		p.x += (p.vx + 0.25*math.Sin(p.spin)) * d
+		p.y += p.vy * d
+		p.spin += 0.22 * d
 		// Esfria mais devagar quando ainda está subindo depressa.
-		p.heat -= 0.016 + 0.014*clamp01(p.vy+0.4)
+		p.heat -= (0.016 + 0.014*clamp01(p.vy+0.4)) * d
 		if p.heat > 0.04 && p.y > 0 && p.y < float64(h) && p.x > -2 && p.x < float64(w)+2 {
 			keep = append(keep, p)
 		}
@@ -178,7 +207,14 @@ func stepRelaxFire(st *relaxFireState) {
 	st.sparks = keep
 }
 
-func relaxFireFrames(st *relaxFireState, width, height int, fade float64) ([]string, string) {
+// stepRelaxFire é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real em relaxFireFrames.
+func stepRelaxFire(st *relaxFireState) {
+	relaxFireInit(st)
+	relaxFireAdvance(st, 1)
+}
+
+func relaxFireFrames(st *relaxFireState, width, height int, fade, now float64) ([]string, string) {
 	w := maxInt(26, minInt(width, 110))
 	h := maxInt(8, minInt(height, 30))
 	if !st.inited || st.w != w*2 || st.h != h*4 {
@@ -186,6 +222,11 @@ func relaxFireFrames(st *relaxFireState, width, height int, fade float64) ([]str
 		for i := 0; i < 60; i++ {
 			stepRelaxFire(st) // acende antes de aparecer, sem partir do vazio
 		}
+	}
+	// A chama e as brasas andam pelo relógio de render: sub-passos por tempo
+	// real, ~30fps. O autômato ainda dispara uma vez por 100ms lá dentro.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxFireAdvance(st, relaxSubDT/0.1)
 	}
 	b := newRelaxBraille(w, h)
 
@@ -202,12 +243,22 @@ func relaxFireFrames(st *relaxFireState, width, height int, fade float64) ([]str
 	}
 
 	// Brasa desenhada como rastro curto: um ponto sozinho não dá a ideia de
-	// que está viajando.
+	// que está viajando. A mais quente ganha um glifo pontual de faísca — só o
+	// topo da brasa, poucas por quadro; a chama continua Braille.
 	for _, p := range st.sparks {
 		lvl := relaxFireLevels - 1 - int((1-p.heat)*float64(relaxFireLevels-8))
 		b.line(p.px, p.py, p.x, p.y, minInt(maxInt(lvl, 6), relaxFireLevels-1))
 		if p.heat > 0.7 {
 			b.set(int(p.x), int(p.y), relaxFireSpark)
+			// Faísca mais viva vira glifo: ✦ quente, · morna, ˙ tênue.
+			g := "˙"
+			switch {
+			case p.heat > 0.9:
+				g = "✦"
+			case p.heat > 0.8:
+				g = "·"
+			}
+			b.text(int(p.x)/2, int(p.y)/4, g, relaxFireSpark)
 		}
 	}
 

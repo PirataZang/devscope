@@ -11,16 +11,16 @@ numa tela só, dentro do terminal.
   <a href="https://github.com/PirataZang/devscope/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/PirataZang/devscope/ci.yml?branch=main&label=CI&style=for-the-badge&labelColor=0d1117" alt="CI"></a>
   <a href="https://github.com/PirataZang/devscope/releases"><img src="https://img.shields.io/github/v/release/PirataZang/devscope?label=release&style=for-the-badge&labelColor=0d1117&color=7c3aed" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0d1117" alt="MIT"></a>
-  <img src="https://img.shields.io/badge/go-1.22%2B-00ADD8?style=for-the-badge&labelColor=0d1117&logo=go&logoColor=white" alt="Go">
+  <img src="https://img.shields.io/badge/go-1.24%2B-00ADD8?style=for-the-badge&labelColor=0d1117&logo=go&logoColor=white" alt="Go">
   <img src="https://img.shields.io/badge/linux%20%C2%B7%20macos%20%C2%B7%20windows-informational?style=for-the-badge&labelColor=0d1117&color=334155" alt="Plataformas">
 </p>
 
 **[Instalar](#-instalação)** ·
-**[Tour](#-um-tour-de-três-telas)** ·
+**[Por que existe](#-por-que-existe)** ·
+**[Tour](#-tour)** ·
 **[Módulos](#-15-módulos-um-contexto)** ·
 **[Preferências](#-preferências)** ·
-**[Arquitetura](#-como-funciona)** ·
-**[Docs](#-documentação)**
+**[Arquitetura](#-como-funciona)**
 
 </div>
 
@@ -42,8 +42,7 @@ numa tela só, dentro do terminal.
 ```
 
 <div align="center">
-<sub><b>Uma linha por projeto:</b> estado animado · stack detectada · branch · containers · portas · caminho<br>
-👇 as três telas em tamanho real logo abaixo, no <a href="#-um-tour-de-três-telas">tour</a></sub>
+<sub><b>Uma linha por projeto:</b> estado animado · stack detectada · branch · containers · portas · caminho</sub>
 </div>
 
 ---
@@ -91,7 +90,7 @@ Coleta concorrente,<br>UI sobre snapshot imutável
 
 ---
 
-## 🔥 O problema
+## 🔥 Por que existe
 
 Você trabalha em **projetos**. Suas ferramentas trabalham em outra unidade — processo,
 container, serviço, repositório. Saber como está tudo, numa manhã de segunda, custa isso:
@@ -105,14 +104,14 @@ container, serviço, repositório. Saber como está tudo, numa manhã de segunda
 <td valign="top">
 
 ```bash
-docker ps -a                  # o que está de pé
-docker stats --no-stream      # consumindo o quê
-pm2 list                      # e os workers Node
+docker ps -a                   # o que está de pé
+docker stats --no-stream       # consumindo o quê
+pm2 list                       # e os workers Node
 git -C /var/www/api status     # o que ficou solto
-gh run list                   # a pipeline passou
-ss -ltn | grep LISTEN         # quem pegou a 8080
-nginx -T | grep server_name   # que domínio é esse
-certbot certificates          # e o SSL, vence quando
+gh run list                    # a pipeline passou
+ss -ltn | grep LISTEN          # quem pegou a 8080
+nginx -T | grep server_name    # que domínio é esse
+certbot certificates           # e o SSL, vence quando
 ```
 
 Oito comandos, oito formatos de saída — e **nenhum deles sabe**
@@ -129,7 +128,8 @@ devscope
 
 Um binário. Ele varre o disco, detecta a stack, correlaciona
 containers, workers, portas, domínios e certificados **ao
-projeto certo** — e deixa você operar tudo dali.
+projeto certo** — e deixa você operar tudo dali, sem sair
+do terminal.
 
 </td>
 </tr>
@@ -150,6 +150,8 @@ curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/in
 ```powershell
 irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
 ```
+
+Pronto — quatro comandos, um binário:
 
 ```bash
 devscope               # abre a TUI
@@ -192,7 +194,7 @@ cada um com `checksums.txt`:
 | macOS Intel / Apple Silicon | `devscope_*_darwin_amd64.tar.gz` · `devscope_*_darwin_arm64.tar.gz` |
 | Windows x64 / ARM64 | `devscope_*_windows_amd64.zip` · `devscope_*_windows_arm64.zip` |
 
-**Build from source** (Go 1.22+)
+**Build from source** (Go 1.24+)
 
 ```bash
 git clone https://github.com/PirataZang/devscope.git && cd devscope
@@ -207,67 +209,87 @@ Ou `go install github.com/devscope/devscope/cmd/devscope@latest` — com `$GOPAT
 
 ---
 
-## 🎬 Um tour de três telas
+## 🎬 Tour
 
-### 1. A lista de projetos
+Três telas, o mesmo padrão. Tudo abaixo é o DevScope de verdade — desenhado com
+caractere de terminal, não com imagem.
 
-<p align="center">
-  <img src="docs/images/dashboard.png" alt="Lista de projetos com stack, branch, containers e portas" width="100%">
-</p>
+### 1 · A lista de projetos
 
-> **O que olhar**
->
-> 🌊 **A onda Braille** à esquerda de cada nome é o estado, animado — verde subindo é saudável,
-> amarelo é atenção, vermelho baixo é parado. É a *altura* da onda que separa os estados, então
-> continua legível em print, sem cor, e para quem enxerga cor de outro jeito.
->
-> 📊 **A régua do host** no topo (CPU, RAM, disco) e o contador `4 rodando · 1 parado`.
->
-> 🔎 <kbd>/</kbd> filtra ao vivo por nome, path, branch ou framework · <kbd>Ctrl</kbd>+<kbd>P</kbd>
-> é a busca fuzzy · <kbd>Enter</kbd> entra no projeto.
+```
+ ⌂ INÍCIO   5 projetos                              CPU 4% ⣤⣦ · RAM 22% ⣀⣄ · DISK 40%   09:34:23
+ ─────────────────────────────────────────────────────────────────────────────────────────────
+        NOME               STACK      BRANCH        CTR   CAMINHO
+ ▌ ⣷⣄⣀⡀ botrpg             Node.js    main            2   ~/bots/botrpg
+   ⣷⣄⣀⡀ laravel-sync       Laravel    main            7   ~/projetos/laravel-sync
+   ⣷⣄⣀⡀ portfolio          Node.js    main            1   ~/projetos/portfolio
+   ⣀⣀⣀⡀ peppercore-site    Vue        main            1   …/projetos/peppercore-site
+ ─────────────────────────────────────────────────────────────────────────────────────────────
+ ⣷⣄⣀⡀ botrpg   ~/bots/botrpg
+   stack     Node.js · pnpm          git       main · limpo
+   runtime   2 containers · :3000    saúde     ⣤ HTTP 200 · SSL 61d
+  ↑↓ navegar · enter git · c containers · / filtrar · ^p fuzzy · ? ajuda · q sair
+```
 
-<br>
+> 🌊 A **onda Braille** à esquerda do nome é o estado, animado — verde subindo é saudável,
+> vermelho baixo é parado. É a *altura* que separa os estados: legível em print, sem cor e
+> para daltônicos. 🔎 <kbd>/</kbd> filtra ao vivo · <kbd>Ctrl</kbd>+<kbd>P</kbd> é fuzzy ·
+> <kbd>Enter</kbd> entra no projeto.
 
-### 2. Git, sem sair do lugar
+### 2 · Git, sem sair do lugar
 
-<p align="center">
-  <img src="docs/images/git.png" alt="Módulo Git com branches, commits, alterações e stashes" width="100%">
-</p>
+```
+ ⑂ GIT   ~/projetos/laravel-sync                    main ⣷⣄⣀⣴ limpa · ↑2 ↓0        09:41:12
+  1 GIT │ 2 ACTIONS │ 3 CONTAINERS │ 4 NGINX │ 5 API                          ↑2 p/ enviar
+ ┌─BRANCHES · 4──────────────────────┐ ┌─COMMITS · main───────────────────────────────┐
+ │ ▸ main            ↑2 ↓0           │ │ a1b2c3d  fix: valida webhook          2h  você │
+ │   feat/pix        ↑5              │ │ 9f8e7d6  feat: fila de eventos        1d  você │
+ │   hotfix/ssl                      │ │ 3c2b1a0  chore: bump deps             2d  time │
+ └───────────────────────────────────┘ └────────────────────────────────────────────────┘
+ ALTERAÇÕES  3 modificados · 1 novo · 2 stash                          3 stash s · a stage
+   M  app/Http/Controllers/WebhookController.php
+   M  routes/api.php
+   ?  database/seeders/DemoSeeder.php
+  c commit · a stage · space checkout · p pull · S-P push · ^g graph · esc voltar
+```
 
-> **O que olhar**
->
-> 🌿 **Branches e commits lado a lado**, alterações não commitadas e stashes — o repositório
-> inteiro numa tela.
->
-> 📝 **O log de comandos** mostra exatamente o `git` que o DevScope executou. Nada acontece
-> escondido, e o link do PR fica clicável.
->
-> ⌨️ <kbd>c</kbd> commit · <kbd>a</kbd> stage · <kbd>Space</kbd> checkout · <kbd>p</kbd> pull ·
-> <kbd>Shift</kbd>+<kbd>P</kbd> push · <kbd>x</kbd> cherry-pick · <kbd>Ctrl</kbd>+<kbd>G</kbd>
-> abre o **Git Graph**, o DAG desenhado no terminal.
+> 🌿 Branches e commits **lado a lado**, alterações e stashes na mesma tela. 📝 O log de
+> comandos mostra o `git` exato que o DevScope rodou — nada acontece escondido, e o link do PR
+> fica clicável. <kbd>Ctrl</kbd>+<kbd>G</kbd> abre o **Git Graph**, o DAG desenhado no terminal.
 
-<br>
+### 3 · Containers do projeto
 
-### 3. Containers do projeto
+```
+ ▣ CONTAINER   ~/projetos/laravel-sync                     ⣴⣾⣦ 7 running        09:42:05
+  1 GIT │ 2 ACTIONS │ 3 CONTAINERS │ 4 NGINX │ 5 API                            7 · ↓0
+ ┌─CONTAINERS · 7─────────────────────────────────────────────────────────────────────┐
+ │ ⣴⣾⣦ app        laravel:8.2     3.1%   220M   :9000 → 9000/tcp        2h             │
+ │ ⣴⣾⣦ queue      laravel:8.2     0.4%    88M   —                       2h             │
+ │ ⣴⣾⣦ redis      redis:7-alpine  0.1%    12M   :6379 → 6379/tcp        2h             │
+ │ ⣀⣀⣀ scheduler  laravel:8.2     0.0%     0M   —                   exited (0)         │
+ └──────────────────────────────────────────────────────────────────────────────────────┘
+ ────────────────────────────────────────────────────────────────────────────────────────
+ ⣴⣾⣦ app   running   laravel:8.2                                             ⧗ 2h
+   portas    :9000 → 9000/tcp
+   recursos  CPU 3.1% ⣤⣦ · MEM 220M ⣴⣤ · NET 1.2MB
+ ┌─LOGS · app─────────────────────────────────────────────────────────────────────────┐
+ │ 09:41:58 [info] worker booted, listening on 9000                                     │
+ │ 09:42:03 production.INFO: PixWebhook processed id=8842                                │
+ └──────────────────────────────────────────────────────────────────────────────────────┘
+  enter portas · m detalhe · e shell · s parar · f logs · / buscar · esc voltar
+```
 
-<p align="center">
-  <img src="docs/images/containers.png" alt="Módulo Containers com lista, logs, stats e portas" width="100%">
-</p>
-
-> **O que olhar**
->
 > 🐳 **Só os containers daquele projeto** — a correlação é por mount path e label do compose.
-> <kbd>Shift</kbd>+<kbd>A</kbd> mostra os de todos, com o nome do projeto alheio em amarelo.
->
-> 📡 **Logs ao vivo, stats e o mapa de portas** na mesma tela, sem abrir outro terminal.
->
-> 🔐 <kbd>m</kbd> abre o detalhe em **7 abas numeradas** (logs · métricas · env · config ·
-> processos · compose · Dockerfile) com busca, rolagem lateral, realce por tipo de conteúdo e
-> **mascaramento automático de segredos** no env — essa tela costuma aparecer em call e em print.
+> 📡 Logs ao vivo, stats e portas na mesma tela. 🔐 <kbd>m</kbd> abre o detalhe em 7 abas
+> (logs · métricas · env · config · processos · compose · Dockerfile) com **mascaramento
+> automático de segredos** no env — essa tela costuma aparecer em call e em print.
 
 ---
 
 ## 🧩 15 módulos, um contexto
+
+Cada módulo aparece **só quando faz sentido** para o projeto aberto — um projeto Go sem Docker
+não mostra a aba de containers. A cor é a cor da categoria, no app inteiro.
 
 <table>
 <tr>
@@ -278,37 +300,37 @@ Ou `go install github.com/devscope/devscope/cmd/devscope@latest` — com `$GOPAT
 > stack, saúde, containers,
 > git e atividade num painel
 
-#### 🟡 SCOPE
-`Git` · `Containers`
-> branches, commits, PR, graph
-> start/stop, shell, logs, stats
+#### 🟡 CÓDIGO
+`Git` · `GH Actions` · `Jenkins`
+> branches, commits, PR, graph,
+> runs, workflows, logs, trigger
 
 </td>
 <td width="33%" valign="top">
 
-#### 🔵 AUTOMATION
-`GH Actions` · `Jenkins`
-> runs, workflows, logs, YAML,
-> trigger, re-run, builds
+#### 🐳 EXECUÇÃO
+`Containers` · `Swarm` · `Kubernetes`
+> start/stop, shell, logs, stats,
+> services, nodes, pods, manifests
 
-#### 🐳 MANAGER
-`Swarm` · `Kubernetes`
-> services, nodes, stacks,
-> pods, manifests, scale
+#### 🟢 REDE
+`Nginx` · `Rotas` · `Ngrok`
+`SSH` · `CF Tunnel`
+> vhosts, endpoints, expor o
+> local, requests ao vivo, URL
 
 </td>
 <td width="33%" valign="top">
 
-#### 🟢 TUNNEL
-`Ngrok` · `SSH` · `CF Tunnel`
-> expor o local, requests
-> ao vivo, copiar URL
+#### 🩷 DADOS
+`API` · `Database` · `WebSocket`
+> cliente HTTP, SQL e frames
+> ao vivo, sem sair da tela
 
-#### 🩷 TOOLS
-`Rotas` · `Nginx` · `API`
-`Database` · `WebSocket`
-> endpoints, vhosts, HTTP,
-> SQL e frames
+#### 🛠️ MESA
+`JSON` · `JWT`
+> formatar/consultar JSON e
+> inspecionar/validar tokens
 
 </td>
 </tr>
@@ -318,7 +340,7 @@ Ou `go install github.com/devscope/devscope/cmd/devscope@latest` — com `$GOPAT
 <sub>
 
 **Também no pacote:** health checks HTTP/TCP · validade de SSL (Let's Encrypt) · portas abertas ·
-workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 12 temas
+workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 12 temas · Git Graph
 
 </sub>
 </div>
@@ -327,46 +349,11 @@ workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 1
 
 ## 🎛️ Preferências
 
-<kbd>Shift</kbd>+<kbd>C</kbd> abre o painel de preferências **dentro** do DevScope:
-
-<table>
-<tr>
-<td width="34%" valign="top">
-
-**🎨 Tema**
-
-Uma lista que gira com
-<kbd>←</kbd> <kbd>→</kbd> e aplica na
-hora, entre 12 opções.
-
-</td>
-<td width="33%" valign="top">
-
-**🔢 Atalhos**
-
-Dez caixas de `nome` + `comando`
-nas teclas <kbd>1</kbd>…<kbd>9</kbd> <kbd>0</kbd>.
-`&` no fim abre solto.
-
-</td>
-<td width="33%" valign="top">
-
-**🤖 Agente de IA**
-
-O que o <kbd>Ctrl</kbd>+<kbd>O</kbd> abre.
-Vazio = o primeiro do `PATH`.
-
-</td>
-</tr>
-</table>
-
-<kbd>Enter</kbd> salva e aplica sem reiniciar · <kbd>Ctrl</kbd>+<kbd>R</kbd> volta tudo ao padrão
-(pede confirmação e guarda o anterior em `user_config.bak.txt`).
-
-Tudo vai para `~/.config/devscope/user_config.txt`, um texto comentado que também dá para editar
-à mão:
+<kbd>Shift</kbd>+<kbd>C</kbd> abre o painel de preferências **dentro** do DevScope — tema,
+atalhos e agente de IA, aplicados na hora, sem reiniciar.
 
 ```yaml
+# ~/.config/devscope/user_config.txt  (texto comentado, editável à mão)
 Theme: dracula-vivid
 
 Commands: {
@@ -378,8 +365,9 @@ Commands: {
 AI: claude
 ```
 
-> 🛟 Deu errado? A cópia de fábrica fica ao lado, reescrita a cada abertura do painel:
-> `cp ~/.config/devscope/user_config.default.txt ~/.config/devscope/user_config.txt`
+<kbd>1</kbd>…<kbd>9</kbd> <kbd>0</kbd> disparam seus comandos (`&` no fim abre solto) ·
+<kbd>Ctrl</kbd>+<kbd>O</kbd> chama o agente de IA · <kbd>Ctrl</kbd>+<kbd>R</kbd> volta tudo ao
+padrão (com backup em `user_config.bak.txt`).
 
 <details>
 <summary><b>⚙️ Configuração do scanner (onde procurar, de quanto em quanto tempo)</b></summary>
@@ -436,22 +424,20 @@ flowchart LR
     D --> J["🖥️ Bubble Tea UI"]
 ```
 
-Os coletores rodam concorrentes e publicam snapshots imutáveis num `StateStore`. A UI **nunca**
+Os coletores rodam concorrentes e publicam snapshots **imutáveis** num `StateStore`. A UI nunca
 lê dado mutável: ela desenha o último snapshot e segue — é isso que faz a tela não congelar
 esperando um `docker inspect` lento.
 
-### 📚 Documentação
-
 | Documento | O que você encontra lá |
 |---|---|
-| 📐&nbsp;**[ARCHITECTURE.md](docs/ARCHITECTURE.md)**&nbsp;&nbsp; | As decisões técnicas: por que Go + Bubble Tea, o modelo de snapshot imutável, como cada coletor funciona e como escrever um novo detector de framework. |
-| 🎨&nbsp;**[DESIGN.md](docs/DESIGN.md)**&nbsp;&nbsp; | O padrão de **todas** as telas: anatomia, teclado, vocabulário Braille, cores, larguras, anti-padrões e o checklist antes de entregar uma tela. |
-| 🗺️&nbsp;**[ROADMAP.md](docs/ROADMAP.md)**&nbsp;&nbsp; | O que já foi entregue por versão e o que vem — do MVP ao modo multi-host. |
+| 📐&nbsp;**[ARCHITECTURE.md](docs/ARCHITECTURE.md)** | Por que Go + Bubble Tea, o modelo de snapshot imutável, como cada coletor funciona e como escrever um novo detector de framework. |
+| 🎨&nbsp;**[DESIGN.md](docs/DESIGN.md)** | O padrão de **todas** as telas: anatomia, teclado, vocabulário Braille, cores, larguras, anti-padrões e o checklist antes de entregar uma tela. |
+| 🗺️&nbsp;**[ROADMAP.md](docs/ROADMAP.md)** | O que já foi entregue por versão e o que vem — do MVP ao multi-host. |
 
 <div align="center">
 <sub>
 
-Go 1.22+ · [Bubble Tea](https://github.com/charmbracelet/bubbletea) (modelo Elm) ·
+Go 1.24+ · [Bubble Tea](https://github.com/charmbracelet/bubbletea) (modelo Elm) ·
 [Lip Gloss](https://github.com/charmbracelet/lipgloss) · Cobra + Viper
 
 </sub>

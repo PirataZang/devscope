@@ -130,10 +130,11 @@ type relaxHgStar2 struct {
 type relaxHourglassState struct {
 	inited  bool
 	tick    int
+	clock   relaxSubClock
 	stars   []relaxHgStar2
 	pattern float64 // fase do padrão espiral do disco
-	flipT   int     // >0 durante a virada
-	rest    int     // passos parados depois que o de cima esvaziou
+	flipT   float64 // >0 durante a virada (em ticks, fracionário)
+	rest    float64 // passos parados depois que o de cima esvaziou (em ticks)
 	fell    int     // quantas passaram pelo gargalo neste ciclo
 	neck    float64 // brilho do gargalo, decai a cada passo
 }
@@ -154,20 +155,26 @@ func relaxHgNewStar() relaxHgStar2 {
 	return s
 }
 
-func stepRelaxHourglass(st *relaxHourglassState) {
-	if !st.inited {
-		st.inited = true
-		st.stars = make([]relaxHgStar2, relaxHgN)
-		for i := range st.stars {
-			st.stars[i] = relaxHgNewStar()
-		}
+func relaxHgInit(st *relaxHourglassState) {
+	st.inited = true
+	st.stars = make([]relaxHgStar2, relaxHgN)
+	for i := range st.stars {
+		st.stars[i] = relaxHgNewStar()
 	}
-	st.tick++
-	st.pattern += 0.009
-	st.neck *= 0.86
+}
+
+// relaxHgAdvance anda a simulação por `d` ticks (1 = passo de 100ms).
+// Fracionário pro frame de render dar sub-passos e a areia escorrer suave a
+// 30fps. Todo incremento por tick é escalado por `d`; o decaimento do gargalo
+// vira math.Pow pra somar igual depois de 100ms; contadores de fase (flipT,
+// rest) andam em `d` mantendo as mesmas durações em segundos. As transições de
+// fase (raio no gargalo, chegada ao disco) só ficam mais finas com sub-passos.
+func relaxHgAdvance(st *relaxHourglassState, d float64) {
+	st.pattern += 0.009 * d
+	st.neck *= math.Pow(0.86, d)
 
 	if st.flipT > 0 {
-		if st.flipT++; st.flipT > relaxHgFlipDur {
+		if st.flipT += d; st.flipT > relaxHgFlipDur {
 			st.flipT = 0
 			relaxHgTurn(st)
 		}
@@ -181,9 +188,9 @@ func stepRelaxHourglass(st *relaxHourglassState) {
 			top++
 			// Vórtice: gira mais rápido quanto mais perto do eixo, e desce
 			// junto com o raio — a estrela acompanha a parede pra dentro.
-			s.th += 0.028 + 0.052/(s.r+0.16)
-			s.r -= s.drain * (0.34 + 0.66*(1-s.r))
-			if s.d -= s.drain * 0.9; s.d < 0 {
+			s.th += (0.028 + 0.052/(s.r+0.16)) * d
+			s.r -= s.drain * (0.34 + 0.66*(1-s.r)) * d
+			if s.d -= s.drain * 0.9 * d; s.d < 0 {
 				s.d = 0
 			}
 			if s.r <= relaxHgNeck {
@@ -191,8 +198,8 @@ func stepRelaxHourglass(st *relaxHourglassState) {
 			}
 		case relaxHgFall:
 			top++
-			s.vy += 0.0021
-			s.y += s.vy
+			s.vy += 0.0021 * d
+			s.y += s.vy * d
 			if math.Abs(s.y) < 0.05 {
 				st.neck = 1
 			}
@@ -209,19 +216,29 @@ func stepRelaxHourglass(st *relaxHourglassState) {
 				s.grow = 0
 			}
 		default:
-			s.orb += s.om
+			s.orb += s.om * d
 			if s.grow < 1 {
-				s.grow = math.Min(1, s.grow+0.017)
+				s.grow = math.Min(1, s.grow+0.017*d)
 			}
 		}
 	}
 
 	// Bulbo de cima vazio: um tempo olhando a galáxia pronta e vira.
 	if top == 0 && st.flipT == 0 {
-		if st.rest++; st.rest > relaxHgFlipWait {
-			st.rest, st.flipT = 0, 1
+		if st.rest += d; st.rest > relaxHgFlipWait {
+			st.rest, st.flipT = 0, math.Min(d, relaxHgFlipDur)
 		}
 	}
+}
+
+// stepRelaxHourglass é um passo cheio de simulação (100ms). Mantido pro teste; o
+// render anda por tempo real, em sub-passos, em relaxHourglassFrames.
+func stepRelaxHourglass(st *relaxHourglassState) {
+	if !st.inited {
+		relaxHgInit(st)
+	}
+	st.tick++
+	relaxHgAdvance(st, 1)
 }
 
 // relaxHgTurn é o instante em que a virada fecha: as estrelas são espelhadas e
@@ -270,9 +287,13 @@ func relaxHgPos(st *relaxHourglassState, s relaxHgStar2) (float64, float64) {
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
-func relaxHourglassFrames(st *relaxHourglassState, width, height int, fade float64) ([]string, string) {
+func relaxHourglassFrames(st *relaxHourglassState, width, height int, fade, now float64) ([]string, string) {
 	if !st.inited {
-		stepRelaxHourglass(st)
+		relaxHgInit(st)
+	}
+	// A areia escorre pelo relógio de render: sub-passos por tempo real, ~30fps.
+	for i, n := 0, st.clock.tick(now); i < n; i++ {
+		relaxHgAdvance(st, relaxSubDT/0.1)
 	}
 	w := maxInt(20, minInt(width, 120))
 	h := maxInt(8, minInt(height, 34))
@@ -302,7 +323,7 @@ func relaxHgDraw(st *relaxHourglassState, b *relaxBraille) {
 	// por isso que o espelhamento das estrelas passa despercebido.
 	ang := 0.0
 	if st.flipT > 0 {
-		ang = math.Pi * easeInOut(float64(st.flipT)/relaxHgFlipDur)
+		ang = math.Pi * easeInOut(st.flipT/relaxHgFlipDur)
 	}
 	sn, cs := math.Sin(ang), math.Cos(ang)
 	put := func(x, y float64, lvl int) {
