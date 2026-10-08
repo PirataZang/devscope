@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -610,7 +611,28 @@ func selectedRuntimeFacts(p core.Project) []string {
 	case p.HasDockerfile:
 		out = append(out, StyleMuted.Render("Dockerfile"))
 	}
+	if c := portConflictFact(p); c != "" {
+		out = append(out, StyleWarning.Render(c))
+	}
 	return out
+}
+
+// portConflictFact resume as portas que este projeto disputa com outros — só um
+// processo faz bind numa porta, então isso é o que impede subir ambos juntos.
+func portConflictFact(p core.Project) string {
+	if len(p.PortConflicts) == 0 {
+		return ""
+	}
+	ports := make([]int, 0, len(p.PortConflicts))
+	for port := range p.PortConflicts {
+		ports = append(ports, port)
+	}
+	sort.Ints(ports)
+	parts := make([]string, 0, len(ports))
+	for _, port := range ports {
+		parts = append(parts, fmt.Sprintf(":%d com %s", port, strings.Join(p.PortConflicts[port], ", ")))
+	}
+	return "⚠ porta " + strings.Join(parts, " · ")
 }
 
 // selectedGitFacts: onde a branch está em relação ao remoto, o que há por

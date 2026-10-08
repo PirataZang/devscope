@@ -347,7 +347,11 @@ func landingPortRows(p *core.Project) []string {
 			continue
 		}
 		seen[port] = true
-		rows = append(rows, StyleAccent.Render(fmt.Sprintf("localhost:%d", port)))
+		row := StyleAccent.Render(fmt.Sprintf("localhost:%d", port))
+		if others := p.PortConflicts[port]; len(others) > 0 {
+			row += StyleWarning.Render("  ⚠ conflito com " + strings.Join(others, ", "))
+		}
+		rows = append(rows, row)
 	}
 	for _, d := range p.Domains {
 		rows = append(rows, StyleAccent.Render(d.Host)+StyleMuted.Render("   nginx"))

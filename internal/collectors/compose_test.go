@@ -34,6 +34,40 @@ services:
 	}
 }
 
+func TestParseComposePortsIgnoresHealthcheck(t *testing.T) {
+	dir := t.TempDir()
+	compose := filepath.Join(dir, "docker-compose.yml")
+	// retries/interval fora de um bloco ports: não podem virar porta 5.
+	if err := os.WriteFile(compose, []byte(`
+services:
+  web:
+    ports:
+      - "3000:3000"
+    healthcheck:
+      interval: 5s
+      timeout: 5s
+      retries: 5
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	ports := ParseComposePorts(dir)
+	for _, p := range ports {
+		if p == 5 {
+			t.Fatalf("retries/interval vazaram como porta: %v", ports)
+		}
+	}
+	// a porta real do mapeamento ainda é capturada
+	found := false
+	for _, p := range ports {
+		if p == 3000 {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("porta 3000 do mapeamento não foi capturada: %v", ports)
+	}
+}
+
 func TestComposeFile(t *testing.T) {
 	dir := t.TempDir()
 	if ComposeFile(dir) != "" {

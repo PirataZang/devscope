@@ -187,6 +187,7 @@ type Project struct {
 	HealthChecks    []HealthCheckResult   `json:"health_checks,omitempty"`
 	DeployScript    string                `json:"deploy_script,omitempty"`
 	Ports           []int                 `json:"ports,omitempty"`
+	PortConflicts   map[int][]string      `json:"port_conflicts,omitempty"` // host port -> outros projetos que disputam a mesma porta
 	LastDeploy      *time.Time      `json:"last_deploy,omitempty"`
 	Uptime          time.Duration   `json:"uptime"`
 	Modules         []ProjectModule `json:"modules,omitempty"`
