@@ -122,6 +122,7 @@ func (a *App) renderOverviewCenter(p *core.Project, width, height int, solo bool
 	var tail []overviewSection
 	if solo {
 		tail = append(tail, overviewBox("GIT", a.overviewGitLines(p, inner)))
+		tail = append(tail, overviewBox(a.diskTitle(), a.overviewDiskLines(inner)))
 	}
 	if mods := overviewModuleLines(p, inner); len(mods) > 0 {
 		tail = append(tail, overviewBox("MÓDULOS", mods))
@@ -471,9 +472,17 @@ func relTime(t time.Time) string {
 
 func (a *App) renderOverviewRail(p *core.Project, width, height int) string {
 	git := a.overviewGitLines(p, maxInt(10, width-2))
-	return lipgloss.JoinVertical(lipgloss.Left,
-		panelBox("GIT", git, width, minInt(height, len(git)+2), false),
-		renderActionsBox(width, maxInt(3, height-len(git)-2),
+	disk := a.overviewDiskLines(maxInt(10, width-2))
+	gitH := minInt(height, len(git)+2)
+	diskH := minInt(maxInt(0, height-gitH-3), len(disk)+2)
+	boxes := []string{panelBox("GIT", git, width, gitH, false)}
+	if diskH >= 3 {
+		boxes = append(boxes, panelBox(a.diskTitle(), fitExactLines(disk, diskH-2), width, diskH, false))
+	} else {
+		diskH = 0
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, append(boxes,
+		renderActionsBox(width, maxInt(3, height-gitH-diskH),
 			[2]string{"a", "analisar"},
 			[2]string{"l", "containers"},
 			[2]string{"g", "git"},
@@ -481,7 +490,7 @@ func (a *App) renderOverviewRail(p *core.Project, width, height int) string {
 			[2]string{"E", "shell"},
 			[2]string{"r", "atualizar"},
 			[2]string{"tab", "próximo módulo"},
-		),
+		))...,
 	)
 }
 

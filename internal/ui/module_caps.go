@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -100,10 +101,11 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 			// Sempre: é a porta de entrada do projeto.
 			TabOverview: true,
 			// Scratchpads: não dependem do projeto, são ferramentas de mesa.
-			TabAPI: true, TabDatabase: true, TabWebSocket: true,
+			TabAPI: true, TabDatabase: true,
 
 			TabGit:        isRepo,
 			TabWorktrees:  isRepo,
+			TabTasks:      collectors.HasProjectTasks(path),
 			TabContainers: docker || hasTool("docker"),
 			TabActions:    dirExists(path, ".github", "workflows"),
 			TabJenkins:    fileExists(path, "Jenkinsfile") || fileExists(path, ".devscope", "jenkins.json"),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	"github.com/devscope/devscope/internal/config"
@@ -18,6 +19,9 @@ type Manager struct {
 	hostCollector *metrics.HostCollector
 	nginxDomains  []core.Domain
 	sslCerts      []core.SSLCert
+
+	pendingMu sync.Mutex
+	pending   map[string]*core.GitPending // caminho -> última medida
 }
 
 func NewManager(store *core.StateStore, cfg *config.Config) *Manager {
@@ -56,6 +60,51 @@ func (m *Manager) Start(ctx context.Context) {
 	go m.safeRunCtx(ctx, "docker", m.runDocker)
 	go m.safeRunCtx(ctx, "metrics", m.runMetrics)
 	go m.safeRunCtx(ctx, "health", m.runHealth)
+	go m.safeRunCtx(ctx, "git-pending", m.runGitPending)
+}
+
+// runGitPending mede as pendências de git de TODOS os projetos — é o que deixa
+// o dashboard responder "onde eu deixei coisa pela metade?" sem abrir um por um.
+func (m *Manager) runGitPending(ctx context.Context) {
+	interval := m.cfg.Refresh.GitInterval
+	if interval <= 0 {
+		interval = 30 * time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		m.refreshGitPending(ctx)
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+	}
+}
+
+func (m *Manager) refreshGitPending(ctx context.Context) {
+	measured := map[string]*core.GitPending{}
+	for _, p := range m.store.Get().Projects {
+		if ctx.Err() != nil {
+			return
+		}
+		if p.Git == nil || !p.Git.IsRepo {
+			continue
+		}
+		if g := CollectGitPending(ctx, p.Path); g != nil {
+			measured[p.Path] = g
+		}
+	}
+	m.pendingMu.Lock()
+	m.pending = measured
+	m.pendingMu.Unlock()
+	m.store.Update(func(s *core.Snapshot) { applyGitPending(s.Projects, measured) })
+}
+
+func (m *Manager) gitPending() map[string]*core.GitPending {
+	m.pendingMu.Lock()
+	defer m.pendingMu.Unlock()
+	return m.pending
 }
 
 // StartWithContext is an alias for Start.
@@ -140,6 +189,7 @@ func (m *Manager) refreshProjects(ctx context.Context, projects []core.Project) 
 	AssignSSLToProjects(projects, m.sslCerts)
 	AssignDeployScripts(projects)
 	ApplyProjectStatus(projects, nil)
+	applyGitPending(projects, m.gitPending())
 	projects = SortPinnedFirst(projects, m.cfg.Pinned)
 	m.store.SetProjects(projects)
 	m.store.SetOrphanContainers(orphans)

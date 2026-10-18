@@ -359,25 +359,25 @@ func (a *App) worktreeDetail(p *core.Project, width int) []string {
 	}
 }
 
-type wtStateLabel struct {
+type stateLabel struct {
 	text  string
 	style lipgloss.Style
 }
 
 // worktreeState: uma palavra por linha da tabela. Pasta sumida ganha de tudo
 // (não há o que abrir); alteração ganha de trava (é o que se perde).
-func worktreeState(w collectors.GitWorktree) wtStateLabel {
+func worktreeState(w collectors.GitWorktree) stateLabel {
 	switch {
 	case w.Prunable:
-		return wtStateLabel{"pasta sumiu", StyleUnhealthy}
+		return stateLabel{"pasta sumiu", StyleUnhealthy}
 	case w.Bare:
-		return wtStateLabel{"bare", StyleMuted}
+		return stateLabel{"bare", StyleMuted}
 	case w.Changes > 0:
-		return wtStateLabel{countOf(w.Changes, "alteração", "alterações"), StyleWarning}
+		return stateLabel{countOf(w.Changes, "alteração", "alterações"), StyleWarning}
 	case w.Locked:
-		return wtStateLabel{"travada", StyleWarning}
+		return stateLabel{"travada", StyleWarning}
 	}
-	return wtStateLabel{"limpa", StyleHealthy}
+	return stateLabel{"limpa", StyleHealthy}
 }
 
 // worktreeFolder: as irmãs da principal (onde o DevScope cria) aparecem só

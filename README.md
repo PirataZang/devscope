@@ -132,7 +132,7 @@ Coleta concorrente,<br>UI sobre snapshot imutável
   selecionado: stack, containers, portas, branch e último commit.
 - 🔎 **Filtro ao vivo** (<kbd>/</kbd>) por nome, caminho, branch ou framework, e **busca fuzzy**
   (<kbd>Ctrl</kbd>+<kbd>P</kbd>) para pular direto para um projeto.
-- 🧭 **Módulos do projeto** — <kbd>Tab</kbd> passa por Git, Worktrees, Containers, API e Database. Só
+- 🧭 **Módulos do projeto** — <kbd>Tab</kbd> passa por Git, Worktrees, Tarefas, Containers, API e Database. Só
   aparecem os módulos que fazem sentido para aquele projeto.
 - ❓ **Ajuda** (<kbd>?</kbd>) com todos os atalhos agrupados por cor, e **12 temas**
   (<kbd>Shift</kbd>+<kbd>T</kbd>) com preview na hora.
@@ -302,9 +302,9 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 <td width="33%" valign="top">
 
 #### 🐳 EXECUÇÃO
-`Containers` · `Swarm` · `Kubernetes`
-> start/stop, shell, logs, stats,
-> services, nodes, pods, manifests
+`Tarefas` · `Containers` · `Swarm` · `Kubernetes`
+> make/npm/just, start/stop, shell,
+> logs, stats, services, pods
 
 #### 🟢 REDE
 `Nginx` · `Ngrok` · `CF Tunnel`
@@ -315,9 +315,9 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 <td width="33%" valign="top">
 
 #### 🩷 DADOS
-`API` · `Database` · `WebSocket`
-> cliente HTTP, SQL e frames
-> ao vivo, sem sair da tela
+`API` · `Database`
+> cliente HTTP e SQL,
+> sem sair da tela
 
 #### 🛠️ MESA
 `JSON` · `JWT`

@@ -55,7 +55,7 @@ func TestHelpHasABlockPerScreen(t *testing.T) {
 	}
 	for _, want := range []string{
 		"GIT · BRANCHES", "CONTAINERS", "NGINX", "NGROK", "CLOUDFLARE TUNNEL",
-		"GITHUB ACTIONS", "JENKINS", "SWARM", "KUBERNETES", "API", "DATABASE", "WEBSOCKET",
+		"GITHUB ACTIONS", "JENKINS", "SWARM", "KUBERNETES", "API", "DATABASE",
 	} {
 		if _, ok := blocks[want]; !ok {
 			t.Fatalf("tela %q não aparece na ajuda", want)

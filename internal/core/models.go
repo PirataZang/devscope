@@ -92,6 +92,22 @@ type GitInfo struct {
 	Remotes        []GitRemote     `json:"remotes,omitempty"`
 }
 
+// GitPending é o "onde eu deixei coisa pela metade" de um repositório, medido
+// para todos os projetos (collectors.CollectGitPending). Fica fora de GitInfo
+// para não disputar com o módulo Git, que regrava GitInfo inteiro.
+type GitPending struct {
+	Changes  int       `json:"changes"`
+	Ahead    int       `json:"ahead"`
+	Behind   int       `json:"behind"`
+	Upstream bool      `json:"upstream"`
+	At       time.Time `json:"at"`
+}
+
+// Any diz se há algo a fazer: alteração local, commit a enviar ou a receber.
+func (g *GitPending) Any() bool {
+	return g != nil && (g.Changes > 0 || g.Ahead > 0 || g.Behind > 0)
+}
+
 type Service struct {
 	Type   ServiceType `json:"type"`
 	Name   string      `json:"name"`
@@ -178,6 +194,7 @@ type Project struct {
 	Status          ProjectStatus   `json:"status"`
 	Health          HealthStatus    `json:"health"`
 	Git             *GitInfo        `json:"git,omitempty"`
+	Pending         *GitPending     `json:"git_pending,omitempty"`
 	Services        []Service       `json:"services,omitempty"`
 	Containers      []Container     `json:"containers,omitempty"`
 	Workers         []Worker        `json:"workers,omitempty"`

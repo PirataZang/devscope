@@ -49,6 +49,8 @@ func helpGroups() []helpGroup {
 			}},
 			{"TELA INICIAL", []helpEntry{
 				{"/", "filtrar projetos ao vivo"},
+				{"p", "só projetos com pendência de git (± alterações · ↑ enviar · ↓ receber)"},
+				{"shift+P", "portas: quem está usando cada porta da máquina"},
 				{"ctrl+p", "busca fuzzy de projetos"},
 				{"g · c", "abrir direto em Git / Containers"},
 				{"shift+E", "terminal no diretório do projeto"},
@@ -57,6 +59,16 @@ func helpGroups() []helpGroup {
 				{"shift+T", "escolher tema"},
 				{"ctrl+t", "relax — animações de terminal"},
 				{"r", "atualização rápida"},
+			}},
+			{"PORTAS (shift+P)", []helpEntry{
+				{"enter", "abrir o projeto dono da porta"},
+				{"x", "encerrar (docker stop no container, SIGTERM no processo)"},
+				{"o", "abrir no navegador"},
+				{"r · esc", "atualizar / voltar"},
+			}},
+			{"VISÃO GERAL", []helpEntry{
+				{"x", "limpar pastas geradas (node_modules, vendor, target…)"},
+				{"r", "atualizar e medir o disco de novo"},
 			}},
 			{"APPS EXTERNOS", []helpEntry{
 				{"1-9 · 0", "abrir o programa cadastrado na tecla"},
@@ -146,6 +158,11 @@ func helpGroups() []helpGroup {
 		}},
 
 		{"EXECUÇÃO", ColorDocker, []helpBlock{
+			{"TAREFAS", []helpEntry{
+				{"enter", "rodar no terminal (Makefile, justfile, Taskfile, npm, composer)"},
+				{"ctrl+c", "parar a tarefa; enter volta ao DevScope"},
+				{"r · esc", "atualizar / voltar"},
+			}},
 			{"CONTAINERS", []helpEntry{
 				{"enter", "portas do container"},
 				{"m", "detalhe: logs, métricas, env, config"},
@@ -295,17 +312,7 @@ func helpGroups() []helpGroup {
 				{"ctrl+shift+←→", "estender por palavra"},
 				{"ctrl+shift+home", "estender até o início"},
 				{"ctrl+shift+end", "estender até o fim"},
-				{"onde", "API · JSON · JWT · Kubernetes · WebSocket"},
-			}},
-			{"WEBSOCKET", []helpEntry{
-				{"enter", "abrir a conversa / trocar de servidor"},
-				{"tab", "servidores ↔ conversa"},
-				{"c · d · r", "conectar / desligar / reconectar"},
-				{"n · e", "novo / editar servidor"},
-				{"m", "nova mensagem"},
-				{"/ · f", "buscar / filtrar"},
-				{"shift+enter", "quebra de linha na mensagem"},
-				{"shift+A · esc", "todos os projetos / voltar"},
+				{"onde", "API · JSON · JWT · Kubernetes"},
 			}},
 		}},
 	}

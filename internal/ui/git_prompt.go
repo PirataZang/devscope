@@ -314,6 +314,8 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.gitMergeBranch(p, branch)
 		case "wt-remove":
 			return a, a.wtRemove(p, branch)
+		case "disk-clean":
+			return a, a.cleanDisk(p)
 		}
 	case "esc", "n", "N":
 		a.gitConfirmOn = false
@@ -348,6 +350,8 @@ func (a *App) renderGitConfirm() string {
 		opts.Title = "Mesclar branch"
 		opts.Subtitle = "git merge na branch atual"
 		opts.Detail = truncate(branch+"  →  "+into, 48)
+	case "disk-clean":
+		opts = a.diskConfirmOpts()
 	case "wt-remove":
 		opts.Brand = "WORKTREES"
 		opts.Color = tabAccentColor(TabWorktrees)
