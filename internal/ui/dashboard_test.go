@@ -322,8 +322,8 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 		"Git", "Containers",
 		"GH Actions", "Jenkins",
 		"Swarm", "Kubernetes",
-		"Ngrok", "SSH Tunnel", "CF Tunnel",
-		"Rotas", "API", "Database", "WS",
+		"Ngrok", "CF Tunnel",
+		"API", "Database", "WS",
 		"tab · shift+tab",
 	} {
 		if !strings.Contains(plain, want) {

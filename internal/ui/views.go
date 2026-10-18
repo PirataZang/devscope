@@ -29,14 +29,13 @@ const (
 	TabDatabase
 	TabJSON
 	TabJWT
-	TabRoutes
 	TabWebSocket
 	TabNgrok
 	TabCFTunnel
-	TabSSH
 	TabJenkins
 	TabActions
 	TabNginx
+	TabWorktrees
 )
 
 func (t Tab) String() string {
@@ -45,6 +44,8 @@ func (t Tab) String() string {
 		return "Visão Geral"
 	case TabGit:
 		return "Git"
+	case TabWorktrees:
+		return "Worktrees"
 	case TabContainers:
 		return "Containers"
 	case TabKubernetes:
@@ -61,16 +62,12 @@ func (t Tab) String() string {
 		return "JSON"
 	case TabJWT:
 		return "JWT"
-	case TabRoutes:
-		return "Rotas"
 	case TabWebSocket:
 		return "WS"
 	case TabNgrok:
 		return "Ngrok"
 	case TabCFTunnel:
 		return "CF Tunnel"
-	case TabSSH:
-		return "SSH Tunnel"
 	case TabJenkins:
 		return "Jenkins"
 	case TabActions:
@@ -91,8 +88,8 @@ func (t Tab) String() string {
 // por capacidade do projeto (module_caps.go).
 var AllTabs = []Tab{
 	TabOverview,
-	TabGit, TabActions, TabJenkins,
+	TabGit, TabWorktrees, TabActions, TabJenkins,
 	TabContainers, TabSwarm, TabKubernetes,
-	TabNginx, TabRoutes, TabNgrok, TabSSH, TabCFTunnel,
+	TabNginx, TabNgrok, TabCFTunnel,
 	TabAPI, TabDatabase, TabWebSocket,
 }

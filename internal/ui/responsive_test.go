@@ -202,6 +202,9 @@ func responsiveScenes() []struct {
 		scene{"git/grafo", func(a *App) {
 			a.view, a.tab, a.gitSubview = ViewProject, TabGit, gitSubviewGraph
 		}},
+		scene{"worktrees/lista", func(a *App) {
+			a.view, a.tab, a.wtList = ViewProject, TabWorktrees, sampleWorktrees(a.selectedProject.Path)
+		}},
 		scene{"git/filtro-branch", func(a *App) {
 			a.view, a.tab = ViewProject, TabGit
 			a.gitBranchFilterOn, a.gitBranchFilterInput = true, "feat"
@@ -273,13 +276,15 @@ func contentStats(out string) (rows, cells int) {
 // Estar nesta lista é uma decisão de design, não uma isenção de teste — elas
 // continuam cobradas por não estourar e por não mentir.
 var boundedScenes = map[string]string{
-	"dashboard/vazio": "estado vazio: diz o motivo e a saída, e nada mais",
-	"dashboard/fuzzy": "prompt de busca — uma linha de campo",
-	"tema":            "modal: lista fixa de temas",
-	"preferências":    "modal: formulário de tamanho fixo",
-	"git/commit":      "cresce com arquivos e diff; sem commit carregado é o estado vazio",
-	"containers/deps": "árvore do compose: tem o tamanho do compose",
-	"git/grafo":       "cresce com os commits do grafo",
+	"dashboard/vazio":   "estado vazio: diz o motivo e a saída, e nada mais",
+	"dashboard/fuzzy":   "prompt de busca — uma linha de campo",
+	"tema":              "modal: lista fixa de temas",
+	"preferências":      "modal: formulário de tamanho fixo",
+	"git/commit":        "cresce com arquivos e diff; sem commit carregado é o estado vazio",
+	"containers/deps":   "árvore do compose: tem o tamanho do compose",
+	"worktrees/lista":   "lista de worktrees: tem o tamanho do repositório",
+	"containers/portas": "portas de um container: tem o tamanho do que ele publica",
+	"git/grafo":         "cresce com os commits do grafo",
 }
 
 func isBounded(name string) bool {

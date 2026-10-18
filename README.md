@@ -132,7 +132,7 @@ Coleta concorrente,<br>UI sobre snapshot imutável
   selecionado: stack, containers, portas, branch e último commit.
 - 🔎 **Filtro ao vivo** (<kbd>/</kbd>) por nome, caminho, branch ou framework, e **busca fuzzy**
   (<kbd>Ctrl</kbd>+<kbd>P</kbd>) para pular direto para um projeto.
-- 🧭 **Módulos do projeto** — <kbd>Tab</kbd> passa por Git, Containers, Rotas, API e Database. Só
+- 🧭 **Módulos do projeto** — <kbd>Tab</kbd> passa por Git, Worktrees, Containers, API e Database. Só
   aparecem os módulos que fazem sentido para aquele projeto.
 - ❓ **Ajuda** (<kbd>?</kbd>) com todos os atalhos agrupados por cor, e **12 temas**
   (<kbd>Shift</kbd>+<kbd>T</kbd>) com preview na hora.
@@ -279,7 +279,7 @@ do terminal.
 
 ---
 
-## 🧩 15 módulos, um contexto
+## 🧩 14 módulos, um contexto
 
 Cada módulo aparece **só quando faz sentido** para o projeto aberto — um projeto Go sem Docker
 não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da categoria, no app inteiro.
@@ -294,9 +294,9 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 > git e atividade num painel
 
 #### 🟡 CÓDIGO
-`Git` · `GH Actions` · `Jenkins`
+`Git` · `Worktrees` · `GH Actions` · `Jenkins`
 > branches, commits, PR, graph,
-> runs, workflows, logs, trigger
+> worktrees, runs, workflows, trigger
 
 </td>
 <td width="33%" valign="top">
@@ -307,10 +307,9 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 > services, nodes, pods, manifests
 
 #### 🟢 REDE
-`Nginx` · `Rotas` · `Ngrok`
-`SSH` · `CF Tunnel`
-> vhosts, endpoints, expor o
-> local, requests ao vivo, URL
+`Nginx` · `Ngrok` · `CF Tunnel`
+> vhosts, expor o local,
+> requests ao vivo, URL
 
 </td>
 <td width="33%" valign="top">
@@ -333,8 +332,7 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 <sub>
 
 **Também no pacote:** health checks HTTP/TCP · validade de SSL (Let's Encrypt) · portas abertas ·
-workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 12 temas · Git Graph ·
-rotas detectadas em Laravel, Express, NestJS, Next/Nuxt, Django, Flask, FastAPI, Rails, Spring, Go e Rust
+workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 12 temas · Git Graph
 
 </sub>
 </div>

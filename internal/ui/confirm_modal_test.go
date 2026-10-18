@@ -25,7 +25,7 @@ func TestRenderDeleteConfirmBox(t *testing.T) {
 }
 
 func TestTunnelDeleteUsesSharedModal(t *testing.T) {
-	got := stripANSI(renderTunnelDeleteConfirmBox("SSH", tabAccentColor(TabSSH), "app", "remote :3000", 80, 20))
+	got := stripANSI(renderTunnelDeleteConfirmBox("NGROK", tabAccentColor(TabNgrok), "app", "remote :3000", 80, 20))
 	if !strings.Contains(got, "Excluir túnel") || !strings.Contains(got, "app") {
 		t.Fatalf("%q", got)
 	}

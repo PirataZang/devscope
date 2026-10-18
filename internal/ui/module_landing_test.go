@@ -21,9 +21,7 @@ func landingRenderers(a *App) map[Tab]func(*core.Project) string {
 		TabActions:    a.renderGHALanding,
 		TabJenkins:    a.renderJenkinsLanding,
 		TabNginx:      a.renderNginxLanding,
-		TabRoutes:     a.renderRoutesLanding,
 		TabNgrok:      a.renderNgrokLanding,
-		TabSSH:        a.renderSSHLanding,
 		TabCFTunnel:   a.renderCFLanding,
 		TabJSON:       a.renderJsonLanding,
 		TabJWT:        a.renderJwtLanding,
@@ -129,7 +127,7 @@ func TestLandingStateIsNotDuplicated(t *testing.T) {
 
 // A sondagem que ainda não voltou diz "…", não mente com "offline".
 func TestLandingProbePendingIsHonest(t *testing.T) {
-	for _, tab := range []Tab{TabNgrok, TabSSH, TabCFTunnel, TabKubernetes, TabSwarm, TabActions, TabJenkins, TabNginx} {
+	for _, tab := range []Tab{TabNgrok, TabCFTunnel, TabKubernetes, TabSwarm, TabActions, TabJenkins, TabNginx} {
 		a, p := landingTestApp(140, 40, tab)
 		got := stripANSI(landingRenderers(a)[tab](p))
 		if !strings.Contains(got, "sondando") {
@@ -212,7 +210,6 @@ func TestLandingDropsFactsThatRepeatTheState(t *testing.T) {
 		state string
 	}{
 		{TabNgrok, func(a *App) { a.landingNgrokOK, a.landingNgrokAvail = true, false }, "ngrok"},
-		{TabSSH, func(a *App) { a.landingSSHOK, a.landingSSHAvail = true, false }, "ssh"},
 		{TabActions, func(a *App) { a.landingGHAOK = true }, "gh"},
 		{TabKubernetes, func(a *App) { a.landingK8sOK = true }, "kubectl"},
 	}

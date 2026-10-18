@@ -54,7 +54,7 @@ func TestHelpHasABlockPerScreen(t *testing.T) {
 		}
 	}
 	for _, want := range []string{
-		"GIT · BRANCHES", "CONTAINERS", "NGINX", "NGROK", "SSH TUNNEL", "CLOUDFLARE TUNNEL",
+		"GIT · BRANCHES", "CONTAINERS", "NGINX", "NGROK", "CLOUDFLARE TUNNEL",
 		"GITHUB ACTIONS", "JENKINS", "SWARM", "KUBERNETES", "API", "DATABASE", "WEBSOCKET",
 	} {
 		if _, ok := blocks[want]; !ok {
