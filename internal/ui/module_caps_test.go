@@ -42,7 +42,7 @@ func TestModuleCapsShowsEverythingUntilProbed(t *testing.T) {
 // tem, e diz quantos ficaram de fora.
 func TestModuleCapsHidesIrrelevantAndAnnouncesThem(t *testing.T) {
 	a := capsApp(map[Tab]bool{
-		TabOverview: true, TabGit: true, TabAPI: true, TabDatabase: true, TabWebSocket: true,
+		TabOverview: true, TabGit: true, TabAPI: true, TabDatabase: true,
 	})
 	plain := stripANSI(a.renderProjectSidebar())
 	for _, want := range []string{"Visão Geral", "Git", "API", "Database"} {
@@ -59,8 +59,8 @@ func TestModuleCapsHidesIrrelevantAndAnnouncesThem(t *testing.T) {
 	if !strings.Contains(plain, "ocultos") || !strings.Contains(plain, "⋯") {
 		t.Fatalf("a sidebar não anuncia os módulos ocultos:\n%s", plain)
 	}
-	if n := a.hiddenTabCount(); n != len(AllTabs)-5 {
-		t.Fatalf("%d ocultos, esperado %d", n, len(AllTabs)-5)
+	if n := a.hiddenTabCount(); n != len(AllTabs)-4 {
+		t.Fatalf("%d ocultos, esperado %d", n, len(AllTabs)-4)
 	}
 }
 

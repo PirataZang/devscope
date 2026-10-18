@@ -319,11 +319,11 @@ func TestProjectSidebarShowsVerticalTabs(t *testing.T) {
 	for _, want := range []string{
 		"PROJETO", "CÓDIGO", "EXECUÇÃO", "REDE", "DADOS",
 		"Visão Geral",
-		"Git", "Containers",
+		"Git", "Worktrees", "Tarefas", "Containers",
 		"GH Actions", "Jenkins",
 		"Swarm", "Kubernetes",
 		"Ngrok", "CF Tunnel",
-		"API", "Database", "WS",
+		"API", "Database",
 		"tab · shift+tab",
 	} {
 		if !strings.Contains(plain, want) {

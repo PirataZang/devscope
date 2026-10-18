@@ -194,7 +194,14 @@ func (a *App) renderProjectsBar(projects []core.Project, width int) string {
 	if pills := renderStatusPills(projects, a.animFrame); pills != "" {
 		left += "   " + pills
 	}
-	if a.filter != "" && !a.filterOn {
+	if n := countPending(a.snapshot.Projects); n > 0 || a.pendingOnly {
+		pill := StyleWarning.Render("±"+strconv.Itoa(n)) + StyleMuted.Render(" pendentes")
+		if a.pendingOnly {
+			pill = StyleSelected.Render(" só pendentes ") + StyleMuted.Render(" p mostra todos")
+		}
+		left += "   " + pill
+	}
+	if (a.filter != "" && !a.filterOn) || a.pendingOnly {
 		left += StyleMuted.Render("   de " + strconv.Itoa(len(a.snapshot.Projects)))
 	}
 	rightW := width - lipgloss.Width(left) - 3
@@ -343,10 +350,20 @@ func (a *App) renderProjectRow(c tableCols, p core.Project, selected bool) strin
 		branch = p.Git.Branch
 	}
 
+	// A pendência mora DENTRO da coluna BRANCH, encostada à direita: é sobre a
+	// branch que ela fala, e coluna nova roubaria largura do CAMINHO. A branch
+	// cede primeiro — "±3" é o que faz o olho parar na linha.
+	marks := pendingMarks(p)
+	markW := minInt(runewidth.StringWidth(marks), maxInt(0, c.branch-6))
+	branchW := c.branch
+	if markW > 0 {
+		branchW = c.branch - markW - 1
+	}
 	row := renderCells(selected, []dashCell{
 		{text: glyph, width: c.dot, style: dotStyle},
 		{text: p.Name, width: c.name, style: StyleNormal.Bold(true)},
-		{text: branch, width: c.branch, style: lipgloss.NewStyle().Foreground(ColorAccent)},
+		{text: branch, width: branchW, style: lipgloss.NewStyle().Foreground(ColorAccent)},
+		{text: marks, width: markW, style: StyleWarning, right: true},
 		// A cauda do caminho é a parte que identifica; corta pela esquerda.
 		{text: elideLeft(shortenPath(p.Path), c.path), width: c.path, style: StyleMuted},
 	})
@@ -643,18 +660,19 @@ func selectedGitFacts(p core.Project, width int) []string {
 	if g == nil || !g.IsRepo {
 		return nil
 	}
+	changes, ahead, behind := projectPending(p)
 	var out []string
 	if g.Branch != "" {
 		branch := g.Branch
-		if g.Ahead > 0 {
-			branch += fmt.Sprintf(" ↑%d", g.Ahead)
+		if ahead > 0 {
+			branch += fmt.Sprintf(" ↑%d", ahead)
 		}
-		if g.Behind > 0 {
-			branch += fmt.Sprintf(" ↓%d", g.Behind)
+		if behind > 0 {
+			branch += fmt.Sprintf(" ↓%d", behind)
 		}
 		out = append(out, lipgloss.NewStyle().Foreground(ColorAccent).Render(branch))
 	}
-	if n := g.Modified + g.Staged + g.Untracked; n > 0 {
+	if n := changes; n > 0 {
 		word := "alterados"
 		if n == 1 {
 			word = "alterado"
@@ -668,6 +686,53 @@ func selectedGitFacts(p core.Project, width int) []string {
 		out = append(out, StyleMuted.Render(truncate(msg, room)+"  "+commitAge(p)))
 	}
 	return out
+}
+
+// ─── pendências de git ──────────────────────────────────────────────────────
+
+// projectPending: a medida do ciclo de pendências (todos os projetos, a cada
+// git_interval) quando existe; antes dela, o que o GitInfo tiver — só o
+// projeto já aberto tem contagem lá.
+func projectPending(p core.Project) (changes, ahead, behind int) {
+	if p.Pending != nil {
+		return p.Pending.Changes, p.Pending.Ahead, p.Pending.Behind
+	}
+	if g := p.Git; g != nil && g.IsRepo {
+		return g.Modified + g.Staged + g.Untracked, g.Ahead, g.Behind
+	}
+	return 0, 0, 0
+}
+
+func hasPending(p core.Project) bool {
+	c, a, b := projectPending(p)
+	return c+a+b > 0
+}
+
+func countPending(projects []core.Project) int {
+	n := 0
+	for _, p := range projects {
+		if hasPending(p) {
+			n++
+		}
+	}
+	return n
+}
+
+// pendingMarks: `±3` alterações locais, `↑2` commits a enviar, `↓1` a receber.
+// Alteração vem primeiro: é a que se perde se ninguém lembrar dela.
+func pendingMarks(p core.Project) string {
+	c, a, b := projectPending(p)
+	var parts []string
+	if c > 0 {
+		parts = append(parts, "±"+strconv.Itoa(c))
+	}
+	if a > 0 {
+		parts = append(parts, "↑"+strconv.Itoa(a))
+	}
+	if b > 0 {
+		parts = append(parts, "↓"+strconv.Itoa(b))
+	}
+	return strings.Join(parts, " ")
 }
 
 // projectStatusWord é a ÚNICA fonte da palavra de estado do app.
@@ -800,6 +865,8 @@ func (a *App) renderDashboardFooter(width int) string {
 		[2]string{"ENTER", "git"},
 		[2]string{"c", "containers"},
 		[2]string{"/", "filtrar"},
+		[2]string{"p", "pendências"},
+		[2]string{"shift+P", "portas"},
 		[2]string{"ctrl+p", "fuzzy"},
 		[2]string{"shift+E", "terminal"},
 		[2]string{"ctrl+o", a.aiToolLabel()},

@@ -16,7 +16,6 @@ import (
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/nginxutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
-	"github.com/devscope/devscope/internal/wsutil"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -31,6 +30,7 @@ type App struct {
 	filter      string
 	filterOn    bool
 	filterInput string
+	pendingOnly bool // `p` no dashboard: só projetos com pendência de git
 
 	helpOn     bool
 	helpScroll int
@@ -171,6 +171,12 @@ type App struct {
 	gitBranchDenylist           map[string]struct{}
 	dashboardScroll             int
 	dashboardSubview            dashboardSubview
+	portsList                   []portRow
+	portsLoading                bool
+	portsCursor                 int
+	portsScroll                 int
+	portsStatus                 string
+	portsConfirm                bool
 	relaxGame                   relaxGame
 	relaxReturnView             View
 	relaxCube                   relaxCubeState
@@ -453,47 +459,6 @@ type App struct {
 	jwtHScrollIn                int
 	jwtHScrollOut               int
 	jwtHScrollSecret            int
-	wsOpen                      bool
-	wsComposeOn                 bool
-	wsComposeFocus              wsComposeFocus
-	wsComposePending            bool
-	wsEditing                   bool
-	wsConnected                 bool
-	wsSubTab                    wsSubTab
-	wsFocus                     wsFocus
-	wsURL                       string
-	wsHeaders                   string
-	wsSend                      string
-	wsStatus                    string
-	wsErr                       string
-	wsFrames                    []wsFrame
-	wsFrameSeq                  int
-	wsFrameCursor               int
-	wsMsgScroll                 int
-	wsMsgHScroll                int
-	wsSendVScroll               int
-	wsSendHScroll               int
-	wsFilter                    wsFilterKind
-	wsSearchOn                  bool
-	wsSearchInput               string
-	wsSearch                    string
-	wsPayloadMode               wsPayloadMode
-	wsSendMode                  wsSendMode
-	wsHistory                   []string
-	wsRecent                    []string
-	wsRecentCursor              int
-	wsEditSourceIdx             int
-	wsShowAll                   bool
-	wsAllCursor                 int
-	wsStats                     wsStats
-	wsInfo                      wsutil.Info
-	wsConnectedAt               time.Time
-	wsLastSendAt                time.Time
-	wsLatency                   time.Duration
-	wsAutoReconnect             bool
-	wsPortIndex                 int
-	wsEdit                      editorState
-	wsSess                      *wsutil.Session
 	ngrokOpen                   bool
 	ngrokLoading                bool
 	ngrokWizard                 bool
@@ -587,6 +552,24 @@ type App struct {
 	wtCursor                    int
 	wtScroll                    int
 	wtFollow                    string
+	diskPath                    string
+	diskTargets                 []collectors.CleanTarget
+	diskLoading                 bool
+	diskStatus                  string
+	relPath                     string
+	relState                    collectors.ReleaseState
+	relRuns                     map[string]collectors.GHARun
+	relLoading                  bool
+	relBump                     int // 0 patch · 1 minor · 2 major
+	relBumpSet                  bool
+	relStatus                   string
+	relWatch                    string // tag cujo workflow está sendo acompanhado
+	taskList                    []collectors.ProjectTask
+	taskLoading                 bool
+	taskPath                    string
+	taskCursor                  int
+	taskScroll                  int
+	taskLast                    map[string]taskResult
 	nginxLoading                bool
 	nginxView                   nginxView
 	nginxCursor                 int
@@ -824,9 +807,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.gitComposeOn {
 			return a.updateGitCompose(msg)
 		}
-		if a.wsComposeOn {
-			return a.updateWsCompose(msg)
-		}
 		if a.dockerAddOn {
 			return a.updateDockerAdd(msg)
 		}
@@ -847,9 +827,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if a.dbFilterOn {
 			return a.updateDbFilter(msg, a.currentProject())
-		}
-		if a.wsSearchOn {
-			return a.updateWsSearch(msg)
 		}
 		if a.gitDiffSearchOn {
 			return a.updateGitDiffSearch(msg)
@@ -952,6 +929,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case wtActionMsg:
 		return a, a.handleWorktreeAction(msg)
 
+	case tasksLoadedMsg:
+		a.handleTasksLoaded(msg)
+		return a, nil
+
+	case taskDoneMsg:
+		a.handleTaskDone(msg)
+		return a, nil
+
 	case gitWTRefreshedMsg:
 		a.handleGitWTRefreshed(msg)
 		return a, nil
@@ -1018,8 +1003,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case swarmLoadedMsg, swarmActionMsg, swarmDetailMsg, swarmTickMsg:
 		return a.handleSwarmMsg(msg)
 
-	case wsConnectedMsg, wsEventMsg:
-		return a.handleWsMsg(msg)
 	case ngrokLoadedMsg, ngrokActionMsg:
 		return a.handleNgrokMsg(msg)
 
@@ -1128,6 +1111,33 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleProjectLogsLoaded(msg)
 		return a, nil
 
+	case relLoadedMsg:
+		a.handleReleaseLoaded(msg)
+		return a, nil
+
+	case relTaggedMsg:
+		return a, a.handleReleaseTagged(msg)
+
+	case relPollMsg:
+		return a, a.handleReleasePoll(msg)
+
+	case relRunsMsg:
+		return a, a.handleReleaseRuns(msg)
+
+	case diskLoadedMsg:
+		a.handleDiskLoaded(msg)
+		return a, nil
+
+	case diskCleanedMsg:
+		return a, a.handleDiskCleaned(msg)
+
+	case portsLoadedMsg:
+		a.handlePortsLoaded(msg)
+		return a, nil
+
+	case portStoppedMsg:
+		return a, a.handlePortStopped(msg)
+
 	case projectShellDoneMsg:
 		a.handleProjectShellDone(msg)
 		return a, nil
@@ -1232,9 +1242,6 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.view == ViewProject && a.tab == TabJWT && a.jwtOpen && a.jwtEditing {
 		return a.updateProject(msg)
 	}
-	if a.view == ViewProject && a.tab == TabWebSocket && a.wsOpen && (a.wsEditing || a.wsComposeOn) {
-		return a.updateProject(msg)
-	}
 
 	switch {
 	case key.Matches(msg, key.NewBinding(key.WithKeys("q", "ctrl+c"))):
@@ -1330,6 +1337,10 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a, nil
 	}
 
+	if a.dashboardSubview == dashboardSubviewPorts {
+		return a.handlePortsKeys(msg)
+	}
+
 	projects := filterNestedProjects(sortProjects(a.filteredProjects()))
 
 	switch msg.String() {
@@ -1338,9 +1349,10 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		a.filterInput = a.filter
 		return a, nil
 	case "esc":
-		if a.filter != "" {
+		if a.filter != "" || a.pendingOnly {
 			a.filter = ""
 			a.filterInput = ""
+			a.pendingOnly = false
 			a.cursor = 0
 			a.dashboardScroll = 0
 		}
@@ -1383,6 +1395,11 @@ func (a *App) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if len(projects) > 0 && a.cursor < len(projects) {
 			return a, a.openProject(projects[a.cursor], TabContainers)
 		}
+	case "p":
+		a.pendingOnly = !a.pendingOnly
+		a.cursor, a.dashboardScroll = 0, 0
+	case "P", "shift+p":
+		return a, a.openPortsView()
 	case "r":
 		a.snapshot = a.store.Get()
 	}
@@ -1398,13 +1415,6 @@ func (a *App) closeToolClients() {
 	a.swarmGen++
 	a.jsonOpen = false
 	a.jwtOpen = false
-	if a.wsOpen || a.wsConnected {
-		a.wsCloseSession()
-	}
-	a.wsOpen = false
-	a.wsComposeOn = false
-	a.wsEditing = false
-	a.wsShowAll = false
 	a.ngrokOpen = false
 	a.ngrokWizard = false
 	a.ngrokConfirmDelete = false
@@ -1452,6 +1462,8 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 	a.projectContentScroll = 0
 	var cmds []tea.Cmd
 	switch t {
+	case TabOverview:
+		cmds = append(cmds, a.loadDisk(p))
 	case TabGit:
 		if p != nil {
 			a.initGitTab(p)
@@ -1459,6 +1471,13 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 	case TabWorktrees:
 		a.wtStatus = ""
 		cmds = append(cmds, a.loadWorktrees(p))
+	case TabTasks:
+		cmds = append(cmds, a.loadTasks(p))
+	case TabReleases:
+		cmds = append(cmds, a.loadRelease(p))
+		if a.relWatch != "" {
+			cmds = append(cmds, relPoll(a.relPath))
+		}
 	case TabContainers:
 		a.initContainersTab()
 		cmds = append(cmds, a.requestContainerPreview())
@@ -1484,8 +1503,6 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterJsonTab(p)
 	case TabJWT:
 		a.enterJwtTab(p)
-	case TabWebSocket:
-		a.enterWsTab(p)
 	case TabNgrok:
 		a.enterNgrokTab(p)
 		if !a.landingNgrokOK {
@@ -1557,9 +1574,6 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabJWT {
 		a.jwtOpen = false
 	}
-	if tab == TabWebSocket {
-		a.wsOpen = false
-	}
 	if tab == TabNgrok {
 		a.ngrokOpen = false
 	}
@@ -1581,6 +1595,9 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	cmds = append(cmds, a.startProjectLoad(cp.Path), a.probeModuleCaps(&cp))
 	if tab == TabLogs {
 		cmds = append(cmds, a.initLogsTab(&cp))
+	}
+	if tab == TabOverview {
+		cmds = append(cmds, a.loadDisk(&cp))
 	}
 	if tab == TabContainers {
 		cmds = append(cmds, a.requestContainerPreview())
@@ -1649,9 +1666,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabJWT && a.jwtOpen {
 		return a.handleJwtKeys(msg, p)
 	}
-	if a.tab == TabWebSocket && a.wsOpen {
-		return a.handleWsKeys(msg, p)
-	}
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.handleNgrokKeys(msg, p)
 	}
@@ -1666,6 +1680,21 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabWorktrees {
 		if cmd, ok := a.handleWorktreeKeys(msg, p); ok {
+			return a, cmd
+		}
+	}
+	if a.tab == TabTasks {
+		if cmd, ok := a.handleTaskKeys(msg, p); ok {
+			return a, cmd
+		}
+	}
+	if a.tab == TabReleases {
+		if cmd, ok := a.handleReleaseKeys(msg, p); ok {
+			return a, cmd
+		}
+	}
+	if a.tab == TabOverview {
+		if cmd, ok := a.handleOverviewKeys(msg, p); ok {
 			return a, cmd
 		}
 	}
@@ -2103,9 +2132,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabJWT && !a.jwtOpen {
 			return a, a.openJwtClient(p)
 		}
-		if a.tab == TabWebSocket && !a.wsOpen {
-			return a, a.openWsClient(p)
-		}
 		if a.tab == TabNgrok && !a.ngrokOpen {
 			return a, a.openNgrokClient(p)
 		}
@@ -2181,7 +2207,23 @@ func (a *App) currentProjectPath() string {
 	return ""
 }
 
+// filteredProjects é a lista do dashboard: busca por texto e, com `p`, só os
+// projetos com pendência de git.
 func (a *App) filteredProjects() []core.Project {
+	projects := a.textFilteredProjects()
+	if !a.pendingOnly {
+		return projects
+	}
+	var out []core.Project
+	for _, p := range projects {
+		if hasPending(p) {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+func (a *App) textFilteredProjects() []core.Project {
 	if a.filter == "" {
 		return a.snapshot.Projects
 	}
@@ -2231,8 +2273,6 @@ func (a *App) View() string {
 		content = a.renderApiSearchPrompt()
 	case a.gitComposeOn:
 		content = a.renderGitCompose()
-	case a.wsComposeOn:
-		content = a.renderWsCompose()
 	case a.dockerAddOn:
 		content = a.renderDockerAdd()
 	case a.gitPromptOn:
@@ -2256,6 +2296,9 @@ func (a *App) renderCurrentView() string {
 	case ViewRelax:
 		return a.renderRelax()
 	default:
+		if a.dashboardSubview == dashboardSubviewPorts {
+			return a.renderPortsView()
+		}
 		return a.renderDashboard()
 	}
 }
@@ -2303,9 +2346,6 @@ func (a *App) renderProject() string {
 	if a.tab == TabJWT && a.jwtOpen {
 		return a.renderJwtTab(p)
 	}
-	if a.tab == TabWebSocket && a.wsOpen {
-		return a.renderWsTab(p)
-	}
 	if a.tab == TabNgrok && a.ngrokOpen {
 		return a.renderNgrokTab(p)
 	}
@@ -2342,7 +2382,7 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees ||
+	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees || a.tab == TabTasks || a.tab == TabReleases ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
@@ -2471,6 +2511,10 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderGitTab(p)
 	case TabWorktrees:
 		return a.renderWorktreesTab(p)
+	case TabTasks:
+		return a.renderTasksTab(p)
+	case TabReleases:
+		return a.renderReleasesTab(p)
 	case TabContainers:
 		return a.renderContainersTab(p)
 	case TabLogs:
@@ -2487,8 +2531,6 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderJsonLanding(p)
 	case TabJWT:
 		return a.renderJwtLanding(p)
-	case TabWebSocket:
-		return a.renderWsLanding(p)
 	case TabNgrok:
 		return a.renderNgrokLanding(p)
 	case TabCFTunnel:
@@ -2654,8 +2696,6 @@ func (a *App) moduleClientOpen(t Tab) bool {
 		return a.jsonOpen
 	case TabJWT:
 		return a.jwtOpen
-	case TabWebSocket:
-		return a.wsOpen
 	case TabNgrok:
 		return a.ngrokOpen
 	case TabCFTunnel:

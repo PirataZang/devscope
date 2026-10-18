@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 )
 
@@ -202,6 +203,18 @@ func responsiveScenes() []struct {
 		scene{"git/grafo", func(a *App) {
 			a.view, a.tab, a.gitSubview = ViewProject, TabGit, gitSubviewGraph
 		}},
+		scene{"portas", func(a *App) {
+			a.dashboardSubview = dashboardSubviewPorts
+			a.portsList = []portRow{
+				{Listener: collectors.Listener{Port: 3000, Addr: "*", PID: 4123, Process: "node", Cmdline: "node /home/dev/projetos/portal/node_modules/.bin/vite --port 3000", Cwd: "/home/dev/projetos/portal"}, project: "portal-web", path: "/home/dev/projetos/portal"},
+				{Listener: collectors.Listener{Port: 5432, Addr: "*", PID: 900, Process: "docker-proxy"}, project: "digiliza-checkout-web", container: "digiliza-checkout-web-postgres-1"},
+				{Listener: collectors.Listener{Port: 6379, Addr: "127.0.0.1"}},
+			}
+		}},
+		scene{"tarefas/lista", func(a *App) {
+			a.view, a.tab, a.taskList = ViewProject, TabTasks, sampleTasks()
+			a.taskLast = map[string]taskResult{"make test": {code: 2, dur: 14e9}, "pnpm build": {dur: 3e9}}
+		}},
 		scene{"worktrees/lista", func(a *App) {
 			a.view, a.tab, a.wtList = ViewProject, TabWorktrees, sampleWorktrees(a.selectedProject.Path)
 		}},
@@ -282,6 +295,8 @@ var boundedScenes = map[string]string{
 	"preferências":      "modal: formulário de tamanho fixo",
 	"git/commit":        "cresce com arquivos e diff; sem commit carregado é o estado vazio",
 	"containers/deps":   "árvore do compose: tem o tamanho do compose",
+	"portas":            "portas abertas: tem o tamanho do que a máquina escuta",
+	"tarefas/lista":     "lista de tarefas: tem o tamanho do que o projeto declara",
 	"worktrees/lista":   "lista de worktrees: tem o tamanho do repositório",
 	"containers/portas": "portas de um container: tem o tamanho do que ele publica",
 	"git/grafo":         "cresce com os commits do grafo",

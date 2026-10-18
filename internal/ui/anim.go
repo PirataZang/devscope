@@ -182,7 +182,7 @@ func (a *App) needsAnim() bool {
 		a.gitBranchLoading || a.gitCommitFilesLoading || a.gitActionLoading || a.gitCommitDiffLoading ||
 		a.dockerAddLoading || a.dockerAddDetailsLoading || a.dockerAddTagsLoading ||
 		a.containerDetailLoading || a.apiLoading || a.dbLoading || a.dbSchemaLoading ||
-		a.k8sLoading || a.swarmLoading || a.wtLoading ||
+		a.k8sLoading || a.swarmLoading || a.wtLoading || a.taskLoading || a.portsLoading || a.diskLoading || a.relLoading || a.relWatch != "" ||
 		a.ngrokLoading || a.cfLoading || a.jenkinsLoading || a.ghaLoading ||
 		(a.ghaOpen && a.ghaHasActiveWork()) ||
 		a.projectLogsLoading || a.projectGitLoading || a.projectDockerLoading {
@@ -201,7 +201,7 @@ func (a *App) wantsPulseAnim() bool {
 	if a.currentProject() != nil {
 		return true
 	}
-	if a.ghaOpen || (a.jenkinsOpen && a.jenkinsInfo.Connected) || a.wsConnected {
+	if a.ghaOpen || (a.jenkinsOpen && a.jenkinsInfo.Connected) {
 		return true
 	}
 	return false

@@ -258,10 +258,10 @@ type sidebarGroup struct {
 func sidebarGroups() []sidebarGroup {
 	return []sidebarGroup{
 		{"PROJETO", ColorAccent, []Tab{TabOverview}},
-		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabWorktrees, TabActions, TabJenkins}},
-		{"EXECUÇÃO", ColorDocker, []Tab{TabContainers, TabSwarm, TabKubernetes}},
+		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins}},
+		{"EXECUÇÃO", ColorDocker, []Tab{TabTasks, TabContainers, TabSwarm, TabKubernetes}},
 		{"REDE", ColorPrimary, []Tab{TabNginx, TabNgrok, TabCFTunnel}},
-		{"DADOS", ColorPink, []Tab{TabAPI, TabDatabase, TabWebSocket}},
+		{"DADOS", ColorPink, []Tab{TabAPI, TabDatabase}},
 	}
 }
 
@@ -349,6 +349,10 @@ func tabGlyph(t Tab) string {
 		return "⑂"
 	case TabWorktrees:
 		return "⇌"
+	case TabTasks:
+		return "»"
+	case TabReleases:
+		return "⇡"
 	case TabContainers:
 		return "▣"
 	case TabKubernetes:
@@ -365,10 +369,6 @@ func tabGlyph(t Tab) string {
 		return "{"
 	case TabJWT:
 		return "⚿"
-	case TabWebSocket:
-		// ⚡ e ☰ medem 2 colunas nas libs e 1 na maioria dos terminais — a linha
-		// da sidebar saía 1 coluna curta.
-		return "⇅"
 	case TabNgrok:
 		return "⇪"
 	case TabCFTunnel:

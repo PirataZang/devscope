@@ -14,6 +14,7 @@ type dashboardSubview int
 const (
 	dashboardSubviewList dashboardSubview = iota
 	dashboardSubviewShellReturn
+	dashboardSubviewPorts
 )
 
 type Tab int
@@ -29,13 +30,14 @@ const (
 	TabDatabase
 	TabJSON
 	TabJWT
-	TabWebSocket
 	TabNgrok
 	TabCFTunnel
 	TabJenkins
 	TabActions
 	TabNginx
 	TabWorktrees
+	TabTasks
+	TabReleases
 )
 
 func (t Tab) String() string {
@@ -46,6 +48,10 @@ func (t Tab) String() string {
 		return "Git"
 	case TabWorktrees:
 		return "Worktrees"
+	case TabTasks:
+		return "Tarefas"
+	case TabReleases:
+		return "Releases"
 	case TabContainers:
 		return "Containers"
 	case TabKubernetes:
@@ -62,8 +68,6 @@ func (t Tab) String() string {
 		return "JSON"
 	case TabJWT:
 		return "JWT"
-	case TabWebSocket:
-		return "WS"
 	case TabNgrok:
 		return "Ngrok"
 	case TabCFTunnel:
@@ -88,8 +92,8 @@ func (t Tab) String() string {
 // por capacidade do projeto (module_caps.go).
 var AllTabs = []Tab{
 	TabOverview,
-	TabGit, TabWorktrees, TabActions, TabJenkins,
-	TabContainers, TabSwarm, TabKubernetes,
+	TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins,
+	TabTasks, TabContainers, TabSwarm, TabKubernetes,
 	TabNginx, TabNgrok, TabCFTunnel,
-	TabAPI, TabDatabase, TabWebSocket,
+	TabAPI, TabDatabase,
 }

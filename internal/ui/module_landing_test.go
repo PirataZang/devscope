@@ -15,7 +15,6 @@ func landingRenderers(a *App) map[Tab]func(*core.Project) string {
 	return map[Tab]func(*core.Project) string{
 		TabAPI:        a.renderApiLanding,
 		TabDatabase:   a.renderDbLanding,
-		TabWebSocket:  a.renderWsLanding,
 		TabSwarm:      a.renderSwarmLanding,
 		TabKubernetes: a.renderK8sLanding,
 		TabActions:    a.renderGHALanding,

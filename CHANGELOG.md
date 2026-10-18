@@ -16,7 +16,32 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - `d` remove com uma confirmação só — com alteração pendente ela diz quantas se perdem e já usa `--force`; a principal e as travadas não se removem daqui
   - `enter` abre a worktree como projeto (Git, Containers e o resto passam a olhar para a pasta dela); `shift+E` e `ctrl+O` abrem terminal e agente de IA nela; `p` poda registros de pastas apagadas à mão
   - Aparece em todo repositório git; lock/unlock, move e repair ficam no terminal
+- **Módulo Tarefas (EXECUÇÃO)** — os comandos que o projeto já declara, numa lista só: alvos do `Makefile`, receitas do `justfile`, tarefas do `Taskfile.yml` e scripts do `package.json` e do `composer.json`
+  - `enter` roda no terminal de verdade — servidor de dev, cor e pergunta funcionam; `ctrl+c` para só a tarefa, e a saída fica na tela até o `enter` que volta ao DevScope
+  - A lista guarda o resultado da última execução (`ok · 3s`, `saiu 2 · 14s`, `parada`), com glifos distintos para ler sem cor
+  - Descrição tirada do comentário do autor (`## desc` na linha do alvo ou `#` logo acima, `desc:` do Taskfile) ou do próprio comando do script
+  - Scripts de Node rodam com o gerenciador do lockfile (pnpm, yarn, bun ou npm); alvos internos ficam de fora (`.PHONY`, regras de padrão, receitas `_privadas`, tarefas `internal`)
+  - Aparece quando o projeto tem algum desses arquivos
 - **Conflito de portas entre projetos** — porta do host reivindicada por mais de um projeto aparece com aviso no resumo do dashboard e na lista de portas da abertura dos módulos (só um processo consegue escutar cada porta)
+- **Módulo Releases (CÓDIGO)** — lançar uma versão sem esquecer passo
+  - Mostra a última tag, quantos commits entram e as três próximas versões (patch · minor · major); a sugerida é a que já tem seção no CHANGELOG
+  - VERIFICAÇÕES antes de lançar: alteração sem commit e commit não enviado bloqueiam; branch fora da padrão, remoto à frente e CHANGELOG sem a seção só avisam
+  - `enter` cria a tag anotada no HEAD com a seção do CHANGELOG como mensagem (sem seção, a lista de commits) e envia só a tag; se o push falha, a tag local é desfeita
+  - Depois do push acompanha ao vivo o workflow que a tag dispara (via `gh`) até publicar ou falhar; a lista de releases anteriores mostra o resultado de cada uma
+- **Pendências de git em todos os projetos** — o dashboard responde "onde eu deixei coisa pela metade?" sem abrir um por um
+  - Na coluna BRANCH: `±3` alterações locais, `↑2` commits a enviar, `↓1` a receber; na barra, quantos projetos têm pendência
+  - `p` mostra só os projetos com pendência; `esc` volta para todos
+  - Medido a cada `git_interval` (30s) com um `git status` por projeto, sem travar o index do git que você estiver usando
+- **Portas (`shift+P` na tela inicial)** — quem está usando cada porta da máquina
+  - Agrupada por dono: um cabeçalho por projeto (nome, quantas portas, pasta), depois composes que não estão na lista de projetos, programas e portas do sistema
+  - Porta → processo → projeto: pelo container que publica a porta (inclusive de compose fora da lista, pela pasta dele), pela pasta onde o processo roda ou pela porta declarada no compose
+  - Cores para o que importa: `rede` em amarelo (acessível por outras máquinas) e `local` em verde, container em azul, e porta disputada entre projetos em vermelho com `⚠ também em <projeto>`
+  - `x` encerra com a ação certa para o dono (`docker stop` no container, SIGTERM no processo), com confirmação; `enter` abre o projeto, `o` abre no navegador
+  - Mostra se a porta está aberta para a rede ou só local; no Linux lê `/proc` direto, no macOS usa o `lsof`
+- **Disco na Visão Geral** — caixa DISCO com o tamanho das pastas que o projeto gera (`node_modules`, `vendor`, `target`, `.next`, `.venv`…)
+  - `x` apaga todas com uma confirmação que diz o que sai e o comando que traz de volta
+  - Num repositório git só entra pasta que o git ignora: `vendor/` commitado ou `build/` versionado nunca aparecem
+  - `r` na Visão Geral agora atualiza de verdade (antes a caixa AÇÕES prometia e não fazia nada)
 
 ### Changed
 - README refeito: instalação primeiro, tour em GIF da visão geral, do Git e do Docker, tabelas de atalhos e instalação avançada no fim
@@ -29,6 +54,7 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ### Removed
 - **Aba Rotas** e o pacote `routeutil` — não fazia mais sentido no DevScope
 - **Aba SSH Tunnel** e o pacote `sshutil` — não funcionava de forma confiável
+- **Aba WebSocket** e o pacote `wsutil` — sem finalidade no DevScope; a dependência `gorilla/websocket` saiu junto
 
 ## [1.6.9] - 2026-09-25
 

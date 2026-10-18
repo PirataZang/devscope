@@ -81,9 +81,9 @@ Cinco grupos, e cada rótulo responde a uma pergunta:
 |-------|----------|---------|
 | `PROJETO` | o que é isto aqui? | Visão Geral |
 | `CÓDIGO` | o que mudou, e o que roda em cima disso? | Git · Worktrees · GH Actions · Jenkins |
-| `EXECUÇÃO` | o que está no ar? | Containers · Swarm · Kubernetes |
+| `EXECUÇÃO` | o que está no ar? | Tarefas · Containers · Swarm · Kubernetes |
 | `REDE` | por onde se chega? | Nginx · Ngrok · CF Tunnel |
-| `DADOS` | com o que eu falo? | API · Database · WebSocket |
+| `DADOS` | com o que eu falo? | API · Database |
 
 A cor do grupo é a cor de destaque do módulo no app inteiro (`tabAccentColor`):
 cabeçalho, borda do trilho, foco do painel. **Uma cor por categoria, não por
@@ -220,7 +220,7 @@ Regras da gaveta (`internal/ui/git_drawer.go`):
 
 ## 1.5 Faixa de abertura do módulo
 
-Onze dos catorze módulos abrem numa tela de antes-de-entrar. Ela responde a
+Dez dos catorze módulos abrem numa tela de antes-de-entrar. Ela responde a
 **três perguntas**: o que é isto, dá para usar aqui, como eu entro.
 
 ```
@@ -310,7 +310,7 @@ mostrar.
     o mesmo glifo de "parado", e em screenshot parado os dois viravam a mesma
     coisa (§6).
 
-Módulo com conteúdo real na abertura (Logs, Worktrees) **não tem faixa**: segue o padrão de
+Módulo com conteúdo real na abertura (Logs, Worktrees, Tarefas) **não tem faixa**: segue o padrão de
 lista+detalhe (§1.3).
 
 ---
