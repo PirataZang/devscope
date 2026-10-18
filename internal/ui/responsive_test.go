@@ -93,10 +93,15 @@ func responsiveProject() core.Project {
 
 // responsiveApp monta o app num tamanho, já com dados realistas: caminho longo,
 // nome de container longo, branch longa. Conteúdo curto esconde estouro.
+// responsiveNow congela o relógio: cada tamanho renderiza num instante, e um
+// segundo virando entre os dois fazia o teste de honestidade acusar o relógio
+// "sumindo" da tela grande.
+var responsiveNow = time.Now()
+
 func responsiveApp(w, h int) *App {
 	p := responsiveProject()
 	a := &App{
-		width: w, height: h, now: time.Now(), view: ViewDashboard,
+		width: w, height: h, now: responsiveNow, view: ViewDashboard,
 		selectedProject: &p, gitSubview: gitSubviewMain, gitFocus: gitFocusBranches,
 		gitViewBranch: p.Git.Branch, gitBranches: p.Git.Branches, gitBranchCommits: p.Git.Commits,
 		containerSubview:       containerSubviewList,

@@ -318,8 +318,13 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.cleanDisk(p)
 		case "release":
 			return a, a.releaseTag(p, branch)
+		case "release-setup":
+			return a, a.createReleaseFiles(p)
 		}
 	case "esc", "n", "N":
+		if action == "release-setup" {
+			a.declineReleaseSetup()
+		}
 		a.gitConfirmOn = false
 		a.gitConfirmBranch = ""
 		a.gitConfirmAction = ""
@@ -356,6 +361,8 @@ func (a *App) renderGitConfirm() string {
 		opts = a.diskConfirmOpts()
 	case "release":
 		opts = a.releaseConfirmOpts(branch)
+	case "release-setup":
+		opts = a.releaseSetupConfirmOpts()
 	case "wt-remove":
 		opts.Brand = "WORKTREES"
 		opts.Color = tabAccentColor(TabWorktrees)

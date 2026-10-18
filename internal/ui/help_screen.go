@@ -140,6 +140,7 @@ func helpGroups() []helpGroup {
 			{"RELEASES", []helpEntry{
 				{"←→", "escolher a versão: patch / minor / major"},
 				{"enter", "lançar: cria a tag anotada e envia (confirma)"},
+				{"w", "criar release.yml e CHANGELOG.md que faltarem (commit só deles + push)"},
 				{"o", "abrir o workflow da release ou a página de releases"},
 				{"r · esc", "atualizar / voltar"},
 			}},

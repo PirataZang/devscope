@@ -72,15 +72,15 @@ pequena esticada — cada faixa decide **o que cabe**, não só o quanto estica.
 ## 1.2 Navegação: módulos contextuais
 
 A barra lateral lista **os módulos que fazem sentido para o projeto aberto**, não
-os catorze que o DevScope sabe fazer. Num projeto Go sem Docker, sem Jenkins e
-sem túnel, catorze linhas são doze coisas que não existem.
+os quinze que o DevScope sabe fazer. Num projeto Go sem Docker, sem Jenkins e
+sem túnel, quinze linhas são treze coisas que não existem.
 
 Cinco grupos, e cada rótulo responde a uma pergunta:
 
 | grupo | pergunta | módulos |
 |-------|----------|---------|
 | `PROJETO` | o que é isto aqui? | Visão Geral |
-| `CÓDIGO` | o que mudou, e o que roda em cima disso? | Git · Worktrees · GH Actions · Jenkins |
+| `CÓDIGO` | o que mudou, e o que roda em cima disso? | Git · Worktrees · Releases · GH Actions · Jenkins |
 | `EXECUÇÃO` | o que está no ar? | Tarefas · Containers · Swarm · Kubernetes |
 | `REDE` | por onde se chega? | Nginx · Ngrok · CF Tunnel |
 | `DADOS` | com o que eu falo? | API · Database |
@@ -109,7 +109,7 @@ tocada, e ela roda fora do `View` (§13).
    **Toda porta de entrada tem de medir.** `openProject` sonda; `Init()` sonda
    quando o `devscope` abre dentro de um projeto (`openProjectFromCwd`), que
    entra direto no módulo sem passar por `openProject`. Esse caminho ficou sem
-   sondagem e o "na dúvida, mostre" virou o modo permanente: os catorze módulos,
+   sondagem e o "na dúvida, mostre" virou o modo permanente: os quinze módulos,
    em todo projeto, sempre.
 
    **E medir de novo quando o dado chega.** A sondagem lê `p.Git` e
@@ -220,7 +220,7 @@ Regras da gaveta (`internal/ui/git_drawer.go`):
 
 ## 1.5 Faixa de abertura do módulo
 
-Dez dos catorze módulos abrem numa tela de antes-de-entrar. Ela responde a
+Dez dos quinze módulos abrem numa tela de antes-de-entrar. Ela responde a
 **três perguntas**: o que é isto, dá para usar aqui, como eu entro.
 
 ```
@@ -310,7 +310,7 @@ mostrar.
     o mesmo glifo de "parado", e em screenshot parado os dois viravam a mesma
     coisa (§6).
 
-Módulo com conteúdo real na abertura (Logs, Worktrees, Tarefas) **não tem faixa**: segue o padrão de
+Módulo com conteúdo real na abertura (Logs, Worktrees, Tarefas, Releases) **não tem faixa**: segue o padrão de
 lista+detalhe (§1.3).
 
 ---

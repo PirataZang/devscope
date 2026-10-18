@@ -46,16 +46,17 @@ var keyNav = map[string]bool{
 // motivo. Estar aqui é decisão registrada, não isenção silenciosa — que é a
 // diferença entre uma exceção e um esquecimento.
 var keysWithoutHelp = map[string]string{
-	"ctrl+u":     "limpa o campo dentro do formulário, que já mostra as próprias teclas",
-	"ctrl+j":     "quebra de linha no compositor, ao lado do enter que envia",
-	"ctrl+m":     "alias de enter que alguns terminais mandam",
-	"w":          "join-token de worker no formulário do Swarm, escrito no próprio formulário",
-	"m":          "join-token de manager no formulário do Swarm, idem",
-	"merge":      "nome de modo do prompt de git, não é tecla",
-	"release":    "nome de modo da confirmação de release, não é tecla",
-	"disk-clean": "nome de modo da confirmação de limpeza de disco, não é tecla",
-	"wt-remove":  "nome de modo da confirmação de worktree, não é tecla",
-	"!":          "aviso de setup do GitHub CLI — anunciado na barra da própria tela",
+	"ctrl+u":        "limpa o campo dentro do formulário, que já mostra as próprias teclas",
+	"ctrl+j":        "quebra de linha no compositor, ao lado do enter que envia",
+	"ctrl+m":        "alias de enter que alguns terminais mandam",
+	"w":             "join-token de worker no formulário do Swarm, escrito no próprio formulário",
+	"m":             "join-token de manager no formulário do Swarm, idem",
+	"merge":         "nome de modo do prompt de git, não é tecla",
+	"release-setup": "nome de modo da confirmação dos arquivos de release, não é tecla",
+	"release":       "nome de modo da confirmação de release, não é tecla",
+	"disk-clean":    "nome de modo da confirmação de limpeza de disco, não é tecla",
+	"wt-remove":     "nome de modo da confirmação de worktree, não é tecla",
+	"!":             "aviso de setup do GitHub CLI — anunciado na barra da própria tela",
 }
 
 // canonKey põe uma tecla na forma canônica — e expande as que representam

@@ -279,7 +279,7 @@ do terminal.
 
 ---
 
-## 🧩 14 módulos, um contexto
+## 🧩 15 módulos, um contexto
 
 Cada módulo aparece **só quando faz sentido** para o projeto aberto — um projeto Go sem Docker
 não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da categoria, no app inteiro.
@@ -294,9 +294,10 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 > git e atividade num painel
 
 #### 🟡 CÓDIGO
-`Git` · `Worktrees` · `GH Actions` · `Jenkins`
+`Git` · `Worktrees` · `Releases`
+`GH Actions` · `Jenkins`
 > branches, commits, PR, graph,
-> worktrees, runs, workflows, trigger
+> worktrees, releases, runs, trigger
 
 </td>
 <td width="33%" valign="top">
@@ -336,6 +337,45 @@ workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 1
 
 </sub>
 </div>
+
+---
+
+## 🏷️ Releases: lançar uma versão sem esquecer passo
+
+O módulo **Releases** (grupo CÓDIGO) aparece em **qualquer repositório git**. Ele mostra a última
+versão, quantos commits entram, sugere a próxima (patch · minor · major com <kbd>←</kbd><kbd>→</kbd>)
+e confere o que bloqueia antes de deixar lançar. <kbd>Enter</kbd> cria a tag anotada e envia; se
+houver workflow de release, a tela acompanha até publicar.
+
+O que ele usa — só o remoto é obrigatório:
+
+| peça | para que serve | sem ela |
+|---|---|---|
+| **remoto `origin`** | é para onde a tag vai | não há release (`git remote add origin <url>`) |
+| **tags `vX.Y.Z`** | a próxima versão sai da última tag semver; `nightly`, `deploy-prod` etc. são ignoradas | a primeira release começa a numeração (`v0.0.1`, `v0.1.0` ou `v1.0.0`) |
+| **`CHANGELOG.md`** | a seção `## [1.7.0] - 2026-10-18` ([Keep a Changelog](https://keepachangelog.com/)) vira a mensagem da tag e define a versão sugerida | a tag leva a lista de commits — o DevScope oferece criar (veja abaixo) |
+| **workflow de tag** (`.github/workflows/release.yml` com `on: push: tags: ["v*"]`) | publica a release quando a tag chega ao GitHub — binários, página, notas | a tag só marca o commit — o DevScope oferece criar (veja abaixo) |
+| **`gh`** (GitHub CLI, com `gh auth login`) | acompanha o workflow ao vivo e mostra o resultado das releases anteriores | a release sai igual, só não dá para acompanhar daqui |
+
+**Sem workflow ou sem CHANGELOG?** Ao pedir o release (<kbd>Enter</kbd>), ou a qualquer hora com
+<kbd>w</kbd>, o DevScope cria o que faltar, commita **só esses arquivos** e envia a branch — o
+workflow precisa estar no commit da tag para o GitHub rodá-lo.
+
+- **`.github/workflows/release.yml`** — o modelo segue o projeto: com `.goreleaser.yaml`,
+  **goreleaser** (binários por sistema); sem, **GitHub Release** com a mensagem da tag como notas.
+- **`CHANGELOG.md`** — no formato Keep a Changelog, com um `## [Unreleased]` pronto e um bloco de
+  **instruções para IA** num comentário (invisível no GitHub). Peça a qualquer agente — Claude,
+  Copilot, Cursor — para "atualizar o CHANGELOG": ele lê as regras antes e escreve no formato que o
+  Releases lê (levantar as mudanças com `git log` desde a última tag, um item por mudança que o
+  usuário percebe, escolher patch/minor/major pelo maior impacto, renomear `[Unreleased]` para
+  `[X.Y.Z] - data` na hora de lançar).
+
+Recusou? O próximo <kbd>Enter</kbd> lança sem eles.
+
+**Bloqueiam o lançamento:** alteração sem commit, commit não enviado, branch sem upstream e nada
+novo desde a última tag. **Só avisam:** estar fora da branch padrão, o remoto ter commits que você
+não tem e o CHANGELOG não ter a seção da versão. A mesma explicação aparece na própria tela, na
+seção **COMO FUNCIONA**, com o estado do repositório aberto.
 
 ---
 

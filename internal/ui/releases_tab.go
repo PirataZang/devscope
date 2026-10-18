@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -43,6 +44,12 @@ type relRunsMsg struct {
 
 type relPollMsg struct{ path string }
 
+type relSetupMsg struct {
+	path, kind string
+	created    []string
+	err        error
+}
+
 // relCheck é uma linha das VERIFICAÇÕES. block: falhar impede o lançamento.
 type relCheck struct {
 	ok, block bool
@@ -56,6 +63,7 @@ func (a *App) loadRelease(p *core.Project) tea.Cmd {
 	path := p.Path
 	if a.relPath != path {
 		a.relPath, a.relState, a.relRuns, a.relWatch, a.relBumpSet = path, collectors.ReleaseState{}, nil, "", false
+		a.relSkipSetup = false
 	}
 	a.relLoading = true
 	return func() tea.Msg {
@@ -118,6 +126,8 @@ func releaseChecks(st collectors.ReleaseState, next string) []relCheck {
 		out = append(out, relCheck{block: true, text: countOf(pend.Changes, "alteração", "alterações") + " sem commit — commite ou guarde antes"})
 	}
 	switch {
+	case st.Origin == "":
+		out = append(out, relCheck{block: true, text: "sem remoto origin — não há para onde enviar a tag"})
 	case !pend.Upstream:
 		out = append(out, relCheck{block: true, text: "branch sem upstream — envie a branch antes (shift+P no Git)"})
 	case pend.Ahead > 0:
@@ -145,12 +155,65 @@ func releaseChecks(st collectors.ReleaseState, next string) []relCheck {
 			out = append(out, relCheck{text: "CHANGELOG sem a seção " + strings.TrimPrefix(next, "v") + " — a tag vai com a lista de commits"})
 		}
 	}
-	if st.Workflow != "" {
-		out = append(out, relCheck{ok: true, text: st.Workflow + " publica a release quando a tag chega"})
-	} else {
-		out = append(out, relCheck{text: "nenhum workflow roda em tag — a tag só marca o commit"})
-	}
 	return out
+}
+
+// relGuide é uma linha de COMO FUNCIONA: uma peça que o Releases usa, se este
+// repositório tem, e a frase que diz para que serve — ou como configurar.
+type relGuide struct {
+	ok         bool
+	name, text string
+}
+
+// releaseGuide é a documentação da tela, escrita para ESTE repositório: quem
+// abre o módulo pela primeira vez entende o que cada peça faz sem sair dele, e
+// o que falta já vem com o comando ou o formato para resolver.
+func releaseGuide(st collectors.ReleaseState, next string) []relGuide {
+	version := strings.TrimPrefix(next, "v")
+	g := []relGuide{
+		{st.Last.Name != "", "tags vX.Y.Z",
+			"a versão sai da última tag semver (" + st.Last.Name + ") — tags fora do padrão são ignoradas"},
+		{st.Changelog != "", "CHANGELOG.md",
+			"a seção \"## [" + version + "] - data\" vira a mensagem da tag e escolhe a versão sugerida"},
+		{st.Workflow != "", firstNonEmpty(st.Workflow, "release.yml"),
+			"roda quando a tag chega ao GitHub e publica a release (binários, página, notas)"},
+		{st.GH, "gh",
+			"o GitHub CLI acompanha o workflow da tag ao vivo nesta tela"},
+		{st.Origin != "", "origin",
+			"a tag é enviada para " + compactGitRemote(st.Origin)},
+	}
+	if !g[0].ok {
+		g[0].text = "nenhuma tag vX.Y.Z ainda — a primeira release começa a numeração"
+	}
+	if !g[1].ok {
+		g[1].text = "opcional: w cria, com instruções para a IA escrever as notas — sem ele a tag leva a lista de commits"
+	}
+	if !g[2].ok {
+		g[2].text = "opcional: w cria .github/workflows/release.yml — sem ele a tag só marca o commit, nada é publicado"
+	}
+	if !g[3].ok {
+		g[3].text = "opcional: instale o GitHub CLI e rode gh auth login para acompanhar o workflow daqui"
+	}
+	if !g[4].ok {
+		g[4].text = "obrigatório: git remote add origin <url> — sem remoto não há release"
+	}
+	return g
+}
+
+func releaseGuideLine(g relGuide, width int) string {
+	glyph, st := "◆", StyleHealthy
+	if !g.ok {
+		glyph, st = "◌", StyleWarning
+		if strings.HasPrefix(g.text, "obrigatório") {
+			glyph, st = "⚠", StyleUnhealthy
+		}
+	}
+	name := lipgloss.NewStyle().Foreground(ColorAccent).Render(padRight(truncate(g.name, 13), 13))
+	textSt := StyleMuted
+	if !g.ok {
+		textSt = st
+	}
+	return st.Render(glyph) + " " + name + " " + textSt.Render(truncate(g.text, maxInt(10, width-17)))
 }
 
 func firstBlock(checks []relCheck) string {
@@ -182,6 +245,20 @@ func (a *App) handleReleaseKeys(msg tea.KeyMsg, p *core.Project) (tea.Cmd, bool)
 		a.gitConfirmOn = true
 		a.gitConfirmAction = "release"
 		a.gitConfirmBranch = a.relNext()
+		// Sem workflow a tag não publica nada, e sem CHANGELOG as notas são só
+		// a lista de commits: oferece criar ANTES, uma vez. Recusou, o próximo
+		// enter lança assim mesmo.
+		if len(relSetupNames(a.relState)) > 0 && !a.relSkipSetup {
+			a.gitConfirmAction = "release-setup"
+		}
+	case "w":
+		if len(relSetupNames(a.relState)) == 0 {
+			a.relStatus = a.relState.Workflow + " e " + filepath.Base(a.relState.Changelog) + " já existem"
+			return nil, true
+		}
+		a.gitConfirmOn = true
+		a.gitConfirmAction = "release-setup"
+		a.gitConfirmBranch = strings.Join(relSetupNames(a.relState), " · ")
 	case "o":
 		a.openReleasePage(p)
 	default:
@@ -297,12 +374,15 @@ func (a *App) renderReleasesTab(p *core.Project) string {
 	if firstBlock(checks) != "" {
 		launch = [2]string{"enter", "ver o que falta"}
 	}
-	cmdBar := StyleStatusBar.Width(w).Render(fitKeybindsWrap(maxInt(10, w-2), 2,
-		launch,
+	items := [][2]string{launch}
+	if missing := relSetupNames(st); len(missing) > 0 && st.Branch != "" {
+		items = append(items, [2]string{"w", "criar " + strings.Join(missing, " e ")})
+	}
+	cmdBar := StyleStatusBar.Width(w).Render(fitKeybindsWrap(maxInt(10, w-2), 2, append(items,
 		[2]string{"←→", "versão"},
 		[2]string{"o", "abrir no GitHub"},
 		[2]string{"r", "atualizar"},
-	))
+	)...))
 
 	if a.relLoading && st.Branch == "" {
 		body := []string{"", "  " + a.loadingText("lendo tags e commits…")}
@@ -315,6 +395,12 @@ func (a *App) renderReleasesTab(p *core.Project) string {
 	lines = append(lines, "", sectionHeader("VERIFICAÇÕES", w, tabAccentColor(TabReleases)))
 	for _, c := range checks {
 		lines = append(lines, "  "+releaseCheckLine(c, w-2))
+	}
+	// A documentação mora na tela, não num README que ninguém abre na hora:
+	// cada peça que o módulo usa, se este repositório tem e para que serve.
+	lines = append(lines, "", sectionHeader("COMO FUNCIONA", w, ColorMuted))
+	for _, g := range releaseGuide(st, next) {
+		lines = append(lines, "  "+releaseGuideLine(g, w-2))
 	}
 
 	history := a.releaseHistoryLines(w)
@@ -451,6 +537,84 @@ func (a *App) runVisual(r collectors.GHARun) (string, lipgloss.Style, string) {
 		return "◆", StyleHealthy, "publicada · " + r.Workflow
 	}
 	return "⚠", StyleUnhealthy, r.Workflow + " " + r.Conclusion
+}
+
+// relSetupNames: o que falta para o release publicar alguma coisa, pelo nome
+// do arquivo — é o que a barra, a confirmação e o status mostram.
+func relSetupNames(st collectors.ReleaseState) []string {
+	workflow, changelog := collectors.ReleaseSetup(st)
+	var out []string
+	if workflow {
+		out = append(out, "release.yml")
+	}
+	if changelog {
+		out = append(out, collectors.ChangelogPath)
+	}
+	return out
+}
+
+func (a *App) createReleaseFiles(p *core.Project) tea.Cmd {
+	path := p.Path
+	workflow, changelog := collectors.ReleaseSetup(a.relState)
+	a.relStatus = "criando " + strings.Join(relSetupNames(a.relState), " e ") + "…"
+	a.relLoading = true
+	return func() tea.Msg {
+		created, kind, err := collectors.CreateReleaseFiles(path, workflow, changelog)
+		return relSetupMsg{path: path, created: created, kind: kind, err: err}
+	}
+}
+
+func (a *App) handleReleaseSetup(msg relSetupMsg) tea.Cmd {
+	a.relLoading = false
+	if msg.err != nil {
+		a.relStatus = "erro: " + lastLine(msg.err.Error())
+	} else {
+		a.relStatus = strings.Join(msg.created, " e ") + " commitados e enviados — enter lança " + a.relNext()
+		if len(msg.created) > 0 && strings.HasSuffix(msg.created[len(msg.created)-1], collectors.ChangelogPath) {
+			a.relStatus = "criados e enviados — escreva a seção da versão no CHANGELOG (a IA tem as instruções nele) e enter lança"
+		}
+	}
+	if p := a.currentProject(); p != nil && pathsMatch(p.Path, msg.path) {
+		return a.loadRelease(p)
+	}
+	return nil
+}
+
+func (a *App) declineReleaseSetup() {
+	a.relSkipSetup = true
+	a.relStatus = "sem eles a tag só marca o commit — enter de novo lança assim mesmo, w cria depois"
+}
+
+// releaseSetupConfirmOpts diz o que vai acontecer de verdade: quais arquivos,
+// qual modelo de workflow, que só eles entram no commit e que a branch sobe.
+func (a *App) releaseSetupConfirmOpts() deleteConfirmOpts {
+	workflow, changelog := collectors.ReleaseSetup(a.relState)
+	var parts []string
+	if workflow {
+		model := "GitHub Release"
+		if _, kind := collectors.ReleaseWorkflowTemplate(a.relPath); kind == "goreleaser" {
+			model = "goreleaser"
+		}
+		parts = append(parts, "release.yml ("+model+")")
+	}
+	detail := "commit só desses arquivos + push da branch"
+	if changelog {
+		parts = append(parts, collectors.ChangelogPath)
+		detail = "CHANGELOG com instruções para IA · commit só deles + push"
+	}
+	subtitle := "sem workflow a tag só marca o commit — nada é publicado"
+	if !workflow {
+		subtitle = "sem CHANGELOG a tag leva só a lista de commits"
+	}
+	return deleteConfirmOpts{
+		Brand:    "RELEASES",
+		Color:    tabAccentColor(TabReleases),
+		Title:    "Preparar o release",
+		Subtitle: subtitle,
+		Label:    "cria",
+		Target:   strings.Join(parts, " · "),
+		Detail:   detail,
+	}
 }
 
 func (a *App) releaseConfirmOpts(tag string) deleteConfirmOpts {

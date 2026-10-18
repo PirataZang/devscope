@@ -34,6 +34,11 @@ type ReleaseState struct {
 	// Workflow é o arquivo de workflow que dispara em push de tag — é ele que
 	// transforma a tag em release de verdade (build, binários, página).
 	Workflow string
+	// Origin é a URL do remoto para onde a tag vai; "" = sem remoto.
+	Origin string
+	// GH diz se o GitHub CLI está instalado — sem ele não dá para acompanhar o
+	// workflow, mas a release sai igual.
+	GH bool
 }
 
 var semverRe = regexp.MustCompile(`^v?(\d+)\.(\d+)\.(\d+)$`)
@@ -66,6 +71,8 @@ func CollectRelease(ctx context.Context, path string) ReleaseState {
 		st.Changelog = f
 	}
 	st.Workflow = tagWorkflow(path)
+	st.Origin = strings.TrimSpace(gitOutput(path, "remote", "get-url", "origin"))
+	st.GH = GHAAvailable()
 	return st
 }
 
@@ -171,6 +178,186 @@ func ReleaseRuns(path string, tags []string) map[string]GHARun {
 		}
 	}
 	return out
+}
+
+// ReleaseWorkflowPath é onde o DevScope cria o workflow de release.
+const ReleaseWorkflowPath = ".github/workflows/release.yml"
+
+// ReleaseWorkflowTemplate escolhe o modelo pelo que o projeto já tem: com
+// .goreleaser.yaml, o goreleaser (binários por sistema, como o próprio
+// DevScope); sem, uma Release do GitHub com as notas da tag — serve para
+// qualquer stack, e as notas são a seção do CHANGELOG que vira a mensagem da
+// tag.
+func ReleaseWorkflowTemplate(path string) (content, kind string) {
+	if firstFile(path, ".goreleaser.yaml", ".goreleaser.yml") != "" {
+		return goreleaserWorkflow, "goreleaser"
+	}
+	return githubReleaseWorkflow, "github"
+}
+
+const goreleaserWorkflow = `name: Release
+
+# Criado pelo DevScope: roda quando uma tag vX.Y.Z chega ao GitHub.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+`
+
+const githubReleaseWorkflow = `name: Release
+
+# Criado pelo DevScope: roda quando uma tag vX.Y.Z chega ao GitHub e publica a
+# Release com a mensagem da tag como notas (o DevScope põe nela a seção do
+# CHANGELOG.md da versão).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # O checkout pode trazer a tag sem a mensagem; busca de novo a anotada.
+      - run: git fetch --force --tags
+
+      - name: Notas da tag
+        run: git tag -l --format='%(contents)' "$GITHUB_REF_NAME" > notes.md
+
+      - name: Publicar a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+`
+
+// ChangelogPath é onde o DevScope cria o CHANGELOG.
+const ChangelogPath = "CHANGELOG.md"
+
+// changelogTemplate é o CHANGELOG inicial. O bloco de instruções vai num
+// comentário HTML: o GitHub não mostra, mas qualquer IA que abrir o arquivo
+// para escrever as notas lê antes — e escreve no formato que o Releases lê.
+const changelogTemplate = `# Changelog
+
+Todas as mudanças notáveis deste projeto ficam neste arquivo.
+
+O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
+e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+
+<!--
+INSTRUÇÕES PARA IA (Claude, Copilot, Cursor, ChatGPT…) — leia antes de editar.
+
+Este arquivo é lido pelo DevScope (módulo Releases) na hora de lançar:
+  - a seção "## [X.Y.Z] - AAAA-MM-DD" da versão vira a MENSAGEM DA TAG e as
+    notas da Release no GitHub — escreva para quem vai ler a página da release;
+  - se existe seção para a próxima patch, minor ou major, essa é a versão que
+    o DevScope sugere. Então a versão escolhida aqui é a que vai ser lançada.
+
+Como escrever:
+  1. Levante o que mudou desde a última release, sem inventar nada:
+       git log $(git describe --tags --abbrev=0)..HEAD --oneline
+     e o diff quando a mensagem do commit não disser o efeito.
+  2. Novidades entram em "## [Unreleased]". Na hora de lançar, renomeie para
+     "## [X.Y.Z] - AAAA-MM-DD" e deixe um "## [Unreleased]" vazio acima dela.
+  3. Agrupe em ### Added, ### Changed, ### Deprecated, ### Removed, ### Fixed e
+     ### Security — nesta ordem, só os que tiverem item.
+  4. Um item por mudança que o USUÁRIO percebe, não um por commit. Comece pelo
+     efeito ("Login lembra o último e-mail"), não pela implementação
+     ("refatora AuthService"). Nome da funcionalidade em negrito.
+  5. Escolha a versão pelo maior impacto: algo removido ou incompatível →
+     major; funcionalidade nova → minor; só correção ou ajuste pequeno → patch.
+  6. Escreva no idioma deste arquivo. Não apague nem reescreva versões já
+     lançadas.
+-->
+
+## [Unreleased]
+`
+
+// ReleaseSetup diz o que falta para o release publicar algo: o workflow que
+// roda em tag e o CHANGELOG que vira as notas.
+func ReleaseSetup(st ReleaseState) (workflow, changelog bool) {
+	return st.Workflow == "", st.Changelog == ""
+}
+
+// CreateReleaseFiles cria o que falta (workflow de tag e/ou CHANGELOG.md),
+// commita SÓ esses arquivos — o que mais estiver alterado fica como estava — e
+// envia a branch. Tem de ir antes da tag: o GitHub roda o workflow que está no
+// commit da tag, e a mensagem da tag sai do CHANGELOG.
+func CreateReleaseFiles(path string, workflow, changelog bool) (created []string, kind string, err error) {
+	write := func(rel, content string) error {
+		file := filepath.Join(path, filepath.FromSlash(rel))
+		if _, err := os.Stat(file); err == nil {
+			return fmt.Errorf("%s já existe — o DevScope não sobrescreve", rel)
+		}
+		if err := os.MkdirAll(filepath.Dir(file), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(file, []byte(content), 0o644); err != nil {
+			return err
+		}
+		created = append(created, rel)
+		return nil
+	}
+	if workflow {
+		var content string
+		content, kind = ReleaseWorkflowTemplate(path)
+		if err := write(ReleaseWorkflowPath, content); err != nil {
+			return created, kind, err
+		}
+	}
+	if changelog {
+		if err := write(ChangelogPath, changelogTemplate); err != nil {
+			return created, kind, err
+		}
+	}
+	if len(created) == 0 {
+		return nil, kind, fmt.Errorf("nada a criar")
+	}
+
+	msg := "chore: arquivos de release (workflow e CHANGELOG)"
+	switch {
+	case !changelog:
+		msg = "ci: workflow de release"
+	case !workflow:
+		msg = "docs: CHANGELOG"
+	}
+	if out, err := gitRunOutput(path, append([]string{"add", "--"}, created...)...); err != nil {
+		return created, kind, fmt.Errorf("git add: %s", firstNonEmptyStr(out, err.Error()))
+	}
+	if out, err := gitRunOutput(path, append([]string{"commit", "-m", msg, "--"}, created...)...); err != nil {
+		return created, kind, fmt.Errorf("commit: %s", firstNonEmptyStr(out, err.Error()))
+	}
+	if out, err := gitRunOutput(path, "push"); err != nil {
+		return created, kind, fmt.Errorf("commit feito, mas o push falhou: %s", firstNonEmptyStr(out, err.Error()))
+	}
+	return created, kind, nil
 }
 
 // gitDefaultBranch é a branch para onde o origin aponta; sem isso, main ou

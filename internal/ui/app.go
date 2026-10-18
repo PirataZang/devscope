@@ -564,6 +564,7 @@ type App struct {
 	relBumpSet                  bool
 	relStatus                   string
 	relWatch                    string // tag cujo workflow está sendo acompanhado
+	relSkipSetup                bool   // recusou criar workflow/CHANGELOG: o próximo enter lança sem eles
 	taskList                    []collectors.ProjectTask
 	taskLoading                 bool
 	taskPath                    string
@@ -1117,6 +1118,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case relTaggedMsg:
 		return a, a.handleReleaseTagged(msg)
+
+	case relSetupMsg:
+		return a, a.handleReleaseSetup(msg)
 
 	case relPollMsg:
 		return a, a.handleReleasePoll(msg)

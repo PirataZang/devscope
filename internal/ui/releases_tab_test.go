@@ -27,8 +27,11 @@ func readyRelease() collectors.ReleaseState {
 		Previous: []collectors.ReleaseTag{{Name: "v1.6.8", Date: time.Now().Add(-37 * 24 * time.Hour)}},
 		Commits:  []string{"67a16b7 Add Worktrees tab", "54c10dd Remove Routes"},
 		Count:    2, Branch: "main", Default: "main",
-		Pending:  &core.GitPending{Upstream: true},
-		Workflow: "release.yml",
+		Pending:   &core.GitPending{Upstream: true},
+		Workflow:  "release.yml",
+		Changelog: "/p/app/CHANGELOG.md",
+		Origin:    "git@github.com:PirataZang/devscope.git",
+		GH:        true,
 	}
 }
 
@@ -38,7 +41,8 @@ func TestReleaseReadyToLaunch(t *testing.T) {
 	for _, want := range []string{
 		"⇡ RELEASES", "última   v1.6.9", "2 commits desde então",
 		"patch v1.6.10", "minor v1.7.0", "VERIFICAÇÕES", "◆ árvore limpa", "◆ tudo enviado",
-		"release.yml publica", "COMMITS DESDE v1.6.9 · 2", "Add Worktrees tab", "enter lançar v1.6.10",
+		"COMO FUNCIONA", "◆ release.yml", "roda quando a tag chega",
+		"◆ origin", "PirataZang/devscope", "COMMITS DESDE v1.6.9 · 2", "Add Worktrees tab", "enter lançar v1.6.10",
 	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("faltou %q:\n%s", want, got)
@@ -109,5 +113,85 @@ func TestReleaseWatchesWorkflow(t *testing.T) {
 		"v1.7.0": {Status: "completed", Conclusion: "failure", Workflow: "Release"},
 	}}); cmd != nil || a.relWatch != "" || !strings.Contains(a.relStatus, "failure") {
 		t.Fatalf("terminou: para e avisa — %q", a.relStatus)
+	}
+}
+
+// Repositório sem nada configurado: a tela ensina o que cada peça faz e como
+// criar, e só o remoto bloqueia — o resto é opcional.
+func TestReleaseGuideTeachesWhatIsMissing(t *testing.T) {
+	a, p := releaseTestApp(t, collectors.ReleaseState{
+		Commits: []string{"abc primeiro"}, Count: 1, Branch: "main", Default: "main",
+		Pending: &core.GitPending{},
+	})
+	got := stripANSI(a.renderReleasesTab(p))
+	for _, want := range []string{
+		"nenhuma release ainda",
+		"◌ tags vX.Y.Z", "a primeira release começa a numeração",
+		"◌ CHANGELOG.md", "w cria, com instruções para a IA",
+		"◌ release.yml", "w cria .github/workflows/release.yml", "a tag só marca o commit",
+		"◌ gh", "gh auth login",
+		"⚠ origin", "obrigatório: git remote add origin",
+		"⚠ sem remoto origin",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("faltou %q:\n%s", want, got)
+		}
+	}
+}
+
+// Pedir o release sem workflow oferece criar antes; recusar uma vez e o próximo
+// enter lança assim mesmo.
+func TestReleaseOffersWorkflowBeforeLaunch(t *testing.T) {
+	st := readyRelease()
+	st.Workflow = ""
+	a, p := releaseTestApp(t, st)
+	if got := stripANSI(a.renderReleasesTab(p)); !strings.Contains(got, "w criar release.yml") || strings.Contains(got, "e CHANGELOG.md") {
+		t.Fatalf("a barra anuncia o w:\n%s", got)
+	}
+
+	a.handleReleaseKeys(tea.KeyMsg{Type: tea.KeyEnter}, p)
+	if a.gitConfirmAction != "release-setup" {
+		t.Fatalf("sem workflow, enter oferece criar antes: %q", a.gitConfirmAction)
+	}
+	box := stripANSI(a.renderGitConfirm())
+	for _, want := range []string{"Preparar o release", "release.yml (GitHub Release)", "commit só desses arquivos"} {
+		if !strings.Contains(box, want) {
+			t.Fatalf("faltou %q:\n%s", want, box)
+		}
+	}
+
+	a.updateGitConfirm(tea.KeyMsg{Type: tea.KeyEsc})
+	if !a.relSkipSetup || !strings.Contains(a.relStatus, "enter de novo lança") {
+		t.Fatalf("recusar explica o que acontece: %q", a.relStatus)
+	}
+	a.handleReleaseKeys(tea.KeyMsg{Type: tea.KeyEnter}, p)
+	if a.gitConfirmAction != "release" || a.gitConfirmBranch != "v1.6.10" {
+		t.Fatalf("depois de recusar, enter lança: %q %q", a.gitConfirmAction, a.gitConfirmBranch)
+	}
+}
+
+func TestReleaseWKeyWithExistingWorkflow(t *testing.T) {
+	a, p := releaseTestApp(t, readyRelease())
+	a.handleReleaseKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("w")}, p)
+	if a.gitConfirmOn || !strings.Contains(a.relStatus, "já existem") {
+		t.Fatalf("com workflow, w só avisa: %v %q", a.gitConfirmOn, a.relStatus)
+	}
+}
+
+// Faltando os dois, uma confirmação só cria os dois — e diz que o CHANGELOG
+// vem com as instruções para a IA.
+func TestReleaseSetupCreatesBoth(t *testing.T) {
+	st := readyRelease()
+	st.Workflow, st.Changelog = "", ""
+	a, p := releaseTestApp(t, st)
+	if got := stripANSI(a.renderReleasesTab(p)); !strings.Contains(got, "w criar release.yml e CHANGELOG.md") {
+		t.Fatalf("a barra anuncia os dois:\n%s", got)
+	}
+	a.handleReleaseKeys(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("w")}, p)
+	box := stripANSI(a.renderGitConfirm())
+	for _, want := range []string{"Preparar o release", "release.yml (GitHub Release)", "release.yml (GitHub Release) · CHANGELOG.md", "CHANGELOG com instruções para IA"} {
+		if !strings.Contains(box, want) {
+			t.Fatalf("faltou %q:\n%s", want, box)
+		}
 	}
 }

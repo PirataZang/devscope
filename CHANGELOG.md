@@ -7,6 +7,18 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **Releases prepara o repositório** — ao pedir o release sem workflow de tag ou sem CHANGELOG, o DevScope oferece criar o que faltar antes (também com `w`)
+  - `.github/workflows/release.yml` pelo projeto: com `.goreleaser.yaml`, goreleaser (binários por sistema); sem, GitHub Release com a mensagem da tag — a seção do CHANGELOG — como notas
+  - `CHANGELOG.md` no formato Keep a Changelog com `## [Unreleased]` e **instruções para IA** num comentário invisível no GitHub: como levantar as mudanças (`git log` desde a última tag), agrupar, escrever pelo efeito para o usuário, escolher a versão e renomear a seção na hora de lançar — no formato que o Releases lê
+  - Commita só esses arquivos e envia a branch, porque o GitHub roda o workflow que está no commit da tag; o resto das suas alterações fica como estava
+  - Recusou: o próximo `enter` lança sem eles; arquivo existente nunca é sobrescrito
+
+### Changed
+- **Releases documentado na própria tela** — nova seção COMO FUNCIONA com cada peça que o módulo usa (tags `vX.Y.Z`, `CHANGELOG.md`, workflow de tag, `gh`, remoto `origin`), se o repositório aberto tem e para que serve; o que falta vem com o formato ou o comando para configurar, marcado como opcional ou obrigatório
+- Repositório sem remoto `origin` agora bloqueia o lançamento com o motivo, em vez de falhar no push
+- README ganhou a seção "Releases" com os requisitos e o que bloqueia ou só avisa
+
 ## [1.7.0] - 2026-10-18
 
 ### Added
