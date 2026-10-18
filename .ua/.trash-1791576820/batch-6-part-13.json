@@ -1,0 +1,1676 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/swarm_tab_test.go",
+   "type": "file",
+   "name": "swarm_tab_test.go",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "summary": "Testes da aba Docker Swarm cobrindo landing, central, abas de tipo, navegação e formulário de scale.",
+   "tags": [
+    "test",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestAllTabsIncludesSwarm",
+   "type": "function",
+   "name": "TestAllTabsIncludesSwarm",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    12,
+    29
+   ],
+   "summary": "Testa que a lista de abas inclui o módulo Swarm.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSidebarShowsSwarmInExecucao",
+   "type": "function",
+   "name": "TestSidebarShowsSwarmInExecucao",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    31,
+    37
+   ],
+   "summary": "Testa que a sidebar mostra Swarm no grupo Execução.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestSwarmLandingEnterAndEsc",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    39,
+    68
+   ],
+   "summary": "Testa que Enter entra na aba Swarm a partir da landing e Esc volta.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSanitizeSwarmStackName",
+   "type": "function",
+   "name": "TestSanitizeSwarmStackName",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    70,
+    74
+   ],
+   "summary": "Testa a normalização de nomes de stack do Swarm.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmKindCycle",
+   "type": "function",
+   "name": "TestSwarmKindCycle",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    76,
+    86
+   ],
+   "summary": "Testa a ciclagem dos tipos de lista do Swarm.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmControlCenterRenders",
+   "type": "function",
+   "name": "TestSwarmControlCenterRenders",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    88,
+    121
+   ],
+   "summary": "Testa a renderização da central do Swarm com dados simulados.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmReplicaStyleFlagsIncomplete",
+   "type": "function",
+   "name": "TestSwarmReplicaStyleFlagsIncomplete",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    124,
+    135
+   ],
+   "summary": "Testa que réplicas incompletas são sinalizadas.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmKindTabsShowAll",
+   "type": "function",
+   "name": "TestSwarmKindTabsShowAll",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    137,
+    151
+   ],
+   "summary": "Testa que as abas de tipo exibem todos os tipos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmNavPushPop",
+   "type": "function",
+   "name": "TestSwarmNavPushPop",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    153,
+    164
+   ],
+   "summary": "Testa a pilha de navegação do Swarm.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_tab_test.go:TestSwarmScaleForm",
+   "type": "function",
+   "name": "TestSwarmScaleForm",
+   "filePath": "internal/ui/swarm_tab_test.go",
+   "lineRange": [
+    166,
+    182
+   ],
+   "summary": "Testa o formulário de scale de service.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/swarm_views.go",
+   "type": "file",
+   "name": "swarm_views.go",
+   "filePath": "internal/ui/swarm_views.go",
+   "summary": "Views da aba Docker Swarm: landing, central com tabela de nodes/services/stacks/tasks, painéis laterais e modais.",
+   "tags": [
+    "component",
+    "docker-swarm",
+    "renderizacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "type": "function",
+   "name": "renderSwarmLanding",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    13,
+    46
+   ],
+   "summary": "Renderiza a landing do módulo Docker Swarm com estado do cluster e prévia.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmTab",
+   "type": "function",
+   "name": "renderSwarmTab",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    48,
+    65
+   ],
+   "summary": "Renderiza a aba Swarm escolhendo entre landing, central, logs, detalhe e formulários.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmConfirmOpts",
+   "type": "function",
+   "name": "swarmConfirmOpts",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    67,
+    104
+   ],
+   "summary": "Monta as opções do modal de confirmação das ações destrutivas do Swarm.",
+   "tags": [
+    "confirmacao",
+    "acao-destrutiva",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmCluster",
+   "type": "function",
+   "name": "renderSwarmCluster",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    106,
+    128
+   ],
+   "summary": "Compõe a central do Swarm com cabeçalho, abas, tabela e trilho lateral.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmHeader",
+   "type": "function",
+   "name": "renderSwarmHeader",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    132,
+    153
+   ],
+   "summary": "Renderiza o cabeçalho com estado do Swarm e contagens.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmStateChip",
+   "type": "function",
+   "name": "swarmStateChip",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    155,
+    167
+   ],
+   "summary": "Gera o chip de estado do Swarm (ativo, inativo, manager).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmKindTabs",
+   "type": "function",
+   "name": "renderSwarmKindTabs",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    181,
+    218
+   ],
+   "summary": "Desenha as abas de tipo com as contagens de cada um.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmKindLabel",
+   "type": "function",
+   "name": "swarmKindLabel",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    220,
+    240
+   ],
+   "summary": "Retorna o rótulo de cada tipo de lista do Swarm.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmCountFor",
+   "type": "function",
+   "name": "swarmCountFor",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    242,
+    262
+   ],
+   "summary": "Retorna a contagem de itens de um tipo.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmServiceHealth",
+   "type": "function",
+   "name": "swarmServiceHealth",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    266,
+    279
+   ],
+   "summary": "Conta services saudáveis, degradados e fora do ar.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmReplicaStyle",
+   "type": "function",
+   "name": "swarmReplicaStyle",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    291,
+    303
+   ],
+   "summary": "Escolhe o estilo das réplicas, sinalizando as incompletas.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmTable",
+   "type": "function",
+   "name": "renderSwarmTable",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    305,
+    333
+   ],
+   "summary": "Renderiza a tabela do tipo ativo com scroll.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmColumns",
+   "type": "function",
+   "name": "swarmColumns",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    339,
+    360
+   ],
+   "summary": "Calcula as larguras das colunas da tabela do Swarm.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmTableHeader",
+   "type": "function",
+   "name": "swarmTableHeader",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    362,
+    391
+   ],
+   "summary": "Renderiza o cabeçalho da tabela do Swarm.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmRow",
+   "type": "function",
+   "name": "renderSwarmRow",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    393,
+    483
+   ],
+   "summary": "Renderiza uma linha da tabela (node, service, stack ou task) com status.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmNodeDot",
+   "type": "function",
+   "name": "swarmNodeDot",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    485,
+    494
+   ],
+   "summary": "Gera o indicador de status de um node.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmSummary",
+   "type": "function",
+   "name": "renderSwarmSummary",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    518,
+    545
+   ],
+   "summary": "Renderiza o painel de resumo do item selecionado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmRightRail",
+   "type": "function",
+   "name": "renderSwarmRightRail",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    547,
+    556
+   ],
+   "summary": "Compõe o trilho direito da central do Swarm.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmNodesPanel",
+   "type": "function",
+   "name": "renderSwarmNodesPanel",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    558,
+    607
+   ],
+   "summary": "Renderiza o painel de nodes do cluster.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmEventsPanel",
+   "type": "function",
+   "name": "renderSwarmEventsPanel",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    609,
+    622
+   ],
+   "summary": "Renderiza o painel de eventos do Swarm.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmActionsPanel",
+   "type": "function",
+   "name": "renderSwarmActionsPanel",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    624,
+    641
+   ],
+   "summary": "Renderiza o painel de ações rápidas do Swarm.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:swarmHints",
+   "type": "function",
+   "name": "swarmHints",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    643,
+    667
+   ],
+   "summary": "Monta a linha de dicas de teclas da aba Swarm.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmFormBox",
+   "type": "function",
+   "name": "renderSwarmFormBox",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    669,
+    755
+   ],
+   "summary": "Renderiza o modal dos formulários do Swarm.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmLogsBox",
+   "type": "function",
+   "name": "renderSwarmLogsBox",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    765,
+    795
+   ],
+   "summary": "Renderiza a sobreposição com logs do service.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/swarm_views.go:renderSwarmDetailBox",
+   "type": "function",
+   "name": "renderSwarmDetailBox",
+   "filePath": "internal/ui/swarm_views.go",
+   "lineRange": [
+    797,
+    814
+   ],
+   "summary": "Renderiza a sobreposição de detalhe do item.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-swarm"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestAllTabsIncludesSwarm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSidebarShowsSwarmInExecucao",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSanitizeSwarmStackName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmKindCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmControlCenterRenders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmReplicaStyleFlagsIncomplete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmKindTabsShowAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmNavPushPop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "function:internal/ui/swarm_tab_test.go:TestSwarmScaleForm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmConfirmOpts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmCluster",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmStateChip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmKindTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmKindLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmCountFor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmServiceHealth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmReplicaStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmTableHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmNodeDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmRightRail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmNodesPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmEventsPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmActionsPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:swarmHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmFormBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmLogsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmDetailBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmLandingEnterAndEsc",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmLandingEnterAndEsc",
+   "target": "function:internal/ui/swarm_tab.go:handleSwarmKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSanitizeSwarmStackName",
+   "target": "function:internal/ui/swarm_tab.go:sanitizeSwarmStackName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmKindCycle",
+   "target": "function:internal/ui/swarm_tab.go:handleSwarmKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmControlCenterRenders",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmReplicaStyleFlagsIncomplete",
+   "target": "function:internal/ui/swarm_views.go:swarmReplicaStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmKindTabsShowAll",
+   "target": "function:internal/ui/swarm_views.go:renderSwarmKindTabs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmNavPushPop",
+   "target": "function:internal/ui/swarm_tab.go:swarmPopNav",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_tab_test.go:TestSwarmScaleForm",
+   "target": "function:internal/ui/swarm_tab.go:handleSwarmKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "target": "function:internal/ui/module_landing.go:landingToolState",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "target": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmLanding",
+   "target": "function:internal/ui/module_landing.go:landingContainerRows",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:swarmConfirmOpts",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmHeader",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmTable",
+   "target": "function:internal/ui/swarm_tab.go:swarmRowCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmTable",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmRow",
+   "target": "function:internal/collectors/swarm.go:SwarmBelongsToProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmActionsPanel",
+   "target": "function:internal/ui/swarm_tab.go:swarmQuickActionItems",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmLogsBox",
+   "target": "function:internal/ui/swarm_tab.go:swarmSelectedName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/swarm_views.go:renderSwarmDetailBox",
+   "target": "function:internal/ui/swarm_tab.go:swarmSelectedName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/swarm_views.go",
+   "target": "file:internal/ui/swarm_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

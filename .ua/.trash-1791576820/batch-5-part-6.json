@@ -1,0 +1,2301 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/api_tab.go",
+   "type": "file",
+   "name": "api_tab.go",
+   "filePath": "internal/ui/api_tab.go",
+   "summary": "Cliente HTTP estilo Postman dentro da TUI: edição de URL/params/headers/auth/body com editor multilinha, envio assíncrono, histórico e busca na resposta.",
+   "tags": [
+    "component",
+    "api-client",
+    "text-editing",
+    "event-handler",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:initApiTab",
+   "type": "function",
+   "name": "initApiTab",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    30,
+    60
+   ],
+   "summary": "Inicializa o estado do cliente HTTP da aba API para o projeto: URL base, método, cabeçalhos, autenticação e histórico.",
+   "tags": [
+    "state-init",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:openApiWithPreset",
+   "type": "function",
+   "name": "openApiWithPreset",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    78,
+    107
+   ],
+   "summary": "Abre o cliente de API com método e caminho pré-preenchidos a partir das rotas detectadas do projeto.",
+   "tags": [
+    "api-client",
+    "navigation",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiBaseURL",
+   "type": "function",
+   "name": "apiBaseURL",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    109,
+    124
+   ],
+   "summary": "Monta a URL base da API do projeto a partir do domínio ou da primeira porta conhecida.",
+   "tags": [
+    "api-client",
+    "url",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:leaveApiTab",
+   "type": "function",
+   "name": "leaveApiTab",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    127,
+    136
+   ],
+   "summary": "Fecha o cliente de API em tela cheia e volta para a landing da aba de ferramentas.",
+   "tags": [
+    "navigation",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:renderApiLanding",
+   "type": "function",
+   "name": "renderApiLanding",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    138,
+    187
+   ],
+   "summary": "Renderiza a landing da ferramenta API com resumo do projeto, portas e histórico recente.",
+   "tags": [
+    "rendering",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiProjectPorts",
+   "type": "function",
+   "name": "apiProjectPorts",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    189,
+    202
+   ],
+   "summary": "Coleta as portas candidatas do projeto para o cliente de API, sem duplicatas.",
+   "tags": [
+    "utility",
+    "ports",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMethodStyle",
+   "type": "function",
+   "name": "apiMethodStyle",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    204,
+    219
+   ],
+   "summary": "Escolhe o estilo Lip Gloss de cor para cada método HTTP.",
+   "tags": [
+    "styling",
+    "http",
+    "lipgloss"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:fitApiFieldWindowSel",
+   "type": "function",
+   "name": "fitApiFieldWindowSel",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    227,
+    297
+   ],
+   "summary": "Recorta o texto de um campo em largura fixa mantendo o cursor visível e destacando a seleção.",
+   "tags": [
+    "text-editing",
+    "rendering",
+    "utility"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMaskSecret",
+   "type": "function",
+   "name": "apiMaskSecret",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    299,
+    313
+   ],
+   "summary": "Mascara tokens e segredos de autenticação para exibição na tela.",
+   "tags": [
+    "security",
+    "formatting",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:cycleApiAuth",
+   "type": "function",
+   "name": "cycleApiAuth",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    315,
+    324
+   ],
+   "summary": "Alterna entre os tipos de autenticação disponíveis (none, bearer, basic etc.).",
+   "tags": [
+    "api-client",
+    "auth",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:renderApiMultilineEdit",
+   "type": "function",
+   "name": "renderApiMultilineEdit",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    327,
+    394
+   ],
+   "summary": "Renderiza o editor multilinha de corpo/cabeçalhos com cursor, seleção e truncamento seguro para ANSI.",
+   "tags": [
+    "rendering",
+    "text-editing",
+    "json"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:renderJSONColumns",
+   "type": "function",
+   "name": "renderJSONColumns",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    397,
+    422
+   ],
+   "summary": "Recorta uma linha de JSON por coluna e aplica realce de sintaxe.",
+   "tags": [
+    "rendering",
+    "json",
+    "syntax-highlight"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiStatusStyle",
+   "type": "function",
+   "name": "apiStatusStyle",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    424,
+    436
+   ],
+   "summary": "Escolhe a cor do status HTTP da última resposta (2xx, 4xx, 5xx).",
+   "tags": [
+    "styling",
+    "http",
+    "lipgloss"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:renderApiCursor",
+   "type": "function",
+   "name": "renderApiCursor",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    446,
+    455
+   ],
+   "summary": "Desenha o cursor de texto em uma posição de um campo de linha única.",
+   "tags": [
+    "rendering",
+    "text-editing",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiSelRange",
+   "type": "function",
+   "name": "apiSelRange",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    462,
+    474
+   ],
+   "summary": "Retorna o intervalo [lo,hi) da seleção ativa no editor.",
+   "tags": [
+    "text-editing",
+    "selection",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiDeleteSelection",
+   "type": "function",
+   "name": "apiDeleteSelection",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    476,
+    493
+   ],
+   "summary": "Apaga o texto selecionado no editor e reposiciona o cursor.",
+   "tags": [
+    "text-editing",
+    "selection",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiBodyStartCursor",
+   "type": "function",
+   "name": "apiBodyStartCursor",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    496,
+    511
+   ],
+   "summary": "Posiciona o cursor inicial do corpo dentro de {} ou [] ou no início quando vazio.",
+   "tags": [
+    "text-editing",
+    "json",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:applyApiPort",
+   "type": "function",
+   "name": "applyApiPort",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    513,
+    525
+   ],
+   "summary": "Troca a porta da URL da requisição pela porta informada.",
+   "tags": [
+    "api-client",
+    "ports",
+    "url"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:cycleApiPort",
+   "type": "function",
+   "name": "cycleApiPort",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    527,
+    537
+   ],
+   "summary": "Alterna entre as portas do projeto na URL da requisição.",
+   "tags": [
+    "api-client",
+    "ports",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:pushApiHistory",
+   "type": "function",
+   "name": "pushApiHistory",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    539,
+    552
+   ],
+   "summary": "Registra a requisição no histórico, sem duplicatas e com limite de tamanho.",
+   "tags": [
+    "api-client",
+    "history",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:sendApiRequest",
+   "type": "function",
+   "name": "sendApiRequest",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    554,
+    580
+   ],
+   "summary": "Dispara a requisição HTTP de forma assíncrona como tea.Cmd, montando método, URL, cabeçalhos, auth e corpo.",
+   "tags": [
+    "api-client",
+    "http",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:handleApiResponse",
+   "type": "function",
+   "name": "handleApiResponse",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    582,
+    601
+   ],
+   "summary": "Aplica a resposta HTTP recebida ao estado: status, tempo, corpo formatado e cabeçalhos.",
+   "tags": [
+    "api-client",
+    "http",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiSearchMatches",
+   "type": "function",
+   "name": "apiSearchMatches",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    603,
+    615
+   ],
+   "summary": "Encontra as linhas da resposta que casam com o termo de busca.",
+   "tags": [
+    "search",
+    "api-client",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMatchLineSet",
+   "type": "function",
+   "name": "apiMatchLineSet",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    617,
+    627
+   ],
+   "summary": "Converte os resultados de busca em um conjunto de linhas para realce.",
+   "tags": [
+    "search",
+    "utility",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:jumpApiSearch",
+   "type": "function",
+   "name": "jumpApiSearch",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    629,
+    639
+   ],
+   "summary": "Navega entre as ocorrências da busca na resposta, ajustando a rolagem.",
+   "tags": [
+    "search",
+    "navigation",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:updateApiEdit",
+   "type": "function",
+   "name": "updateApiEdit",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    645,
+    882
+   ],
+   "summary": "Editor de texto genérico estilo VS Code: digitação, seleção, movimentação por palavra/linha, indentação e atalhos de edição.",
+   "tags": [
+    "text-editing",
+    "keyboard",
+    "event-handler"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiLineIndent",
+   "type": "function",
+   "name": "apiLineIndent",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    884,
+    894
+   ],
+   "summary": "Retorna a indentação da linha atual para auto-indentar novas linhas.",
+   "tags": [
+    "text-editing",
+    "utility",
+    "indentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiRuneBefore",
+   "type": "function",
+   "name": "apiRuneBefore",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    896,
+    905
+   ],
+   "summary": "Retorna o caractere imediatamente antes do cursor, ignorando espaços.",
+   "tags": [
+    "text-editing",
+    "utility",
+    "runes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiRuneAfter",
+   "type": "function",
+   "name": "apiRuneAfter",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    907,
+    916
+   ],
+   "summary": "Retorna o caractere imediatamente após o cursor, ignorando espaços.",
+   "tags": [
+    "text-editing",
+    "utility",
+    "runes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMoveWordLeft",
+   "type": "function",
+   "name": "apiMoveWordLeft",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    941,
+    959
+   ],
+   "summary": "Move o cursor uma palavra para a esquerda no estilo VS Code.",
+   "tags": [
+    "text-editing",
+    "navigation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMoveWordRight",
+   "type": "function",
+   "name": "apiMoveWordRight",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    961,
+    979
+   ],
+   "summary": "Move o cursor uma palavra para a direita no estilo VS Code.",
+   "tags": [
+    "text-editing",
+    "navigation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiMoveLine",
+   "type": "function",
+   "name": "apiMoveLine",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    981,
+    1017
+   ],
+   "summary": "Move o cursor para a linha de cima/baixo preservando a coluna.",
+   "tags": [
+    "text-editing",
+    "navigation",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiUnindentAt",
+   "type": "function",
+   "name": "apiUnindentAt",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1019,
+    1029
+   ],
+   "summary": "Remove um nível de indentação no início da linha do cursor.",
+   "tags": [
+    "text-editing",
+    "indentation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:updateApiSearch",
+   "type": "function",
+   "name": "updateApiSearch",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1031,
+    1053
+   ],
+   "summary": "Trata o modo de digitação da busca na resposta da API.",
+   "tags": [
+    "search",
+    "keyboard",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:renderApiSearchPrompt",
+   "type": "function",
+   "name": "renderApiSearchPrompt",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1055,
+    1064
+   ],
+   "summary": "Renderiza a linha do prompt de busca da aba API.",
+   "tags": [
+    "rendering",
+    "search",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiCurrentEditText",
+   "type": "function",
+   "name": "apiCurrentEditText",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1072,
+    1096
+   ],
+   "summary": "Retorna o texto em edição conforme o foco (URL, célula da tabela, token de auth ou corpo).",
+   "tags": [
+    "text-editing",
+    "state",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiSetCurrentEditText",
+   "type": "function",
+   "name": "apiSetCurrentEditText",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1098,
+    1126
+   ],
+   "summary": "Grava o texto editado de volta no campo correspondente ao foco atual.",
+   "tags": [
+    "text-editing",
+    "state",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:beginApiEdit",
+   "type": "function",
+   "name": "beginApiEdit",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1130,
+    1158
+   ],
+   "summary": "Entra em modo de edição no elemento focado, criando uma linha na tabela vazia quando necessário.",
+   "tags": [
+    "text-editing",
+    "state",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:cycleApiMethod",
+   "type": "function",
+   "name": "cycleApiMethod",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1161,
+    1172
+   ],
+   "summary": "Gira o método HTTP no lugar, como o seletor do Postman.",
+   "tags": [
+    "api-client",
+    "http",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiSetSection",
+   "type": "function",
+   "name": "apiSetSection",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1176,
+    1193
+   ],
+   "summary": "Troca a aba da requisição (params, headers, auth, body) e move o foco para o painel.",
+   "tags": [
+    "navigation",
+    "api-client",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiCycleFocus",
+   "type": "function",
+   "name": "apiCycleFocus",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1198,
+    1214
+   ],
+   "summary": "Alterna o foco entre URL, painel da aba e resposta em ordem fixa.",
+   "tags": [
+    "navigation",
+    "focus",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:apiRecallHistory",
+   "type": "function",
+   "name": "apiRecallHistory",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1217,
+    1235
+   ],
+   "summary": "Traz uma chamada anterior do histórico de volta para a linha de requisição.",
+   "tags": [
+    "history",
+    "api-client",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:handleApiKeys",
+   "type": "function",
+   "name": "handleApiKeys",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1242,
+    1347
+   ],
+   "summary": "Despacha as teclas da aba API em camadas: modo de digitação, foco atual e atalhos da tela.",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "api-client"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:handleApiRowKeys",
+   "type": "function",
+   "name": "handleApiRowKeys",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1350,
+    1376
+   ],
+   "summary": "Trata a navegação e edição da tabela de params/headers.",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "table"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab.go:handleApiResponseKeys",
+   "type": "function",
+   "name": "handleApiResponseKeys",
+   "filePath": "internal/ui/api_tab.go",
+   "lineRange": [
+    1380,
+    1424
+   ],
+   "summary": "Trata rolagem, busca e troca entre corpo e cabeçalhos na leitura da resposta.",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/compose_messages.go",
+   "type": "file",
+   "name": "compose_messages.go",
+   "filePath": "internal/ui/compose_messages.go",
+   "summary": "Mensagens e comandos Bubble Tea para up/build/down/restart do docker compose, com barra de progresso animada.",
+   "tags": [
+    "event-handler",
+    "compose",
+    "progress",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/compose_messages.go:composeVerbLabel",
+   "type": "function",
+   "name": "composeVerbLabel",
+   "filePath": "internal/ui/compose_messages.go",
+   "lineRange": [
+    48,
+    60
+   ],
+   "summary": "Converte a ação do compose no gerúndio exibido na barra de progresso.",
+   "tags": [
+    "formatting",
+    "compose",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/compose_messages.go:composeProgressBar",
+   "type": "function",
+   "name": "composeProgressBar",
+   "filePath": "internal/ui/compose_messages.go",
+   "lineRange": [
+    66,
+    91
+   ],
+   "summary": "Desenha a barra ASCII animada com preenchimento assintótico e pulso Braille enquanto o compose roda.",
+   "tags": [
+    "rendering",
+    "progress",
+    "animation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/container_deps.go",
+   "type": "file",
+   "name": "container_deps.go",
+   "filePath": "internal/ui/container_deps.go",
+   "summary": "Tela de árvore de dependências entre serviços compose, com status de cada serviço.",
+   "tags": [
+    "component",
+    "dependencies",
+    "compose",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:buildDepForest",
+   "type": "function",
+   "name": "buildDepForest",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    32,
+    68
+   ],
+   "summary": "Agrupa serviços compose em raízes com suas dependências aninhadas, no formato de `npm ls`.",
+   "tags": [
+    "graph",
+    "dependencies",
+    "compose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:flattenDepTree",
+   "type": "function",
+   "name": "flattenDepTree",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    70,
+    108
+   ],
+   "summary": "Achata a floresta de dependências em linhas com prefixos de árvore para exibição.",
+   "tags": [
+    "tree",
+    "rendering",
+    "dependencies"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:depServiceStatus",
+   "type": "function",
+   "name": "depServiceStatus",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    114,
+    123
+   ],
+   "summary": "Associa de forma aproximada um serviço compose a um container em execução para obter seu status.",
+   "tags": [
+    "matching",
+    "docker",
+    "dependencies"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:handleContainerDepsKeys",
+   "type": "function",
+   "name": "handleContainerDepsKeys",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    125,
+    143
+   ],
+   "summary": "Trata as teclas da tela de dependências de containers (navegação e saída).",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "dependencies"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:renderContainerDeps",
+   "type": "function",
+   "name": "renderContainerDeps",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    145,
+    181
+   ],
+   "summary": "Renderiza a árvore de dependências dos serviços compose do projeto.",
+   "tags": [
+    "rendering",
+    "dependencies",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_deps.go:renderDepLine",
+   "type": "function",
+   "name": "renderDepLine",
+   "filePath": "internal/ui/container_deps.go",
+   "lineRange": [
+    183,
+    202
+   ],
+   "summary": "Renderiza uma linha da árvore de dependências com status do serviço e realce de seleção.",
+   "tags": [
+    "rendering",
+    "dependencies",
+    "tui"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:initApiTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:openApiWithPreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiBaseURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:leaveApiTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:renderApiLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiProjectPorts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMethodStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:fitApiFieldWindowSel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMaskSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:cycleApiAuth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:renderApiMultilineEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:renderJSONColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiStatusStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:renderApiCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiSelRange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiDeleteSelection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiBodyStartCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:applyApiPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:cycleApiPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:pushApiHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:sendApiRequest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:handleApiResponse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiSearchMatches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMatchLineSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:jumpApiSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:updateApiEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiLineIndent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiRuneBefore",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiRuneAfter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMoveWordLeft",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMoveWordRight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiMoveLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiUnindentAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:updateApiSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:renderApiSearchPrompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiCurrentEditText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiSetCurrentEditText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:beginApiEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:cycleApiMethod",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiSetSection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiCycleFocus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:apiRecallHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:handleApiKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:handleApiRowKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "function:internal/ui/api_tab.go:handleApiResponseKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "function:internal/ui/compose_messages.go:composeVerbLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "function:internal/ui/compose_messages.go:composeProgressBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:buildDepForest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:flattenDepTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:depServiceStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:handleContainerDepsKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:renderContainerDeps",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "function:internal/ui/container_deps.go:renderDepLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/compose_messages.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_deps.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/api_tab.go:renderApiLanding",
+   "target": "function:internal/collectors/ports.go:FormatPortsShort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_deps.go:handleContainerDepsKeys",
+   "target": "function:internal/ui/containers_tab.go:requestContainerPreview",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

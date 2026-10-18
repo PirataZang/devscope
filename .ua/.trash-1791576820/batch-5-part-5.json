@@ -1,0 +1,1832 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/swarm.go",
+   "type": "file",
+   "name": "swarm.go",
+   "filePath": "internal/collectors/swarm.go",
+   "summary": "Camada completa de integração com Docker Swarm via CLI: modelos, listagem de nós/serviços/tasks/stacks/redes/secrets/configs, inspeção e ações de gestão do cluster.",
+   "tags": [
+    "collector",
+    "swarm",
+    "docker",
+    "orchestration",
+    "service"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Integração via CLI do docker com `--format {{json .}}`, decodificando uma linha JSON por recurso em vez de usar o SDK do Docker."
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmAvailable",
+   "type": "function",
+   "name": "SwarmAvailable",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    96,
+    99
+   ],
+   "summary": "Informa se a CLI do docker está disponível no PATH.",
+   "tags": [
+    "swarm",
+    "detection",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:runDocker",
+   "type": "function",
+   "name": "runDocker",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    101,
+    124
+   ],
+   "summary": "Executa a CLI do docker com timeout, retornando a saída e erros com stderr anexado.",
+   "tags": [
+    "exec",
+    "docker",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmClusterInfo",
+   "type": "function",
+   "name": "SwarmClusterInfo",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    134,
+    178
+   ],
+   "summary": "Lê o estado do Swarm (nó, papel, managers, cluster) a partir do `docker info`.",
+   "tags": [
+    "swarm",
+    "collector",
+    "cluster"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListNodes",
+   "type": "function",
+   "name": "SwarmListNodes",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    180,
+    211
+   ],
+   "summary": "Lista os nós do cluster Swarm via `docker node ls` em formato JSON.",
+   "tags": [
+    "swarm",
+    "collector",
+    "nodes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListServices",
+   "type": "function",
+   "name": "SwarmListServices",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    213,
+    240
+   ],
+   "summary": "Lista os serviços do Swarm com modo, réplicas, imagem e portas.",
+   "tags": [
+    "swarm",
+    "collector",
+    "services"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListTasks",
+   "type": "function",
+   "name": "SwarmListTasks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    242,
+    257
+   ],
+   "summary": "Lista as tasks de todos os serviços do Swarm.",
+   "tags": [
+    "swarm",
+    "collector",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListServiceTasks",
+   "type": "function",
+   "name": "SwarmListServiceTasks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    259,
+    266
+   ],
+   "summary": "Lista as tasks de um serviço Swarm específico.",
+   "tags": [
+    "swarm",
+    "collector",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:parseSwarmTasks",
+   "type": "function",
+   "name": "parseSwarmTasks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    268,
+    305
+   ],
+   "summary": "Faz o parsing da saída JSON linha a linha de `docker service ps` em SwarmTask.",
+   "tags": [
+    "parsing",
+    "swarm",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListStacks",
+   "type": "function",
+   "name": "SwarmListStacks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    307,
+    329
+   ],
+   "summary": "Lista as stacks implantadas no Swarm com a contagem de serviços.",
+   "tags": [
+    "swarm",
+    "collector",
+    "stacks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListNetworks",
+   "type": "function",
+   "name": "SwarmListNetworks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    331,
+    353
+   ],
+   "summary": "Lista as redes overlay/Swarm do engine.",
+   "tags": [
+    "swarm",
+    "collector",
+    "networks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListSecrets",
+   "type": "function",
+   "name": "SwarmListSecrets",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    355,
+    377
+   ],
+   "summary": "Lista os secrets cadastrados no Swarm.",
+   "tags": [
+    "swarm",
+    "collector",
+    "secrets"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmListConfigs",
+   "type": "function",
+   "name": "SwarmListConfigs",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    379,
+    401
+   ],
+   "summary": "Lista os configs cadastrados no Swarm.",
+   "tags": [
+    "swarm",
+    "collector",
+    "configs"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmRecentEvents",
+   "type": "function",
+   "name": "SwarmRecentEvents",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    404,
+    437
+   ],
+   "summary": "Tira um snapshot não-streaming dos eventos recentes do docker desde um instante.",
+   "tags": [
+    "swarm",
+    "events",
+    "collector"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInspectService",
+   "type": "function",
+   "name": "SwarmInspectService",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    439,
+    441
+   ],
+   "summary": "Retorna o `docker service inspect --pretty` de um serviço.",
+   "tags": [
+    "swarm",
+    "inspect",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInspectNode",
+   "type": "function",
+   "name": "SwarmInspectNode",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    443,
+    445
+   ],
+   "summary": "Retorna o inspect legível de um nó do Swarm.",
+   "tags": [
+    "swarm",
+    "inspect",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInspectNetwork",
+   "type": "function",
+   "name": "SwarmInspectNetwork",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    447,
+    449
+   ],
+   "summary": "Retorna o inspect de uma rede do Swarm.",
+   "tags": [
+    "swarm",
+    "inspect",
+    "networks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInspectSecret",
+   "type": "function",
+   "name": "SwarmInspectSecret",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    451,
+    455
+   ],
+   "summary": "Retorna o inspect de um secret (metadados, sem o valor).",
+   "tags": [
+    "swarm",
+    "inspect",
+    "secrets"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInspectConfig",
+   "type": "function",
+   "name": "SwarmInspectConfig",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    457,
+    460
+   ],
+   "summary": "Retorna o inspect de um config do Swarm.",
+   "tags": [
+    "swarm",
+    "inspect",
+    "configs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceTasks",
+   "type": "function",
+   "name": "SwarmServiceTasks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    462,
+    464
+   ],
+   "summary": "Retorna em texto as tasks de um serviço (`docker service ps`).",
+   "tags": [
+    "swarm",
+    "services",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceLogs",
+   "type": "function",
+   "name": "SwarmServiceLogs",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    466,
+    471
+   ],
+   "summary": "Busca as últimas linhas de log de um serviço Swarm.",
+   "tags": [
+    "swarm",
+    "logs",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceScale",
+   "type": "function",
+   "name": "SwarmServiceScale",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    473,
+    479
+   ],
+   "summary": "Escala um serviço Swarm para o número de réplicas informado.",
+   "tags": [
+    "swarm",
+    "action",
+    "scaling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceRemove",
+   "type": "function",
+   "name": "SwarmServiceRemove",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    481,
+    484
+   ],
+   "summary": "Remove um serviço do Swarm.",
+   "tags": [
+    "swarm",
+    "action",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceForceUpdate",
+   "type": "function",
+   "name": "SwarmServiceForceUpdate",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    486,
+    488
+   ],
+   "summary": "Força o redeploy de um serviço com `docker service update --force`.",
+   "tags": [
+    "swarm",
+    "action",
+    "deploy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceUpdateImage",
+   "type": "function",
+   "name": "SwarmServiceUpdateImage",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    490,
+    492
+   ],
+   "summary": "Atualiza a imagem de um serviço Swarm.",
+   "tags": [
+    "swarm",
+    "action",
+    "deploy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceRollback",
+   "type": "function",
+   "name": "SwarmServiceRollback",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    494,
+    496
+   ],
+   "summary": "Faz rollback de um serviço Swarm para a especificação anterior.",
+   "tags": [
+    "swarm",
+    "action",
+    "rollback"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceCreate",
+   "type": "function",
+   "name": "SwarmServiceCreate",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    498,
+    508
+   ],
+   "summary": "Cria um serviço Swarm com imagem, réplicas, porta publicada e rede opcionais.",
+   "tags": [
+    "swarm",
+    "action",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmInit",
+   "type": "function",
+   "name": "SwarmInit",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    510,
+    516
+   ],
+   "summary": "Inicializa um Swarm no engine local, com advertise-addr opcional.",
+   "tags": [
+    "swarm",
+    "action",
+    "cluster"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmLeave",
+   "type": "function",
+   "name": "SwarmLeave",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    518,
+    524
+   ],
+   "summary": "Sai do Swarm, opcionalmente com --force.",
+   "tags": [
+    "swarm",
+    "action",
+    "cluster"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmJoinToken",
+   "type": "function",
+   "name": "SwarmJoinToken",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    526,
+    532
+   ],
+   "summary": "Obtém o comando de join para worker ou manager.",
+   "tags": [
+    "swarm",
+    "cluster",
+    "security"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmNodePromote",
+   "type": "function",
+   "name": "SwarmNodePromote",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    534,
+    536
+   ],
+   "summary": "Promove um nó a manager.",
+   "tags": [
+    "swarm",
+    "action",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmNodeDemote",
+   "type": "function",
+   "name": "SwarmNodeDemote",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    538,
+    540
+   ],
+   "summary": "Rebaixa um manager a worker.",
+   "tags": [
+    "swarm",
+    "action",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmNodeAvailability",
+   "type": "function",
+   "name": "SwarmNodeAvailability",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    542,
+    550
+   ],
+   "summary": "Altera a disponibilidade de um nó (active, pause, drain) após validar o valor.",
+   "tags": [
+    "swarm",
+    "action",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmNodeRemove",
+   "type": "function",
+   "name": "SwarmNodeRemove",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    552,
+    560
+   ],
+   "summary": "Remove um nó do cluster Swarm, opcionalmente forçando.",
+   "tags": [
+    "swarm",
+    "action",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmStackDeploy",
+   "type": "function",
+   "name": "SwarmStackDeploy",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    562,
+    564
+   ],
+   "summary": "Implanta uma stack a partir de um arquivo compose.",
+   "tags": [
+    "swarm",
+    "deploy",
+    "stacks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmStackRemove",
+   "type": "function",
+   "name": "SwarmStackRemove",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    566,
+    569
+   ],
+   "summary": "Remove uma stack do Swarm.",
+   "tags": [
+    "swarm",
+    "action",
+    "stacks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmStackServices",
+   "type": "function",
+   "name": "SwarmStackServices",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    571,
+    573
+   ],
+   "summary": "Lista em texto os serviços de uma stack.",
+   "tags": [
+    "swarm",
+    "stacks",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmPruneNetworks",
+   "type": "function",
+   "name": "SwarmPruneNetworks",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    575,
+    577
+   ],
+   "summary": "Remove redes não utilizadas do engine.",
+   "tags": [
+    "swarm",
+    "action",
+    "networks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmSecretRemove",
+   "type": "function",
+   "name": "SwarmSecretRemove",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    579,
+    581
+   ],
+   "summary": "Remove um secret do Swarm.",
+   "tags": [
+    "swarm",
+    "action",
+    "secrets"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmConfigRemove",
+   "type": "function",
+   "name": "SwarmConfigRemove",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    583,
+    585
+   ],
+   "summary": "Remove um config do Swarm.",
+   "tags": [
+    "swarm",
+    "action",
+    "configs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:DiscoverSwarmCompose",
+   "type": "function",
+   "name": "DiscoverSwarmCompose",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    588,
+    608
+   ],
+   "summary": "Encontra no projeto um arquivo compose adequado para stack deploy, preferindo variantes de swarm.",
+   "tags": [
+    "swarm",
+    "discovery",
+    "compose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:ParseServiceReplicas",
+   "type": "function",
+   "name": "ParseServiceReplicas",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    611,
+    620
+   ],
+   "summary": "Extrai réplicas em execução e desejadas de strings como \"2/2\" ou \"0/3\".",
+   "tags": [
+    "parsing",
+    "swarm",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmServiceStatus",
+   "type": "function",
+   "name": "SwarmServiceStatus",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    623,
+    635
+   ],
+   "summary": "Deriva um rótulo de status simples a partir das réplicas/modo do serviço.",
+   "tags": [
+    "swarm",
+    "status",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:SwarmBelongsToProject",
+   "type": "function",
+   "name": "SwarmBelongsToProject",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    638,
+    645
+   ],
+   "summary": "Heurística que indica se o nome de um recurso Swarm pertence ao projeto.",
+   "tags": [
+    "swarm",
+    "matching",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm.go:sanitizeStackToken",
+   "type": "function",
+   "name": "sanitizeStackToken",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    647,
+    659
+   ],
+   "summary": "Normaliza um nome para o formato aceito em nomes de stack (minúsculas, alfanumérico).",
+   "tags": [
+    "utility",
+    "sanitization",
+    "swarm"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmInfo",
+   "type": "class",
+   "name": "SwarmInfo",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    14,
+    28
+   ],
+   "summary": "Visão compacta da participação do engine local no Swarm (estado, papel, IDs, contagens).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "cluster"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmNode",
+   "type": "class",
+   "name": "SwarmNode",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    30,
+    39
+   ],
+   "summary": "Modelo de um nó do cluster Swarm (hostname, status, disponibilidade, papel).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmService",
+   "type": "class",
+   "name": "SwarmService",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    41,
+    48
+   ],
+   "summary": "Modelo de um serviço Swarm (modo, réplicas, imagem, portas).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "services"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmTask",
+   "type": "class",
+   "name": "SwarmTask",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    50,
+    59
+   ],
+   "summary": "Modelo de uma task de serviço Swarm (nó, estado desejado/atual, erro).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmStack",
+   "type": "class",
+   "name": "SwarmStack",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    61,
+    65
+   ],
+   "summary": "Modelo de uma stack Swarm com quantidade de serviços.",
+   "tags": [
+    "data-model",
+    "swarm",
+    "stacks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmNetwork",
+   "type": "class",
+   "name": "SwarmNetwork",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    67,
+    72
+   ],
+   "summary": "Modelo de uma rede Docker/Swarm (driver, escopo).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "networks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmSecret",
+   "type": "class",
+   "name": "SwarmSecret",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    74,
+    79
+   ],
+   "summary": "Modelo de metadados de um secret do Swarm.",
+   "tags": [
+    "data-model",
+    "swarm",
+    "secrets"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmConfig",
+   "type": "class",
+   "name": "SwarmConfig",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    81,
+    86
+   ],
+   "summary": "Modelo de metadados de um config do Swarm.",
+   "tags": [
+    "data-model",
+    "swarm",
+    "configs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/swarm.go:SwarmEvent",
+   "type": "class",
+   "name": "SwarmEvent",
+   "filePath": "internal/collectors/swarm.go",
+   "lineRange": [
+    88,
+    93
+   ],
+   "summary": "Modelo de um evento do docker (tipo, ação, ator, horário).",
+   "tags": [
+    "data-model",
+    "swarm",
+    "events"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/swarm_test.go",
+   "type": "file",
+   "name": "swarm_test.go",
+   "filePath": "internal/collectors/swarm_test.go",
+   "summary": "Testes dos helpers de Swarm: réplicas, status de serviço, vínculo com projeto e descoberta de compose para stack deploy.",
+   "tags": [
+    "test",
+    "swarm",
+    "compose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/swarm_test.go:TestParseServiceReplicas",
+   "type": "function",
+   "name": "TestParseServiceReplicas",
+   "filePath": "internal/collectors/swarm_test.go",
+   "lineRange": [
+    10,
+    19
+   ],
+   "summary": "Testa a extração de réplicas em execução e desejadas de strings como \"2/3\".",
+   "tags": [
+    "test",
+    "swarm",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm_test.go:TestSwarmServiceStatus",
+   "type": "function",
+   "name": "TestSwarmServiceStatus",
+   "filePath": "internal/collectors/swarm_test.go",
+   "lineRange": [
+    21,
+    31
+   ],
+   "summary": "Testa a derivação do rótulo de status de um serviço Swarm a partir das réplicas.",
+   "tags": [
+    "test",
+    "swarm",
+    "status"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm_test.go:TestSwarmBelongsToProject",
+   "type": "function",
+   "name": "TestSwarmBelongsToProject",
+   "filePath": "internal/collectors/swarm_test.go",
+   "lineRange": [
+    33,
+    40
+   ],
+   "summary": "Testa a heurística que liga nomes de recursos Swarm a um projeto.",
+   "tags": [
+    "test",
+    "swarm",
+    "matching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/swarm_test.go:TestDiscoverSwarmComposePrefersSwarmFile",
+   "type": "function",
+   "name": "TestDiscoverSwarmComposePrefersSwarmFile",
+   "filePath": "internal/collectors/swarm_test.go",
+   "lineRange": [
+    42,
+    55
+   ],
+   "summary": "Testa que a descoberta de compose prefere um arquivo específico de swarm quando existe.",
+   "tags": [
+    "test",
+    "swarm",
+    "compose"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/dbutil/config_test.go",
+   "type": "file",
+   "name": "config_test.go",
+   "filePath": "internal/dbutil/config_test.go",
+   "summary": "Teste de ida e volta (save/load) e upsert da configuração de conexões de banco do pacote dbutil.",
+   "tags": [
+    "test",
+    "database",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/dbutil/config_test.go:TestSaveLoadRoundTripAndUpsert",
+   "type": "function",
+   "name": "TestSaveLoadRoundTripAndUpsert",
+   "filePath": "internal/dbutil/config_test.go",
+   "lineRange": [
+    5,
+    27
+   ],
+   "summary": "Testa que salvar e carregar a configuração de banco preserva os dados e que o upsert substitui entradas existentes.",
+   "tags": [
+    "test",
+    "database",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmAvailable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmAvailable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:runDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmClusterInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmClusterInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListNodes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListNodes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListServices",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListServices",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListTasks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListTasks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListServiceTasks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListServiceTasks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:parseSwarmTasks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListStacks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListStacks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListNetworks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListNetworks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListSecrets",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListSecrets",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListConfigs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmListConfigs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmRecentEvents",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmRecentEvents",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectService",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectService",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectNode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectNode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectNetwork",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectNetwork",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectSecret",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInspectConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceTasks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceTasks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceScale",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceScale",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceForceUpdate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceForceUpdate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceUpdateImage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceUpdateImage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceRollback",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceRollback",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceCreate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceCreate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmInit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmLeave",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmLeave",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmJoinToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmJoinToken",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodePromote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodePromote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeDemote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeDemote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeAvailability",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeAvailability",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmNodeRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackDeploy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackDeploy",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackServices",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmStackServices",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmPruneNetworks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmPruneNetworks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmSecretRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmSecretRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmConfigRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmConfigRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:DiscoverSwarmCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:DiscoverSwarmCompose",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:ParseServiceReplicas",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:ParseServiceReplicas",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmServiceStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmBelongsToProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:SwarmBelongsToProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "function:internal/collectors/swarm.go:sanitizeStackToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmNode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmNode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmService",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmService",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmTask",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmTask",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmStack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmStack",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmNetwork",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmNetwork",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmSecret",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmEvent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "class:internal/collectors/swarm.go:SwarmEvent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestParseServiceReplicas",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestParseServiceReplicas",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestSwarmServiceStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestSwarmServiceStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestSwarmBelongsToProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestSwarmBelongsToProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestDiscoverSwarmComposePrefersSwarmFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/swarm_test.go",
+   "target": "function:internal/collectors/swarm_test.go:TestDiscoverSwarmComposePrefersSwarmFile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/dbutil/config_test.go",
+   "target": "function:internal/dbutil/config_test.go:TestSaveLoadRoundTripAndUpsert",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/dbutil/config_test.go",
+   "target": "function:internal/dbutil/config_test.go:TestSaveLoadRoundTripAndUpsert",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/swarm.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,2666 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/nginx_view.go",
+   "type": "file",
+   "name": "nginx_view.go",
+   "filePath": "internal/ui/nginx_view.go",
+   "summary": "Renderiza o console do Nginx na TUI: cabeçalho de identificação do projeto/hub, régua numerada com contadores, tabela de rotas responsiva e painel do arquivo de configuração com numeração e realce de sintaxe.",
+   "tags": [
+    "component",
+    "render",
+    "nginx",
+    "tui",
+    "lipgloss"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxTab",
+   "type": "function",
+   "name": "renderNginxTab",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    35,
+    70
+   ],
+   "summary": "Monta a aba Nginx completa do projeto: cabeçalho, régua, corpo de rotas e barra de comandos ajustados ao tamanho do terminal.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxHeader",
+   "type": "function",
+   "name": "renderNginxHeader",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    75,
+    95
+   ],
+   "summary": "Renderiza o cabeçalho de identificação: projeto, hub ao qual pertence e de onde as configs estão sendo lidas.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxRuler",
+   "type": "function",
+   "name": "renderNginxRuler",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    99,
+    120
+   ],
+   "summary": "Renderiza a régua com as abas numeradas junto aos contadores de confs.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxRulerStatus",
+   "type": "function",
+   "name": "nginxRulerStatus",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    123,
+    158
+   ],
+   "summary": "Retorna o recado transitório da régua quando existir, senão os contadores de hubs, singles e SSL.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxCounts",
+   "type": "function",
+   "name": "nginxCounts",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    160,
+    173
+   ],
+   "summary": "Conta quantos sites são hubs, singles e quantos têm SSL na lista atual.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxCommandBar",
+   "type": "function",
+   "name": "renderNginxCommandBar",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    175,
+    203
+   ],
+   "summary": "Renderiza a barra de comandos com os atalhos disponíveis no contexto atual.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxRoutesView",
+   "type": "function",
+   "name": "renderNginxRoutesView",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    207,
+    216
+   ],
+   "summary": "Compõe a visão de rotas: lista à esquerda e arquivo selecionado à direita, ocultando o arquivo em terminais estreitos.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxColumns",
+   "type": "function",
+   "name": "nginxColumns",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    231,
+    275
+   ],
+   "summary": "Dimensiona as colunas da tabela de rotas pela largura do painel, decidindo quais colunas (projeto, tipo, destino) cabem.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxTable",
+   "type": "function",
+   "name": "renderNginxTable",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    289,
+    313
+   ],
+   "summary": "Renderiza a tabela de rotas com cabeçalho, linhas visíveis e rolagem conforme a seleção.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxTableHeader",
+   "type": "function",
+   "name": "renderNginxTableHeader",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    315,
+    329
+   ],
+   "summary": "Renderiza a linha de cabeçalho da tabela de rotas conforme as colunas calculadas.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxRow",
+   "type": "function",
+   "name": "renderNginxRow",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    331,
+    354
+   ],
+   "summary": "Renderiza uma linha da tabela para um nginxutil.Site, destacando seleção e rotas de outros projetos.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxKindCell",
+   "type": "function",
+   "name": "nginxKindCell",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    373,
+    382
+   ],
+   "summary": "Devolve o texto e o estilo da célula de tipo (hub ou single) de um site.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxTargetLabel",
+   "type": "function",
+   "name": "nginxTargetLabel",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    386,
+    400
+   ],
+   "summary": "Descreve para onde a rota aponta; para hubs, a pasta que guarda os arquivos .inc.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxEmptyHint",
+   "type": "function",
+   "name": "nginxEmptyHint",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    402,
+    416
+   ],
+   "summary": "Gera a mensagem de orientação exibida quando não há rotas Nginx detectadas.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:renderNginxFilePanel",
+   "type": "function",
+   "name": "renderNginxFilePanel",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    421,
+    448
+   ],
+   "summary": "Mostra o arquivo da rota selecionada com numeração de linhas, realce de sintaxe e viewport rolável.",
+   "tags": [
+    "nginx",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxFilePosition",
+   "type": "function",
+   "name": "nginxFilePosition",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    466,
+    480
+   ],
+   "summary": "Formata o indicador de posição (linha atual/total) do arquivo exibido.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:highlightNginxLine",
+   "type": "function",
+   "name": "highlightNginxLine",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    492,
+    515
+   ],
+   "summary": "Aplica realce a uma linha de config Nginx: diretiva em destaque, bloco em negrito, comentário e pontuação apagados, sem alterar o texto.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view.go:nginxHighlightArgs",
+   "type": "function",
+   "name": "nginxHighlightArgs",
+   "filePath": "internal/ui/nginx_view.go",
+   "lineRange": [
+    518,
+    538
+   ],
+   "summary": "Realça os argumentos de uma diretiva, apagando ';', '{' e '}' e mantendo o argumento em texto normal.",
+   "tags": [
+    "nginx",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/nginx_view_test.go",
+   "type": "file",
+   "name": "nginx_view_test.go",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "summary": "Testes do console do Nginx: verifica que o layout cabe em qualquer terminal, que as colunas não excedem o painel, a navegação por teclas, o realce que só pinta e a marcação de rotas de outros projetos.",
+   "tags": [
+    "test",
+    "nginx",
+    "tui",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:nginxConsoleApp",
+   "type": "function",
+   "name": "nginxConsoleApp",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    14,
+    32
+   ],
+   "summary": "Fixture de teste que cria um App com snapshot e layout Nginx falsos no tamanho de terminal indicado.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:TestNginxConsoleFitsAnyTerminal",
+   "type": "function",
+   "name": "TestNginxConsoleFitsAnyTerminal",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    34,
+    50
+   ],
+   "summary": "Verifica que o console do Nginx nunca ultrapassa a largura/altura em vários tamanhos de terminal.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:TestNginxColumnsNeverExceedPanel",
+   "type": "function",
+   "name": "TestNginxColumnsNeverExceedPanel",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    53,
+    62
+   ],
+   "summary": "Verifica que as colunas calculadas nunca excedem a largura do painel.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:TestNginxNavigationKeys",
+   "type": "function",
+   "name": "TestNginxNavigationKeys",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    65,
+    89
+   ],
+   "summary": "Verifica que número troca de aba, setas rolam de lado e esc sobe um nível sem fechar o módulo.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:TestNginxHighlightOnlyPaints",
+   "type": "function",
+   "name": "TestNginxHighlightOnlyPaints",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    91,
+    105
+   ],
+   "summary": "Verifica que o realce de sintaxe preserva exatamente o texto original da linha.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_view_test.go:TestNginxForeignRouteIsMarked",
+   "type": "function",
+   "name": "TestNginxForeignRouteIsMarked",
+   "filePath": "internal/ui/nginx_view_test.go",
+   "lineRange": [
+    109,
+    119
+   ],
+   "summary": "Verifica que rotas de outros projetos continuam identificáveis (nome em amarelo) mesmo sem a coluna PROJETO.",
+   "tags": [
+    "test",
+    "tui",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/ngrok_tab.go",
+   "type": "file",
+   "name": "ngrok_tab.go",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "summary": "Implementa a aba Ngrok da TUI: carregamento assíncrono de túneis e requisições do agente, tabela de túneis, painéis de detalhes/requisições/logs, configuração, assistente (wizard) modal de criação e ações de iniciar, parar, reiniciar, duplicar, excluir, copiar URL e abrir no navegador.",
+   "tags": [
+    "component",
+    "ngrok",
+    "tui",
+    "event-handler",
+    "bubbletea"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:openNgrokClient",
+   "type": "function",
+   "name": "openNgrokClient",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    73,
+    97
+   ],
+   "summary": "Abre o cliente Ngrok para o projeto, inicializando estado e sugerindo porta, e dispara o primeiro carregamento.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "type": "function",
+   "name": "refreshNgrok",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    108,
+    133
+   ],
+   "summary": "Comando assíncrono que consulta o agente ngrok (ping, túneis vivos, requisições HTTP) e mescla com a config salva do projeto.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:handleNgrokMsg",
+   "type": "function",
+   "name": "handleNgrokMsg",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    135,
+    165
+   ],
+   "summary": "Trata as mensagens de carregamento e de ação do Ngrok, atualizando o estado da aba e agendando novos refreshes.",
+   "tags": [
+    "ngrok",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokLanding",
+   "type": "function",
+   "name": "renderNgrokLanding",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    167,
+    205
+   ],
+   "summary": "Renderiza a tela inicial do Ngrok antes da abertura, com status do agente e instruções.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokTab",
+   "type": "function",
+   "name": "renderNgrokTab",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    207,
+    234
+   ],
+   "summary": "Monta a aba Ngrok completa: cabeçalho, navegação, visão ativa (túneis, requisições, logs, config) e wizard modal.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokHints",
+   "type": "function",
+   "name": "ngrokHints",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    236,
+    258
+   ],
+   "summary": "Gera a linha de atalhos de teclado conforme a visão e o foco atuais.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokHeader",
+   "type": "function",
+   "name": "renderNgrokHeader",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    262,
+    279
+   ],
+   "summary": "Renderiza o cabeçalho com região, versão do agente e contagem de túneis online/offline.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokNav",
+   "type": "function",
+   "name": "renderNgrokNav",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    288,
+    322
+   ],
+   "summary": "Renderiza a navegação entre as visões da aba Ngrok.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokCounts",
+   "type": "function",
+   "name": "ngrokCounts",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    324,
+    333
+   ],
+   "summary": "Conta túneis online e offline do projeto.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokTunnelsView",
+   "type": "function",
+   "name": "renderNgrokTunnelsView",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    344,
+    362
+   ],
+   "summary": "Compõe a visão de túneis com a tabela ocupando a largura inteira e os painéis auxiliares abaixo.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokColumns",
+   "type": "function",
+   "name": "ngrokColumns",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    366,
+    378
+   ],
+   "summary": "Calcula a largura das colunas da tabela de túneis a partir da largura disponível.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokTunnelTable",
+   "type": "function",
+   "name": "renderNgrokTunnelTable",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    380,
+    418
+   ],
+   "summary": "Renderiza a tabela de túneis com cabeçalho, linhas e rolagem.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokRow",
+   "type": "function",
+   "name": "renderNgrokRow",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    420,
+    458
+   ],
+   "summary": "Renderiza uma linha de túnel com indicador de status, nome, porta e URL pública.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokTunnelDot",
+   "type": "function",
+   "name": "ngrokTunnelDot",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    460,
+    471
+   ],
+   "summary": "Devolve o indicador animado de status do túnel conforme o estado e o frame atual.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokCommands",
+   "type": "function",
+   "name": "renderNgrokCommands",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    473,
+    486
+   ],
+   "summary": "Renderiza o painel de comandos disponíveis para o túnel selecionado.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokDetailsPane",
+   "type": "function",
+   "name": "renderNgrokDetailsPane",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    491,
+    538
+   ],
+   "summary": "Mostra as URLs completas do túnel selecionado e a procedência do domínio.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokRequestsPane",
+   "type": "function",
+   "name": "renderNgrokRequestsPane",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    543,
+    604
+   ],
+   "summary": "Renderiza a lista de requisições HTTP recentes com túnel, método, status colorido, latência e IP.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokStatusStyle",
+   "type": "function",
+   "name": "ngrokStatusStyle",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    606,
+    619
+   ],
+   "summary": "Escolhe o estilo de cor para um código de status HTTP.",
+   "tags": [
+    "ngrok",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokMethodStyle",
+   "type": "function",
+   "name": "ngrokMethodStyle",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    621,
+    632
+   ],
+   "summary": "Escolhe o estilo de cor para um método HTTP.",
+   "tags": [
+    "ngrok",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokLatencyStyle",
+   "type": "function",
+   "name": "ngrokLatencyStyle",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    635,
+    644
+   ],
+   "summary": "Escolhe o estilo de cor pela latência, destacando requisições acima de 1s.",
+   "tags": [
+    "ngrok",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokLogsPane",
+   "type": "function",
+   "name": "renderNgrokLogsPane",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    657,
+    707
+   ],
+   "summary": "Renderiza o painel de logs do agente ngrok com rolagem.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokConfig",
+   "type": "function",
+   "name": "renderNgrokConfig",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    716,
+    738
+   ],
+   "summary": "Renderiza a visão de configuração que funde setup, histórico e domínios reservados.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokSetupLines",
+   "type": "function",
+   "name": "ngrokSetupLines",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    740,
+    755
+   ],
+   "summary": "Gera as linhas de setup (binário, authtoken, arquivo de config) do ngrok.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokHistoryLines",
+   "type": "function",
+   "name": "ngrokHistoryLines",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    757,
+    779
+   ],
+   "summary": "Gera as linhas do histórico de túneis do projeto.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokDomainLines",
+   "type": "function",
+   "name": "ngrokDomainLines",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    781,
+    811
+   ],
+   "summary": "Gera as linhas de domínios reservados e onde estão em uso.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokWizard",
+   "type": "function",
+   "name": "renderNgrokWizard",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    833,
+    855
+   ],
+   "summary": "Renderiza o wizard modal de criação de túnel com campos e preview do comando ngrok.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardFields",
+   "type": "function",
+   "name": "ngrokWizardFields",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    857,
+    894
+   ],
+   "summary": "Renderiza os campos do wizard (nome, porta, protocolo, domínio, região) com o foco atual.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokPortHint",
+   "type": "function",
+   "name": "ngrokPortHint",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    898,
+    911
+   ],
+   "summary": "Mostra as portas já detectadas pelo scanner no projeto para facilitar a criação do túnel.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardSpec",
+   "type": "function",
+   "name": "ngrokWizardSpec",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    922,
+    932
+   ],
+   "summary": "Monta o TunnelConfig descrito pelo formulário atual, usado no preview e na criação.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardValue",
+   "type": "function",
+   "name": "ngrokWizardValue",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    934,
+    949
+   ],
+   "summary": "Formata o valor exibido de um campo do wizard ajustado à largura.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:renderNgrokWizardFieldValue",
+   "type": "function",
+   "name": "renderNgrokWizardFieldValue",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    960,
+    978
+   ],
+   "summary": "Renderiza o valor de um campo do wizard com cursor quando editável.",
+   "tags": [
+    "ngrok",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:beginNgrokWizard",
+   "type": "function",
+   "name": "beginNgrokWizard",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    980,
+    1004
+   ],
+   "summary": "Abre o wizard de criação com valores iniciais e porta sugerida.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardText",
+   "type": "function",
+   "name": "ngrokWizardText",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1006,
+    1017
+   ],
+   "summary": "Devolve o texto do campo editável em foco no wizard.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:setNgrokWizardText",
+   "type": "function",
+   "name": "setNgrokWizardText",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1019,
+    1028
+   ],
+   "summary": "Atualiza o texto do campo editável em foco no wizard.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardFocusField",
+   "type": "function",
+   "name": "ngrokWizardFocusField",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1030,
+    1039
+   ],
+   "summary": "Move o foco do wizard para o campo indicado, sincronizando o input de texto.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokWizardCycle",
+   "type": "function",
+   "name": "ngrokWizardCycle",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1043,
+    1066
+   ],
+   "summary": "Alterna o valor do campo de escolha ou percorre as portas expostas pelo projeto (tecla espaço).",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:cycleFrom",
+   "type": "function",
+   "name": "cycleFrom",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1068,
+    1078
+   ],
+   "summary": "Retorna a próxima opção de uma lista circular a partir do valor atual.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:handleNgrokKeys",
+   "type": "function",
+   "name": "handleNgrokKeys",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1096,
+    1184
+   ],
+   "summary": "Despacha as teclas da aba Ngrok: navegação, troca de visão, ações sobre túneis e abertura do wizard.",
+   "tags": [
+    "ngrok",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokMove",
+   "type": "function",
+   "name": "ngrokMove",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1186,
+    1221
+   ],
+   "summary": "Move o cursor na lista ativa (túneis, requisições ou logs) respeitando os limites.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:updateNgrokWizard",
+   "type": "function",
+   "name": "updateNgrokWizard",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1223,
+    1320
+   ],
+   "summary": "Trata as teclas dentro do wizard modal: edição de texto, foco entre campos, ciclo de opções, confirmação e cancelamento.",
+   "tags": [
+    "ngrok",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokCreateAndStart",
+   "type": "function",
+   "name": "ngrokCreateAndStart",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1322,
+    1359
+   ],
+   "summary": "Valida o formulário, salva o túnel na config do projeto e o inicia no agente ngrok.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokStartSelected",
+   "type": "function",
+   "name": "ngrokStartSelected",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1361,
+    1390
+   ],
+   "summary": "Inicia o túnel selecionado com a config salva e atualiza o histórico.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokStopSelected",
+   "type": "function",
+   "name": "ngrokStopSelected",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1392,
+    1405
+   ],
+   "summary": "Para o túnel selecionado no agente ngrok.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokRestartSelected",
+   "type": "function",
+   "name": "ngrokRestartSelected",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1407,
+    1423
+   ],
+   "summary": "Reinicia o túnel selecionado preservando domínio reservado e região.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokDeleteSelected",
+   "type": "function",
+   "name": "ngrokDeleteSelected",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1425,
+    1438
+   ],
+   "summary": "Para e remove o túnel selecionado da config do projeto.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokDuplicateSelected",
+   "type": "function",
+   "name": "ngrokDuplicateSelected",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1440,
+    1451
+   ],
+   "summary": "Abre o wizard pré-preenchido com a config do túnel selecionado.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokCopyURL",
+   "type": "function",
+   "name": "ngrokCopyURL",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1453,
+    1472
+   ],
+   "summary": "Copia a URL pública ou local do túnel selecionado para a área de transferência.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokOpenBrowser",
+   "type": "function",
+   "name": "ngrokOpenBrowser",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1474,
+    1494
+   ],
+   "summary": "Abre a URL pública do túnel selecionado no navegador padrão.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab.go:ngrokSpecFor",
+   "type": "function",
+   "name": "ngrokSpecFor",
+   "filePath": "internal/ui/ngrok_tab.go",
+   "lineRange": [
+    1498,
+    1517
+   ],
+   "summary": "Recupera a config salva do túnel (domínio reservado, região) para religá-lo igual.",
+   "tags": [
+    "ngrok",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/ngrok_tab_test.go",
+   "type": "file",
+   "name": "ngrok_tab_test.go",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "summary": "Testes da aba Ngrok: inclusão na lista de abas, tela inicial e abertura, atalho na barra lateral, edição da porta como texto no wizard, propagação de domínio e região, renderização e layout da tabela de túneis e modais.",
+   "tags": [
+    "test",
+    "ngrok",
+    "tui",
+    "wizard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestAllTabsIncludesNgrok",
+   "type": "function",
+   "name": "TestAllTabsIncludesNgrok",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Verifica que a aba Ngrok aparece na lista de abas do aplicativo.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokLandingAndOpen",
+   "type": "function",
+   "name": "TestNgrokLandingAndOpen",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    28,
+    55
+   ],
+   "summary": "Verifica a tela inicial do Ngrok e a transição ao abrir o cliente.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokSidebarKey",
+   "type": "function",
+   "name": "TestNgrokSidebarKey",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    57,
+    66
+   ],
+   "summary": "Verifica o atalho da barra lateral que leva à aba Ngrok.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardEditsPortAsText",
+   "type": "function",
+   "name": "TestNgrokWizardEditsPortAsText",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    68,
+    112
+   ],
+   "summary": "Verifica que o campo de porta do wizard é editado como texto livre.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardCarriesDomainAndRegion",
+   "type": "function",
+   "name": "TestNgrokWizardCarriesDomainAndRegion",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    116,
+    143
+   ],
+   "summary": "Verifica que domínio reservado e região do wizard chegam aos argumentos do agente.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsRender",
+   "type": "function",
+   "name": "TestNgrokTunnelsRender",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    145,
+    159
+   ],
+   "summary": "Verifica a renderização da tabela de túneis com dados de exemplo.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsViewLayout",
+   "type": "function",
+   "name": "TestNgrokTunnelsViewLayout",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    161,
+    178
+   ],
+   "summary": "Verifica que a visão de túneis respeita as dimensões do terminal.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardIsModal",
+   "type": "function",
+   "name": "TestNgrokWizardIsModal",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    180,
+    191
+   ],
+   "summary": "Verifica que o wizard é modal e captura as teclas.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ngrok_tab_test.go:TestNgrokDeleteConfirmModal",
+   "type": "function",
+   "name": "TestNgrokDeleteConfirmModal",
+   "filePath": "internal/ui/ngrok_tab_test.go",
+   "lineRange": [
+    193,
+    207
+   ],
+   "summary": "Verifica que excluir um túnel exige confirmação em modal.",
+   "tags": [
+    "test",
+    "tui",
+    "ngrok"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/overview_tab_test.go",
+   "type": "file",
+   "name": "overview_tab_test.go",
+   "filePath": "internal/ui/overview_tab_test.go",
+   "summary": "Testes da aba Overview: layout do dashboard, faixa de alerta só quando há problema, caixas que se ajustam ao conteúdo e rótulo de ambiente do projeto.",
+   "tags": [
+    "test",
+    "overview",
+    "dashboard",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab_test.go:TestOverviewDashboardLayout",
+   "type": "function",
+   "name": "TestOverviewDashboardLayout",
+   "filePath": "internal/ui/overview_tab_test.go",
+   "lineRange": [
+    10,
+    63
+   ],
+   "summary": "Verifica o layout do dashboard Overview com projeto, containers, Git e métricas do host.",
+   "tags": [
+    "test",
+    "tui",
+    "overview"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab_test.go:TestOverviewAlertOnlyWhenBroken",
+   "type": "function",
+   "name": "TestOverviewAlertOnlyWhenBroken",
+   "filePath": "internal/ui/overview_tab_test.go",
+   "lineRange": [
+    66,
+    86
+   ],
+   "summary": "Verifica que a faixa de alerta não ocupa linhas quando não há problemas.",
+   "tags": [
+    "test",
+    "tui",
+    "overview"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab_test.go:TestOverviewBoxesFitTheirContent",
+   "type": "function",
+   "name": "TestOverviewBoxesFitTheirContent",
+   "filePath": "internal/ui/overview_tab_test.go",
+   "lineRange": [
+    89,
+    120
+   ],
+   "summary": "Verifica que as caixas se ajustam ao conteúdo e a sobra vai para CONTAINERS.",
+   "tags": [
+    "test",
+    "tui",
+    "overview"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab_test.go:TestProjectEnvLabel",
+   "type": "function",
+   "name": "TestProjectEnvLabel",
+   "filePath": "internal/ui/overview_tab_test.go",
+   "lineRange": [
+    122,
+    129
+   ],
+   "summary": "Verifica o rótulo de ambiente gerado para um projeto.",
+   "tags": [
+    "test",
+    "tui",
+    "overview"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/paths.go",
+   "type": "file",
+   "name": "paths.go",
+   "filePath": "internal/ui/paths.go",
+   "summary": "Helper mínimo que compara dois caminhos de sistema de arquivos após normalizá-los com filepath.Clean, usado para casar containers com projetos.",
+   "tags": [
+    "utility",
+    "filesystem",
+    "paths"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxRuler",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxRulerStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxCommandBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxRoutesView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxTableHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxKindCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxTargetLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxEmptyHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:renderNginxFilePanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxFilePosition",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:highlightNginxLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "function:internal/ui/nginx_view.go:nginxHighlightArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/nginxutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:nginxConsoleApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxConsoleFitsAnyTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxConsoleFitsAnyTerminal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxColumnsNeverExceedPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxColumnsNeverExceedPanel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxNavigationKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxNavigationKeys",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxHighlightOnlyPaints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxHighlightOnlyPaints",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxForeignRouteIsMarked",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "function:internal/ui/nginx_view_test.go:TestNginxForeignRouteIsMarked",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "file:internal/nginxutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_view_test.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:openNgrokClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:handleNgrokMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokTunnelsView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokTunnelTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokTunnelDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokCommands",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokDetailsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokRequestsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokStatusStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokMethodStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokLatencyStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokLogsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokSetupLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokHistoryLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokDomainLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardFields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokPortHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardSpec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokWizardFieldValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:beginNgrokWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:setNgrokWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardFocusField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokWizardCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:cycleFrom",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:handleNgrokKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:updateNgrokWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokCreateAndStart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokStartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokStopSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokRestartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokDeleteSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokDuplicateSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokCopyURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokOpenBrowser",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "function:internal/ui/ngrok_tab.go:ngrokSpecFor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/ngrokutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/ngrokutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/ngrokutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestAllTabsIncludesNgrok",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestAllTabsIncludesNgrok",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokLandingAndOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokLandingAndOpen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokSidebarKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokSidebarKey",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardEditsPortAsText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardEditsPortAsText",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardCarriesDomainAndRegion",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardCarriesDomainAndRegion",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsRender",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsRender",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsViewLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsViewLayout",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardIsModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardIsModal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokDeleteConfirmModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "function:internal/ui/ngrok_tab_test.go:TestNgrokDeleteConfirmModal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/ngrokutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/ngrokutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab_test.go",
+   "target": "file:internal/ngrokutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewDashboardLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewDashboardLayout",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewAlertOnlyWhenBroken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewAlertOnlyWhenBroken",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewBoxesFitTheirContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestOverviewBoxesFitTheirContent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestProjectEnvLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "function:internal/ui/overview_tab_test.go:TestProjectEnvLabel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:openNgrokClient",
+   "target": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/config.go:CountForeignLive",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/agent.go:ListHTTPRequests",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/config.go:MergeTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/config.go:MergeTunnelsAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:refreshNgrok",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:renderNgrokWizard",
+   "target": "function:internal/ngrokutil/agent.go:StartArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:beginNgrokWizard",
+   "target": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokCreateAndStart",
+   "target": "function:internal/ngrokutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokCreateAndStart",
+   "target": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokCreateAndStart",
+   "target": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokStartSelected",
+   "target": "function:internal/ngrokutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokStartSelected",
+   "target": "function:internal/ngrokutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokStartSelected",
+   "target": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokStopSelected",
+   "target": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokRestartSelected",
+   "target": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokRestartSelected",
+   "target": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokDeleteSelected",
+   "target": "function:internal/ngrokutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab.go:ngrokDeleteSelected",
+   "target": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_view_test.go:TestNginxColumnsNeverExceedPanel",
+   "target": "function:internal/ui/nginx_view.go:nginxColumns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_view_test.go:TestNginxHighlightOnlyPaints",
+   "target": "function:internal/ui/nginx_view.go:highlightNginxLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_view_test.go:TestNginxConsoleFitsAnyTerminal",
+   "target": "function:internal/ui/nginx_view.go:renderNginxTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardEditsPortAsText",
+   "target": "function:internal/ui/ngrok_tab.go:beginNgrokWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab_test.go:TestNgrokLandingAndOpen",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab_test.go:TestNgrokTunnelsViewLayout",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokTunnelsView",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ngrok_tab_test.go:TestNgrokWizardCarriesDomainAndRegion",
+   "target": "function:internal/ui/ngrok_tab.go:renderNgrokWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_view.go",
+   "target": "file:internal/ui/nginx_view_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/ngrok_tab.go",
+   "target": "file:internal/ui/ngrok_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

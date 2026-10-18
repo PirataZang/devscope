@@ -1,0 +1,367 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/k8s_test.go",
+   "type": "file",
+   "name": "k8s_test.go",
+   "filePath": "internal/collectors/k8s_test.go",
+   "summary": "Testes unitários dos helpers de Kubernetes: templates de Deployment/Service e descoberta de manifests no projeto.",
+   "tags": [
+    "test",
+    "kubernetes",
+    "collector"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s_test.go:TestK8sDeploymentTemplate",
+   "type": "function",
+   "name": "TestK8sDeploymentTemplate",
+   "filePath": "internal/collectors/k8s_test.go",
+   "lineRange": [
+    10,
+    17
+   ],
+   "summary": "Verifica que o template de Deployment do Kubernetes gerado contém os campos esperados.",
+   "tags": [
+    "test",
+    "kubernetes",
+    "template"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s_test.go:TestK8sServiceTemplate",
+   "type": "function",
+   "name": "TestK8sServiceTemplate",
+   "filePath": "internal/collectors/k8s_test.go",
+   "lineRange": [
+    19,
+    26
+   ],
+   "summary": "Verifica que o template de Service do Kubernetes é gerado corretamente.",
+   "tags": [
+    "test",
+    "kubernetes",
+    "template"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s_test.go:TestDiscoverProjectManifests",
+   "type": "function",
+   "name": "TestDiscoverProjectManifests",
+   "filePath": "internal/collectors/k8s_test.go",
+   "lineRange": [
+    28,
+    42
+   ],
+   "summary": "Testa a descoberta de manifests Kubernetes dentro do diretório de um projeto temporário.",
+   "tags": [
+    "test",
+    "kubernetes",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/nginx.go",
+   "type": "file",
+   "name": "nginx.go",
+   "filePath": "internal/collectors/nginx.go",
+   "summary": "Coletor que lê configurações de sites nginx, extrai domínios e proxies e os associa aos projetos por porta.",
+   "tags": [
+    "collector",
+    "nginx",
+    "parsing",
+    "domains"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/nginx.go:CollectNginxDomains",
+   "type": "function",
+   "name": "CollectNginxDomains",
+   "filePath": "internal/collectors/nginx.go",
+   "lineRange": [
+    20,
+    43
+   ],
+   "summary": "Lê as configurações de sites do nginx e extrai domínios (server_name) e destinos de proxy_pass.",
+   "tags": [
+    "collector",
+    "nginx",
+    "parsing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/nginx.go:parseNginxConfig",
+   "type": "function",
+   "name": "parseNginxConfig",
+   "filePath": "internal/collectors/nginx.go",
+   "lineRange": [
+    45,
+    84
+   ],
+   "summary": "Faz o parsing textual de um arquivo de configuração nginx, retornando os domínios com suas portas de proxy.",
+   "tags": [
+    "parsing",
+    "nginx",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/nginx.go:AssignDomainsToProjects",
+   "type": "function",
+   "name": "AssignDomainsToProjects",
+   "filePath": "internal/collectors/nginx.go",
+   "lineRange": [
+    87,
+    105
+   ],
+   "summary": "Associa domínios nginx aos projetos pela sobreposição entre a porta do proxy e as portas do projeto.",
+   "tags": [
+    "collector",
+    "nginx",
+    "matching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/pm2.go",
+   "type": "file",
+   "name": "pm2.go",
+   "filePath": "internal/collectors/pm2.go",
+   "summary": "Coletor de workers PM2 via `pm2 jlist`, vinculando processos aos projetos pelo diretório de trabalho.",
+   "tags": [
+    "collector",
+    "pm2",
+    "process-manager"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/pm2.go:CollectPM2",
+   "type": "function",
+   "name": "CollectPM2",
+   "filePath": "internal/collectors/pm2.go",
+   "lineRange": [
+    28,
+    41
+   ],
+   "summary": "Executa `pm2 jlist` e devolve todos os workers PM2 decodificados do JSON.",
+   "tags": [
+    "collector",
+    "pm2",
+    "process"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/pm2.go:AssignWorkersToProjects",
+   "type": "function",
+   "name": "AssignWorkersToProjects",
+   "filePath": "internal/collectors/pm2.go",
+   "lineRange": [
+    44,
+    79
+   ],
+   "summary": "Vincula apps PM2 aos projetos comparando o pm_cwd do processo com o caminho do projeto.",
+   "tags": [
+    "collector",
+    "pm2",
+    "matching"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/pm2.go:PM2ProjectRunning",
+   "type": "function",
+   "name": "PM2ProjectRunning",
+   "filePath": "internal/collectors/pm2.go",
+   "lineRange": [
+    81,
+    88
+   ],
+   "summary": "Indica se algum worker PM2 do projeto está em estado online.",
+   "tags": [
+    "utility",
+    "pm2",
+    "status"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestK8sDeploymentTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestK8sDeploymentTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestK8sServiceTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestK8sServiceTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestDiscoverProjectManifests",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "function:internal/collectors/k8s_test.go:TestDiscoverProjectManifests",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "function:internal/collectors/nginx.go:CollectNginxDomains",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "function:internal/collectors/nginx.go:CollectNginxDomains",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "function:internal/collectors/nginx.go:parseNginxConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "function:internal/collectors/nginx.go:AssignDomainsToProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "function:internal/collectors/nginx.go:AssignDomainsToProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:CollectPM2",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:CollectPM2",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:AssignWorkersToProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:AssignWorkersToProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:PM2ProjectRunning",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "function:internal/collectors/pm2.go:PM2ProjectRunning",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/nginx.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/pm2.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/k8s_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

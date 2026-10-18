@@ -1,0 +1,1358 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/module_landing.go",
+   "type": "file",
+   "name": "module_landing.go",
+   "filePath": "internal/ui/module_landing.go",
+   "summary": "Componente padronizado de landing (abertura) dos módulos com faixa de estado, fatos, prévia do projeto e ações.",
+   "tags": [
+    "component",
+    "landing-page",
+    "renderizacao",
+    "design-system"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "type": "function",
+   "name": "renderModuleLanding",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    81,
+    107
+   ],
+   "summary": "Desenha a faixa de abertura padronizada de um módulo a partir dos dados de moduleLanding.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingBand",
+   "type": "function",
+   "name": "landingBand",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    111,
+    140
+   ],
+   "summary": "Gera a faixa de título, tagline, estado e fatos da landing.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingPreview",
+   "type": "function",
+   "name": "landingPreview",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    147,
+    179
+   ],
+   "summary": "Gera a prévia do que o projeto tem para o módulo, cortando com +N quando não cabe.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingFactRows",
+   "type": "function",
+   "name": "landingFactRows",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    187,
+    215
+   ],
+   "summary": "Alinha os pares rótulo→valor em linhas com largura de rótulo por grupo.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:renderLandingActions",
+   "type": "function",
+   "name": "renderLandingActions",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    228,
+    253
+   ],
+   "summary": "Renderiza a linha de teclas de ação da landing, destacando a principal.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingToolState",
+   "type": "function",
+   "name": "landingToolState",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    261,
+    272
+   ],
+   "summary": "Descreve o estado de uma ferramenta externa (encontrada, ausente, não verificada) com vocabulário único.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingContainerRows",
+   "type": "function",
+   "name": "landingContainerRows",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    291,
+    324
+   ],
+   "summary": "Lista os containers do projeto e suas portas para a prévia dos módulos.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_landing.go:landingPortRows",
+   "type": "function",
+   "name": "landingPortRows",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    339,
+    360
+   ],
+   "summary": "Lista as portas publicadas do projeto para a prévia dos módulos.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/module_landing.go:moduleLanding",
+   "type": "class",
+   "name": "moduleLanding",
+   "filePath": "internal/ui/module_landing.go",
+   "lineRange": [
+    31,
+    57
+   ],
+   "summary": "Estrutura de dados da landing padronizada de módulo: título, tagline, estado, fatos, prévia e ações.",
+   "tags": [
+    "data-model",
+    "struct",
+    "landing-page"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/overview_tab.go",
+   "type": "file",
+   "name": "overview_tab.go",
+   "filePath": "internal/ui/overview_tab.go",
+   "summary": "Dashboard da Visão Geral do projeto com alertas, stack/runtime, containers, módulos, saúde, Git e atividade.",
+   "tags": [
+    "component",
+    "dashboard",
+    "visao-geral",
+    "renderizacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:renderOverviewDashboard",
+   "type": "function",
+   "name": "renderOverviewDashboard",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    17,
+    41
+   ],
+   "summary": "Renderiza o dashboard da Visão Geral do projeto com alerta, centro e trilho lateral.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:renderOverviewAlert",
+   "type": "function",
+   "name": "renderOverviewAlert",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    45,
+    63
+   ],
+   "summary": "Renderiza o alerta de problemas do projeto quando houver.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewProblems",
+   "type": "function",
+   "name": "overviewProblems",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    65,
+    86
+   ],
+   "summary": "Lista os problemas detectados no projeto (containers parados, saúde, conflitos).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:renderOverviewCenter",
+   "type": "function",
+   "name": "renderOverviewCenter",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    117,
+    166
+   ],
+   "summary": "Compõe a coluna central da Visão Geral com stack, containers, módulos e saúde.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewStackRuntimeLines",
+   "type": "function",
+   "name": "overviewStackRuntimeLines",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    168,
+    243
+   ],
+   "summary": "Gera as linhas de stack e runtime do projeto com métricas de CPU e memória.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewContainerLines",
+   "type": "function",
+   "name": "overviewContainerLines",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    254,
+    294
+   ],
+   "summary": "Gera as linhas de containers do projeto com status e portas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:containerPortsShort",
+   "type": "function",
+   "name": "containerPortsShort",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    296,
+    315
+   ],
+   "summary": "Resume as portas de um container em texto curto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:containerDot",
+   "type": "function",
+   "name": "containerDot",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    318,
+    330
+   ],
+   "summary": "Gera o indicador de status do container, testando unhealthy antes de healthy.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewModuleLines",
+   "type": "function",
+   "name": "overviewModuleLines",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    336,
+    346
+   ],
+   "summary": "Lista os módulos disponíveis para o projeto.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewHealthLines",
+   "type": "function",
+   "name": "overviewHealthLines",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    348,
+    369
+   ],
+   "summary": "Gera as linhas de saúde dos health checks do projeto.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:healthGlyph",
+   "type": "function",
+   "name": "healthGlyph",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    371,
+    380
+   ],
+   "summary": "Gera o glifo colorido de um status de saúde.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:projectRuntimeMetrics",
+   "type": "function",
+   "name": "projectRuntimeMetrics",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    384,
+    398
+   ],
+   "summary": "Soma CPU e memória dos containers do projeto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewActivity",
+   "type": "function",
+   "name": "overviewActivity",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    420,
+    450
+   ],
+   "summary": "Gera o feed de atividade recente do projeto (commits, scans).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:relTime",
+   "type": "function",
+   "name": "relTime",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    452,
+    468
+   ],
+   "summary": "Formata um instante como tempo relativo curto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:renderOverviewRail",
+   "type": "function",
+   "name": "renderOverviewRail",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    472,
+    486
+   ],
+   "summary": "Renderiza o trilho lateral da Visão Geral com Git e atividade.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:overviewGitLines",
+   "type": "function",
+   "name": "overviewGitLines",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    488,
+    538
+   ],
+   "summary": "Gera as linhas de resumo Git do projeto (branch, sincronia, alterações).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "visao-geral"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/overview_tab.go:projectEnvLabel",
+   "type": "function",
+   "name": "projectEnvLabel",
+   "filePath": "internal/ui/overview_tab.go",
+   "lineRange": [
+    540,
+    555
+   ],
+   "summary": "Determina o rótulo de ambiente do projeto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "visao-geral"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingBand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingPreview",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingFactRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:renderLandingActions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingToolState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingContainerRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "function:internal/ui/module_landing.go:landingPortRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "class:internal/ui/module_landing.go:moduleLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:renderOverviewDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:renderOverviewAlert",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewProblems",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:renderOverviewCenter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewStackRuntimeLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewContainerLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:containerPortsShort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:containerDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewModuleLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewHealthLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:healthGlyph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:projectRuntimeMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewActivity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:relTime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:renderOverviewRail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:overviewGitLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "function:internal/ui/overview_tab.go:projectEnvLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/overview_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing.go:landingBand",
+   "target": "function:internal/ui/project_sidebar.go:tabGlyph",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing.go:renderLandingActions",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing.go:landingContainerRows",
+   "target": "function:internal/collectors/ports.go:ParseContainerPortMappings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/overview_tab.go:overviewStackRuntimeLines",
+   "target": "function:internal/collectors/ports.go:FormatPortsShort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/overview_tab.go:containerPortsShort",
+   "target": "function:internal/collectors/ports.go:ParseContainerPortMappings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "batchIndex": 14,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": "docs/ARCHITECTURE.md",
+   "language": "markdown",
+   "sizeLines": 691,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "docs/DESIGN.md",
+   "language": "markdown",
+   "sizeLines": 877,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "docs/ROADMAP.md",
+   "language": "markdown",
+   "sizeLines": 153,
+   "fileCategory": "docs"
+  }
+ ],
+ "batchImportData": {
+  "docs/ARCHITECTURE.md": [],
+  "docs/DESIGN.md": [],
+  "docs/ROADMAP.md": []
+ },
+ "neighborMap": {}
+}

@@ -1,0 +1,568 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_jackpot.go",
+   "type": "file",
+   "name": "relax_jackpot.go",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "summary": "Cena 'Jackpoint' do modo Relax: um caça-níquel em Braille que sorteia, gira três rolos com curva de freio, exibe prêmios com partículas (moedas, cartas, TNT, HAHAHA) e recomeça sozinho.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "state-machine",
+    "simulation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Separa sorteio (gerador injetado para testes determinísticos), física do rolo, partículas e render em camadas independentes."
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpSpin",
+   "type": "function",
+   "name": "relaxJpSpin",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    61,
+    77
+   ],
+   "summary": "Sorteia as três posições dos rolos com chances de trinca declaradas; recebe o gerador de fora para que testes fixem a semente.",
+   "tags": [
+    "random",
+    "probability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpAdvance",
+   "type": "function",
+   "name": "relaxJpAdvance",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    336,
+    371
+   ],
+   "summary": "Avança a máquina de estados do jackpot (giro, espera, prêmio, limpeza) por um passo de tempo fracionário.",
+   "tags": [
+    "state-machine",
+    "simulation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpNewSpin",
+   "type": "function",
+   "name": "relaxJpNewSpin",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    383,
+    394
+   ],
+   "summary": "Inicia uma nova rodada: sorteia o resultado e lança os rolos com tempos de parada escalonados.",
+   "tags": [
+    "state-machine",
+    "random"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpShowDur",
+   "type": "function",
+   "name": "relaxJpShowDur",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    397,
+    409
+   ],
+   "summary": "Devolve a duração, em passos de 100ms, da exibição de cada tipo de prêmio.",
+   "tags": [
+    "timing",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpFall",
+   "type": "function",
+   "name": "relaxJpFall",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    413,
+    440
+   ],
+   "summary": "Fábrica de partículas em queda (moeda, ficha, carta) com peso por tipo para a chuva não descer em bloco.",
+   "tags": [
+    "particle-system",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpStepParts",
+   "type": "function",
+   "name": "relaxJpStepParts",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    442,
+    467
+   ],
+   "summary": "Integra as partículas com gravidade e arrasto multiplicativo por sub-passo e descarta as que saíram do palco.",
+   "tags": [
+    "particle-system",
+    "physics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpShowStep",
+   "type": "function",
+   "name": "relaxJpShowStep",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    471,
+    535
+   ],
+   "summary": "Executa o passo de cada prêmio, emitindo chuvas de moedas, explosões e efeitos específicos conforme o símbolo vencedor.",
+   "tags": [
+    "state-machine",
+    "particle-system"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJackpotFrames",
+   "type": "function",
+   "name": "relaxJackpotFrames",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    539,
+    558
+   ],
+   "summary": "Ponto de entrada de render da cena: avança o estado pelo tempo real e devolve as linhas Braille do quadro.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpDraw",
+   "type": "function",
+   "name": "relaxJpDraw",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    560,
+    593
+   ],
+   "summary": "Compõe o quadro do jackpot: caixas dos rolos, partículas, explosão e risada sobre o canvas Braille.",
+   "tags": [
+    "rendering",
+    "braille-rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpBox",
+   "type": "function",
+   "name": "relaxJpBox",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    597,
+    618
+   ],
+   "summary": "Desenha a caixa de um rolo no canvas Braille.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpReelDraw",
+   "type": "function",
+   "name": "relaxJpReelDraw",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    624,
+    650
+   ],
+   "summary": "Desenha um rolo em movimento com borrão de símbolos fantasma e recorte na janela.",
+   "tags": [
+    "rendering",
+    "animation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpSymbol",
+   "type": "function",
+   "name": "relaxJpSymbol",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    654,
+    668
+   ],
+   "summary": "Põe um símbolo vetorial na tela, com tom apagado para fantasmas e função de recorte da janela do rolo.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpDrawParts",
+   "type": "function",
+   "name": "relaxJpDrawParts",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    672,
+    685
+   ],
+   "summary": "Desenha todas as partículas ativas do prêmio no canvas.",
+   "tags": [
+    "rendering",
+    "particle-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpPartArt",
+   "type": "function",
+   "name": "relaxJpPartArt",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    690,
+    718
+   ],
+   "summary": "Desenha uma partícula por tipo: moeda e ficha achatam com o giro, carta tomba como retângulo e faísca esfria.",
+   "tags": [
+    "rendering",
+    "particle-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpBlast",
+   "type": "function",
+   "name": "relaxJpBlast",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    722,
+    749
+   ],
+   "summary": "Efeito do TNT: clarão que toma a tela e onda de choque se abrindo a partir do centro.",
+   "tags": [
+    "rendering",
+    "effect"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpLaugh",
+   "type": "function",
+   "name": "relaxJpLaugh",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    753,
+    775
+   ],
+   "summary": "Desenha o 'HAHAHA' da banana em meia densidade, como presença de fundo que entra e apaga com a fase.",
+   "tags": [
+    "rendering",
+    "effect"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_jackpot.go:relaxJpLetter",
+   "type": "function",
+   "name": "relaxJpLetter",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    779,
+    791
+   ],
+   "summary": "Desenha as duas letras necessárias à cena (H e A) com o pincel vetorial.",
+   "tags": [
+    "rendering",
+    "typography"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_jackpot.go:relaxJpReel",
+   "type": "class",
+   "name": "relaxJpReel",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    231,
+    236
+   ],
+   "summary": "Estrutura de um rolo: posição de partida, de parada e curva de freio, com métodos launch e step.",
+   "tags": [
+    "data-model",
+    "physics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_jackpot.go:relaxJackpotState",
+   "type": "class",
+   "name": "relaxJackpotState",
+   "filePath": "internal/ui/relax_jackpot.go",
+   "lineRange": [
+    300,
+    321
+   ],
+   "summary": "Estado completo da cena jackpot: rolos, fase, resultado sorteado, partículas e temporizadores.",
+   "tags": [
+    "data-model",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_moon.go",
+   "type": "file",
+   "name": "relax_moon.go",
+   "filePath": "internal/ui/relax_moon.go",
+   "summary": "Cena da Lua do modo Relax: renderiza uma lua esférica em Braille com iluminação por normal, mares, crateras, fase contínua, libração e nuvens finas.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "shading"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_moon.go:relaxMoonInit",
+   "type": "function",
+   "name": "relaxMoonInit",
+   "filePath": "internal/ui/relax_moon.go",
+   "lineRange": [
+    54,
+    92
+   ],
+   "summary": "Inicializa a lua com acidentes de relevo (mares e crateras) sorteados e nuvens iniciais.",
+   "tags": [
+    "initialization",
+    "procedural-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_moon.go:relaxMoonFrames",
+   "type": "function",
+   "name": "relaxMoonFrames",
+   "filePath": "internal/ui/relax_moon.go",
+   "lineRange": [
+    117,
+    284
+   ],
+   "summary": "Renderiza a lua em Braille reconstruindo a normal da esfera por subpixel, com terminador em degradê, libração e nuvens à frente.",
+   "tags": [
+    "rendering",
+    "shading"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_motion.go",
+   "type": "file",
+   "name": "relax_motion.go",
+   "filePath": "internal/ui/relax_motion.go",
+   "summary": "Helpers de movimento compartilhados pelas cenas do Relax: lerp, lerp angular, smoothDamp independente do passo, funções de easing, clamps e value noise 1D.",
+   "tags": [
+    "utility",
+    "animation",
+    "easing",
+    "math"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpSpin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpNewSpin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpShowDur",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpFall",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpStepParts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpShowStep",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJackpotFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpReelDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpSymbol",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpDrawParts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpPartArt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpBlast",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpLaugh",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpLetter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "class:internal/ui/relax_jackpot.go:relaxJpReel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "class:internal/ui/relax_jackpot.go:relaxJackpotState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_moon.go",
+   "target": "function:internal/ui/relax_moon.go:relaxMoonInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_moon.go",
+   "target": "function:internal/ui/relax_moon.go:relaxMoonFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/relax_jackpot.go:relaxJackpotFrames",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpDraw",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/relax_jackpot.go:relaxJpNewSpin",
+   "target": "function:internal/ui/relax_jackpot.go:relaxJpSpin",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_moon.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_jackpot.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

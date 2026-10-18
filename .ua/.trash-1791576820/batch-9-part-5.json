@@ -1,0 +1,297 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/routeutil/openapi.go",
+   "type": "file",
+   "name": "openapi.go",
+   "filePath": "internal/routeutil/openapi.go",
+   "summary": "Carrega e interpreta especificações OpenAPI/Swagger (JSON ou YAML) a partir de arquivos conhecidos do projeto ou de endpoints HTTP locais, convertendo operações em rotas.",
+   "tags": [
+    "api-schema",
+    "openapi",
+    "parser",
+    "route-discovery"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/openapi.go:loadOpenAPIFromFiles",
+   "type": "function",
+   "name": "loadOpenAPIFromFiles",
+   "filePath": "internal/routeutil/openapi.go",
+   "lineRange": [
+    29,
+    60
+   ],
+   "summary": "Procura arquivos OpenAPI/Swagger conhecidos no projeto e os converte em rotas.",
+   "tags": [
+    "openapi",
+    "filesystem",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/openapi.go:loadOpenAPIFromHTTP",
+   "type": "function",
+   "name": "loadOpenAPIFromHTTP",
+   "filePath": "internal/routeutil/openapi.go",
+   "lineRange": [
+    62,
+    98
+   ],
+   "summary": "Busca specs OpenAPI em endpoints padrão nas portas locais informadas.",
+   "tags": [
+    "openapi",
+    "http",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/openapi.go:parseOpenAPI",
+   "type": "function",
+   "name": "parseOpenAPI",
+   "filePath": "internal/routeutil/openapi.go",
+   "lineRange": [
+    100,
+    157
+   ],
+   "summary": "Interpreta spec OpenAPI JSON/YAML extraindo método, caminho, resumo e segurança.",
+   "tags": [
+    "openapi",
+    "parser",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/routeutil/route.go",
+   "type": "file",
+   "name": "route.go",
+   "filePath": "internal/routeutil/route.go",
+   "summary": "Define o modelo Route e a interface Scanner, mantendo um registro global de scanners de rotas registrados no init para cada stack suportada.",
+   "tags": [
+    "type-definition",
+    "data-model",
+    "registry",
+    "plugin-pattern"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/route.go:Route",
+   "type": "class",
+   "name": "Route",
+   "filePath": "internal/routeutil/route.go",
+   "lineRange": [
+    4,
+    12
+   ],
+   "summary": "Endpoint HTTP descoberto com método, caminho, origem, arquivo/linha, resumo e flag de auth.",
+   "tags": [
+    "data-model",
+    "route",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/route.go:Scanner",
+   "type": "class",
+   "name": "Scanner",
+   "filePath": "internal/routeutil/route.go",
+   "lineRange": [
+    15,
+    19
+   ],
+   "summary": "Interface de scanner de rotas por stack: Name, Match e Scan.",
+   "tags": [
+    "interface",
+    "plugin-pattern",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/route.go:Register",
+   "type": "function",
+   "name": "Register",
+   "filePath": "internal/routeutil/route.go",
+   "lineRange": [
+    23,
+    25
+   ],
+   "summary": "Registra um Scanner no registro global.",
+   "tags": [
+    "registry",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/route.go:init",
+   "type": "function",
+   "name": "init",
+   "filePath": "internal/routeutil/route.go",
+   "lineRange": [
+    27,
+    41
+   ],
+   "summary": "Registra todos os scanners de stack suportados (Laravel, NestJS, Express, Django etc.).",
+   "tags": [
+    "registry",
+    "initialization",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_django.go",
+   "type": "file",
+   "name": "scan_django.go",
+   "filePath": "internal/routeutil/scan_django.go",
+   "summary": "Scanner de rotas Django que lê urls.py e extrai padrões path/re_path em rotas HTTP.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "django",
+    "python",
+    "regex-parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_django.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_django.go",
+   "lineRange": [
+    23,
+    78
+   ],
+   "summary": "Percorre o projeto e extrai rotas de Django via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/routeutil/openapi.go",
+   "target": "function:internal/routeutil/openapi.go:loadOpenAPIFromFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/openapi.go",
+   "target": "function:internal/routeutil/openapi.go:loadOpenAPIFromHTTP",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/openapi.go",
+   "target": "function:internal/routeutil/openapi.go:parseOpenAPI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "class:internal/routeutil/route.go:Route",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "class:internal/routeutil/route.go:Route",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "function:internal/routeutil/route.go:Register",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "function:internal/routeutil/route.go:Register",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/route.go",
+   "target": "function:internal/routeutil/route.go:init",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_django.go",
+   "target": "function:internal/routeutil/scan_django.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_django.go",
+   "target": "function:internal/routeutil/scan_django.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/openapi.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/routeutil/scan_django.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/routeutil/scan_django.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/openapi.go",
+   "target": "file:internal/routeutil/route.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

@@ -1,0 +1,1092 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 6,
+  "filesSkipped": [
+    "go.mod"
+  ],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 6,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 6
+    }
+  },
+  "results": [
+    {
+      "path": ".goreleaser.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 46,
+      "nonEmptyLines": 41,
+      "sections": [
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "before",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "builds",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "archives",
+          "level": 1,
+          "line": 25
+        },
+        {
+          "heading": "checksum",
+          "level": 1,
+          "line": 36
+        },
+        {
+          "heading": "changelog",
+          "level": 1,
+          "line": 40
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "Animation.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 2823,
+      "nonEmptyLines": 2001,
+      "sections": [
+        {
+          "heading": "ASCII &amp; Unicode Art para Terminal e TUI",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1. ASCII vs Unicode",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "ASCII",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "Unicode",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "2. Caracteres essenciais",
+          "level": 1,
+          "line": 56
+        },
+        {
+          "heading": "2.1 Linhas",
+          "level": 2,
+          "line": 58
+        },
+        {
+          "heading": "2.2 Cantos",
+          "level": 2,
+          "line": 79
+        },
+        {
+          "heading": "2.3 Junções",
+          "level": 2,
+          "line": 100
+        },
+        {
+          "heading": "3. Blocos",
+          "level": 1,
+          "line": 120
+        },
+        {
+          "heading": "4. Meio-blocos",
+          "level": 1,
+          "line": 160
+        },
+        {
+          "heading": "5. Pontos e partículas",
+          "level": 1,
+          "line": 184
+        },
+        {
+          "heading": "6. Símbolos de destaque",
+          "level": 1,
+          "line": 223
+        },
+        {
+          "heading": "7. Caracteres ASCII para desenho",
+          "level": 1,
+          "line": 245
+        },
+        {
+          "heading": "Densidade",
+          "level": 3,
+          "line": 259
+        },
+        {
+          "heading": "8. Composição de uma cena",
+          "level": 1,
+          "line": 281
+        },
+        {
+          "heading": "9. Animação baseada em Frames",
+          "level": 1,
+          "line": 324
+        },
+        {
+          "heading": "10. FPS",
+          "level": 1,
+          "line": 369
+        },
+        {
+          "heading": "11. Tick",
+          "level": 1,
+          "line": 403
+        },
+        {
+          "heading": "12. Frames não precisam redesenhar tudo",
+          "level": 1,
+          "line": 439
+        },
+        {
+          "heading": "13. Movimento horizontal",
+          "level": 1,
+          "line": 466
+        },
+        {
+          "heading": "14. Movimento vertical",
+          "level": 1,
+          "line": 514
+        },
+        {
+          "heading": "15. Movimento suave",
+          "level": 1,
+          "line": 546
+        },
+        {
+          "heading": "16. Bounce",
+          "level": 1,
+          "line": 582
+        },
+        {
+          "heading": "17. Easing",
+          "level": 1,
+          "line": 626
+        },
+        {
+          "heading": "18. Animação de partículas",
+          "level": 1,
+          "line": 663
+        },
+        {
+          "heading": "19. Partículas com símbolos diferentes",
+          "level": 1,
+          "line": 709
+        },
+        {
+          "heading": "20. Sistema de estrelas",
+          "level": 1,
+          "line": 737
+        },
+        {
+          "heading": "21. Twinkle",
+          "level": 1,
+          "line": 775
+        },
+        {
+          "heading": "22. Cometa",
+          "level": 1,
+          "line": 796
+        },
+        {
+          "heading": "23. Fogo",
+          "level": 1,
+          "line": 836
+        },
+        {
+          "heading": "Frame 1",
+          "level": 3,
+          "line": 853
+        },
+        {
+          "heading": "Frame 2",
+          "level": 3,
+          "line": 862
+        },
+        {
+          "heading": "Frame 3",
+          "level": 3,
+          "line": 871
+        },
+        {
+          "heading": "24. Fumaça",
+          "level": 1,
+          "line": 884
+        },
+        {
+          "heading": "25. Chuva",
+          "level": 1,
+          "line": 915
+        },
+        {
+          "heading": "26. Neve",
+          "level": 1,
+          "line": 950
+        },
+        {
+          "heading": "27. Água",
+          "level": 1,
+          "line": 972
+        },
+        {
+          "heading": "28. Árvore animada",
+          "level": 1,
+          "line": 1005
+        },
+        {
+          "heading": "29. Folhas",
+          "level": 1,
+          "line": 1042
+        },
+        {
+          "heading": "30. Animação de personagem",
+          "level": 1,
+          "line": 1075
+        },
+        {
+          "heading": "Idle",
+          "level": 3,
+          "line": 1079
+        },
+        {
+          "heading": "Passo 1",
+          "level": 3,
+          "line": 1087
+        },
+        {
+          "heading": "Passo 2",
+          "level": 3,
+          "line": 1095
+        },
+        {
+          "heading": "Passo 3",
+          "level": 3,
+          "line": 1103
+        },
+        {
+          "heading": "31. Animação por squash &amp; stretch",
+          "level": 1,
+          "line": 1115
+        },
+        {
+          "heading": "32. Blink",
+          "level": 1,
+          "line": 1147
+        },
+        {
+          "heading": "33. Pulse",
+          "level": 1,
+          "line": 1173
+        },
+        {
+          "heading": "34. Barras animadas",
+          "level": 1,
+          "line": 1197
+        },
+        {
+          "heading": "35. Spinner",
+          "level": 1,
+          "line": 1233
+        },
+        {
+          "heading": "Simples",
+          "level": 3,
+          "line": 1237
+        },
+        {
+          "heading": "Unicode",
+          "level": 3,
+          "line": 1246
+        },
+        {
+          "heading": "Outro estilo",
+          "level": 3,
+          "line": 1261
+        },
+        {
+          "heading": "36. Spinner customizado",
+          "level": 1,
+          "line": 1272
+        },
+        {
+          "heading": "37. Marquee",
+          "level": 1,
+          "line": 1297
+        },
+        {
+          "heading": "38. Typewriter",
+          "level": 1,
+          "line": 1339
+        },
+        {
+          "heading": "39. Fade usando caracteres",
+          "level": 1,
+          "line": 1374
+        },
+        {
+          "heading": "40. Transição entre dois frames",
+          "level": 1,
+          "line": 1400
+        },
+        {
+          "heading": "41. Double Buffer",
+          "level": 1,
+          "line": 1433
+        },
+        {
+          "heading": "42. Não use sleeps espalhados",
+          "level": 1,
+          "line": 1461
+        },
+        {
+          "heading": "43. Delta Time",
+          "level": 1,
+          "line": 1497
+        },
+        {
+          "heading": "44. Animações determinísticas",
+          "level": 1,
+          "line": 1523
+        },
+        {
+          "heading": "45. Animações contínuas vs discretas",
+          "level": 1,
+          "line": 1548
+        },
+        {
+          "heading": "Discreta",
+          "level": 2,
+          "line": 1550
+        },
+        {
+          "heading": "Contínua",
+          "level": 2,
+          "line": 1569
+        },
+        {
+          "heading": "46. Sistema de camadas",
+          "level": 1,
+          "line": 1589
+        },
+        {
+          "heading": "47. Área de animação",
+          "level": 1,
+          "line": 1635
+        },
+        {
+          "heading": "48. Responsividade ao tamanho do terminal",
+          "level": 1,
+          "line": 1661
+        },
+        {
+          "heading": "49. Animações proporcionais ao terminal",
+          "level": 1,
+          "line": 1700
+        },
+        {
+          "heading": "50. Terminal width e Unicode",
+          "level": 1,
+          "line": 1720
+        },
+        {
+          "heading": "51. Braille",
+          "level": 1,
+          "line": 1746
+        },
+        {
+          "heading": "52. Por que Braille é interessante?",
+          "level": 1,
+          "line": 1770
+        },
+        {
+          "heading": "53. Gráficos usando Braille",
+          "level": 1,
+          "line": 1800
+        },
+        {
+          "heading": "54. Braille + partículas",
+          "level": 1,
+          "line": 1827
+        },
+        {
+          "heading": "55. Caracteres para efeitos de luz",
+          "level": 1,
+          "line": 1854
+        },
+        {
+          "heading": "56. Explosão de partículas",
+          "level": 1,
+          "line": 1892
+        },
+        {
+          "heading": "57. Ruído controlado",
+          "level": 1,
+          "line": 1935
+        },
+        {
+          "heading": "58. Fireflies",
+          "level": 1,
+          "line": 1964
+        },
+        {
+          "heading": "59. Animação de gato dormindo",
+          "level": 1,
+          "line": 2006
+        },
+        {
+          "heading": "60. Animação de respiração",
+          "level": 1,
+          "line": 2056
+        },
+        {
+          "heading": "61. Animação de olhos",
+          "level": 1,
+          "line": 2087
+        },
+        {
+          "heading": "62. Delorean / carro em ASCII",
+          "level": 1,
+          "line": 2111
+        },
+        {
+          "heading": "63. Ilusão de movimento",
+          "level": 1,
+          "line": 2146
+        },
+        {
+          "heading": "64. Parallax",
+          "level": 1,
+          "line": 2166
+        },
+        {
+          "heading": "65. Ambiente de idle",
+          "level": 1,
+          "line": 2189
+        },
+        {
+          "heading": "66. Regras para uma boa animação TUI",
+          "level": 1,
+          "line": 2229
+        },
+        {
+          "heading": "1. Evite excesso",
+          "level": 2,
+          "line": 2231
+        },
+        {
+          "heading": "2. Use movimento lento para elementos ambientais",
+          "level": 2,
+          "line": 2235
+        },
+        {
+          "heading": "3. Crie pequenas imperfeições",
+          "level": 2,
+          "line": 2248
+        },
+        {
+          "heading": "4. Preserve o foco da interface",
+          "level": 2,
+          "line": 2267
+        },
+        {
+          "heading": "67. Arquitetura recomendada em Go",
+          "level": 1,
+          "line": 2273
+        },
+        {
+          "heading": "68. Entidades animadas",
+          "level": 1,
+          "line": 2318
+        },
+        {
+          "heading": "69. Gerenciador de animações",
+          "level": 1,
+          "line": 2345
+        },
+        {
+          "heading": "70. Performance",
+          "level": 1,
+          "line": 2365
+        },
+        {
+          "heading": "Evite",
+          "level": 3,
+          "line": 2369
+        },
+        {
+          "heading": "Prefira",
+          "level": 3,
+          "line": 2377
+        },
+        {
+          "heading": "71. Número de partículas",
+          "level": 1,
+          "line": 2395
+        },
+        {
+          "heading": "72. Animação adaptativa",
+          "level": 1,
+          "line": 2421
+        },
+        {
+          "heading": "73. Estados de animação",
+          "level": 1,
+          "line": 2452
+        },
+        {
+          "heading": "74. Sistema de ciclo",
+          "level": 1,
+          "line": 2481
+        },
+        {
+          "heading": "75. Eventos ambientais",
+          "level": 1,
+          "line": 2507
+        },
+        {
+          "heading": "76. Combinação de técnicas",
+          "level": 1,
+          "line": 2538
+        },
+        {
+          "heading": "77. Checklist para criar uma animação",
+          "level": 1,
+          "line": 2568
+        },
+        {
+          "heading": "78. Fallback ASCII",
+          "level": 1,
+          "line": 2590
+        },
+        {
+          "heading": "79. Biblioteca mental de caracteres",
+          "level": 1,
+          "line": 2636
+        },
+        {
+          "heading": "Estrutura",
+          "level": 3,
+          "line": 2640
+        },
+        {
+          "heading": "Linhas",
+          "level": 3,
+          "line": 2646
+        },
+        {
+          "heading": "Blocos",
+          "level": 3,
+          "line": 2652
+        },
+        {
+          "heading": "Meio-blocos",
+          "level": 3,
+          "line": 2658
+        },
+        {
+          "heading": "Pontos",
+          "level": 3,
+          "line": 2664
+        },
+        {
+          "heading": "Círculos",
+          "level": 3,
+          "line": 2670
+        },
+        {
+          "heading": "Estrelas",
+          "level": 3,
+          "line": 2676
+        },
+        {
+          "heading": "Geometria",
+          "level": 3,
+          "line": 2682
+        },
+        {
+          "heading": "ASCII básico",
+          "level": 3,
+          "line": 2688
+        },
+        {
+          "heading": "80. Princípio final",
+          "level": 1,
+          "line": 2697
+        },
+        {
+          "heading": "Referência rápida",
+          "level": 1,
+          "line": 2748
+        },
+        {
+          "heading": "Ideia central",
+          "level": 2,
+          "line": 2793
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 116
+      }
+    },
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 336,
+      "nonEmptyLines": 300,
+      "sections": [
+        {
+          "heading": "Changelog",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "[Unreleased]",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 10
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 51
+        },
+        {
+          "heading": "[1.6.3] - 2026-08-25",
+          "level": 2,
+          "line": 54
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 56
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "heading": "[1.6.2] - 2026-08-25",
+          "level": 2,
+          "line": 62
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 64
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 123
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 135
+        },
+        {
+          "heading": "[1.4.0] - 2026-08-01",
+          "level": 2,
+          "line": 139
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 141
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 165
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 171
+        },
+        {
+          "heading": "[1.3.1] - 2026-07-29",
+          "level": 2,
+          "line": 174
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 176
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 182
+        },
+        {
+          "heading": "[1.3.0] - 2026-07-23",
+          "level": 2,
+          "line": 185
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 187
+        },
+        {
+          "heading": "[1.2.0] - 2026-07-23",
+          "level": 2,
+          "line": 219
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 221
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 263
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 268
+        },
+        {
+          "heading": "[1.0.0] - 2026-07-17",
+          "level": 2,
+          "line": 271
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 273
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 290
+        },
+        {
+          "heading": "[0.1.2] - 2026-07-15",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 297
+        },
+        {
+          "heading": "[0.1.1] - 2026-07-15",
+          "level": 2,
+          "line": 302
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 304
+        },
+        {
+          "heading": "[0.1.0] - 2026-07-15",
+          "level": 2,
+          "line": 311
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 313
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 34
+      }
+    },
+    {
+      "path": "CODE_OF_CONDUCT.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 28,
+      "nonEmptyLines": 17,
+      "sections": [
+        {
+          "heading": "Código de Conduta",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Compromisso",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Comportamento esperado",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Comportamento inaceitável",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "Aplicação",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "heading": "Atribuição",
+          "level": 2,
+          "line": 26
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "Makefile",
+      "language": "makefile",
+      "fileCategory": "infra",
+      "totalLines": 58,
+      "nonEmptyLines": 46,
+      "steps": [
+        {
+          "name": "build",
+          "startLine": 16,
+          "endLine": 19
+        },
+        {
+          "name": "build-all",
+          "startLine": 20,
+          "endLine": 23
+        },
+        {
+          "name": "test",
+          "startLine": 24,
+          "endLine": 26
+        },
+        {
+          "name": "lint",
+          "startLine": 27,
+          "endLine": 30
+        },
+        {
+          "name": "clean",
+          "startLine": 31,
+          "endLine": 33
+        },
+        {
+          "name": "install",
+          "startLine": 35,
+          "endLine": 37
+        },
+        {
+          "name": "install-dev",
+          "startLine": 39,
+          "endLine": 50
+        },
+        {
+          "name": "run",
+          "startLine": 51,
+          "endLine": 53
+        },
+        {
+          "name": "dev",
+          "startLine": 54,
+          "endLine": 55
+        },
+        {
+          "name": "deps",
+          "startLine": 56,
+          "endLine": 59
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "stepCount": 10
+      }
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 532,
+      "nonEmptyLines": 389,
+      "sections": [
+        {
+          "heading": "◆ DevScope",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "O `htop` dos seus projetos",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "🚀 Instalação",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "heading": "⚡ Em 30 segundos",
+          "level": 2,
+          "line": 87
+        },
+        {
+          "heading": "📦",
+          "level": 3,
+          "line": 94
+        },
+        {
+          "heading": "🔍",
+          "level": 3,
+          "line": 102
+        },
+        {
+          "heading": "⚙️",
+          "level": 3,
+          "line": 110
+        },
+        {
+          "heading": "🧊",
+          "level": 3,
+          "line": 118
+        },
+        {
+          "heading": "🌿 Git, sem sair do terminal",
+          "level": 2,
+          "line": 142
+        },
+        {
+          "heading": "🐳 Docker, por projeto",
+          "level": 2,
+          "line": 190
+        },
+        {
+          "heading": "🔥 Por que existe",
+          "level": 2,
+          "line": 235
+        },
+        {
+          "heading": "🧩 15 módulos, um contexto",
+          "level": 2,
+          "line": 282
+        },
+        {
+          "heading": "🏠 PROJETO",
+          "level": 4,
+          "line": 291
+        },
+        {
+          "heading": "🟡 CÓDIGO",
+          "level": 4,
+          "line": 296
+        },
+        {
+          "heading": "🐳 EXECUÇÃO",
+          "level": 4,
+          "line": 304
+        },
+        {
+          "heading": "🟢 REDE",
+          "level": 4,
+          "line": 309
+        },
+        {
+          "heading": "🩷 DADOS",
+          "level": 4,
+          "line": 318
+        },
+        {
+          "heading": "🛠️ MESA",
+          "level": 4,
+          "line": 323
+        },
+        {
+          "heading": "⌨️ Atalhos essenciais",
+          "level": 2,
+          "line": 344
+        },
+        {
+          "heading": "🎛️ Preferências",
+          "level": 2,
+          "line": 363
+        },
+        {
+          "heading": "📥 Instalação avançada",
+          "level": 2,
+          "line": 425
+        },
+        {
+          "heading": "🏗️ Como funciona",
+          "level": 2,
+          "line": 472
+        },
+        {
+          "heading": "🤝 Contribuindo",
+          "level": 2,
+          "line": 508
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 23
+      }
+    }
+  ]
+}

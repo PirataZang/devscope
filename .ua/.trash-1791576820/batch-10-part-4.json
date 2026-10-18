@@ -1,0 +1,2461 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/ws_tab.go",
+   "type": "file",
+   "name": "ws_tab.go",
+   "filePath": "internal/ui/ws_tab.go",
+   "summary": "Aba do módulo WebSocket: gerencia URLs salvas por projeto, conecta via wsutil, envia frames, registra mensagens/latência e renderiza visão geral em três colunas, inspetor, histórico e filtros.",
+   "tags": [
+    "tui",
+    "websocket",
+    "component",
+    "client"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:openWsClient",
+   "type": "function",
+   "name": "openWsClient",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    111,
+    146
+   ],
+   "summary": "Abre o cliente WebSocket do projeto carregando URLs salvas e definindo a URL padrão.",
+   "tags": [
+    "lifecycle",
+    "websocket",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:leaveWsTab",
+   "type": "function",
+   "name": "leaveWsTab",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    148,
+    158
+   ],
+   "summary": "Sai da aba WebSocket fechando edição e estado transitório.",
+   "tags": [
+    "lifecycle",
+    "websocket",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:rememberWsURL",
+   "type": "function",
+   "name": "rememberWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    170,
+    188
+   ],
+   "summary": "Registra uma URL usada na lista do projeto e persiste.",
+   "tags": [
+    "persistence",
+    "websocket",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsLanding",
+   "type": "function",
+   "name": "renderWsLanding",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    208,
+    228
+   ],
+   "summary": "Landing do módulo WebSocket.",
+   "tags": [
+    "rendering",
+    "landing",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsTab",
+   "type": "function",
+   "name": "renderWsTab",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    232,
+    254
+   ],
+   "summary": "Renderiza a aba WebSocket conforme a subaba ativa.",
+   "tags": [
+    "rendering",
+    "layout",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsHints",
+   "type": "function",
+   "name": "wsHints",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    256,
+    286
+   ],
+   "summary": "Dicas de teclas contextuais da aba WebSocket.",
+   "tags": [
+    "hints",
+    "keybindings",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsHeader",
+   "type": "function",
+   "name": "renderWsHeader",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    288,
+    328
+   ],
+   "summary": "Header com estado da conexão, URL viva e estatísticas.",
+   "tags": [
+    "rendering",
+    "header",
+    "websocket"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsSubTabs",
+   "type": "function",
+   "name": "renderWsSubTabs",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    334,
+    356
+   ],
+   "summary": "Barra de subabas (overview, mensagens, histórico, settings).",
+   "tags": [
+    "rendering",
+    "navigation",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsOverview",
+   "type": "function",
+   "name": "renderWsOverview",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    360,
+    370
+   ],
+   "summary": "Visão geral em três colunas: conexões, mensagens e inspetor.",
+   "tags": [
+    "rendering",
+    "layout",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsLeftColumn",
+   "type": "function",
+   "name": "renderWsLeftColumn",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    372,
+    381
+   ],
+   "summary": "Coluna esquerda com conexões, estatísticas e filtros.",
+   "tags": [
+    "rendering",
+    "layout",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsServerEntries",
+   "type": "function",
+   "name": "wsServerEntries",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    383,
+    396
+   ],
+   "summary": "Lista as entradas de servidor (URLs salvas e detectadas) do projeto.",
+   "tags": [
+    "data",
+    "websocket",
+    "accessor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsServerColumns",
+   "type": "function",
+   "name": "wsServerColumns",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    407,
+    417
+   ],
+   "summary": "Larguras das colunas da tabela de servidores.",
+   "tags": [
+    "layout",
+    "table",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsConnections",
+   "type": "function",
+   "name": "renderWsConnections",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    419,
+    467
+   ],
+   "summary": "Renderiza a lista de conexões/URLs do projeto.",
+   "tags": [
+    "rendering",
+    "table",
+    "websocket"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsServerHeader",
+   "type": "function",
+   "name": "renderWsServerHeader",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    469,
+    483
+   ],
+   "summary": "Cabeçalho da tabela de servidores.",
+   "tags": [
+    "rendering",
+    "table",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsServerTableRow",
+   "type": "function",
+   "name": "renderWsServerTableRow",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    485,
+    517
+   ],
+   "summary": "Linha da tabela de servidores com estado e latência.",
+   "tags": [
+    "rendering",
+    "table",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsServerStateCell",
+   "type": "function",
+   "name": "wsServerStateCell",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    519,
+    538
+   ],
+   "summary": "Célula de estado (conectado/desconectado) de um servidor.",
+   "tags": [
+    "rendering",
+    "status",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsStatsBox",
+   "type": "function",
+   "name": "renderWsStatsBox",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    540,
+    560
+   ],
+   "summary": "Caixa com contadores de mensagens, bytes e latência.",
+   "tags": [
+    "rendering",
+    "metrics",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsFiltersBox",
+   "type": "function",
+   "name": "renderWsFiltersBox",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    562,
+    588
+   ],
+   "summary": "Caixa com filtros por direção/tipo de frame e contagens.",
+   "tags": [
+    "rendering",
+    "filter",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsMessagesTable",
+   "type": "function",
+   "name": "renderWsMessagesTable",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    590,
+    625
+   ],
+   "summary": "Tabela rolável de frames trocados.",
+   "tags": [
+    "rendering",
+    "table",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:formatWsFrameRow",
+   "type": "function",
+   "name": "formatWsFrameRow",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    627,
+    642
+   ],
+   "summary": "Formata uma linha de frame com hora, direção, tipo e prévia.",
+   "tags": [
+    "formatting",
+    "websocket",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsInspector",
+   "type": "function",
+   "name": "renderWsInspector",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    644,
+    706
+   ],
+   "summary": "Inspetor do frame selecionado com payload formatado e metadados do handshake.",
+   "tags": [
+    "rendering",
+    "inspector",
+    "websocket"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsConnPlainLines",
+   "type": "function",
+   "name": "wsConnPlainLines",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    708,
+    730
+   ],
+   "summary": "Linhas de texto simples com informações da conexão.",
+   "tags": [
+    "formatting",
+    "websocket",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsPayloadLines",
+   "type": "function",
+   "name": "renderWsPayloadLines",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    732,
+    750
+   ],
+   "summary": "Formata o payload do frame (JSON indentado ou texto).",
+   "tags": [
+    "formatting",
+    "json",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsHistory",
+   "type": "function",
+   "name": "renderWsHistory",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    754,
+    763
+   ],
+   "summary": "Subaba de histórico de conexões.",
+   "tags": [
+    "rendering",
+    "history",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:renderWsSettings",
+   "type": "function",
+   "name": "renderWsSettings",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    765,
+    792
+   ],
+   "summary": "Subaba de configurações da conexão (headers, URL).",
+   "tags": [
+    "rendering",
+    "configuration",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsAllConnEntries",
+   "type": "function",
+   "name": "wsAllConnEntries",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    799,
+    815
+   ],
+   "summary": "Agrega URLs WebSocket salvas de todos os projetos para o popup global.",
+   "tags": [
+    "data",
+    "aggregation",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:handleWsKeys",
+   "type": "function",
+   "name": "handleWsKeys",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    819,
+    953
+   ],
+   "summary": "Handler de teclas da aba WebSocket: foco, navegação, conectar/desconectar, compor, buscar e gerenciar URLs.",
+   "tags": [
+    "event-handler",
+    "keybindings",
+    "websocket"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsPan",
+   "type": "function",
+   "name": "wsPan",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    955,
+    970
+   ],
+   "summary": "Rola horizontalmente o conteúdo do inspetor/tabela.",
+   "tags": [
+    "navigation",
+    "scroll",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:toggleWsShowAll",
+   "type": "function",
+   "name": "toggleWsShowAll",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    972,
+    981
+   ],
+   "summary": "Alterna o popup com conexões de todos os projetos.",
+   "tags": [
+    "state",
+    "popup",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:pickWsAllEntry",
+   "type": "function",
+   "name": "pickWsAllEntry",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    983,
+    1004
+   ],
+   "summary": "Seleciona uma conexão do popup global e troca para ela.",
+   "tags": [
+    "action",
+    "popup",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:cycleWsFocus",
+   "type": "function",
+   "name": "cycleWsFocus",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1006,
+    1021
+   ],
+   "summary": "Cicla o foco entre os painéis da aba WebSocket.",
+   "tags": [
+    "navigation",
+    "focus",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsNav",
+   "type": "function",
+   "name": "wsNav",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1023,
+    1042
+   ],
+   "summary": "Move o cursor no painel focado.",
+   "tags": [
+    "navigation",
+    "cursor",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsEnterAction",
+   "type": "function",
+   "name": "wsEnterAction",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1044,
+    1064
+   ],
+   "summary": "Ação do enter conforme o painel focado.",
+   "tags": [
+    "event-handler",
+    "action",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:beginWsEdit",
+   "type": "function",
+   "name": "beginWsEdit",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1066,
+    1079
+   ],
+   "summary": "Abre o editor de texto para URL ou mensagem.",
+   "tags": [
+    "editor",
+    "state",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:startEditSelectedWsURL",
+   "type": "function",
+   "name": "startEditSelectedWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1091,
+    1104
+   ],
+   "summary": "Inicia a edição da URL selecionada.",
+   "tags": [
+    "editor",
+    "websocket",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:selectedWsURL",
+   "type": "function",
+   "name": "selectedWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1106,
+    1118
+   ],
+   "summary": "Retorna a URL sob o cursor na lista de conexões.",
+   "tags": [
+    "accessor",
+    "websocket",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:connectSelectedWsURL",
+   "type": "function",
+   "name": "connectSelectedWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1131,
+    1153
+   ],
+   "summary": "Conecta à URL selecionada, fechando a sessão anterior se houver.",
+   "tags": [
+    "action",
+    "websocket",
+    "connection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:disconnectSelectedWsURL",
+   "type": "function",
+   "name": "disconnectSelectedWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1155,
+    1174
+   ],
+   "summary": "Desconecta a sessão da URL selecionada.",
+   "tags": [
+    "action",
+    "websocket",
+    "connection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:deleteSelectedWsURL",
+   "type": "function",
+   "name": "deleteSelectedWsURL",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1176,
+    1199
+   ],
+   "summary": "Remove a URL selecionada da lista e persiste.",
+   "tags": [
+    "action",
+    "websocket",
+    "deletion"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:saveWsURLFromEditor",
+   "type": "function",
+   "name": "saveWsURLFromEditor",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1201,
+    1240
+   ],
+   "summary": "Valida e salva a URL editada, substituindo ou adicionando à lista.",
+   "tags": [
+    "action",
+    "validation",
+    "persistence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:updateWsEdit",
+   "type": "function",
+   "name": "updateWsEdit",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1242,
+    1295
+   ],
+   "summary": "Trata teclas do editor de URL/mensagem.",
+   "tags": [
+    "event-handler",
+    "editor",
+    "websocket"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:updateWsSearch",
+   "type": "function",
+   "name": "updateWsSearch",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1297,
+    1323
+   ],
+   "summary": "Trata a digitação na busca de frames.",
+   "tags": [
+    "event-handler",
+    "search",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:cycleWsPort",
+   "type": "function",
+   "name": "cycleWsPort",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1327,
+    1347
+   ],
+   "summary": "Percorre as portas detectadas do projeto para montar a URL padrão.",
+   "tags": [
+    "action",
+    "ports",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:toggleWsConnect",
+   "type": "function",
+   "name": "toggleWsConnect",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1349,
+    1368
+   ],
+   "summary": "Conecta ou desconecta via wsutil.Dial de forma assíncrona.",
+   "tags": [
+    "action",
+    "async",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsSendFrame",
+   "type": "function",
+   "name": "wsSendFrame",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1370,
+    1416
+   ],
+   "summary": "Envia o frame composto (texto, binário ou ping) pela sessão ativa.",
+   "tags": [
+    "action",
+    "websocket",
+    "networking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:waitWsEvent",
+   "type": "function",
+   "name": "waitWsEvent",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1426,
+    1439
+   ],
+   "summary": "Comando que aguarda o próximo evento do canal da sessão.",
+   "tags": [
+    "async",
+    "bubbletea",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:handleWsMsg",
+   "type": "function",
+   "name": "handleWsMsg",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1441,
+    1525
+   ],
+   "summary": "Aplica eventos de conexão, mensagem e erro da sessão ao estado, reagendando a espera.",
+   "tags": [
+    "event-handler",
+    "websocket",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:pushWsFrame",
+   "type": "function",
+   "name": "pushWsFrame",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1529,
+    1545
+   ],
+   "summary": "Adiciona um frame ao buffer limitado e atualiza estatísticas.",
+   "tags": [
+    "state",
+    "buffer",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:pushWsHistory",
+   "type": "function",
+   "name": "pushWsHistory",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1551,
+    1567
+   ],
+   "summary": "Registra uma entrada no histórico de conexões.",
+   "tags": [
+    "state",
+    "history",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:recordWsLatency",
+   "type": "function",
+   "name": "recordWsLatency",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1569,
+    1582
+   ],
+   "summary": "Registra latência de ping/pong para as métricas.",
+   "tags": [
+    "metrics",
+    "latency",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:filteredWsFrames",
+   "type": "function",
+   "name": "filteredWsFrames",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1584,
+    1598
+   ],
+   "summary": "Retorna os frames que passam pelos filtros e pela busca.",
+   "tags": [
+    "filter",
+    "websocket",
+    "query"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsFrameMatchesFilter",
+   "type": "function",
+   "name": "wsFrameMatchesFilter",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1600,
+    1617
+   ],
+   "summary": "Testa um frame contra filtros de direção/tipo e texto.",
+   "tags": [
+    "filter",
+    "predicate",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:wsFilterCounts",
+   "type": "function",
+   "name": "wsFilterCounts",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1619,
+    1644
+   ],
+   "summary": "Conta frames por categoria para a caixa de filtros.",
+   "tags": [
+    "metrics",
+    "filter",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab.go:syncWsFrameCursor",
+   "type": "function",
+   "name": "syncWsFrameCursor",
+   "filePath": "internal/ui/ws_tab.go",
+   "lineRange": [
+    1646,
+    1657
+   ],
+   "summary": "Mantém o cursor de frames válido após mudanças.",
+   "tags": [
+    "cursor",
+    "state",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/ws_tab_test.go",
+   "type": "file",
+   "name": "ws_tab_test.go",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "summary": "Testes da aba WebSocket cobrindo landing, filtros e busca, ciclo de portas, composição de mensagens, popup de todas as conexões e troca de conexão sem rascunho obsoleto.",
+   "tags": [
+    "test",
+    "tui",
+    "websocket",
+    "unit-test"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestAllTabsIncludesWebSocket",
+   "type": "function",
+   "name": "TestAllTabsIncludesWebSocket",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Garante que a aba WebSocket está na lista de abas.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsLandingEnterEsc",
+   "type": "function",
+   "name": "TestWsLandingEnterEsc",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    28,
+    67
+   ],
+   "summary": "Valida entrada e saída do cliente WebSocket pela landing.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsFilterAndSearch",
+   "type": "function",
+   "name": "TestWsFilterAndSearch",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    69,
+    86
+   ],
+   "summary": "Valida filtros e busca de frames.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestSidebarShowsWebSocket",
+   "type": "function",
+   "name": "TestSidebarShowsWebSocket",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    88,
+    94
+   ],
+   "summary": "Teste de SidebarShowsWebSocket.",
+   "tags": [
+    "test",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsCyclePort",
+   "type": "function",
+   "name": "TestWsCyclePort",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    96,
+    103
+   ],
+   "summary": "Teste de WsCyclePort.",
+   "tags": [
+    "test",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsNewURLKey",
+   "type": "function",
+   "name": "TestWsNewURLKey",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    105,
+    126
+   ],
+   "summary": "Valida o atalho de nova URL.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsComposeMOpensAndTabChangesType",
+   "type": "function",
+   "name": "TestWsComposeMOpensAndTabChangesType",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    128,
+    183
+   ],
+   "summary": "Verifica o compositor de mensagens e a troca de tipo com tab.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsMessagesTabTogglesAddress",
+   "type": "function",
+   "name": "TestWsMessagesTabTogglesAddress",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    185,
+    212
+   ],
+   "summary": "Verifica a alternância do endereço na subaba de mensagens.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsAllConnectionsPopup",
+   "type": "function",
+   "name": "TestWsAllConnectionsPopup",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    214,
+    266
+   ],
+   "summary": "Valida o popup de conexões de todos os projetos.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsConnectionManage",
+   "type": "function",
+   "name": "TestWsConnectionManage",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    268,
+    325
+   ],
+   "summary": "Valida adicionar, editar e remover conexões.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsConnectSelectedSwitches",
+   "type": "function",
+   "name": "TestWsConnectSelectedSwitches",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    327,
+    348
+   ],
+   "summary": "Garante que conectar outra URL troca a sessão ativa.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_tab_test.go:TestWsSwitchIgnoresStaleURLDraft",
+   "type": "function",
+   "name": "TestWsSwitchIgnoresStaleURLDraft",
+   "filePath": "internal/ui/ws_tab_test.go",
+   "lineRange": [
+    350,
+    378
+   ],
+   "summary": "Garante que a troca de conexão ignora rascunho de URL obsoleto.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/wsutil/config.go",
+   "type": "file",
+   "name": "config.go",
+   "filePath": "internal/wsutil/config.go",
+   "summary": "Persistência por projeto das URLs WebSocket salvas em .devscope/ws.json, com deduplicação e limpeza das entradas.",
+   "tags": [
+    "configuration",
+    "websocket",
+    "persistence",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/wsutil/config.go:ConfigPath",
+   "type": "function",
+   "name": "ConfigPath",
+   "filePath": "internal/wsutil/config.go",
+   "lineRange": [
+    18,
+    20
+   ],
+   "summary": "Caminho do arquivo ws.json dentro de .devscope.",
+   "tags": [
+    "utility",
+    "path",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/config.go:LoadProject",
+   "type": "function",
+   "name": "LoadProject",
+   "filePath": "internal/wsutil/config.go",
+   "lineRange": [
+    22,
+    34
+   ],
+   "summary": "Carrega as URLs WebSocket salvas do projeto, retornando vazio se não houver arquivo.",
+   "tags": [
+    "persistence",
+    "websocket",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/config.go:SaveProject",
+   "type": "function",
+   "name": "SaveProject",
+   "filePath": "internal/wsutil/config.go",
+   "lineRange": [
+    36,
+    50
+   ],
+   "summary": "Salva as URLs WebSocket do projeto em .devscope/ws.json após limpeza.",
+   "tags": [
+    "persistence",
+    "websocket",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/config.go:cleanURLs",
+   "type": "function",
+   "name": "cleanURLs",
+   "filePath": "internal/wsutil/config.go",
+   "lineRange": [
+    52,
+    67
+   ],
+   "summary": "Remove URLs vazias e duplicadas preservando a ordem.",
+   "tags": [
+    "utility",
+    "deduplication",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/wsutil/config.go:ProjectConfig",
+   "type": "class",
+   "name": "ProjectConfig",
+   "filePath": "internal/wsutil/config.go",
+   "lineRange": [
+    13,
+    16
+   ],
+   "summary": "URLs WebSocket salvas por projeto com timestamp de atualização.",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/wsutil/config_test.go",
+   "type": "file",
+   "name": "config_test.go",
+   "filePath": "internal/wsutil/config_test.go",
+   "summary": "Testes de ida e volta do salvamento/carregamento da configuração WebSocket e do caso de arquivo inexistente.",
+   "tags": [
+    "test",
+    "websocket",
+    "persistence",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/config_test.go:TestSaveLoadProject",
+   "type": "function",
+   "name": "TestSaveLoadProject",
+   "filePath": "internal/wsutil/config_test.go",
+   "lineRange": [
+    9,
+    22
+   ],
+   "summary": "Testa ida e volta de salvar e carregar a configuração WebSocket.",
+   "tags": [
+    "test",
+    "unit-test",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/config_test.go:TestLoadProjectMissing",
+   "type": "function",
+   "name": "TestLoadProjectMissing",
+   "filePath": "internal/wsutil/config_test.go",
+   "lineRange": [
+    24,
+    29
+   ],
+   "summary": "Teste de LoadProjectMissing.",
+   "tags": [
+    "test",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/wsutil/session.go",
+   "type": "file",
+   "name": "session.go",
+   "filePath": "internal/wsutil/session.go",
+   "summary": "Cliente WebSocket baseado em gorilla/websocket: Dial com headers customizados, envio de texto/binário/ping, loop de leitura que emite eventos e formatação do handshake.",
+   "tags": [
+    "websocket",
+    "client",
+    "networking",
+    "service",
+    "concurrency"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Usa canal de eventos alimentado por goroutine (readLoop) e sync.Once para fechar a sessão uma única vez."
+  },
+  {
+   "id": "function:internal/wsutil/session.go:Dial",
+   "type": "function",
+   "name": "Dial",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    47,
+    82
+   ],
+   "summary": "Normaliza a URL, aplica headers e abre a conexão WebSocket, preenchendo Info e iniciando o loop de leitura.",
+   "tags": [
+    "networking",
+    "websocket",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:Events",
+   "type": "function",
+   "name": "Events",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    84,
+    84
+   ],
+   "summary": "Expõe o canal somente-leitura de eventos da sessão.",
+   "tags": [
+    "accessor",
+    "websocket",
+    "channel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:Send",
+   "type": "function",
+   "name": "Send",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    86,
+    88
+   ],
+   "summary": "Envia uma mensagem de texto pela sessão.",
+   "tags": [
+    "websocket",
+    "networking",
+    "api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:SendBinary",
+   "type": "function",
+   "name": "SendBinary",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    90,
+    92
+   ],
+   "summary": "Envia uma mensagem binária pela sessão.",
+   "tags": [
+    "websocket",
+    "networking",
+    "api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:SendMessage",
+   "type": "function",
+   "name": "SendMessage",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    94,
+    101
+   ],
+   "summary": "Envia uma mensagem de tipo arbitrário com lock de escrita.",
+   "tags": [
+    "websocket",
+    "networking",
+    "concurrency"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:Ping",
+   "type": "function",
+   "name": "Ping",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    103,
+    110
+   ],
+   "summary": "Envia um frame de ping de controle.",
+   "tags": [
+    "websocket",
+    "networking",
+    "health-check"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:Close",
+   "type": "function",
+   "name": "Close",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    112,
+    130
+   ],
+   "summary": "Fecha a sessão uma única vez, enviando frame de close e encerrando canais.",
+   "tags": [
+    "lifecycle",
+    "websocket",
+    "cleanup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:readLoop",
+   "type": "function",
+   "name": "readLoop",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    132,
+    162
+   ],
+   "summary": "Goroutine que lê mensagens da conexão e as publica como eventos até desconectar.",
+   "tags": [
+    "concurrency",
+    "goroutine",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:normalizeURL",
+   "type": "function",
+   "name": "normalizeURL",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    164,
+    186
+   ],
+   "summary": "Normaliza a URL de entrada, inferindo esquema ws/wss e validando.",
+   "tags": [
+    "utility",
+    "url",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:parseHeaders",
+   "type": "function",
+   "name": "parseHeaders",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    188,
+    206
+   ],
+   "summary": "Converte texto 'Chave: valor' por linha em http.Header.",
+   "tags": [
+    "parser",
+    "http",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session.go:FormatHandshake",
+   "type": "function",
+   "name": "FormatHandshake",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    209,
+    231
+   ],
+   "summary": "Renderiza os headers de requisição/resposta do handshake para o inspetor.",
+   "tags": [
+    "formatting",
+    "http",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/wsutil/session.go:Event",
+   "type": "class",
+   "name": "Event",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    15,
+    22
+   ],
+   "summary": "Evento de ciclo de vida ou tráfego entregue à TUI.",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/wsutil/session.go:Info",
+   "type": "class",
+   "name": "Info",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    25,
+    34
+   ],
+   "summary": "Metadados do handshake após um Dial bem-sucedido.",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/wsutil/session.go:Session",
+   "type": "class",
+   "name": "Session",
+   "filePath": "internal/wsutil/session.go",
+   "lineRange": [
+    37,
+    44
+   ],
+   "summary": "Conexão WebSocket ativa com canal de eventos, lock de escrita e metadados do handshake.",
+   "tags": [
+    "websocket",
+    "client",
+    "concurrency"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/wsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/wsutil/config_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/wsutil/session.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/wsutil/session_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:openWsClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:leaveWsTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:rememberWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsSubTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsOverview",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsLeftColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsServerEntries",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsServerColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsConnections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsServerHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsServerTableRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsServerStateCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsStatsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsFiltersBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsMessagesTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:formatWsFrameRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsInspector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsConnPlainLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsPayloadLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:renderWsSettings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsAllConnEntries",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:handleWsKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsPan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:toggleWsShowAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:pickWsAllEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:cycleWsFocus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsEnterAction",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:beginWsEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:startEditSelectedWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:selectedWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:connectSelectedWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:disconnectSelectedWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:deleteSelectedWsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:saveWsURLFromEditor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:updateWsEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:updateWsSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:cycleWsPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:toggleWsConnect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsSendFrame",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:waitWsEvent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:handleWsMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:pushWsFrame",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:pushWsHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:recordWsLatency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:filteredWsFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsFrameMatchesFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:wsFilterCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "function:internal/ui/ws_tab.go:syncWsFrameCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/wsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/wsutil/config_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/wsutil/session.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "file:internal/wsutil/session_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestAllTabsIncludesWebSocket",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsLandingEnterEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsFilterAndSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestSidebarShowsWebSocket",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsCyclePort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsNewURLKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsComposeMOpensAndTabChangesType",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsMessagesTabTogglesAddress",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsAllConnectionsPopup",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsConnectionManage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsConnectSelectedSwitches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_tab_test.go",
+   "target": "function:internal/ui/ws_tab_test.go:TestWsSwitchIgnoresStaleURLDraft",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "file:internal/devscopeutil/dir.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "file:internal/devscopeutil/dir_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:ConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:ConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:LoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:LoadProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:SaveProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:SaveProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "function:internal/wsutil/config.go:cleanURLs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "class:internal/wsutil/config.go:ProjectConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "class:internal/wsutil/config.go:ProjectConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/config_test.go",
+   "target": "function:internal/wsutil/config_test.go:TestSaveLoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/config_test.go",
+   "target": "function:internal/wsutil/config_test.go:TestLoadProjectMissing",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Dial",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Dial",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Events",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Events",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Send",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Send",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:SendBinary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:SendBinary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:SendMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:SendMessage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Ping",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Ping",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Close",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:Close",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:readLoop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:normalizeURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:parseHeaders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:FormatHandshake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "function:internal/wsutil/session.go:FormatHandshake",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Event",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Event",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Info",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Info",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Session",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "class:internal/wsutil/session.go:Session",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/config.go:SaveProject",
+   "target": "function:internal/devscopeutil/dir.go:EnsureDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/config.go:SaveProject",
+   "target": "function:internal/wsutil/config.go:cleanURLs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/config.go:LoadProject",
+   "target": "function:internal/wsutil/config.go:cleanURLs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/session.go:Dial",
+   "target": "function:internal/wsutil/session.go:normalizeURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/session.go:Dial",
+   "target": "function:internal/wsutil/session.go:parseHeaders",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/wsutil/session.go:Dial",
+   "target": "function:internal/wsutil/session.go:readLoop",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ws_tab.go:toggleWsConnect",
+   "target": "function:internal/wsutil/session.go:Dial",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ws_tab.go:wsAllConnEntries",
+   "target": "function:internal/wsutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ws_tab.go:handleWsMsg",
+   "target": "function:internal/ui/ws_tab.go:pushWsFrame",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ws_tab.go",
+   "target": "file:internal/ui/ws_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/wsutil/config.go",
+   "target": "file:internal/wsutil/config_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/wsutil/session.go",
+   "target": "file:internal/wsutil/session_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,1279 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/module_shell.go",
+   "type": "file",
+   "name": "module_shell.go",
+   "filePath": "internal/ui/module_shell.go",
+   "summary": "Casca comum dos módulos: barra de contexto, trilho direito, caixa de ações alinhada e cálculos de largura/altura da tela.",
+   "tags": [
+    "module-shell",
+    "layout",
+    "component",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_shell.go:moduleSize",
+   "type": "function",
+   "name": "moduleSize",
+   "filePath": "internal/ui/module_shell.go",
+   "lineRange": [
+    32,
+    44
+   ],
+   "summary": "Calcula largura e altura úteis da área de conteúdo dos módulos.",
+   "tags": [
+    "layout",
+    "utility",
+    "module-shell"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_shell.go:renderModuleContext",
+   "type": "function",
+   "name": "renderModuleContext",
+   "filePath": "internal/ui/module_shell.go",
+   "lineRange": [
+    49,
+    80
+   ],
+   "summary": "Renderiza a barra de topo de todo módulo identificando o módulo e o projeto aberto.",
+   "tags": [
+    "rendering",
+    "header",
+    "module-shell"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_shell.go:moduleActionLinesWidth",
+   "type": "function",
+   "name": "moduleActionLinesWidth",
+   "filePath": "internal/ui/module_shell.go",
+   "lineRange": [
+    121,
+    154
+   ],
+   "summary": "Alinha tecla e descrição por largura visual nas listas de ações, cortando só a descrição se necessário.",
+   "tags": [
+    "layout",
+    "keybindings",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_shell.go:renderActionsBox",
+   "type": "function",
+   "name": "renderActionsBox",
+   "filePath": "internal/ui/module_shell.go",
+   "lineRange": [
+    159,
+    173
+   ],
+   "summary": "Painel compacto de comandos com título usado em várias telas; encolhe até o número de ações.",
+   "tags": [
+    "component",
+    "keybindings",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_shell.go:actionsCmdWidth",
+   "type": "function",
+   "name": "actionsCmdWidth",
+   "filePath": "internal/ui/module_shell.go",
+   "lineRange": [
+    177,
+    192
+   ],
+   "summary": "Calcula a largura reservada à coluna AÇÕES, retornando 0 em telas estreitas.",
+   "tags": [
+    "layout",
+    "responsive",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/module_shell_test.go",
+   "type": "file",
+   "name": "module_shell_test.go",
+   "filePath": "internal/ui/module_shell_test.go",
+   "summary": "Testes da casca de módulos: alinhamento da caixa de ações, largura da coluna AÇÕES e abas de monitoramento.",
+   "tags": [
+    "test",
+    "module-shell",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_shell_test.go:TestActionsBoxAlignsKeysAndFitsWidth",
+   "type": "function",
+   "name": "TestActionsBoxAlignsKeysAndFitsWidth",
+   "filePath": "internal/ui/module_shell_test.go",
+   "lineRange": [
+    11,
+    41
+   ],
+   "summary": "Garante que a caixa de ações alinha teclas e cabe na largura.",
+   "tags": [
+    "test",
+    "module-shell",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "type": "function",
+   "name": "TestWatchTabsFollowModuleShell",
+   "filePath": "internal/ui/module_shell_test.go",
+   "lineRange": [
+    52,
+    91
+   ],
+   "summary": "Garante que as abas de monitoramento seguem o module shell.",
+   "tags": [
+    "test",
+    "module-shell",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/nginx_tab.go",
+   "type": "file",
+   "name": "nginx_tab.go",
+   "filePath": "internal/ui/nginx_tab.go",
+   "summary": "Módulo nginx da TUI: descoberta de sites/hubs/.inc, abas ROTAS/ARQUIVO, wizard de criação de .conf/.inc e exclusão de sites.",
+   "tags": [
+    "nginx",
+    "infrastructure",
+    "wizard",
+    "event-handler",
+    "component"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:openNginxClient",
+   "type": "function",
+   "name": "openNginxClient",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    52,
+    69
+   ],
+   "summary": "Abre o módulo nginx do projeto detectando o layout de configuração e carregando as rotas.",
+   "tags": [
+    "nginx",
+    "lifecycle",
+    "infrastructure"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:leaveNginxTab",
+   "type": "function",
+   "name": "leaveNginxTab",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    71,
+    80
+   ],
+   "summary": "Sai do módulo nginx limpando estado de wizard, hub e seleção.",
+   "tags": [
+    "nginx",
+    "lifecycle",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:refreshNginx",
+   "type": "function",
+   "name": "refreshNginx",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    82,
+    117
+   ],
+   "summary": "Comando assíncrono que descobre os sites/rotas nginx do projeto (ou de todos os projetos) e emite nginxLoadedMsg.",
+   "tags": [
+    "nginx",
+    "async",
+    "discovery"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:refreshNginxIncs",
+   "type": "function",
+   "name": "refreshNginxIncs",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    120,
+    134
+   ],
+   "summary": "Recarrega os arquivos .inc do hub nginx atualmente aberto.",
+   "tags": [
+    "nginx",
+    "async",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:handleNginxMsg",
+   "type": "function",
+   "name": "handleNginxMsg",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    136,
+    181
+   ],
+   "summary": "Processa mensagens do módulo nginx (rotas carregadas, incs carregadas, resultado de ações).",
+   "tags": [
+    "nginx",
+    "event-handler",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:resolveProjectPath",
+   "type": "function",
+   "name": "resolveProjectPath",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    198,
+    208
+   ],
+   "summary": "Encontra o caminho de um projeto pelo nome para abrir hubs na visão de todos os projetos.",
+   "tags": [
+    "nginx",
+    "lookup",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:renderNginxLanding",
+   "type": "function",
+   "name": "renderNginxLanding",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    210,
+    240
+   ],
+   "summary": "Renderiza a landing do módulo nginx com layout detectado e contagem de rotas.",
+   "tags": [
+    "nginx",
+    "rendering",
+    "landing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:renderNginxWizard",
+   "type": "function",
+   "name": "renderNginxWizard",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    242,
+    277
+   ],
+   "summary": "Renderiza o wizard de criação de .conf/.inc com seus campos.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "form"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:renderNginxWizardFieldBox",
+   "type": "function",
+   "name": "renderNginxWizardFieldBox",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    279,
+    319
+   ],
+   "summary": "Renderiza a caixa de um campo do wizard nginx com foco e valor.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "component"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:renderNginxWizardFieldValue",
+   "type": "function",
+   "name": "renderNginxWizardFieldValue",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    321,
+    339
+   ],
+   "summary": "Renderiza o valor de um campo do wizard, com cursor quando em foco.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:beginNginxConfWizard",
+   "type": "function",
+   "name": "beginNginxConfWizard",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    369,
+    384
+   ],
+   "summary": "Inicia o wizard para criar um novo arquivo .conf de site nginx.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:beginNginxIncWizard",
+   "type": "function",
+   "name": "beginNginxIncWizard",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    386,
+    395
+   ],
+   "summary": "Inicia o wizard para criar um novo .inc dentro do hub aberto.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxWizardText",
+   "type": "function",
+   "name": "nginxWizardText",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    397,
+    420
+   ],
+   "summary": "Retorna o texto do campo do wizard nginx em foco.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:setNginxWizardText",
+   "type": "function",
+   "name": "setNginxWizardText",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    422,
+    443
+   ],
+   "summary": "Atualiza o texto do campo do wizard nginx em foco.",
+   "tags": [
+    "nginx",
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxWizardFocusField",
+   "type": "function",
+   "name": "nginxWizardFocusField",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    447,
+    463
+   ],
+   "summary": "Move o foco entre os campos ativos do wizard, que variam com o tipo (hub/single).",
+   "tags": [
+    "nginx",
+    "wizard",
+    "focus"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:handleNginxKeys",
+   "type": "function",
+   "name": "handleNginxKeys",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    465,
+    580
+   ],
+   "summary": "Trata as teclas do módulo nginx: navegação, abas ROTAS/ARQUIVO, drill-down em hubs, criar, excluir e ver todos.",
+   "tags": [
+    "nginx",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxMove",
+   "type": "function",
+   "name": "nginxMove",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    584,
+    601
+   ],
+   "summary": "Move o cursor da lista na aba ROTAS ou rola o texto na aba ARQUIVO.",
+   "tags": [
+    "nginx",
+    "navigation",
+    "scroll"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxFileHScrollBy",
+   "type": "function",
+   "name": "nginxFileHScrollBy",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    612,
+    621
+   ],
+   "summary": "Rola horizontalmente o conteúdo do arquivo nginx exibido.",
+   "tags": [
+    "nginx",
+    "scroll",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:updateNginxWizard",
+   "type": "function",
+   "name": "updateNginxWizard",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    623,
+    698
+   ],
+   "summary": "Trata a edição do wizard nginx (campos, tipo, confirmar, cancelar).",
+   "tags": [
+    "nginx",
+    "wizard",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxCreateConf",
+   "type": "function",
+   "name": "nginxCreateConf",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    700,
+    732
+   ],
+   "summary": "Cria o arquivo .conf a partir do wizard via nginxutil.CreateConf.",
+   "tags": [
+    "nginx",
+    "action",
+    "filesystem"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxCreateInc",
+   "type": "function",
+   "name": "nginxCreateInc",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    734,
+    755
+   ],
+   "summary": "Cria um arquivo .inc no hub aberto via nginxutil.CreateInc.",
+   "tags": [
+    "nginx",
+    "action",
+    "filesystem"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab.go:nginxDeleteSelected",
+   "type": "function",
+   "name": "nginxDeleteSelected",
+   "filePath": "internal/ui/nginx_tab.go",
+   "lineRange": [
+    757,
+    782
+   ],
+   "summary": "Exclui o site/arquivo nginx selecionado via nginxutil.DeleteSite.",
+   "tags": [
+    "nginx",
+    "action",
+    "filesystem"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/nginx_tab_test.go",
+   "type": "file",
+   "name": "nginx_tab_test.go",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "summary": "Testes do módulo nginx: landing, criação via wizard, drill-down em hub com .inc e varredura de outros projetos.",
+   "tags": [
+    "test",
+    "nginx",
+    "integration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:TestAllTabsIncludesNginx",
+   "type": "function",
+   "name": "TestAllTabsIncludesNginx",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    13,
+    27
+   ],
+   "summary": "Verifica que a lista de abas inclui o nginx.",
+   "tags": [
+    "test",
+    "nginx",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:newNginxProjectDir",
+   "type": "function",
+   "name": "newNginxProjectDir",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    29,
+    51
+   ],
+   "summary": "Helper que cria um diretório de projeto temporário com configurações nginx.",
+   "tags": [
+    "test",
+    "fixture",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "type": "function",
+   "name": "TestNginxLandingAndOpen",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    53,
+    82
+   ],
+   "summary": "Testa a landing do nginx e a abertura do módulo.",
+   "tags": [
+    "test",
+    "nginx",
+    "landing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "type": "function",
+   "name": "TestNginxCreateConfSingleViaWizard",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    84,
+    105
+   ],
+   "summary": "Testa a criação de um .conf single pelo wizard.",
+   "tags": [
+    "test",
+    "nginx",
+    "wizard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "type": "function",
+   "name": "TestNginxHubDrillDownCreateAndDeleteInc",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    110,
+    186
+   ],
+   "summary": "Testa drill-down em hub, criação e exclusão de .inc.",
+   "tags": [
+    "test",
+    "nginx",
+    "integration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "type": "function",
+   "name": "TestNginxShowAllScansOtherProjects",
+   "filePath": "internal/ui/nginx_tab_test.go",
+   "lineRange": [
+    188,
+    234
+   ],
+   "summary": "Verifica que 'ver todos' varre outros projetos.",
+   "tags": [
+    "test",
+    "nginx",
+    "discovery"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "function:internal/ui/module_shell.go:moduleSize",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "function:internal/ui/module_shell.go:renderModuleContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "function:internal/ui/module_shell.go:moduleActionLinesWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "function:internal/ui/module_shell.go:renderActionsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "function:internal/ui/module_shell.go:actionsCmdWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "function:internal/ui/module_shell_test.go:TestActionsBoxAlignsKeysAndFitsWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "function:internal/ui/module_shell_test.go:TestActionsBoxAlignsKeysAndFitsWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:openNginxClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:leaveNginxTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:refreshNginx",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:refreshNginxIncs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:resolveProjectPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:renderNginxLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:renderNginxWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:renderNginxWizardFieldBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:renderNginxWizardFieldValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:beginNginxConfWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:beginNginxIncWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:setNginxWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxWizardFocusField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxFileHScrollBy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:updateNginxWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxCreateConf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxCreateInc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "function:internal/ui/nginx_tab.go:nginxDeleteSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestAllTabsIncludesNginx",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestAllTabsIncludesNginx",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:newNginxProjectDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_shell_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/nginxutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/nginx_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/module_shell.go:renderModuleContext",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell.go:renderActionsBox",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell_test.go:TestActionsBoxAlignsKeysAndFitsWidth",
+   "target": "function:internal/ui/module_shell.go:renderActionsBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell_test.go:TestActionsBoxAlignsKeysAndFitsWidth",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "target": "function:internal/ui/json_tab.go:renderJsonLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_shell_test.go:TestWatchTabsFollowModuleShell",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:refreshNginx",
+   "target": "function:internal/nginxutil/agent.go:Discover",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:refreshNginxIncs",
+   "target": "function:internal/nginxutil/agent.go:DiscoverHubIncs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:renderNginxWizardFieldBox",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:nginxCreateConf",
+   "target": "function:internal/nginxutil/agent.go:CreateConf",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:nginxCreateInc",
+   "target": "function:internal/nginxutil/agent.go:CreateInc",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab.go:nginxDeleteSelected",
+   "target": "function:internal/nginxutil/agent.go:DeleteSite",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "target": "function:internal/ui/nginx_tab.go:renderNginxLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "target": "function:internal/ui/nginx_tab.go:refreshNginx",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxLandingAndOpen",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "target": "function:internal/ui/nginx_tab.go:openNginxClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "target": "function:internal/ui/nginx_tab.go:beginNginxConfWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxCreateConfSingleViaWizard",
+   "target": "function:internal/ui/nginx_tab.go:nginxCreateConf",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:openNginxClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:beginNginxConfWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:nginxCreateConf",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:beginNginxIncWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:nginxCreateInc",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxHubDrillDownCreateAndDeleteInc",
+   "target": "function:internal/ui/nginx_tab.go:nginxDeleteSelected",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "target": "function:internal/ui/nginx_tab.go:openNginxClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "target": "function:internal/ui/nginx_tab.go:refreshNginx",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/nginx_tab_test.go:TestNginxShowAllScansOtherProjects",
+   "target": "function:internal/ui/nginx_tab.go:handleNginxMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_shell.go",
+   "target": "file:internal/ui/module_shell_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/nginx_tab.go",
+   "target": "file:internal/ui/nginx_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

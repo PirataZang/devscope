@@ -1,0 +1,96 @@
+Found 79 batch files (16 logical batches, 10 multi-part):
+  batch-1-part-1.json: 63 nodes, 327 edges
+  batch-1-part-2.json: 57 nodes, 109 edges
+  batch-1-part-3.json: 81 nodes, 172 edges
+  batch-1-part-4.json: 33 nodes, 40 edges
+  batch-1-part-5.json: 47 nodes, 62 edges
+  batch-1-part-6.json: 32 nodes, 39 edges
+  batch-2-part-1.json: 78 nodes, 163 edges
+  batch-2-part-2.json: 34 nodes, 52 edges
+  batch-2-part-3.json: 28 nodes, 61 edges
+  batch-2-part-4.json: 104 nodes, 224 edges
+  batch-2-part-5.json: 52 nodes, 138 edges
+  batch-2-part-6.json: 39 nodes, 89 edges
+  batch-3-part-1.json: 92 nodes, 159 edges
+  batch-3-part-2.json: 51 nodes, 75 edges
+  batch-3-part-3.json: 39 nodes, 39 edges
+  batch-3-part-4.json: 48 nodes, 47 edges
+  batch-3-part-5.json: 51 nodes, 51 edges
+  batch-4-part-1.json: 31 nodes, 49 edges
+  batch-4-part-2.json: 30 nodes, 45 edges
+  batch-4-part-3.json: 40 nodes, 75 edges
+  batch-4-part-4.json: 44 nodes, 70 edges
+  batch-4-part-5.json: 24 nodes, 38 edges
+  batch-4-part-6.json: 154 nodes, 274 edges
+  batch-4-part-7.json: 50 nodes, 77 edges
+  batch-5-part-1.json: 12 nodes, 24 edges
+  batch-5-part-2.json: 21 nodes, 45 edges
+  batch-5-part-3.json: 16 nodes, 23 edges
+  batch-5-part-4.json: 13 nodes, 24 edges
+  batch-5-part-5.json: 61 nodes, 114 edges
+  batch-5-part-6.json: 56 nodes, 193 edges
+  batch-5-part-7.json: 66 nodes, 250 edges
+  batch-5-part-8.json: 67 nodes, 242 edges
+  batch-5-part-9.json: 70 nodes, 224 edges
+  batch-5-part-10.json: 18 nodes, 73 edges
+  batch-6-part-1.json: 21 nodes, 119 edges
+  batch-6-part-2.json: 62 nodes, 205 edges
+  batch-6-part-3.json: 56 nodes, 193 edges
+  batch-6-part-4.json: 25 nodes, 130 edges
+  batch-6-part-5.json: 52 nodes, 203 edges
+  batch-6-part-6.json: 132 nodes, 324 edges
+  batch-6-part-7.json: 22 nodes, 128 edges
+  batch-6-part-8.json: 67 nodes, 190 edges
+  batch-6-part-9.json: 18 nodes, 127 edges
+  batch-6-part-10.json: 28 nodes, 126 edges
+  batch-6-part-11.json: 10 nodes, 110 edges
+  batch-6-part-12.json: 42 nodes, 182 edges
+  batch-6-part-13.json: 37 nodes, 150 edges
+  batch-6-part-14.json: 17 nodes, 71 edges
+  batch-7-part-1.json: 43 nodes, 220 edges
+  batch-7-part-2.json: 49 nodes, 98 edges
+  batch-7-part-3.json: 48 nodes, 95 edges
+  batch-7-part-4.json: 8 nodes, 36 edges
+  batch-8-part-1.json: 24 nodes, 26 edges
+  batch-8-part-2.json: 15 nodes, 16 edges
+  batch-8-part-3.json: 42 nodes, 45 edges
+  batch-8-part-4.json: 51 nodes, 92 edges
+  batch-8-part-5.json: 28 nodes, 37 edges
+  batch-8-part-6.json: 13 nodes, 17 edges
+  batch-8-part-7.json: 59 nodes, 112 edges
+  batch-8-part-8.json: 21 nodes, 32 edges
+  batch-8-part-9.json: 9 nodes, 15 edges
+  batch-9-part-1.json: 50 nodes, 97 edges
+  batch-9-part-2.json: 26 nodes, 43 edges
+  batch-9-part-3.json: 14 nodes, 26 edges
+  batch-9-part-4.json: 21 nodes, 42 edges
+  batch-9-part-5.json: 11 nodes, 16 edges
+  batch-9-part-6.json: 7 nodes, 11 edges
+  batch-9-part-7.json: 10 nodes, 13 edges
+  batch-10-part-1.json: 22 nodes, 33 edges
+  batch-10-part-2.json: 57 nodes, 182 edges
+  batch-10-part-3.json: 91 nodes, 246 edges
+  batch-10-part-4.json: 92 nodes, 130 edges
+  batch-10-part-5.json: 4 nodes, 3 edges
+  batch-11.json: 2 nodes, 4 edges
+  batch-12.json: 3 nodes, 4 edges
+  batch-13.json: 7 nodes, 16 edges
+  batch-14.json: 3 nodes, 23 edges
+  batch-15.json: 5 nodes, 13 edges
+  batch-16.json: 16 nodes, 30 edges
+
+Input: 3142 nodes, 7718 edges
+
+Fixed (1 corrections):
+     1 × tested_by edges flipped (test → production became production → test)
+
+Tested-by linker:
+     6 × tested_by edges produced (path-convention supplement, production → test)
+    99 × production nodes tagged "tested"
+
+Output: 3142 nodes, 7724 edges
+
+Imports edge recovery:
+  Recovered 0 `imports` edges from importMap (294 entries scanned)
+
+Written to /home/igor/Documentos/projects/devscope/.ua/intermediate/assembled-graph.json (2979 KB)

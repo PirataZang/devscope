@@ -1,0 +1,891 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/git_cache.go",
+   "type": "file",
+   "name": "git_cache.go",
+   "filePath": "internal/ui/git_cache.go",
+   "summary": "Cache e saneamento de branches Git para a UI, com denylist de branches excluídas para evitar que reapareçam a partir de dados obsoletos.",
+   "tags": [
+    "git",
+    "cache",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_cache.go:filterGitBranches",
+   "type": "function",
+   "name": "filterGitBranches",
+   "filePath": "internal/ui/git_cache.go",
+   "lineRange": [
+    17,
+    32
+   ],
+   "summary": "Filtra a lista de branches removendo as que estão na denylist de branches excluídas recentemente.",
+   "tags": [
+    "git",
+    "filter",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_cache.go:pruneGitBranch",
+   "type": "function",
+   "name": "pruneGitBranch",
+   "filePath": "internal/ui/git_cache.go",
+   "lineRange": [
+    38,
+    60
+   ],
+   "summary": "Remove uma branch excluída do cache local e do store para que não reapareça na UI.",
+   "tags": [
+    "git",
+    "cache",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_cache.go:projectGitInfo",
+   "type": "function",
+   "name": "projectGitInfo",
+   "filePath": "internal/ui/git_cache.go",
+   "lineRange": [
+    71,
+    80
+   ],
+   "summary": "Retorna os metadados Git do projeto para renderização, usando a lista de branches saneada para evitar 'piscar' branches apagadas.",
+   "tags": [
+    "git",
+    "cache",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/git_cache_test.go",
+   "type": "file",
+   "name": "git_cache_test.go",
+   "filePath": "internal/ui/git_cache_test.go",
+   "summary": "Testes da denylist e da remoção de branches Git do cache.",
+   "tags": [
+    "test",
+    "git",
+    "cache"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_cache_test.go:TestFilterGitBranchesDenylist",
+   "type": "function",
+   "name": "TestFilterGitBranchesDenylist",
+   "filePath": "internal/ui/git_cache_test.go",
+   "lineRange": [
+    9,
+    25
+   ],
+   "summary": "Testa a filtragem de branches pela denylist.",
+   "tags": [
+    "test",
+    "git",
+    "filter"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_cache_test.go:TestPruneGitBranch",
+   "type": "function",
+   "name": "TestPruneGitBranch",
+   "filePath": "internal/ui/git_cache_test.go",
+   "lineRange": [
+    27,
+    45
+   ],
+   "summary": "Testa a remoção de branch do cache e do store.",
+   "tags": [
+    "test",
+    "git",
+    "cache"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/git_drawer.go",
+   "type": "file",
+   "name": "git_drawer.go",
+   "filePath": "internal/ui/git_drawer.go",
+   "summary": "Gaveta inferior da tela Git (log de comandos e stash): altura, abrir/fechar/alternar e atalhos da barra de comandos.",
+   "tags": [
+    "git",
+    "drawer",
+    "component",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_drawer.go:gitDrawerHeight",
+   "type": "function",
+   "name": "gitDrawerHeight",
+   "filePath": "internal/ui/git_drawer.go",
+   "lineRange": [
+    36,
+    55
+   ],
+   "summary": "Calcula a altura fixa e modesta da gaveta do Git, emprestada da área de branches/commits.",
+   "tags": [
+    "git",
+    "layout",
+    "drawer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer.go:openGitDrawer",
+   "type": "function",
+   "name": "openGitDrawer",
+   "filePath": "internal/ui/git_drawer.go",
+   "lineRange": [
+    59,
+    70
+   ],
+   "summary": "Abre ou troca a gaveta do Git (log/stash), levando o foco para o log.",
+   "tags": [
+    "git",
+    "drawer",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer.go:gitDrawerHints",
+   "type": "function",
+   "name": "gitDrawerHints",
+   "filePath": "internal/ui/git_drawer.go",
+   "lineRange": [
+    109,
+    123
+   ],
+   "summary": "Monta os atalhos da barra de comandos referentes à gaveta, com rótulos que contam o conteúdo.",
+   "tags": [
+    "git",
+    "keybindings",
+    "drawer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/git_drawer_test.go",
+   "type": "file",
+   "name": "git_drawer_test.go",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "summary": "Testes da gaveta da tela Git: abertura por tecla, foco, log após comandos e encaixe em todos os tamanhos de terminal.",
+   "tags": [
+    "test",
+    "git",
+    "drawer"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:drawerApp",
+   "type": "function",
+   "name": "drawerApp",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    12,
+    31
+   ],
+   "summary": "Helper que monta um App de teste na aba Git com dados de exemplo.",
+   "tags": [
+    "test",
+    "fixture",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitDefaultScreenHasNoDrawerBoxes",
+   "type": "function",
+   "name": "TestGitDefaultScreenHasNoDrawerBoxes",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    35,
+    49
+   ],
+   "summary": "Garante que a tela Git padrão não exibe a gaveta.",
+   "tags": [
+    "test",
+    "git",
+    "drawer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitDrawerKeysToggle",
+   "type": "function",
+   "name": "TestGitDrawerKeysToggle",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    52,
+    77
+   ],
+   "summary": "Testa as teclas que abrem e fecham a gaveta do Git.",
+   "tags": [
+    "test",
+    "git",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitStashKeyWithoutStashes",
+   "type": "function",
+   "name": "TestGitStashKeyWithoutStashes",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    80,
+    92
+   ],
+   "summary": "Testa a tecla de stash quando não há stashes.",
+   "tags": [
+    "test",
+    "git",
+    "drawer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitCommandOpensLogDrawer",
+   "type": "function",
+   "name": "TestGitCommandOpensLogDrawer",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    96,
+    112
+   ],
+   "summary": "Verifica que executar um comando Git abre a gaveta de log.",
+   "tags": [
+    "test",
+    "git",
+    "drawer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitFocusCycleSkipsClosedDrawer",
+   "type": "function",
+   "name": "TestGitFocusCycleSkipsClosedDrawer",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    115,
+    148
+   ],
+   "summary": "Garante que o ciclo de foco pula a gaveta fechada.",
+   "tags": [
+    "test",
+    "git",
+    "focus"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitCommandBarKeepsDrawerKeys",
+   "type": "function",
+   "name": "TestGitCommandBarKeepsDrawerKeys",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    152,
+    169
+   ],
+   "summary": "Verifica que a barra de comandos mantém as teclas da gaveta.",
+   "tags": [
+    "test",
+    "git",
+    "keybindings"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitDrawerHeightStaysModest",
+   "type": "function",
+   "name": "TestGitDrawerHeightStaysModest",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    173,
+    188
+   ],
+   "summary": "Garante que a altura da gaveta permanece modesta.",
+   "tags": [
+    "test",
+    "git",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_drawer_test.go:TestGitScreenFitsEveryTerminal",
+   "type": "function",
+   "name": "TestGitScreenFitsEveryTerminal",
+   "filePath": "internal/ui/git_drawer_test.go",
+   "lineRange": [
+    191,
+    203
+   ],
+   "summary": "Garante que a tela Git cabe em todos os tamanhos de terminal.",
+   "tags": [
+    "test",
+    "git",
+    "responsive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/help_screen.go",
+   "type": "file",
+   "name": "help_screen.go",
+   "filePath": "internal/ui/help_screen.go",
+   "summary": "Tela de ajuda em sobreposição: tabela de atalhos por grupo de módulos, régua colorida e distribuição dos blocos em colunas equilibradas.",
+   "tags": [
+    "help",
+    "keybindings",
+    "rendering",
+    "overlay"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:helpGroups",
+   "type": "function",
+   "name": "helpGroups",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    30,
+    320
+   ],
+   "summary": "Define a tabela completa de ajuda: grupos de módulos, telas e seus atalhos de teclado.",
+   "tags": [
+    "help",
+    "keybindings",
+    "data-model"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:renderHelpScreen",
+   "type": "function",
+   "name": "renderHelpScreen",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    336,
+    368
+   ],
+   "summary": "Renderiza a sobreposição de ajuda em tela cheia sobre o fundo atual.",
+   "tags": [
+    "rendering",
+    "help",
+    "overlay"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:renderHelpRuler",
+   "type": "function",
+   "name": "renderHelpRuler",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    380,
+    392
+   ],
+   "summary": "Renderiza a régua numerada de grupos de ajuda, cada um na cor que possui na sidebar.",
+   "tags": [
+    "rendering",
+    "help",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:renderHelpBody",
+   "type": "function",
+   "name": "renderHelpBody",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    394,
+    421
+   ],
+   "summary": "Renderiza o corpo de um grupo de ajuda distribuindo seus blocos em colunas.",
+   "tags": [
+    "rendering",
+    "help",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:helpBlockLines",
+   "type": "function",
+   "name": "helpBlockLines",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    425,
+    461
+   ],
+   "summary": "Distribui os blocos de um grupo em colunas equilibradas pela altura.",
+   "tags": [
+    "layout",
+    "help",
+    "algorithm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/help_screen.go:helpOneBlock",
+   "type": "function",
+   "name": "helpOneBlock",
+   "filePath": "internal/ui/help_screen.go",
+   "lineRange": [
+    463,
+    478
+   ],
+   "summary": "Renderiza um bloco de ajuda (tela + atalhos) com título colorido.",
+   "tags": [
+    "rendering",
+    "help",
+    "component"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "function:internal/ui/git_cache.go:filterGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "function:internal/ui/git_cache.go:pruneGitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "function:internal/ui/git_cache.go:projectGitInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "function:internal/ui/git_cache_test.go:TestFilterGitBranchesDenylist",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "function:internal/ui/git_cache_test.go:TestFilterGitBranchesDenylist",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "function:internal/ui/git_cache_test.go:TestPruneGitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "function:internal/ui/git_cache_test.go:TestPruneGitBranch",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "function:internal/ui/git_drawer.go:gitDrawerHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "function:internal/ui/git_drawer.go:openGitDrawer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "function:internal/ui/git_drawer.go:gitDrawerHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:drawerApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDefaultScreenHasNoDrawerBoxes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDefaultScreenHasNoDrawerBoxes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDrawerKeysToggle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDrawerKeysToggle",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitStashKeyWithoutStashes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitStashKeyWithoutStashes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitCommandOpensLogDrawer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitCommandOpensLogDrawer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitFocusCycleSkipsClosedDrawer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitFocusCycleSkipsClosedDrawer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitCommandBarKeepsDrawerKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitCommandBarKeepsDrawerKeys",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDrawerHeightStaysModest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitDrawerHeightStaysModest",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitScreenFitsEveryTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "function:internal/ui/git_drawer_test.go:TestGitScreenFitsEveryTerminal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:helpGroups",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:renderHelpScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:renderHelpRuler",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:renderHelpBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:helpBlockLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "function:internal/ui/help_screen.go:helpOneBlock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_cache_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_drawer_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/git_cache_test.go:TestFilterGitBranchesDenylist",
+   "target": "function:internal/ui/git_cache.go:filterGitBranches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_cache_test.go:TestPruneGitBranch",
+   "target": "function:internal/ui/git_cache.go:pruneGitBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitDefaultScreenHasNoDrawerBoxes",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitDefaultScreenHasNoDrawerBoxes",
+   "target": "function:internal/ui/git_drawer.go:gitDrawerHeight",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitDrawerKeysToggle",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitFocusCycleSkipsClosedDrawer",
+   "target": "function:internal/ui/git_drawer.go:openGitDrawer",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitCommandBarKeepsDrawerKeys",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_drawer_test.go:TestGitDrawerHeightStaysModest",
+   "target": "function:internal/ui/git_drawer.go:gitDrawerHeight",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/help_screen.go:renderHelpScreen",
+   "target": "function:internal/ui/foundation.go:clampRenderedHeight",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/help_screen.go:renderHelpRuler",
+   "target": "function:internal/ui/foundation.go:padRightVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/help_screen.go:renderHelpBody",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/help_screen.go:helpBlockLines",
+   "target": "function:internal/ui/foundation.go:padRightVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/help_screen.go:helpOneBlock",
+   "target": "function:internal/ui/foundation.go:sectionHeader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_cache.go",
+   "target": "file:internal/ui/git_cache_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/git_drawer.go",
+   "target": "file:internal/ui/git_drawer_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/help_screen.go",
+   "target": "file:internal/ui/keymap_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

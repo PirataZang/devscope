@@ -1,0 +1,1384 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/git_test.go",
+   "type": "file",
+   "name": "git_test.go",
+   "filePath": "internal/collectors/git_test.go",
+   "summary": "Suíte de testes de integração do coletor Git usando repositórios temporários: resumo, ordenação de branches, commits, diffs, origem de branch, pull, criação/renomeação/remoção de branch, cherry-pick, staging e fluxos de conflito.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectGitSummary",
+   "type": "function",
+   "name": "TestCollectGitSummary",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    14,
+    27
+   ],
+   "summary": "Testa a coleta resumida via .git/HEAD.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectGitBranchesOrder",
+   "type": "function",
+   "name": "TestCollectGitBranchesOrder",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    29,
+    67
+   ],
+   "summary": "Testa a ordenação de branches.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectCommitsAtBranch",
+   "type": "function",
+   "name": "TestCollectCommitsAtBranch",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    77,
+    123
+   ],
+   "summary": "Testa a listagem de commits por branch.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectCommitFiles",
+   "type": "function",
+   "name": "TestCollectCommitFiles",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    125,
+    143
+   ],
+   "summary": "Testa a listagem de arquivos de um commit.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectCommitFileDiff",
+   "type": "function",
+   "name": "TestCollectCommitFileDiff",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    145,
+    164
+   ],
+   "summary": "Testa o diff de arquivo em um commit.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectCommitFullMessage",
+   "type": "function",
+   "name": "TestCollectCommitFullMessage",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    166,
+    181
+   ],
+   "summary": "Testa a mensagem completa de commit.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestParseGitHubRepo",
+   "type": "function",
+   "name": "TestParseGitHubRepo",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    183,
+    199
+   ],
+   "summary": "Testa o parsing de owner/repo de remotes do GitHub.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitBranchOrigin",
+   "type": "function",
+   "name": "TestGitBranchOrigin",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    209,
+    227
+   ],
+   "summary": "Testa a inferência da branch de origem.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitPullOrigin",
+   "type": "function",
+   "name": "TestGitPullOrigin",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    229,
+    239
+   ],
+   "summary": "Testa o pull a partir da branch de origem.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitBranchCreateRenameDelete",
+   "type": "function",
+   "name": "TestGitBranchCreateRenameDelete",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    241,
+    270
+   ],
+   "summary": "Testa criação, renomeação e remoção de branches.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitCheckoutAndCherryPick",
+   "type": "function",
+   "name": "TestGitCheckoutAndCherryPick",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    272,
+    304
+   ],
+   "summary": "Testa checkout e cherry-pick.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectGitFilesStagingColumns",
+   "type": "function",
+   "name": "TestCollectGitFilesStagingColumns",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    306,
+    338
+   ],
+   "summary": "Testa as colunas de staging/worktree do status.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectWorkingTreeDiffModifiedAndUntracked",
+   "type": "function",
+   "name": "TestCollectWorkingTreeDiffModifiedAndUntracked",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    340,
+    366
+   ],
+   "summary": "Testa o diff de arquivos modificados e não rastreados.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestCollectConflictDiffStages",
+   "type": "function",
+   "name": "TestCollectConflictDiffStages",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    406,
+    456
+   ],
+   "summary": "Testa o diff de conflito entre stages ours/theirs.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitConflictSidesMerge",
+   "type": "function",
+   "name": "TestGitConflictSidesMerge",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    458,
+    493
+   ],
+   "summary": "Testa os rótulos ours/theirs durante merge.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitOpInProgressMergeConflict",
+   "type": "function",
+   "name": "TestGitOpInProgressMergeConflict",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    495,
+    542
+   ],
+   "summary": "Testa a detecção de merge em andamento com conflito.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git_test.go:TestGitRemoteBranchNames",
+   "type": "function",
+   "name": "TestGitRemoteBranchNames",
+   "filePath": "internal/collectors/git_test.go",
+   "lineRange": [
+    560,
+    604
+   ],
+   "summary": "Testa a listagem de branches remotas.",
+   "tags": [
+    "test",
+    "git",
+    "integration-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/collectors/health.go",
+   "type": "file",
+   "name": "health.go",
+   "filePath": "internal/collectors/health.go",
+   "summary": "Executa health checks HTTP/TCP concorrentes para cada projeto, inferindo alvos a partir de portas do projeto, containers e PORT do .env, e registra status e latência.",
+   "tags": [
+    "health-check",
+    "collector",
+    "networking",
+    "concurrency"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Concorrência limitada com canal-semáforo (chan struct{}) + sync.WaitGroup e sync.Mutex para os resultados."
+  },
+  {
+   "id": "function:internal/collectors/health.go:CollectHealth",
+   "type": "function",
+   "name": "CollectHealth",
+   "filePath": "internal/collectors/health.go",
+   "lineRange": [
+    25,
+    79
+   ],
+   "summary": "Executa checks HTTP/TCP concorrentes por projeto com semáforo e agrega o status de saúde.",
+   "tags": [
+    "health-check",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/health.go:inferHealthTargets",
+   "type": "function",
+   "name": "inferHealthTargets",
+   "filePath": "internal/collectors/health.go",
+   "lineRange": [
+    81,
+    132
+   ],
+   "summary": "Infere URLs HTTP e alvos TCP a partir das portas do projeto, dos containers e do .env.",
+   "tags": [
+    "health-check",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/health.go:readEnvPort",
+   "type": "function",
+   "name": "readEnvPort",
+   "filePath": "internal/collectors/health.go",
+   "lineRange": [
+    134,
+    148
+   ],
+   "summary": "Lê a variável PORT do .env do projeto.",
+   "tags": [
+    "health-check",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/health.go:checkTarget",
+   "type": "function",
+   "name": "checkTarget",
+   "filePath": "internal/collectors/health.go",
+   "lineRange": [
+    150,
+    211
+   ],
+   "summary": "Testa um alvo TCP ou HTTP medindo latência e classificando como saudável, degradado ou não saudável.",
+   "tags": [
+    "health-check",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/collectors/integration_test.go",
+   "type": "file",
+   "name": "integration_test.go",
+   "filePath": "internal/collectors/integration_test.go",
+   "summary": "Testes de integração leves para detecção de script de deploy e parsing de configuração do nginx.",
+   "tags": [
+    "test",
+    "deployment",
+    "nginx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/integration_test.go:TestDetectDeployScript",
+   "type": "function",
+   "name": "TestDetectDeployScript",
+   "filePath": "internal/collectors/integration_test.go",
+   "lineRange": [
+    9,
+    19
+   ],
+   "summary": "Testa a detecção de script deploy.sh.",
+   "tags": [
+    "test",
+    "deployment",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/integration_test.go:TestParseNginxConfig",
+   "type": "function",
+   "name": "TestParseNginxConfig",
+   "filePath": "internal/collectors/integration_test.go",
+   "lineRange": [
+    21,
+    33
+   ],
+   "summary": "Testa o parsing de configuração do nginx.",
+   "tags": [
+    "test",
+    "deployment",
+    "integration-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/k8s.go",
+   "type": "file",
+   "name": "k8s.go",
+   "filePath": "internal/collectors/k8s.go",
+   "summary": "Integração com Kubernetes via `kubectl`: contextos, namespaces, pods, deployments, services, eventos, describe/YAML, apply, delete, scale, logs, descoberta de manifestos do projeto e templates mínimos de Deployment/Service.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "collector",
+    "templates"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/collectors/k8s.go:K8sResource",
+   "type": "class",
+   "name": "K8sResource",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    42,
+    53
+   ],
+   "summary": "Linha genérica de recurso Kubernetes (pod, deployment, service) para a TUI.",
+   "tags": [
+    "data-model",
+    "kubernetes",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/k8s.go:K8sClusterMeta",
+   "type": "class",
+   "name": "K8sClusterMeta",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    55,
+    58
+   ],
+   "summary": "Metadados do cluster: versão do servidor e quantidade de nós.",
+   "tags": [
+    "data-model",
+    "kubernetes",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sAvailable",
+   "type": "function",
+   "name": "K8sAvailable",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    13,
+    16
+   ],
+   "summary": "Indica se o kubectl está no PATH.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sCurrentContext",
+   "type": "function",
+   "name": "K8sCurrentContext",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    18,
+    24
+   ],
+   "summary": "Retorna o contexto atual do kubectl.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sContexts",
+   "type": "function",
+   "name": "K8sContexts",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    26,
+    32
+   ],
+   "summary": "Lista os contextos configurados no kubeconfig.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sNamespaces",
+   "type": "function",
+   "name": "K8sNamespaces",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    34,
+    40
+   ],
+   "summary": "Lista os namespaces do cluster.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sClusterMetaInfo",
+   "type": "function",
+   "name": "K8sClusterMetaInfo",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    60,
+    80
+   ],
+   "summary": "Obtém versão do servidor e contagem de nós do cluster.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sListEvents",
+   "type": "function",
+   "name": "K8sListEvents",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    82,
+    101
+   ],
+   "summary": "Lista eventos recentes do namespace ordenados por tempo.",
+   "tags": [
+    "kubernetes",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sListPods",
+   "type": "function",
+   "name": "K8sListPods",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    103,
+    148
+   ],
+   "summary": "Lista pods com status, prontidão, reinícios e idade.",
+   "tags": [
+    "kubernetes",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sListDeployments",
+   "type": "function",
+   "name": "K8sListDeployments",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    150,
+    169
+   ],
+   "summary": "Lista deployments com réplicas prontas e idade.",
+   "tags": [
+    "kubernetes",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sListServices",
+   "type": "function",
+   "name": "K8sListServices",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    171,
+    190
+   ],
+   "summary": "Lista services com tipo, cluster IP e portas.",
+   "tags": [
+    "kubernetes",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sDescribe",
+   "type": "function",
+   "name": "K8sDescribe",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    199,
+    205
+   ],
+   "summary": "Executa kubectl describe para um recurso.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "function",
+   "name": "K8sGetYAML",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    207,
+    213
+   ],
+   "summary": "Retorna o YAML de um recurso.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sDelete",
+   "type": "function",
+   "name": "K8sDelete",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    215,
+    222
+   ],
+   "summary": "Remove um recurso do cluster.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sApplyFile",
+   "type": "function",
+   "name": "K8sApplyFile",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    224,
+    226
+   ],
+   "summary": "Aplica um manifesto a partir de arquivo.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sApplyYAML",
+   "type": "function",
+   "name": "K8sApplyYAML",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    228,
+    240
+   ],
+   "summary": "Aplica YAML via stdin no kubectl.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sPodLogs",
+   "type": "function",
+   "name": "K8sPodLogs",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    242,
+    251
+   ],
+   "summary": "Retorna os últimos logs de um pod.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sScale",
+   "type": "function",
+   "name": "K8sScale",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    253,
+    259
+   ],
+   "summary": "Escala um deployment para o número de réplicas informado.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "function",
+   "name": "DiscoverProjectManifests",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    262,
+    297
+   ],
+   "summary": "Encontra arquivos yaml/yml em diretórios Kubernetes comuns do projeto.",
+   "tags": [
+    "kubernetes",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sDeploymentTemplate",
+   "type": "function",
+   "name": "K8sDeploymentTemplate",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    300,
+    328
+   ],
+   "summary": "Retorna um YAML mínimo de Deployment.",
+   "tags": [
+    "kubernetes",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:K8sServiceTemplate",
+   "type": "function",
+   "name": "K8sServiceTemplate",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    331,
+    351
+   ],
+   "summary": "Retorna um YAML mínimo de Service ClusterIP.",
+   "tags": [
+    "kubernetes",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:runKubectl",
+   "type": "function",
+   "name": "runKubectl",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    353,
+    376
+   ],
+   "summary": "Executa o kubectl com timeout e retorna a saída ou erro descritivo.",
+   "tags": [
+    "kubernetes",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/k8s.go:splitNonEmpty",
+   "type": "function",
+   "name": "splitNonEmpty",
+   "filePath": "internal/collectors/k8s.go",
+   "lineRange": [
+    378,
+    387
+   ],
+   "summary": "Divide texto em linhas não vazias.",
+   "tags": [
+    "kubernetes",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectGitSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectGitBranchesOrder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectCommitsAtBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectCommitFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectCommitFileDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectCommitFullMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestParseGitHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitBranchOrigin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitPullOrigin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitBranchCreateRenameDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitCheckoutAndCherryPick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectGitFilesStagingColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectWorkingTreeDiffModifiedAndUntracked",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestCollectConflictDiffStages",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitConflictSidesMerge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitOpInProgressMergeConflict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "function:internal/collectors/git_test.go:TestGitRemoteBranchNames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/git_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "function:internal/collectors/health.go:CollectHealth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "function:internal/collectors/health.go:CollectHealth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "function:internal/collectors/health.go:inferHealthTargets",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "function:internal/collectors/health.go:readEnvPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "function:internal/collectors/health.go:checkTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/health.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/integration_test.go",
+   "target": "function:internal/collectors/integration_test.go:TestDetectDeployScript",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/integration_test.go",
+   "target": "function:internal/collectors/integration_test.go:TestParseNginxConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "class:internal/collectors/k8s.go:K8sResource",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "class:internal/collectors/k8s.go:K8sResource",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "class:internal/collectors/k8s.go:K8sClusterMeta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "class:internal/collectors/k8s.go:K8sClusterMeta",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sAvailable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sAvailable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sCurrentContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sCurrentContext",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sContexts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sContexts",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sNamespaces",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sNamespaces",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sClusterMetaInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sClusterMetaInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListEvents",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListEvents",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListPods",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListPods",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListDeployments",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListDeployments",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListServices",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sListServices",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDescribe",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDescribe",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDelete",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sApplyFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sApplyFile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sApplyYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sApplyYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sPodLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sPodLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sScale",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sScale",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDeploymentTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sDeploymentTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sServiceTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:K8sServiceTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:runKubectl",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/k8s.go",
+   "target": "function:internal/collectors/k8s.go:splitNonEmpty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  }
+ ]
+}

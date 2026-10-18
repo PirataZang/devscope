@@ -1,0 +1,3326 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/jenkins_tab.go",
+   "type": "file",
+   "name": "jenkins_tab.go",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "summary": "Módulo Jenkins completo da TUI: carga assíncrona de jobs/builds/console, visões geral/pipelines/builds, sparklines de atividade, disparo/parada de builds e formulário de configurações.",
+   "tags": [
+    "jenkins",
+    "ci-cd",
+    "component",
+    "event-handler",
+    "rendering"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:openJenkinsClient",
+   "type": "function",
+   "name": "openJenkinsClient",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    67,
+    84
+   ],
+   "summary": "Abre o cliente Jenkins do projeto carregando a configuração e disparando o primeiro refresh.",
+   "tags": [
+    "jenkins",
+    "ci-cd",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:loadJenkinsSettingsDraft",
+   "type": "function",
+   "name": "loadJenkinsSettingsDraft",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    95,
+    111
+   ],
+   "summary": "Carrega a configuração Jenkins salva do projeto para o rascunho editável das configurações.",
+   "tags": [
+    "jenkins",
+    "settings",
+    "config"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:refreshJenkins",
+   "type": "function",
+   "name": "refreshJenkins",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    113,
+    170
+   ],
+   "summary": "Comando assíncrono que busca jobs, builds, console e fila do servidor Jenkins e emite jenkinsLoadedMsg.",
+   "tags": [
+    "jenkins",
+    "ci-cd",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:scheduleJenkinsTick",
+   "type": "function",
+   "name": "scheduleJenkinsTick",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    172,
+    181
+   ],
+   "summary": "Agenda o próximo tick de atualização periódica da aba Jenkins.",
+   "tags": [
+    "jenkins",
+    "polling",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:handleJenkinsMsg",
+   "type": "function",
+   "name": "handleJenkinsMsg",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    183,
+    230
+   ],
+   "summary": "Processa mensagens Bubble Tea da aba Jenkins (dados carregados, ações, ticks), atualizando estado e reagendando.",
+   "tags": [
+    "jenkins",
+    "event-handler",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsSelectedBuildNum",
+   "type": "function",
+   "name": "jenkinsSelectedBuildNum",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    242,
+    253
+   ],
+   "summary": "Retorna o número do build selecionado na visão de builds.",
+   "tags": [
+    "jenkins",
+    "selection",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsLanding",
+   "type": "function",
+   "name": "renderJenkinsLanding",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    269,
+    298
+   ],
+   "summary": "Renderiza a landing da aba Jenkins mostrando estado de configuração e ação primária.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "landing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsTab",
+   "type": "function",
+   "name": "renderJenkinsTab",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    300,
+    327
+   ],
+   "summary": "Renderiza a aba Jenkins completa escolhendo entre landing, settings, detalhe de build e as visões principais.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsHints",
+   "type": "function",
+   "name": "jenkinsHints",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    329,
+    355
+   ],
+   "summary": "Monta a barra de atalhos da aba Jenkins conforme a visão e o foco atuais.",
+   "tags": [
+    "jenkins",
+    "keybindings",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsHeader",
+   "type": "function",
+   "name": "renderJenkinsHeader",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    357,
+    385
+   ],
+   "summary": "Renderiza o cabeçalho com servidor, status de conexão e fila do Jenkins.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsNav",
+   "type": "function",
+   "name": "renderJenkinsNav",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    387,
+    404
+   ],
+   "summary": "Renderiza a navegação entre as visões da aba Jenkins (visão geral, pipelines, builds).",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsOverview",
+   "type": "function",
+   "name": "renderJenkinsOverview",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    406,
+    463
+   ],
+   "summary": "Renderiza a visão geral do Jenkins com jobs, atividade recente e inspetor.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "dashboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsPipelinesView",
+   "type": "function",
+   "name": "renderJenkinsPipelinesView",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    472,
+    497
+   ],
+   "summary": "Renderiza a visão de pipelines com navegação lateral, tabela de jobs e inspetor.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "ci-cd"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildsView",
+   "type": "function",
+   "name": "renderJenkinsBuildsView",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    499,
+    524
+   ],
+   "summary": "Renderiza a visão de builds do job selecionado com tabela e painel de logs.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "ci-cd"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsSplit",
+   "type": "function",
+   "name": "jenkinsSplit",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    526,
+    544
+   ],
+   "summary": "Calcula as larguras das colunas esquerda, central e direita da aba Jenkins.",
+   "tags": [
+    "jenkins",
+    "layout",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsSideNav",
+   "type": "function",
+   "name": "renderJenkinsSideNav",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    546,
+    592
+   ],
+   "summary": "Renderiza a navegação lateral de jobs do Jenkins.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "navigation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsJobTable",
+   "type": "function",
+   "name": "renderJenkinsJobTable",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    594,
+    631
+   ],
+   "summary": "Renderiza a tabela de jobs com status, último build e duração.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "table"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "type": "function",
+   "name": "renderJenkinsBuildTable",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    633,
+    676
+   ],
+   "summary": "Renderiza a tabela de builds com status, duração e tempo decorrido.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "table"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "type": "function",
+   "name": "renderJenkinsActivityPane",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    680,
+    730
+   ],
+   "summary": "Desenha sparkline de duração e linha de status dos builds recentes.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "chart"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsBuildsForChart",
+   "type": "function",
+   "name": "jenkinsBuildsForChart",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    732,
+    754
+   ],
+   "summary": "Seleciona os builds mais recentes que cabem no gráfico de atividade.",
+   "tags": [
+    "jenkins",
+    "chart",
+    "data"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsDurationSparkline",
+   "type": "function",
+   "name": "jenkinsDurationSparkline",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    756,
+    798
+   ],
+   "summary": "Gera uma sparkline das durações dos builds normalizadas pelo máximo.",
+   "tags": [
+    "jenkins",
+    "chart",
+    "sparkline"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsStatusSparkline",
+   "type": "function",
+   "name": "jenkinsStatusSparkline",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    800,
+    817
+   ],
+   "summary": "Gera uma linha de glifos coloridos com o status de cada build recente.",
+   "tags": [
+    "jenkins",
+    "chart",
+    "sparkline"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsDurationBars",
+   "type": "function",
+   "name": "jenkinsDurationBars",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    819,
+    861
+   ],
+   "summary": "Gera barras verticais multilinha das durações dos builds coloridas por status.",
+   "tags": [
+    "jenkins",
+    "chart",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsLogsPane",
+   "type": "function",
+   "name": "renderJenkinsLogsPane",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    863,
+    894
+   ],
+   "summary": "Renderiza o painel com o console do build selecionado.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "logs"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "type": "function",
+   "name": "renderJenkinsInspector",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    896,
+    944
+   ],
+   "summary": "Renderiza o inspetor com detalhes do job/build selecionado.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "inspector"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "type": "function",
+   "name": "renderJenkinsSettings",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    946,
+    981
+   ],
+   "summary": "Renderiza o formulário de configurações do Jenkins (URL, usuário, token mascarado, job).",
+   "tags": [
+    "jenkins",
+    "settings",
+    "form"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsSetField",
+   "type": "function",
+   "name": "renderJenkinsSetField",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    983,
+    1003
+   ],
+   "summary": "Renderiza um campo do formulário de configurações com destaque de foco.",
+   "tags": [
+    "jenkins",
+    "form",
+    "component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildDetail",
+   "type": "function",
+   "name": "renderJenkinsBuildDetail",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1005,
+    1032
+   ],
+   "summary": "Renderiza o detalhe em tela cheia de um build com seu console.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "logs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:handleJenkinsKeys",
+   "type": "function",
+   "name": "handleJenkinsKeys",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1034,
+    1117
+   ],
+   "summary": "Trata as teclas da aba Jenkins: navegação, troca de visão, disparar/parar/rebuild e abrir configurações.",
+   "tags": [
+    "jenkins",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:handleJenkinsBuildDetailKeys",
+   "type": "function",
+   "name": "handleJenkinsBuildDetailKeys",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1119,
+    1143
+   ],
+   "summary": "Trata as teclas na tela de detalhe de build (rolagem, voltar).",
+   "tags": [
+    "jenkins",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsMove",
+   "type": "function",
+   "name": "jenkinsMove",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1145,
+    1183
+   ],
+   "summary": "Move a seleção na lista ativa (jobs ou builds) e dispara recarga quando necessário.",
+   "tags": [
+    "jenkins",
+    "navigation",
+    "selection"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsTrigger",
+   "type": "function",
+   "name": "jenkinsTrigger",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1185,
+    1201
+   ],
+   "summary": "Dispara um novo build do job selecionado via cliente Jenkins.",
+   "tags": [
+    "jenkins",
+    "ci-cd",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsStop",
+   "type": "function",
+   "name": "jenkinsStop",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1203,
+    1220
+   ],
+   "summary": "Interrompe o build em execução selecionado via cliente Jenkins.",
+   "tags": [
+    "jenkins",
+    "ci-cd",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsTestConnection",
+   "type": "function",
+   "name": "jenkinsTestConnection",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1226,
+    1243
+   ],
+   "summary": "Testa a conexão com o servidor Jenkins usando o rascunho das configurações.",
+   "tags": [
+    "jenkins",
+    "network",
+    "settings"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:updateJenkinsSettings",
+   "type": "function",
+   "name": "updateJenkinsSettings",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1245,
+    1309
+   ],
+   "summary": "Trata a edição do formulário de configurações do Jenkins (foco, texto, salvar, testar).",
+   "tags": [
+    "jenkins",
+    "settings",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsSetText",
+   "type": "function",
+   "name": "jenkinsSetText",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1311,
+    1326
+   ],
+   "summary": "Retorna o texto do campo de configuração em foco.",
+   "tags": [
+    "jenkins",
+    "settings",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:setJenkinsSetText",
+   "type": "function",
+   "name": "setJenkinsSetText",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1328,
+    1341
+   ],
+   "summary": "Atualiza o texto do campo de configuração em foco.",
+   "tags": [
+    "jenkins",
+    "settings",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsSetFocusField",
+   "type": "function",
+   "name": "jenkinsSetFocusField",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1343,
+    1352
+   ],
+   "summary": "Muda o campo em foco no formulário de configurações do Jenkins.",
+   "tags": [
+    "jenkins",
+    "settings",
+    "focus"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:saveJenkinsSettings",
+   "type": "function",
+   "name": "saveJenkinsSettings",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1354,
+    1377
+   ],
+   "summary": "Persiste a configuração Jenkins do projeto e reabre o cliente.",
+   "tags": [
+    "jenkins",
+    "settings",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsStatusDot",
+   "type": "function",
+   "name": "jenkinsStatusDot",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1379,
+    1392
+   ],
+   "summary": "Renderiza o indicador de status animado (pulsando) de um build/job.",
+   "tags": [
+    "jenkins",
+    "rendering",
+    "animation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab.go:jenkinsStatusStyled",
+   "type": "function",
+   "name": "jenkinsStatusStyled",
+   "filePath": "internal/ui/jenkins_tab.go",
+   "lineRange": [
+    1394,
+    1405
+   ],
+   "summary": "Aplica cor e rótulo ao texto de status do Jenkins.",
+   "tags": [
+    "jenkins",
+    "styling",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/jenkins_tab_test.go",
+   "type": "file",
+   "name": "jenkins_tab_test.go",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "summary": "Testes do módulo Jenkins: presença nas abas e sidebar, landing, configurações, pipelines, gráfico de atividade e mascaramento do token.",
+   "tags": [
+    "test",
+    "jenkins",
+    "ci-cd"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestAllTabsIncludesJenkins",
+   "type": "function",
+   "name": "TestAllTabsIncludesJenkins",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Verifica que a lista de abas inclui o Jenkins.",
+   "tags": [
+    "test",
+    "jenkins",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestJenkinsLandingAndOpen",
+   "type": "function",
+   "name": "TestJenkinsLandingAndOpen",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    36,
+    52
+   ],
+   "summary": "Testa a landing do Jenkins e a abertura do módulo.",
+   "tags": [
+    "test",
+    "jenkins",
+    "landing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "type": "function",
+   "name": "TestJenkinsSettingsNoPanic",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    54,
+    73
+   ],
+   "summary": "Garante que as configurações do Jenkins renderizam sem panic.",
+   "tags": [
+    "test",
+    "jenkins",
+    "settings"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestJenkinsPipelinesRender",
+   "type": "function",
+   "name": "TestJenkinsPipelinesRender",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    75,
+    96
+   ],
+   "summary": "Testa a renderização da visão de pipelines.",
+   "tags": [
+    "test",
+    "jenkins",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestJenkinsActivityChart",
+   "type": "function",
+   "name": "TestJenkinsActivityChart",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    98,
+    110
+   ],
+   "summary": "Testa o gráfico de atividade de builds.",
+   "tags": [
+    "test",
+    "jenkins",
+    "chart"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jenkins_tab_test.go:TestJenkinsTokenMaskedInSettings",
+   "type": "function",
+   "name": "TestJenkinsTokenMaskedInSettings",
+   "filePath": "internal/ui/jenkins_tab_test.go",
+   "lineRange": [
+    112,
+    125
+   ],
+   "summary": "Garante que o token do Jenkins é mascarado nas configurações.",
+   "tags": [
+    "test",
+    "jenkins",
+    "security"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/json_tab.go",
+   "type": "file",
+   "name": "json_tab.go",
+   "filePath": "internal/ui/json_tab.go",
+   "summary": "Ferramenta JSON da TUI: editor de entrada, ações (pretty, minify, sort, strip nulls, diff, conversão YAML/TOML/XML), busca de chaves e integração com a área de transferência.",
+   "tags": [
+    "json",
+    "tool",
+    "editor",
+    "clipboard"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:openJsonClient",
+   "type": "function",
+   "name": "openJsonClient",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    30,
+    45
+   ],
+   "summary": "Inicializa a ferramenta JSON, preparando editor de entrada e estado do resultado.",
+   "tags": [
+    "json",
+    "lifecycle",
+    "tool"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonLanding",
+   "type": "function",
+   "name": "renderJsonLanding",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    57,
+    68
+   ],
+   "summary": "Renderiza a landing da ferramenta JSON.",
+   "tags": [
+    "json",
+    "rendering",
+    "landing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonTab",
+   "type": "function",
+   "name": "renderJsonTab",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    70,
+    101
+   ],
+   "summary": "Renderiza a ferramenta JSON completa: cabeçalho, cards de estatística, trilho de ações e painéis de entrada/saída.",
+   "tags": [
+    "json",
+    "rendering",
+    "component"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonHeader",
+   "type": "function",
+   "name": "renderJsonHeader",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    103,
+    120
+   ],
+   "summary": "Renderiza o cabeçalho da ferramenta JSON com formato detectado e status.",
+   "tags": [
+    "json",
+    "rendering",
+    "header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonStatsCards",
+   "type": "function",
+   "name": "renderJsonStatsCards",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    122,
+    153
+   ],
+   "summary": "Renderiza cards com bytes, linhas, chaves e validade do documento.",
+   "tags": [
+    "json",
+    "rendering",
+    "metrics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:jsonDocStats",
+   "type": "function",
+   "name": "jsonDocStats",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    172,
+    181
+   ],
+   "summary": "Calcula bytes, linhas, número de chaves e validade de um documento JSON.",
+   "tags": [
+    "json",
+    "metrics",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonActionRail",
+   "type": "function",
+   "name": "renderJsonActionRail",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    183,
+    210
+   ],
+   "summary": "Renderiza o trilho lateral de ações disponíveis (pretty, minify, sort, converter...).",
+   "tags": [
+    "json",
+    "rendering",
+    "keybindings"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonPane",
+   "type": "function",
+   "name": "renderJsonPane",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    212,
+    250
+   ],
+   "summary": "Renderiza um painel de entrada ou saída com rolagem, foco e modo edição.",
+   "tags": [
+    "json",
+    "rendering",
+    "component"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:renderJsonMultilineEdit",
+   "type": "function",
+   "name": "renderJsonMultilineEdit",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    252,
+    316
+   ],
+   "summary": "Renderiza o conteúdo multilinha em edição com cursor, seleção e realce JSON.",
+   "tags": [
+    "json",
+    "editor",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:jsonSelRange",
+   "type": "function",
+   "name": "jsonSelRange",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    322,
+    334
+   ],
+   "summary": "Calcula o intervalo de seleção do editor JSON.",
+   "tags": [
+    "json",
+    "selection",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:jsonDeleteSelection",
+   "type": "function",
+   "name": "jsonDeleteSelection",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    336,
+    352
+   ],
+   "summary": "Remove a seleção atual no editor JSON.",
+   "tags": [
+    "json",
+    "selection",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:handleJsonKeys",
+   "type": "function",
+   "name": "handleJsonKeys",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    354,
+    400
+   ],
+   "summary": "Trata as teclas da ferramenta JSON: foco de painel, ações, busca, copiar/colar e sair.",
+   "tags": [
+    "json",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:updateJsonSearch",
+   "type": "function",
+   "name": "updateJsonSearch",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    410,
+    440
+   ],
+   "summary": "Trata o prompt de busca de chaves no documento JSON.",
+   "tags": [
+    "json",
+    "search",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:updateJsonEdit",
+   "type": "function",
+   "name": "updateJsonEdit",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    442,
+    649
+   ],
+   "summary": "Editor completo do JSON no modo edição: navegação, seleção, palavras, colar e desfazer.",
+   "tags": [
+    "json",
+    "editor",
+    "event-handler"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:runJsonAction",
+   "type": "function",
+   "name": "runJsonAction",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    651,
+    697
+   ],
+   "summary": "Executa a ação JSON correspondente à tecla (pretty, minify, sort keys, validar, diff, converter formato).",
+   "tags": [
+    "json",
+    "action",
+    "transformation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:setJsonResult",
+   "type": "function",
+   "name": "setJsonResult",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    704,
+    718
+   ],
+   "summary": "Grava o resultado/estado/erro de uma ação JSON na saída.",
+   "tags": [
+    "json",
+    "state",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:copyJsonOutput",
+   "type": "function",
+   "name": "copyJsonOutput",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    720,
+    733
+   ],
+   "summary": "Copia a saída JSON para a área de transferência e reporta o status.",
+   "tags": [
+    "json",
+    "clipboard",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "function",
+   "name": "copyToClipboard",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    735,
+    759
+   ],
+   "summary": "Copia texto para a área de transferência usando wl-copy, xclip, xsel ou pbcopy conforme disponível.",
+   "tags": [
+    "clipboard",
+    "os-integration",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab.go:readClipboard",
+   "type": "function",
+   "name": "readClipboard",
+   "filePath": "internal/ui/json_tab.go",
+   "lineRange": [
+    761,
+    784
+   ],
+   "summary": "Lê texto da área de transferência via ferramentas do sistema (wl-paste, xclip, xsel, pbpaste).",
+   "tags": [
+    "clipboard",
+    "os-integration",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/json_tab_test.go",
+   "type": "file",
+   "name": "json_tab_test.go",
+   "filePath": "internal/ui/json_tab_test.go",
+   "summary": "Testes da ferramenta JSON: ausência na navegação, entrar/sair, ação pretty, seleção e dashboard.",
+   "tags": [
+    "test",
+    "json",
+    "editor"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/json_tab_test.go:TestJSONNotInNav",
+   "type": "function",
+   "name": "TestJSONNotInNav",
+   "filePath": "internal/ui/json_tab_test.go",
+   "lineRange": [
+    11,
+    20
+   ],
+   "summary": "Garante que a ferramenta JSON não aparece na navegação principal.",
+   "tags": [
+    "test",
+    "json",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestJsonLandingEnterAndEsc",
+   "filePath": "internal/ui/json_tab_test.go",
+   "lineRange": [
+    22,
+    50
+   ],
+   "summary": "Testa entrar e sair da ferramenta JSON via landing.",
+   "tags": [
+    "test",
+    "json",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab_test.go:TestJsonShiftSelectAndCtrlWord",
+   "type": "function",
+   "name": "TestJsonShiftSelectAndCtrlWord",
+   "filePath": "internal/ui/json_tab_test.go",
+   "lineRange": [
+    60,
+    84
+   ],
+   "summary": "Testa seleção com shift e navegação por palavra no editor JSON.",
+   "tags": [
+    "test",
+    "json",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab_test.go:TestSidebarHidesJSON",
+   "type": "function",
+   "name": "TestSidebarHidesJSON",
+   "filePath": "internal/ui/json_tab_test.go",
+   "lineRange": [
+    86,
+    95
+   ],
+   "summary": "Garante que a sidebar oculta a ferramenta JSON.",
+   "tags": [
+    "test",
+    "json",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/json_tab_test.go:TestJsonClientDashboard",
+   "type": "function",
+   "name": "TestJsonClientDashboard",
+   "filePath": "internal/ui/json_tab_test.go",
+   "lineRange": [
+    97,
+    110
+   ],
+   "summary": "Testa o dashboard da ferramenta JSON.",
+   "tags": [
+    "test",
+    "json",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/jwt_tab.go",
+   "type": "file",
+   "name": "jwt_tab.go",
+   "filePath": "internal/ui/jwt_tab.go",
+   "summary": "Ferramenta JWT da TUI: decodificar, verificar, assinar e gerar tokens com seleção de algoritmo, segredo mascarado, coloração das partes e cópia para a área de transferência.",
+   "tags": [
+    "jwt",
+    "security",
+    "tool",
+    "crypto"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:openJwtClient",
+   "type": "function",
+   "name": "openJwtClient",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    31,
+    54
+   ],
+   "summary": "Inicializa a ferramenta JWT com token de exemplo ou em cache e decodifica para a saída.",
+   "tags": [
+    "jwt",
+    "lifecycle",
+    "security"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtLanding",
+   "type": "function",
+   "name": "renderJwtLanding",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    73,
+    83
+   ],
+   "summary": "Renderiza a landing da ferramenta JWT.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "landing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtTab",
+   "type": "function",
+   "name": "renderJwtTab",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    85,
+    116
+   ],
+   "summary": "Renderiza a ferramenta JWT completa: cabeçalho, algoritmos, cards, segredo, trilho de ações e painéis.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "component"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtHeader",
+   "type": "function",
+   "name": "renderJwtHeader",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    118,
+    135
+   ],
+   "summary": "Renderiza o cabeçalho da ferramenta JWT com status do token.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtAlgBar",
+   "type": "function",
+   "name": "renderJwtAlgBar",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    137,
+    149
+   ],
+   "summary": "Renderiza a barra de seleção de algoritmo de assinatura.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "crypto"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtStatsCards",
+   "type": "function",
+   "name": "renderJwtStatsCards",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    151,
+    171
+   ],
+   "summary": "Renderiza cards com algoritmo, expiração e claims do token.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "metrics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtTokenInfo",
+   "type": "function",
+   "name": "jwtTokenInfo",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    179,
+    216
+   ],
+   "summary": "Extrai informações resumidas do token atual (algoritmo, expiração, número de claims).",
+   "tags": [
+    "jwt",
+    "parsing",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtExpSeconds",
+   "type": "function",
+   "name": "jwtExpSeconds",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    218,
+    229
+   ],
+   "summary": "Converte o claim 'exp' (número ou string) em segundos Unix.",
+   "tags": [
+    "jwt",
+    "parsing",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtSecretBox",
+   "type": "function",
+   "name": "renderJwtSecretBox",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    231,
+    273
+   ],
+   "summary": "Renderiza a caixa do segredo de assinatura, mascarado fora da edição.",
+   "tags": [
+    "jwt",
+    "security",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtMaskSecret",
+   "type": "function",
+   "name": "jwtMaskSecret",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    275,
+    284
+   ],
+   "summary": "Mascara o segredo JWT para exibição, mantendo só a largura disponível.",
+   "tags": [
+    "jwt",
+    "security",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtActionRail",
+   "type": "function",
+   "name": "renderJwtActionRail",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    286,
+    317
+   ],
+   "summary": "Renderiza o trilho de ações JWT (decodificar, verificar, assinar, gerar, copiar, exportar).",
+   "tags": [
+    "jwt",
+    "rendering",
+    "keybindings"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtInputPane",
+   "type": "function",
+   "name": "renderJwtInputPane",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    319,
+    344
+   ],
+   "summary": "Renderiza o painel de entrada do token com edição e rolagem horizontal.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtOutputPane",
+   "type": "function",
+   "name": "renderJwtOutputPane",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    346,
+    360
+   ],
+   "summary": "Renderiza o painel de saída com o JSON decodificado ou resultado da ação.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:renderJwtStaticLines",
+   "type": "function",
+   "name": "renderJwtStaticLines",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    362,
+    401
+   ],
+   "summary": "Renderiza linhas estáticas com rolagem vertical/horizontal e coloração opcional das partes do JWT.",
+   "tags": [
+    "jwt",
+    "rendering",
+    "scroll"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:colorJWTVisible",
+   "type": "function",
+   "name": "colorJWTVisible",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    407,
+    426
+   ],
+   "summary": "Colore as três partes (header, payload, assinatura) de um token JWT visível.",
+   "tags": [
+    "jwt",
+    "syntax-highlight",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:handleJwtKeys",
+   "type": "function",
+   "name": "handleJwtKeys",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    428,
+    490
+   ],
+   "summary": "Trata as teclas da ferramenta JWT: foco, edição, ações, algoritmo e rolagem.",
+   "tags": [
+    "jwt",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtScrollDelta",
+   "type": "function",
+   "name": "jwtScrollDelta",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    492,
+    501
+   ],
+   "summary": "Rola verticalmente o painel em foco da ferramenta JWT.",
+   "tags": [
+    "jwt",
+    "scroll",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtHScrollDelta",
+   "type": "function",
+   "name": "jwtHScrollDelta",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    503,
+    513
+   ],
+   "summary": "Rola horizontalmente o painel em foco da ferramenta JWT.",
+   "tags": [
+    "jwt",
+    "scroll",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:jwtSetHScroll",
+   "type": "function",
+   "name": "jwtSetHScroll",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    515,
+    524
+   ],
+   "summary": "Define a rolagem horizontal do painel em foco com limites.",
+   "tags": [
+    "jwt",
+    "scroll",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:cycleJwtAlg",
+   "type": "function",
+   "name": "cycleJwtAlg",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    526,
+    538
+   ],
+   "summary": "Alterna o algoritmo de assinatura JWT selecionado.",
+   "tags": [
+    "jwt",
+    "crypto",
+    "selection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:updateJwtEdit",
+   "type": "function",
+   "name": "updateJwtEdit",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    540,
+    578
+   ],
+   "summary": "Trata a edição de texto dos campos da ferramenta JWT (token e segredo).",
+   "tags": [
+    "jwt",
+    "editor",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:runJwtGenerate",
+   "type": "function",
+   "name": "runJwtGenerate",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    594,
+    604
+   ],
+   "summary": "Gera claims de exemplo, assina e coloca o novo token na entrada.",
+   "tags": [
+    "jwt",
+    "crypto",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "type": "function",
+   "name": "runJwtSign",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    606,
+    628
+   ],
+   "summary": "Assina o payload atual com o segredo e algoritmo selecionados.",
+   "tags": [
+    "jwt",
+    "crypto",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:runJwtCopyClaims",
+   "type": "function",
+   "name": "runJwtCopyClaims",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    630,
+    652
+   ],
+   "summary": "Copia os claims decodificados do token para a área de transferência.",
+   "tags": [
+    "jwt",
+    "clipboard",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:runJwtCopyToken",
+   "type": "function",
+   "name": "runJwtCopyToken",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    661,
+    676
+   ],
+   "summary": "Copia o token atual para a área de transferência.",
+   "tags": [
+    "jwt",
+    "clipboard",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:runJwtCopyResult",
+   "type": "function",
+   "name": "runJwtCopyResult",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    678,
+    692
+   ],
+   "summary": "Copia o resultado da última ação JWT para a área de transferência.",
+   "tags": [
+    "jwt",
+    "clipboard",
+    "action"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:extractJWT",
+   "type": "function",
+   "name": "extractJWT",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    703,
+    720
+   ],
+   "summary": "Extrai um token JWT de um texto arbitrário (ex.: header Authorization: Bearer).",
+   "tags": [
+    "jwt",
+    "parsing",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab.go:setJwtResult",
+   "type": "function",
+   "name": "setJwtResult",
+   "filePath": "internal/ui/jwt_tab.go",
+   "lineRange": [
+    739,
+    753
+   ],
+   "summary": "Grava o resultado/status/erro de uma ação JWT na saída.",
+   "tags": [
+    "jwt",
+    "state",
+    "utility"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:openJenkinsClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:loadJenkinsSettingsDraft",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:refreshJenkins",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:scheduleJenkinsTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:handleJenkinsMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsSelectedBuildNum",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsOverview",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsPipelinesView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildsView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsSplit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsSideNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsJobTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsBuildsForChart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsDurationSparkline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsStatusSparkline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsDurationBars",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsLogsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsSetField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:handleJenkinsKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:handleJenkinsBuildDetailKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsTrigger",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsStop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsTestConnection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:updateJenkinsSettings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsSetText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:setJenkinsSetText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsSetFocusField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:saveJenkinsSettings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsStatusDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "function:internal/ui/jenkins_tab.go:jenkinsStatusStyled",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestAllTabsIncludesJenkins",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestAllTabsIncludesJenkins",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsLandingAndOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsLandingAndOpen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsPipelinesRender",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsPipelinesRender",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsActivityChart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsActivityChart",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsTokenMaskedInSettings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "function:internal/ui/jenkins_tab_test.go:TestJenkinsTokenMaskedInSettings",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:openJsonClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonStatsCards",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:jsonDocStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonActionRail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:renderJsonMultilineEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:jsonSelRange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:jsonDeleteSelection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:handleJsonKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:updateJsonSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:updateJsonEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:runJsonAction",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:setJsonResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:copyJsonOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "function:internal/ui/json_tab.go:readClipboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJSONNotInNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJSONNotInNav",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonShiftSelectAndCtrlWord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonShiftSelectAndCtrlWord",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestSidebarHidesJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestSidebarHidesJSON",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonClientDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "function:internal/ui/json_tab_test.go:TestJsonClientDashboard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:openJwtClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtAlgBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtStatsCards",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtTokenInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtExpSeconds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtSecretBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtMaskSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtActionRail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtInputPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtOutputPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtStaticLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:colorJWTVisible",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:handleJwtKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtScrollDelta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtHScrollDelta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:jwtSetHScroll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:cycleJwtAlg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:updateJwtEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:runJwtGenerate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:runJwtCopyClaims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:runJwtCopyToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:runJwtCopyResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:extractJWT",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "function:internal/ui/jwt_tab.go:setJwtResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/jenkinsutil/client.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/jenkinsutil/client_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/jenkinsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/jenkinsutil/client.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/jenkinsutil/client_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab_test.go",
+   "target": "file:internal/jenkinsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/jsonutil/jsonutil.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/jsonutil/jsonutil_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/json_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/jwtutil/jwtutil.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/jwtutil/jwtutil_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:loadJenkinsSettingsDraft",
+   "target": "function:internal/jenkinsutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:refreshJenkins",
+   "target": "function:internal/jenkinsutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:refreshJenkins",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsHeader",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsNav",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsOverview",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsSideNav",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsJobTable",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "target": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "target": "function:internal/jenkinsutil/client.go:FormatAgo",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildTable",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "target": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsDurationSparkline",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsStatusSparkline",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsDurationBars",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsLogsPane",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "target": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "target": "function:internal/jenkinsutil/client.go:FormatAgo",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsInspector",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "target": "function:internal/jenkinsutil/config.go:MaskToken",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:renderJenkinsBuildDetail",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsTrigger",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsTrigger",
+   "target": "function:internal/jenkinsutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsStop",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsStop",
+   "target": "function:internal/jenkinsutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:jenkinsTestConnection",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab.go:saveJenkinsSettings",
+   "target": "function:internal/jenkinsutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsLandingAndOpen",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsLandingAndOpen",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "target": "function:internal/ui/jenkins_tab.go:loadJenkinsSettingsDraft",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsSettingsNoPanic",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsPipelinesRender",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsPipelinesRender",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsActivityChart",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsActivityChart",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsActivityPane",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsTokenMaskedInSettings",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jenkins_tab_test.go:TestJenkinsTokenMaskedInSettings",
+   "target": "function:internal/ui/jenkins_tab.go:renderJenkinsSettings",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:renderJsonHeader",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:jsonDocStats",
+   "target": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:renderJsonActionRail",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:renderJsonPane",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:updateJsonSearch",
+   "target": "function:internal/jsonutil/jsonutil.go:SearchKey",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:updateJsonEdit",
+   "target": "function:internal/ui/editor.go:move",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:Pretty",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:Minify",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:SortKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab.go:runJsonAction",
+   "target": "function:internal/jsonutil/jsonutil.go:DiffText",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "target": "function:internal/ui/json_tab.go:renderJsonLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonLandingEnterAndEsc",
+   "target": "function:internal/ui/json_tab.go:handleJsonKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonShiftSelectAndCtrlWord",
+   "target": "function:internal/ui/json_tab.go:updateJsonEdit",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonShiftSelectAndCtrlWord",
+   "target": "function:internal/ui/json_tab.go:jsonSelRange",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestSidebarHidesJSON",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonClientDashboard",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/json_tab_test.go:TestJsonClientDashboard",
+   "target": "function:internal/ui/json_tab.go:renderJsonTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:openJwtClient",
+   "target": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtHeader",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtAlgBar",
+   "target": "function:internal/jwtutil/jwtutil.go:Algs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:jwtTokenInfo",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtSecretBox",
+   "target": "function:internal/ui/editor.go:renderEditorLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtSecretBox",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtSecretBox",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtActionRail",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtInputPane",
+   "target": "function:internal/ui/editor.go:renderEditorLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtInputPane",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:renderJwtOutputPane",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:jwtHScrollDelta",
+   "target": "function:internal/ui/editor.go:hScrollDelta",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:cycleJwtAlg",
+   "target": "function:internal/jwtutil/jwtutil.go:Algs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:updateJwtEdit",
+   "target": "function:internal/ui/editor.go:editorApplyKey",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtGenerate",
+   "target": "function:internal/jwtutil/jwtutil.go:GenerateClaims",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "target": "function:internal/jwtutil/jwtutil.go:Sign",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "target": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtCopyClaims",
+   "target": "function:internal/jwtutil/jwtutil.go:ClaimsJSON",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtCopyClaims",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtCopyToken",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab.go:runJwtCopyResult",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jenkins_tab.go",
+   "target": "file:internal/ui/jenkins_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/json_tab.go",
+   "target": "file:internal/ui/json_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/jwt_tab.go",
+   "target": "file:internal/ui/jwt_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

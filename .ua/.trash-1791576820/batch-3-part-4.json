@@ -1,0 +1,1136 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_cube.go",
+   "type": "file",
+   "name": "relax_cube.go",
+   "filePath": "internal/ui/relax_cube.go",
+   "summary": "Cena Relax de cubo mágico 3D em Braille: 27 cubinhos com adesivos, giro de camada animado e projeção em perspectiva; embaralha registrando os movimentos e os desfaz em ordem inversa.",
+   "tags": [
+    "relax",
+    "animacao",
+    "3d",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:relaxCubeInit",
+   "type": "function",
+   "name": "relaxCubeInit",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    85,
+    107
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena cubo mágico para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:relaxCubeRot",
+   "type": "function",
+   "name": "relaxCubeRot",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    110,
+    119
+   ],
+   "summary": "Gira um vetor inteiro 90° em torno de um eixo.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:relaxCubeApply",
+   "type": "function",
+   "name": "relaxCubeApply",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    132,
+    145
+   ],
+   "summary": "Consuma um giro de camada movendo cubinhos e reorientando adesivos.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:stepRelaxCube",
+   "type": "function",
+   "name": "stepRelaxCube",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    147,
+    201
+   ],
+   "summary": "Avança um passo da simulação da cena cubo mágico, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:relaxCubeSolved",
+   "type": "function",
+   "name": "relaxCubeSolved",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    205,
+    214
+   ],
+   "summary": "Verifica se todos os adesivos voltaram às faces de origem.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cube.go:relaxCubeFrames",
+   "type": "function",
+   "name": "relaxCubeFrames",
+   "filePath": "internal/ui/relax_cube.go",
+   "lineRange": [
+    224,
+    326
+   ],
+   "summary": "Renderiza um quadro da cena cubo mágico no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_dragon.go",
+   "type": "file",
+   "name": "relax_dragon.go",
+   "filePath": "internal/ui/relax_dragon.go",
+   "summary": "Cena Relax de dragão batendo asa contra a lua: anatomia procedural (tronco, pescoço, cabeça, cauda, asas com dedos e membrana) em curvas com espessura, golpe de asa assimétrico, jato de fogo, brasas, morros, nuvens e estrelas.",
+   "tags": [
+    "relax",
+    "animacao",
+    "procedural",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgTube",
+   "type": "function",
+   "name": "dgTube",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    180,
+    199
+   ],
+   "summary": "Desenha um segmento do corpo (pescoço, tronco, cauda, perna) como fila de seções perpendiculares à curva.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgScaleTone",
+   "type": "function",
+   "name": "dgScaleTone",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    217,
+    231
+   ],
+   "summary": "Resolve o tom do couro: dorso iluminado pela lua, barriga em contraluz e textura de escamas.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawWing",
+   "type": "function",
+   "name": "dgDrawWing",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    283,
+    373
+   ],
+   "summary": "Desenha uma asa inteira com braço, dedos e membrana em leque de triângulos.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgFireEnv",
+   "type": "function",
+   "name": "dgFireEnv",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    397,
+    409
+   ],
+   "summary": "Envelope de intensidade do jato de fogo ao longo do tempo.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgJawEnv",
+   "type": "function",
+   "name": "dgJawEnv",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    413,
+    425
+   ],
+   "summary": "Envelope de abertura da mandíbula, antes e depois do jato de fogo.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:stepRelaxDragon",
+   "type": "function",
+   "name": "stepRelaxDragon",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    496,
+    589
+   ],
+   "summary": "Avança um passo da simulação da cena dragão batendo asa, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:relaxDragonInit",
+   "type": "function",
+   "name": "relaxDragonInit",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    591,
+    618
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena dragão batendo asa para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgPoseAt",
+   "type": "function",
+   "name": "dgPoseAt",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    640,
+    666
+   ],
+   "summary": "Resolve a pose do esqueleto no instante de render, extrapolando a fase da asa.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:relaxDragonFrames",
+   "type": "function",
+   "name": "relaxDragonFrames",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    678,
+    698
+   ],
+   "summary": "Renderiza um quadro da cena dragão batendo asa no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:relaxDragonScene",
+   "type": "function",
+   "name": "relaxDragonScene",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    703,
+    745
+   ],
+   "summary": "Monta o quadro do dragão da frente para o fundo: corpo, fogo, brasas, morros, nuvens, lua e estrelas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawTrunk",
+   "type": "function",
+   "name": "dgDrawTrunk",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    757,
+    816
+   ],
+   "summary": "Desenha tronco, cauda, pernas e crista de espinhos.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawHead",
+   "type": "function",
+   "name": "dgDrawHead",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    820,
+    889
+   ],
+   "summary": "Desenha pescoço, cabeça, chifres, queixo e olho.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawFire",
+   "type": "function",
+   "name": "dgDrawFire",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    894,
+    942
+   ],
+   "summary": "Desenha o jato de fogo em ASCII por célula com halo Braille.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawEmbers",
+   "type": "function",
+   "name": "dgDrawEmbers",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    946,
+    967
+   ],
+   "summary": "Desenha brasas, fumaça e as letras do rugido.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawHills",
+   "type": "function",
+   "name": "dgDrawHills",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    971,
+    995
+   ],
+   "summary": "Desenha duas cadeias de morros com três harmônicas.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawClouds",
+   "type": "function",
+   "name": "dgDrawClouds",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    999,
+    1028
+   ],
+   "summary": "Desenha faixas de nuvem em meio-tom andando em função do tempo.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawMoon",
+   "type": "function",
+   "name": "dgDrawMoon",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    1031,
+    1055
+   ],
+   "summary": "Desenha o disco da lua com halo, que dá o contraluz.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_dragon.go:dgDrawStars",
+   "type": "function",
+   "name": "dgDrawStars",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    1059,
+    1075
+   ],
+   "summary": "Desenha o céu estrelado piscando.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_dragon.go:dgCanvas",
+   "type": "class",
+   "name": "dgCanvas",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    109,
+    114
+   ],
+   "summary": "Canvas do dragão que combina buffer Braille e camada de caracteres para fogo, brasas e estrelas.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_dragon.go:relaxDragonState",
+   "type": "class",
+   "name": "relaxDragonState",
+   "filePath": "internal/ui/relax_dragon.go",
+   "lineRange": [
+    471,
+    494
+   ],
+   "summary": "Estado mutável da cena dragão batendo asa: entidades, contadores e parâmetros sorteados do ciclo atual.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_drop.go",
+   "type": "file",
+   "name": "relax_drop.go",
+   "filePath": "internal/ui/relax_drop.go",
+   "summary": "Cena Relax de gota na poça: a gota cai, forma coroa e gera pacotes de onda cuja soma produz interferência real, renderizada pela cor da superfície.",
+   "tags": [
+    "relax",
+    "animacao",
+    "ondas",
+    "cena"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_drop.go:stepRelaxDrop",
+   "type": "function",
+   "name": "stepRelaxDrop",
+   "filePath": "internal/ui/relax_drop.go",
+   "lineRange": [
+    81,
+    136
+   ],
+   "summary": "Avança um passo da simulação da cena gota na poça, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_drop.go:relaxDropFrames",
+   "type": "function",
+   "name": "relaxDropFrames",
+   "filePath": "internal/ui/relax_drop.go",
+   "lineRange": [
+    138,
+    154
+   ],
+   "summary": "Renderiza um quadro da cena gota na poça no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_drop.go:relaxDropDraw",
+   "type": "function",
+   "name": "relaxDropDraw",
+   "filePath": "internal/ui/relax_drop.go",
+   "lineRange": [
+    156,
+    228
+   ],
+   "summary": "Desenha a poça somando os pacotes de onda vivos, a gota caindo e a coroa de respingos.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_engine.go",
+   "type": "file",
+   "name": "relax_engine.go",
+   "filePath": "internal/ui/relax_engine.go",
+   "summary": "Motor de animação do Relax: relógio único com passo fixo consumido de um acumulador de tempo real, sub-relógios para física em sub-passos, fade/crossfade global com easing e escurecimento de estilos até a cor de fundo.",
+   "tags": [
+    "service",
+    "animation-engine",
+    "game-loop",
+    "relax",
+    "timing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_engine.go:tick",
+   "type": "function",
+   "name": "tick",
+   "filePath": "internal/ui/relax_engine.go",
+   "lineRange": [
+    50,
+    73
+   ],
+   "summary": "Avança o sub-relógio e devolve quantos sub-passos fixos cabem no tempo decorrido.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_engine.go:advance",
+   "type": "function",
+   "name": "advance",
+   "filePath": "internal/ui/relax_engine.go",
+   "lineRange": [
+    94,
+    134
+   ],
+   "summary": "Consome o tempo real desde o último frame e chama step() o número correto de vezes.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_engine.go:fade",
+   "type": "function",
+   "name": "fade",
+   "filePath": "internal/ui/relax_engine.go",
+   "lineRange": [
+    158,
+    170
+   ],
+   "summary": "Calcula o brilho global (0 a 1) cobrindo entrada da cena e crossfade, com easing.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_engine.go:relaxDim",
+   "type": "function",
+   "name": "relaxDim",
+   "filePath": "internal/ui/relax_engine.go",
+   "lineRange": [
+    186,
+    204
+   ],
+   "summary": "Escurece um estilo interpolando sua cor até o fundo do tema, base do fade e crossfade.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_engine.go:relaxEngine",
+   "type": "class",
+   "name": "relaxEngine",
+   "filePath": "internal/ui/relax_engine.go",
+   "lineRange": [
+    75,
+    86
+   ],
+   "summary": "Motor de animação com acumulador de tempo real, passos fixos de simulação, estado de crossfade e tempo de cena.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_fall.go",
+   "type": "file",
+   "name": "relax_fall.go",
+   "filePath": "internal/ui/relax_fall.go",
+   "summary": "Cena Relax de folhas caindo e pétalas voando: sistema de partículas com dois presets, posições em per-mille, rajadas de vento com easing e física em sub-passos com taxa média de spawn preservada.",
+   "tags": [
+    "relax",
+    "animacao",
+    "particulas",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fall.go:relaxFallSpawn",
+   "type": "function",
+   "name": "relaxFallSpawn",
+   "filePath": "internal/ui/relax_fall.go",
+   "lineRange": [
+    89,
+    117
+   ],
+   "summary": "Cria uma partícula (folha ou pétala) com posição, giro e velocidade sorteados.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fall.go:relaxFallInit",
+   "type": "function",
+   "name": "relaxFallInit",
+   "filePath": "internal/ui/relax_fall.go",
+   "lineRange": [
+    120,
+    129
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena folhas caindo/pétalas voando para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fall.go:relaxFallAdvance",
+   "type": "function",
+   "name": "relaxFallAdvance",
+   "filePath": "internal/ui/relax_fall.go",
+   "lineRange": [
+    135,
+    198
+   ],
+   "summary": "Avança a simulação da cena folhas caindo/pétalas voando por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fall.go:relaxFallFrames",
+   "type": "function",
+   "name": "relaxFallFrames",
+   "filePath": "internal/ui/relax_fall.go",
+   "lineRange": [
+    210,
+    280
+   ],
+   "summary": "Renderiza um quadro da cena folhas caindo/pétalas voando no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_fire.go",
+   "type": "file",
+   "name": "relax_fire.go",
+   "filePath": "internal/ui/relax_fire.go",
+   "summary": "Cena Relax de fogueira: autômato de fogo estilo Doom em subpixels Braille, com calor propagando para cima, decaimento por hash e brasas soltas.",
+   "tags": [
+    "relax",
+    "animacao",
+    "automato-celular",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fire.go:relaxFireBuild",
+   "type": "function",
+   "name": "relaxFireBuild",
+   "filePath": "internal/ui/relax_fire.go",
+   "lineRange": [
+    66,
+    81
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena fogueira para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fire.go:relaxFireTick",
+   "type": "function",
+   "name": "relaxFireTick",
+   "filePath": "internal/ui/relax_fire.go",
+   "lineRange": [
+    95,
+    172
+   ],
+   "summary": "Executa um passo do autômato de fogo: propagação de calor para cima, decaimento por hash e spawn de brasas.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fire.go:relaxFireAdvance",
+   "type": "function",
+   "name": "relaxFireAdvance",
+   "filePath": "internal/ui/relax_fire.go",
+   "lineRange": [
+    178,
+    208
+   ],
+   "summary": "Avança a simulação da cena fogueira por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fire.go:relaxFireFrames",
+   "type": "function",
+   "name": "relaxFireFrames",
+   "filePath": "internal/ui/relax_fire.go",
+   "lineRange": [
+    217,
+    292
+   ],
+   "summary": "Renderiza um quadro da cena fogueira no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:relaxCubeInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:relaxCubeRot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:relaxCubeApply",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:stepRelaxCube",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:relaxCubeSolved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "function:internal/ui/relax_cube.go:relaxCubeFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgTube",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgScaleTone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawWing",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgFireEnv",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgJawEnv",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:stepRelaxDragon",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:relaxDragonInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgPoseAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:relaxDragonFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:relaxDragonScene",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawTrunk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawHead",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawFire",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawEmbers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawHills",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawClouds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawMoon",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "function:internal/ui/relax_dragon.go:dgDrawStars",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "class:internal/ui/relax_dragon.go:dgCanvas",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "class:internal/ui/relax_dragon.go:relaxDragonState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_drop.go",
+   "target": "function:internal/ui/relax_drop.go:stepRelaxDrop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_drop.go",
+   "target": "function:internal/ui/relax_drop.go:relaxDropFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_drop.go",
+   "target": "function:internal/ui/relax_drop.go:relaxDropDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_engine.go",
+   "target": "function:internal/ui/relax_engine.go:tick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_engine.go",
+   "target": "function:internal/ui/relax_engine.go:advance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_engine.go",
+   "target": "function:internal/ui/relax_engine.go:fade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_engine.go",
+   "target": "function:internal/ui/relax_engine.go:relaxDim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_engine.go",
+   "target": "class:internal/ui/relax_engine.go:relaxEngine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fall.go",
+   "target": "function:internal/ui/relax_fall.go:relaxFallSpawn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fall.go",
+   "target": "function:internal/ui/relax_fall.go:relaxFallInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fall.go",
+   "target": "function:internal/ui/relax_fall.go:relaxFallAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fall.go",
+   "target": "function:internal/ui/relax_fall.go:relaxFallFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fire.go",
+   "target": "function:internal/ui/relax_fire.go:relaxFireBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fire.go",
+   "target": "function:internal/ui/relax_fire.go:relaxFireTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fire.go",
+   "target": "function:internal/ui/relax_fire.go:relaxFireAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fire.go",
+   "target": "function:internal/ui/relax_fire.go:relaxFireFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cube.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_dragon.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_drop.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_fall.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_fire.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

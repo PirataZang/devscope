@@ -1,0 +1,2814 @@
+{
+  "scriptCompleted": true,
+  "entryPointCandidates": [
+    {
+      "id": "document:README.md",
+      "score": 5,
+      "name": "README.md",
+      "summary": "README principal do DevScope (\"o htop dos seus projetos\"): instalação via scripts, tour em 30 segundos, recursos de Git e Docker, os 15 módulos, atalhos, preferências, instalação avançada e como funciona."
+    },
+    {
+      "id": "file:cmd/devscope/main.go",
+      "score": 3,
+      "name": "main.go",
+      "summary": "Ponto de entrada do binário devscope: apenas delega para commands.Execute e encerra o processo com código de erro em caso de falha."
+    },
+    {
+      "id": "file:internal/app/app.go",
+      "score": 2,
+      "name": "app.go",
+      "summary": "Ponto de entrada do runtime: redireciona logs, carrega config, cria o StateStore, inicia os collectors e executa a TUI Bubble Tea com tratamento de sinais."
+    },
+    {
+      "id": "file:internal/ui/container_deps.go",
+      "score": 2,
+      "name": "container_deps.go",
+      "summary": "Tela de árvore de dependências entre serviços compose, com status de cada serviço."
+    },
+    {
+      "id": "file:internal/ui/container_images.go",
+      "score": 2,
+      "name": "container_images.go",
+      "summary": "Tela de imagens Docker com escopos (repositório, projeto, todas), tabela e modal de remoção."
+    }
+  ],
+  "fanInRanking": [
+    {
+      "id": "file:internal/core/models.go",
+      "fanIn": 114,
+      "name": "models.go"
+    },
+    {
+      "id": "file:internal/core/state_test.go",
+      "fanIn": 114,
+      "name": "state_test.go"
+    },
+    {
+      "id": "file:internal/core/state.go",
+      "fanIn": 112,
+      "name": "state.go"
+    },
+    {
+      "id": "file:internal/collectors/compose.go",
+      "fanIn": 49,
+      "name": "compose.go"
+    },
+    {
+      "id": "file:internal/collectors/git.go",
+      "fanIn": 48,
+      "name": "git.go"
+    },
+    {
+      "id": "file:internal/collectors/compose_edit.go",
+      "fanIn": 47,
+      "name": "compose_edit.go"
+    },
+    {
+      "id": "file:internal/collectors/docker.go",
+      "fanIn": 47,
+      "name": "docker.go"
+    },
+    {
+      "id": "file:internal/collectors/pm2.go",
+      "fanIn": 47,
+      "name": "pm2.go"
+    },
+    {
+      "id": "file:internal/collectors/compose_presets_test.go",
+      "fanIn": 46,
+      "name": "compose_presets_test.go"
+    },
+    {
+      "id": "file:internal/collectors/gha_test.go",
+      "fanIn": 46,
+      "name": "gha_test.go"
+    },
+    {
+      "id": "file:internal/collectors/git_test.go",
+      "fanIn": 46,
+      "name": "git_test.go"
+    },
+    {
+      "id": "file:internal/collectors/health.go",
+      "fanIn": 46,
+      "name": "health.go"
+    },
+    {
+      "id": "file:internal/collectors/compose_edit_test.go",
+      "fanIn": 45,
+      "name": "compose_edit_test.go"
+    },
+    {
+      "id": "file:internal/collectors/compose_presets.go",
+      "fanIn": 45,
+      "name": "compose_presets.go"
+    },
+    {
+      "id": "file:internal/collectors/compose_test.go",
+      "fanIn": 45,
+      "name": "compose_test.go"
+    },
+    {
+      "id": "file:internal/collectors/database_test.go",
+      "fanIn": 45,
+      "name": "database_test.go"
+    },
+    {
+      "id": "file:internal/collectors/docker_actions.go",
+      "fanIn": 45,
+      "name": "docker_actions.go"
+    },
+    {
+      "id": "file:internal/collectors/docker_detail_test.go",
+      "fanIn": 45,
+      "name": "docker_detail_test.go"
+    },
+    {
+      "id": "file:internal/collectors/docker_hub_test.go",
+      "fanIn": 45,
+      "name": "docker_hub_test.go"
+    },
+    {
+      "id": "file:internal/collectors/docker_stats.go",
+      "fanIn": 45,
+      "name": "docker_stats.go"
+    }
+  ],
+  "fanOutRanking": [
+    {
+      "id": "file:internal/app/app.go",
+      "fanOut": 200,
+      "name": "app.go"
+    },
+    {
+      "id": "file:internal/ui/app.go",
+      "fanOut": 96,
+      "name": "app.go"
+    },
+    {
+      "id": "file:internal/ui/landing_probe.go",
+      "fanOut": 63,
+      "name": "landing_probe.go"
+    },
+    {
+      "id": "file:internal/commands/scan.go",
+      "fanOut": 60,
+      "name": "scan.go"
+    },
+    {
+      "id": "file:internal/ui/containers_tab.go",
+      "fanOut": 55,
+      "name": "containers_tab.go"
+    },
+    {
+      "id": "file:internal/ui/git_tab_test.go",
+      "fanOut": 54,
+      "name": "git_tab_test.go"
+    },
+    {
+      "id": "file:internal/ui/gha_views.go",
+      "fanOut": 53,
+      "name": "gha_views.go"
+    },
+    {
+      "id": "file:internal/ui/git_graph.go",
+      "fanOut": 53,
+      "name": "git_graph.go"
+    },
+    {
+      "id": "file:internal/ui/git_tab.go",
+      "fanOut": 53,
+      "name": "git_tab.go"
+    },
+    {
+      "id": "file:internal/ui/project_sidebar.go",
+      "fanOut": 52,
+      "name": "project_sidebar.go"
+    },
+    {
+      "id": "file:internal/ui/swarm_views.go",
+      "fanOut": 52,
+      "name": "swarm_views.go"
+    },
+    {
+      "id": "file:internal/ui/git_messages.go",
+      "fanOut": 51,
+      "name": "git_messages.go"
+    },
+    {
+      "id": "file:internal/ui/git_prompt.go",
+      "fanOut": 51,
+      "name": "git_prompt.go"
+    },
+    {
+      "id": "file:internal/ui/k8s_tab.go",
+      "fanOut": 51,
+      "name": "k8s_tab.go"
+    },
+    {
+      "id": "file:internal/ui/project_load.go",
+      "fanOut": 51,
+      "name": "project_load.go"
+    },
+    {
+      "id": "file:internal/ui/container_messages.go",
+      "fanOut": 50,
+      "name": "container_messages.go"
+    },
+    {
+      "id": "file:internal/ui/db_tab.go",
+      "fanOut": 50,
+      "name": "db_tab.go"
+    },
+    {
+      "id": "file:internal/ui/gha_detail.go",
+      "fanOut": 50,
+      "name": "gha_detail.go"
+    },
+    {
+      "id": "file:internal/ui/gha_tab_test.go",
+      "fanOut": 50,
+      "name": "gha_tab_test.go"
+    },
+    {
+      "id": "file:internal/ui/graph_features_test.go",
+      "fanOut": 50,
+      "name": "graph_features_test.go"
+    }
+  ],
+  "bfsTraversal": {
+    "startNode": "file:cmd/devscope/main.go",
+    "order": [
+      "file:cmd/devscope/main.go",
+      "file:internal/commands/root.go",
+      "file:internal/commands/scan.go",
+      "file:internal/commands/scan_test.go",
+      "file:internal/app/app.go",
+      "file:pkg/version/version.go",
+      "file:internal/collectors/compose.go",
+      "file:internal/collectors/compose_edit.go",
+      "file:internal/collectors/compose_edit_test.go",
+      "file:internal/collectors/compose_presets.go",
+      "file:internal/collectors/compose_presets_test.go",
+      "file:internal/collectors/compose_test.go",
+      "file:internal/collectors/database.go",
+      "file:internal/collectors/database_test.go",
+      "file:internal/collectors/docker.go",
+      "file:internal/collectors/docker_actions.go",
+      "file:internal/collectors/docker_close_port.go",
+      "file:internal/collectors/docker_deps.go",
+      "file:internal/collectors/docker_detail.go",
+      "file:internal/collectors/docker_detail_test.go",
+      "file:internal/collectors/docker_hub.go",
+      "file:internal/collectors/docker_hub_test.go",
+      "file:internal/collectors/docker_images.go",
+      "file:internal/collectors/docker_stats.go",
+      "file:internal/collectors/docker_stats_test.go",
+      "file:internal/collectors/docker_test.go",
+      "file:internal/collectors/gha.go",
+      "file:internal/collectors/gha_test.go",
+      "file:internal/collectors/git.go",
+      "file:internal/collectors/git_graph.go",
+      "file:internal/collectors/git_test.go",
+      "file:internal/collectors/health.go",
+      "file:internal/collectors/integration_test.go",
+      "file:internal/collectors/k8s.go",
+      "file:internal/collectors/k8s_test.go",
+      "file:internal/collectors/manager.go",
+      "file:internal/collectors/nginx.go",
+      "file:internal/collectors/pm2.go",
+      "file:internal/collectors/ports.go",
+      "file:internal/collectors/ports_test.go",
+      "file:internal/collectors/project_enrich.go",
+      "file:internal/collectors/project_status.go",
+      "file:internal/collectors/projects_filter.go",
+      "file:internal/collectors/registry_inspect.go",
+      "file:internal/collectors/registry_inspect_test.go",
+      "file:internal/collectors/shell.go",
+      "file:internal/collectors/shell_test.go",
+      "file:internal/collectors/ssl.go",
+      "file:internal/collectors/swarm.go",
+      "file:internal/collectors/swarm_test.go",
+      "file:internal/config/config.go",
+      "file:internal/config/userconfig.go",
+      "file:internal/config/userconfig_test.go",
+      "file:internal/core/models.go",
+      "file:internal/core/state.go",
+      "file:internal/core/state_test.go",
+      "file:internal/metrics/disk_unix.go",
+      "file:internal/metrics/disk_windows.go",
+      "file:internal/metrics/host.go",
+      "file:internal/scanner/discover_test.go",
+      "file:internal/scanner/markers.go",
+      "file:internal/scanner/runtime.go",
+      "file:internal/scanner/runtime_test.go",
+      "file:internal/scanner/scanner.go",
+      "file:internal/scanner/scanner_test.go",
+      "file:internal/ui/anim.go",
+      "file:internal/ui/anim_test.go",
+      "file:internal/ui/api_auth_test.go",
+      "file:internal/ui/api_client.go",
+      "file:internal/ui/api_client_test.go",
+      "file:internal/ui/api_json_highlight.go",
+      "file:internal/ui/api_json_highlight_test.go",
+      "file:internal/ui/api_kv.go",
+      "file:internal/ui/api_screen.go",
+      "file:internal/ui/api_select_test.go",
+      "file:internal/ui/api_tab.go",
+      "file:internal/ui/api_tab_test.go",
+      "file:internal/ui/app.go",
+      "file:internal/ui/cf_tab.go",
+      "file:internal/ui/cf_tab_test.go",
+      "file:internal/ui/compose_messages.go",
+      "file:internal/ui/confirm_modal.go",
+      "file:internal/ui/confirm_modal_test.go",
+      "file:internal/ui/container_deps.go",
+      "file:internal/ui/container_detail.go",
+      "file:internal/ui/container_detail_code.go",
+      "file:internal/ui/container_detail_code_test.go",
+      "file:internal/ui/container_detail_layout.go",
+      "file:internal/ui/container_detail_views.go",
+      "file:internal/ui/container_images.go",
+      "file:internal/ui/container_messages.go",
+      "file:internal/ui/container_ports.go",
+      "file:internal/ui/container_stats.go",
+      "file:internal/ui/containers_tab.go",
+      "file:internal/ui/containers_tab_test.go",
+      "file:internal/ui/dashboard.go",
+      "file:internal/ui/dashboard_test.go",
+      "file:internal/ui/db_tab.go",
+      "file:internal/ui/db_tab_test.go",
+      "file:internal/ui/deploy.go",
+      "file:internal/ui/docker_add.go",
+      "file:internal/ui/docker_add_render.go",
+      "file:internal/ui/docker_add_test.go",
+      "file:internal/ui/editor.go",
+      "file:internal/ui/foundation.go",
+      "file:internal/ui/foundation_test.go",
+      "file:internal/ui/fuzzy.go",
+      "file:internal/ui/gha_detail.go",
+      "file:internal/ui/gha_tab.go",
+      "file:internal/ui/gha_tab_test.go",
+      "file:internal/ui/gha_views.go",
+      "file:internal/ui/git_cache.go",
+      "file:internal/ui/git_cache_test.go",
+      "file:internal/ui/git_compose.go",
+      "file:internal/ui/git_drawer.go",
+      "file:internal/ui/git_drawer_test.go",
+      "file:internal/ui/git_graph.go",
+      "file:internal/ui/git_messages.go",
+      "file:internal/ui/git_prompt.go",
+      "file:internal/ui/git_tab.go",
+      "file:internal/ui/git_tab_test.go",
+      "file:internal/ui/graph_features_test.go",
+      "file:internal/ui/graph_layout.go",
+      "file:internal/ui/help_screen.go",
+      "file:internal/ui/help_screen_test.go",
+      "file:internal/ui/helpers.go",
+      "file:internal/ui/jenkins_tab.go",
+      "file:internal/ui/jenkins_tab_test.go",
+      "file:internal/ui/json_tab.go",
+      "file:internal/ui/json_tab_test.go",
+      "file:internal/ui/jwt_tab.go",
+      "file:internal/ui/jwt_tab_test.go",
+      "file:internal/ui/k8s_tab.go",
+      "file:internal/ui/k8s_tab_test.go",
+      "file:internal/ui/keymap_test.go",
+      "file:internal/ui/landing_probe.go",
+      "file:internal/ui/logs_tab.go",
+      "file:internal/ui/module_caps.go",
+      "file:internal/ui/module_caps_test.go",
+      "file:internal/ui/module_landing.go",
+      "file:internal/ui/module_landing_test.go",
+      "file:internal/ui/module_shell.go",
+      "file:internal/ui/module_shell_test.go",
+      "file:internal/ui/nginx_tab.go",
+      "file:internal/ui/nginx_tab_test.go",
+      "file:internal/ui/nginx_view.go",
+      "file:internal/ui/nginx_view_test.go",
+      "file:internal/ui/ngrok_tab.go",
+      "file:internal/ui/ngrok_tab_test.go",
+      "file:internal/ui/overview_tab.go",
+      "file:internal/ui/overview_tab_test.go",
+      "file:internal/ui/paths.go",
+      "file:internal/ui/project_cwd.go",
+      "file:internal/ui/project_cwd_test.go",
+      "file:internal/ui/project_load.go",
+      "file:internal/ui/project_messages.go",
+      "file:internal/ui/project_sidebar.go",
+      "file:internal/ui/relax.go",
+      "file:internal/ui/relax_aquarium.go",
+      "file:internal/ui/relax_ast.go",
+      "file:internal/ui/relax_blackhole.go",
+      "file:internal/ui/relax_braille.go",
+      "file:internal/ui/relax_burst.go",
+      "file:internal/ui/relax_cat.go",
+      "file:internal/ui/relax_chess.go",
+      "file:internal/ui/relax_city.go",
+      "file:internal/ui/relax_clouds.go",
+      "file:internal/ui/relax_coffee.go",
+      "file:internal/ui/relax_cube.go",
+      "file:internal/ui/relax_dragon.go",
+      "file:internal/ui/relax_drop.go",
+      "file:internal/ui/relax_engine.go",
+      "file:internal/ui/relax_fall.go",
+      "file:internal/ui/relax_fire.go",
+      "file:internal/ui/relax_fireworks.go",
+      "file:internal/ui/relax_fox.go",
+      "file:internal/ui/relax_galaxy.go",
+      "file:internal/ui/relax_hourglass.go",
+      "file:internal/ui/relax_invaders.go",
+      "file:internal/ui/relax_jackpot.go",
+      "file:internal/ui/relax_moon.go",
+      "file:internal/ui/relax_motion.go",
+      "file:internal/ui/relax_nebula.go",
+      "file:internal/ui/relax_ridge.go",
+      "file:internal/ui/relax_sea.go",
+      "file:internal/ui/relax_sky.go",
+      "file:internal/ui/relax_smoke.go",
+      "file:internal/ui/relax_sword.go",
+      "file:internal/ui/relax_test.go",
+      "file:internal/ui/relax_tetris.go",
+      "file:internal/ui/relax_tetris_draw.go",
+      "file:internal/ui/relax_tree.go",
+      "file:internal/ui/relax_v4.go",
+      "file:internal/ui/responsive_test.go",
+      "file:internal/ui/routes_tab.go",
+      "file:internal/ui/routes_tab_test.go",
+      "file:internal/ui/shell_return.go",
+      "file:internal/ui/small_terminal_test.go",
+      "file:internal/ui/spark.go",
+      "file:internal/ui/spark_test.go",
+      "file:internal/ui/ssh_tab.go",
+      "file:internal/ui/ssh_tab_test.go",
+      "file:internal/ui/styles.go",
+      "file:internal/ui/swarm_tab.go",
+      "file:internal/ui/swarm_tab_test.go",
+      "file:internal/ui/swarm_views.go",
+      "file:internal/ui/theme.go",
+      "file:internal/ui/theme_test.go",
+      "file:internal/ui/tools_config_test.go",
+      "file:internal/ui/tunnel_modals.go",
+      "file:internal/ui/user_config_screen.go",
+      "file:internal/ui/views.go",
+      "file:internal/ui/ws_compose.go",
+      "file:internal/ui/ws_tab.go",
+      "file:internal/ui/ws_tab_test.go",
+      "file:internal/dbutil/config.go",
+      "file:internal/dbutil/config_test.go",
+      "file:internal/devscopeutil/dir.go",
+      "file:internal/devscopeutil/dir_test.go",
+      "file:internal/detectors/frameworks.go",
+      "file:internal/detectors/frameworks_test.go",
+      "file:internal/detectors/registry.go",
+      "file:internal/cfutil/agent.go",
+      "file:internal/cfutil/agent_test.go",
+      "file:internal/cfutil/config.go",
+      "file:internal/cfutil/discover.go",
+      "file:internal/cfutil/discover_test.go",
+      "file:internal/jenkinsutil/client.go",
+      "file:internal/jenkinsutil/client_test.go",
+      "file:internal/jenkinsutil/config.go",
+      "file:internal/nginxutil/agent.go",
+      "file:internal/nginxutil/agent_test.go",
+      "file:internal/ngrokutil/agent.go",
+      "file:internal/ngrokutil/agent_test.go",
+      "file:internal/ngrokutil/config.go",
+      "file:internal/routeutil/discover.go",
+      "file:internal/routeutil/discover_test.go",
+      "file:internal/routeutil/openapi.go",
+      "file:internal/routeutil/route.go",
+      "file:internal/routeutil/scan_django.go",
+      "file:internal/routeutil/scan_express.go",
+      "file:internal/routeutil/scan_fastapi.go",
+      "file:internal/routeutil/scan_flask.go",
+      "file:internal/routeutil/scan_go.go",
+      "file:internal/routeutil/scan_laravel.go",
+      "file:internal/routeutil/scan_laravel_test.go",
+      "file:internal/routeutil/scan_nestjs.go",
+      "file:internal/routeutil/scan_next_nuxt.go",
+      "file:internal/routeutil/scan_node_extra.go",
+      "file:internal/routeutil/scan_rails.go",
+      "file:internal/routeutil/scan_rust.go",
+      "file:internal/routeutil/scan_spring.go",
+      "file:internal/routeutil/stacks.go",
+      "file:internal/routeutil/walk.go",
+      "file:internal/sshutil/agent.go",
+      "file:internal/sshutil/agent_test.go",
+      "file:internal/sshutil/config.go",
+      "file:internal/wsutil/config.go",
+      "file:internal/wsutil/config_test.go",
+      "file:internal/wsutil/session.go",
+      "file:internal/wsutil/session_test.go",
+      "file:internal/jsonutil/jsonutil.go",
+      "file:internal/jsonutil/jsonutil_test.go",
+      "file:internal/jwtutil/jwtutil.go",
+      "file:internal/jwtutil/jwtutil_test.go"
+    ],
+    "depthMap": {
+      "file:cmd/devscope/main.go": 0,
+      "file:internal/commands/root.go": 1,
+      "file:internal/commands/scan.go": 1,
+      "file:internal/commands/scan_test.go": 1,
+      "file:internal/app/app.go": 2,
+      "file:pkg/version/version.go": 2,
+      "file:internal/collectors/compose.go": 2,
+      "file:internal/collectors/compose_edit.go": 2,
+      "file:internal/collectors/compose_edit_test.go": 2,
+      "file:internal/collectors/compose_presets.go": 2,
+      "file:internal/collectors/compose_presets_test.go": 2,
+      "file:internal/collectors/compose_test.go": 2,
+      "file:internal/collectors/database.go": 2,
+      "file:internal/collectors/database_test.go": 2,
+      "file:internal/collectors/docker.go": 2,
+      "file:internal/collectors/docker_actions.go": 2,
+      "file:internal/collectors/docker_close_port.go": 2,
+      "file:internal/collectors/docker_deps.go": 2,
+      "file:internal/collectors/docker_detail.go": 2,
+      "file:internal/collectors/docker_detail_test.go": 2,
+      "file:internal/collectors/docker_hub.go": 2,
+      "file:internal/collectors/docker_hub_test.go": 2,
+      "file:internal/collectors/docker_images.go": 2,
+      "file:internal/collectors/docker_stats.go": 2,
+      "file:internal/collectors/docker_stats_test.go": 2,
+      "file:internal/collectors/docker_test.go": 2,
+      "file:internal/collectors/gha.go": 2,
+      "file:internal/collectors/gha_test.go": 2,
+      "file:internal/collectors/git.go": 2,
+      "file:internal/collectors/git_graph.go": 2,
+      "file:internal/collectors/git_test.go": 2,
+      "file:internal/collectors/health.go": 2,
+      "file:internal/collectors/integration_test.go": 2,
+      "file:internal/collectors/k8s.go": 2,
+      "file:internal/collectors/k8s_test.go": 2,
+      "file:internal/collectors/manager.go": 2,
+      "file:internal/collectors/nginx.go": 2,
+      "file:internal/collectors/pm2.go": 2,
+      "file:internal/collectors/ports.go": 2,
+      "file:internal/collectors/ports_test.go": 2,
+      "file:internal/collectors/project_enrich.go": 2,
+      "file:internal/collectors/project_status.go": 2,
+      "file:internal/collectors/projects_filter.go": 2,
+      "file:internal/collectors/registry_inspect.go": 2,
+      "file:internal/collectors/registry_inspect_test.go": 2,
+      "file:internal/collectors/shell.go": 2,
+      "file:internal/collectors/shell_test.go": 2,
+      "file:internal/collectors/ssl.go": 2,
+      "file:internal/collectors/swarm.go": 2,
+      "file:internal/collectors/swarm_test.go": 2,
+      "file:internal/config/config.go": 2,
+      "file:internal/config/userconfig.go": 2,
+      "file:internal/config/userconfig_test.go": 2,
+      "file:internal/core/models.go": 2,
+      "file:internal/core/state.go": 2,
+      "file:internal/core/state_test.go": 2,
+      "file:internal/metrics/disk_unix.go": 2,
+      "file:internal/metrics/disk_windows.go": 2,
+      "file:internal/metrics/host.go": 2,
+      "file:internal/scanner/discover_test.go": 2,
+      "file:internal/scanner/markers.go": 2,
+      "file:internal/scanner/runtime.go": 2,
+      "file:internal/scanner/runtime_test.go": 2,
+      "file:internal/scanner/scanner.go": 2,
+      "file:internal/scanner/scanner_test.go": 2,
+      "file:internal/ui/anim.go": 3,
+      "file:internal/ui/anim_test.go": 3,
+      "file:internal/ui/api_auth_test.go": 3,
+      "file:internal/ui/api_client.go": 3,
+      "file:internal/ui/api_client_test.go": 3,
+      "file:internal/ui/api_json_highlight.go": 3,
+      "file:internal/ui/api_json_highlight_test.go": 3,
+      "file:internal/ui/api_kv.go": 3,
+      "file:internal/ui/api_screen.go": 3,
+      "file:internal/ui/api_select_test.go": 3,
+      "file:internal/ui/api_tab.go": 3,
+      "file:internal/ui/api_tab_test.go": 3,
+      "file:internal/ui/app.go": 3,
+      "file:internal/ui/cf_tab.go": 3,
+      "file:internal/ui/cf_tab_test.go": 3,
+      "file:internal/ui/compose_messages.go": 3,
+      "file:internal/ui/confirm_modal.go": 3,
+      "file:internal/ui/confirm_modal_test.go": 3,
+      "file:internal/ui/container_deps.go": 3,
+      "file:internal/ui/container_detail.go": 3,
+      "file:internal/ui/container_detail_code.go": 3,
+      "file:internal/ui/container_detail_code_test.go": 3,
+      "file:internal/ui/container_detail_layout.go": 3,
+      "file:internal/ui/container_detail_views.go": 3,
+      "file:internal/ui/container_images.go": 3,
+      "file:internal/ui/container_messages.go": 3,
+      "file:internal/ui/container_ports.go": 3,
+      "file:internal/ui/container_stats.go": 3,
+      "file:internal/ui/containers_tab.go": 3,
+      "file:internal/ui/containers_tab_test.go": 3,
+      "file:internal/ui/dashboard.go": 3,
+      "file:internal/ui/dashboard_test.go": 3,
+      "file:internal/ui/db_tab.go": 3,
+      "file:internal/ui/db_tab_test.go": 3,
+      "file:internal/ui/deploy.go": 3,
+      "file:internal/ui/docker_add.go": 3,
+      "file:internal/ui/docker_add_render.go": 3,
+      "file:internal/ui/docker_add_test.go": 3,
+      "file:internal/ui/editor.go": 3,
+      "file:internal/ui/foundation.go": 3,
+      "file:internal/ui/foundation_test.go": 3,
+      "file:internal/ui/fuzzy.go": 3,
+      "file:internal/ui/gha_detail.go": 3,
+      "file:internal/ui/gha_tab.go": 3,
+      "file:internal/ui/gha_tab_test.go": 3,
+      "file:internal/ui/gha_views.go": 3,
+      "file:internal/ui/git_cache.go": 3,
+      "file:internal/ui/git_cache_test.go": 3,
+      "file:internal/ui/git_compose.go": 3,
+      "file:internal/ui/git_drawer.go": 3,
+      "file:internal/ui/git_drawer_test.go": 3,
+      "file:internal/ui/git_graph.go": 3,
+      "file:internal/ui/git_messages.go": 3,
+      "file:internal/ui/git_prompt.go": 3,
+      "file:internal/ui/git_tab.go": 3,
+      "file:internal/ui/git_tab_test.go": 3,
+      "file:internal/ui/graph_features_test.go": 3,
+      "file:internal/ui/graph_layout.go": 3,
+      "file:internal/ui/help_screen.go": 3,
+      "file:internal/ui/help_screen_test.go": 3,
+      "file:internal/ui/helpers.go": 3,
+      "file:internal/ui/jenkins_tab.go": 3,
+      "file:internal/ui/jenkins_tab_test.go": 3,
+      "file:internal/ui/json_tab.go": 3,
+      "file:internal/ui/json_tab_test.go": 3,
+      "file:internal/ui/jwt_tab.go": 3,
+      "file:internal/ui/jwt_tab_test.go": 3,
+      "file:internal/ui/k8s_tab.go": 3,
+      "file:internal/ui/k8s_tab_test.go": 3,
+      "file:internal/ui/keymap_test.go": 3,
+      "file:internal/ui/landing_probe.go": 3,
+      "file:internal/ui/logs_tab.go": 3,
+      "file:internal/ui/module_caps.go": 3,
+      "file:internal/ui/module_caps_test.go": 3,
+      "file:internal/ui/module_landing.go": 3,
+      "file:internal/ui/module_landing_test.go": 3,
+      "file:internal/ui/module_shell.go": 3,
+      "file:internal/ui/module_shell_test.go": 3,
+      "file:internal/ui/nginx_tab.go": 3,
+      "file:internal/ui/nginx_tab_test.go": 3,
+      "file:internal/ui/nginx_view.go": 3,
+      "file:internal/ui/nginx_view_test.go": 3,
+      "file:internal/ui/ngrok_tab.go": 3,
+      "file:internal/ui/ngrok_tab_test.go": 3,
+      "file:internal/ui/overview_tab.go": 3,
+      "file:internal/ui/overview_tab_test.go": 3,
+      "file:internal/ui/paths.go": 3,
+      "file:internal/ui/project_cwd.go": 3,
+      "file:internal/ui/project_cwd_test.go": 3,
+      "file:internal/ui/project_load.go": 3,
+      "file:internal/ui/project_messages.go": 3,
+      "file:internal/ui/project_sidebar.go": 3,
+      "file:internal/ui/relax.go": 3,
+      "file:internal/ui/relax_aquarium.go": 3,
+      "file:internal/ui/relax_ast.go": 3,
+      "file:internal/ui/relax_blackhole.go": 3,
+      "file:internal/ui/relax_braille.go": 3,
+      "file:internal/ui/relax_burst.go": 3,
+      "file:internal/ui/relax_cat.go": 3,
+      "file:internal/ui/relax_chess.go": 3,
+      "file:internal/ui/relax_city.go": 3,
+      "file:internal/ui/relax_clouds.go": 3,
+      "file:internal/ui/relax_coffee.go": 3,
+      "file:internal/ui/relax_cube.go": 3,
+      "file:internal/ui/relax_dragon.go": 3,
+      "file:internal/ui/relax_drop.go": 3,
+      "file:internal/ui/relax_engine.go": 3,
+      "file:internal/ui/relax_fall.go": 3,
+      "file:internal/ui/relax_fire.go": 3,
+      "file:internal/ui/relax_fireworks.go": 3,
+      "file:internal/ui/relax_fox.go": 3,
+      "file:internal/ui/relax_galaxy.go": 3,
+      "file:internal/ui/relax_hourglass.go": 3,
+      "file:internal/ui/relax_invaders.go": 3,
+      "file:internal/ui/relax_jackpot.go": 3,
+      "file:internal/ui/relax_moon.go": 3,
+      "file:internal/ui/relax_motion.go": 3,
+      "file:internal/ui/relax_nebula.go": 3,
+      "file:internal/ui/relax_ridge.go": 3,
+      "file:internal/ui/relax_sea.go": 3,
+      "file:internal/ui/relax_sky.go": 3,
+      "file:internal/ui/relax_smoke.go": 3,
+      "file:internal/ui/relax_sword.go": 3,
+      "file:internal/ui/relax_test.go": 3,
+      "file:internal/ui/relax_tetris.go": 3,
+      "file:internal/ui/relax_tetris_draw.go": 3,
+      "file:internal/ui/relax_tree.go": 3,
+      "file:internal/ui/relax_v4.go": 3,
+      "file:internal/ui/responsive_test.go": 3,
+      "file:internal/ui/routes_tab.go": 3,
+      "file:internal/ui/routes_tab_test.go": 3,
+      "file:internal/ui/shell_return.go": 3,
+      "file:internal/ui/small_terminal_test.go": 3,
+      "file:internal/ui/spark.go": 3,
+      "file:internal/ui/spark_test.go": 3,
+      "file:internal/ui/ssh_tab.go": 3,
+      "file:internal/ui/ssh_tab_test.go": 3,
+      "file:internal/ui/styles.go": 3,
+      "file:internal/ui/swarm_tab.go": 3,
+      "file:internal/ui/swarm_tab_test.go": 3,
+      "file:internal/ui/swarm_views.go": 3,
+      "file:internal/ui/theme.go": 3,
+      "file:internal/ui/theme_test.go": 3,
+      "file:internal/ui/tools_config_test.go": 3,
+      "file:internal/ui/tunnel_modals.go": 3,
+      "file:internal/ui/user_config_screen.go": 3,
+      "file:internal/ui/views.go": 3,
+      "file:internal/ui/ws_compose.go": 3,
+      "file:internal/ui/ws_tab.go": 3,
+      "file:internal/ui/ws_tab_test.go": 3,
+      "file:internal/dbutil/config.go": 3,
+      "file:internal/dbutil/config_test.go": 3,
+      "file:internal/devscopeutil/dir.go": 3,
+      "file:internal/devscopeutil/dir_test.go": 3,
+      "file:internal/detectors/frameworks.go": 3,
+      "file:internal/detectors/frameworks_test.go": 3,
+      "file:internal/detectors/registry.go": 3,
+      "file:internal/cfutil/agent.go": 4,
+      "file:internal/cfutil/agent_test.go": 4,
+      "file:internal/cfutil/config.go": 4,
+      "file:internal/cfutil/discover.go": 4,
+      "file:internal/cfutil/discover_test.go": 4,
+      "file:internal/jenkinsutil/client.go": 4,
+      "file:internal/jenkinsutil/client_test.go": 4,
+      "file:internal/jenkinsutil/config.go": 4,
+      "file:internal/nginxutil/agent.go": 4,
+      "file:internal/nginxutil/agent_test.go": 4,
+      "file:internal/ngrokutil/agent.go": 4,
+      "file:internal/ngrokutil/agent_test.go": 4,
+      "file:internal/ngrokutil/config.go": 4,
+      "file:internal/routeutil/discover.go": 4,
+      "file:internal/routeutil/discover_test.go": 4,
+      "file:internal/routeutil/openapi.go": 4,
+      "file:internal/routeutil/route.go": 4,
+      "file:internal/routeutil/scan_django.go": 4,
+      "file:internal/routeutil/scan_express.go": 4,
+      "file:internal/routeutil/scan_fastapi.go": 4,
+      "file:internal/routeutil/scan_flask.go": 4,
+      "file:internal/routeutil/scan_go.go": 4,
+      "file:internal/routeutil/scan_laravel.go": 4,
+      "file:internal/routeutil/scan_laravel_test.go": 4,
+      "file:internal/routeutil/scan_nestjs.go": 4,
+      "file:internal/routeutil/scan_next_nuxt.go": 4,
+      "file:internal/routeutil/scan_node_extra.go": 4,
+      "file:internal/routeutil/scan_rails.go": 4,
+      "file:internal/routeutil/scan_rust.go": 4,
+      "file:internal/routeutil/scan_spring.go": 4,
+      "file:internal/routeutil/stacks.go": 4,
+      "file:internal/routeutil/walk.go": 4,
+      "file:internal/sshutil/agent.go": 4,
+      "file:internal/sshutil/agent_test.go": 4,
+      "file:internal/sshutil/config.go": 4,
+      "file:internal/wsutil/config.go": 4,
+      "file:internal/wsutil/config_test.go": 4,
+      "file:internal/wsutil/session.go": 4,
+      "file:internal/wsutil/session_test.go": 4,
+      "file:internal/jsonutil/jsonutil.go": 4,
+      "file:internal/jsonutil/jsonutil_test.go": 4,
+      "file:internal/jwtutil/jwtutil.go": 4,
+      "file:internal/jwtutil/jwtutil_test.go": 4
+    },
+    "byDepth": {
+      "0": [
+        "file:cmd/devscope/main.go"
+      ],
+      "1": [
+        "file:internal/commands/root.go",
+        "file:internal/commands/scan.go",
+        "file:internal/commands/scan_test.go"
+      ],
+      "2": [
+        "file:internal/app/app.go",
+        "file:pkg/version/version.go",
+        "file:internal/collectors/compose.go",
+        "file:internal/collectors/compose_edit.go",
+        "file:internal/collectors/compose_edit_test.go",
+        "file:internal/collectors/compose_presets.go",
+        "file:internal/collectors/compose_presets_test.go",
+        "file:internal/collectors/compose_test.go",
+        "file:internal/collectors/database.go",
+        "file:internal/collectors/database_test.go",
+        "file:internal/collectors/docker.go",
+        "file:internal/collectors/docker_actions.go",
+        "file:internal/collectors/docker_close_port.go",
+        "file:internal/collectors/docker_deps.go",
+        "file:internal/collectors/docker_detail.go",
+        "file:internal/collectors/docker_detail_test.go",
+        "file:internal/collectors/docker_hub.go",
+        "file:internal/collectors/docker_hub_test.go",
+        "file:internal/collectors/docker_images.go",
+        "file:internal/collectors/docker_stats.go",
+        "file:internal/collectors/docker_stats_test.go",
+        "file:internal/collectors/docker_test.go",
+        "file:internal/collectors/gha.go",
+        "file:internal/collectors/gha_test.go",
+        "file:internal/collectors/git.go",
+        "file:internal/collectors/git_graph.go",
+        "file:internal/collectors/git_test.go",
+        "file:internal/collectors/health.go",
+        "file:internal/collectors/integration_test.go",
+        "file:internal/collectors/k8s.go",
+        "file:internal/collectors/k8s_test.go",
+        "file:internal/collectors/manager.go",
+        "file:internal/collectors/nginx.go",
+        "file:internal/collectors/pm2.go",
+        "file:internal/collectors/ports.go",
+        "file:internal/collectors/ports_test.go",
+        "file:internal/collectors/project_enrich.go",
+        "file:internal/collectors/project_status.go",
+        "file:internal/collectors/projects_filter.go",
+        "file:internal/collectors/registry_inspect.go",
+        "file:internal/collectors/registry_inspect_test.go",
+        "file:internal/collectors/shell.go",
+        "file:internal/collectors/shell_test.go",
+        "file:internal/collectors/ssl.go",
+        "file:internal/collectors/swarm.go",
+        "file:internal/collectors/swarm_test.go",
+        "file:internal/config/config.go",
+        "file:internal/config/userconfig.go",
+        "file:internal/config/userconfig_test.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go",
+        "file:internal/core/state_test.go",
+        "file:internal/metrics/disk_unix.go",
+        "file:internal/metrics/disk_windows.go",
+        "file:internal/metrics/host.go",
+        "file:internal/scanner/discover_test.go",
+        "file:internal/scanner/markers.go",
+        "file:internal/scanner/runtime.go",
+        "file:internal/scanner/runtime_test.go",
+        "file:internal/scanner/scanner.go",
+        "file:internal/scanner/scanner_test.go"
+      ],
+      "3": [
+        "file:internal/ui/anim.go",
+        "file:internal/ui/anim_test.go",
+        "file:internal/ui/api_auth_test.go",
+        "file:internal/ui/api_client.go",
+        "file:internal/ui/api_client_test.go",
+        "file:internal/ui/api_json_highlight.go",
+        "file:internal/ui/api_json_highlight_test.go",
+        "file:internal/ui/api_kv.go",
+        "file:internal/ui/api_screen.go",
+        "file:internal/ui/api_select_test.go",
+        "file:internal/ui/api_tab.go",
+        "file:internal/ui/api_tab_test.go",
+        "file:internal/ui/app.go",
+        "file:internal/ui/cf_tab.go",
+        "file:internal/ui/cf_tab_test.go",
+        "file:internal/ui/compose_messages.go",
+        "file:internal/ui/confirm_modal.go",
+        "file:internal/ui/confirm_modal_test.go",
+        "file:internal/ui/container_deps.go",
+        "file:internal/ui/container_detail.go",
+        "file:internal/ui/container_detail_code.go",
+        "file:internal/ui/container_detail_code_test.go",
+        "file:internal/ui/container_detail_layout.go",
+        "file:internal/ui/container_detail_views.go",
+        "file:internal/ui/container_images.go",
+        "file:internal/ui/container_messages.go",
+        "file:internal/ui/container_ports.go",
+        "file:internal/ui/container_stats.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/ui/containers_tab_test.go",
+        "file:internal/ui/dashboard.go",
+        "file:internal/ui/dashboard_test.go",
+        "file:internal/ui/db_tab.go",
+        "file:internal/ui/db_tab_test.go",
+        "file:internal/ui/deploy.go",
+        "file:internal/ui/docker_add.go",
+        "file:internal/ui/docker_add_render.go",
+        "file:internal/ui/docker_add_test.go",
+        "file:internal/ui/editor.go",
+        "file:internal/ui/foundation.go",
+        "file:internal/ui/foundation_test.go",
+        "file:internal/ui/fuzzy.go",
+        "file:internal/ui/gha_detail.go",
+        "file:internal/ui/gha_tab.go",
+        "file:internal/ui/gha_tab_test.go",
+        "file:internal/ui/gha_views.go",
+        "file:internal/ui/git_cache.go",
+        "file:internal/ui/git_cache_test.go",
+        "file:internal/ui/git_compose.go",
+        "file:internal/ui/git_drawer.go",
+        "file:internal/ui/git_drawer_test.go",
+        "file:internal/ui/git_graph.go",
+        "file:internal/ui/git_messages.go",
+        "file:internal/ui/git_prompt.go",
+        "file:internal/ui/git_tab.go",
+        "file:internal/ui/git_tab_test.go",
+        "file:internal/ui/graph_features_test.go",
+        "file:internal/ui/graph_layout.go",
+        "file:internal/ui/help_screen.go",
+        "file:internal/ui/help_screen_test.go",
+        "file:internal/ui/helpers.go",
+        "file:internal/ui/jenkins_tab.go",
+        "file:internal/ui/jenkins_tab_test.go",
+        "file:internal/ui/json_tab.go",
+        "file:internal/ui/json_tab_test.go",
+        "file:internal/ui/jwt_tab.go",
+        "file:internal/ui/jwt_tab_test.go",
+        "file:internal/ui/k8s_tab.go",
+        "file:internal/ui/k8s_tab_test.go",
+        "file:internal/ui/keymap_test.go",
+        "file:internal/ui/landing_probe.go",
+        "file:internal/ui/logs_tab.go",
+        "file:internal/ui/module_caps.go",
+        "file:internal/ui/module_caps_test.go",
+        "file:internal/ui/module_landing.go",
+        "file:internal/ui/module_landing_test.go",
+        "file:internal/ui/module_shell.go",
+        "file:internal/ui/module_shell_test.go",
+        "file:internal/ui/nginx_tab.go",
+        "file:internal/ui/nginx_tab_test.go",
+        "file:internal/ui/nginx_view.go",
+        "file:internal/ui/nginx_view_test.go",
+        "file:internal/ui/ngrok_tab.go",
+        "file:internal/ui/ngrok_tab_test.go",
+        "file:internal/ui/overview_tab.go",
+        "file:internal/ui/overview_tab_test.go",
+        "file:internal/ui/paths.go",
+        "file:internal/ui/project_cwd.go",
+        "file:internal/ui/project_cwd_test.go",
+        "file:internal/ui/project_load.go",
+        "file:internal/ui/project_messages.go",
+        "file:internal/ui/project_sidebar.go",
+        "file:internal/ui/relax.go",
+        "file:internal/ui/relax_aquarium.go",
+        "file:internal/ui/relax_ast.go",
+        "file:internal/ui/relax_blackhole.go",
+        "file:internal/ui/relax_braille.go",
+        "file:internal/ui/relax_burst.go",
+        "file:internal/ui/relax_cat.go",
+        "file:internal/ui/relax_chess.go",
+        "file:internal/ui/relax_city.go",
+        "file:internal/ui/relax_clouds.go",
+        "file:internal/ui/relax_coffee.go",
+        "file:internal/ui/relax_cube.go",
+        "file:internal/ui/relax_dragon.go",
+        "file:internal/ui/relax_drop.go",
+        "file:internal/ui/relax_engine.go",
+        "file:internal/ui/relax_fall.go",
+        "file:internal/ui/relax_fire.go",
+        "file:internal/ui/relax_fireworks.go",
+        "file:internal/ui/relax_fox.go",
+        "file:internal/ui/relax_galaxy.go",
+        "file:internal/ui/relax_hourglass.go",
+        "file:internal/ui/relax_invaders.go",
+        "file:internal/ui/relax_jackpot.go",
+        "file:internal/ui/relax_moon.go",
+        "file:internal/ui/relax_motion.go",
+        "file:internal/ui/relax_nebula.go",
+        "file:internal/ui/relax_ridge.go",
+        "file:internal/ui/relax_sea.go",
+        "file:internal/ui/relax_sky.go",
+        "file:internal/ui/relax_smoke.go",
+        "file:internal/ui/relax_sword.go",
+        "file:internal/ui/relax_test.go",
+        "file:internal/ui/relax_tetris.go",
+        "file:internal/ui/relax_tetris_draw.go",
+        "file:internal/ui/relax_tree.go",
+        "file:internal/ui/relax_v4.go",
+        "file:internal/ui/responsive_test.go",
+        "file:internal/ui/routes_tab.go",
+        "file:internal/ui/routes_tab_test.go",
+        "file:internal/ui/shell_return.go",
+        "file:internal/ui/small_terminal_test.go",
+        "file:internal/ui/spark.go",
+        "file:internal/ui/spark_test.go",
+        "file:internal/ui/ssh_tab.go",
+        "file:internal/ui/ssh_tab_test.go",
+        "file:internal/ui/styles.go",
+        "file:internal/ui/swarm_tab.go",
+        "file:internal/ui/swarm_tab_test.go",
+        "file:internal/ui/swarm_views.go",
+        "file:internal/ui/theme.go",
+        "file:internal/ui/theme_test.go",
+        "file:internal/ui/tools_config_test.go",
+        "file:internal/ui/tunnel_modals.go",
+        "file:internal/ui/user_config_screen.go",
+        "file:internal/ui/views.go",
+        "file:internal/ui/ws_compose.go",
+        "file:internal/ui/ws_tab.go",
+        "file:internal/ui/ws_tab_test.go",
+        "file:internal/dbutil/config.go",
+        "file:internal/dbutil/config_test.go",
+        "file:internal/devscopeutil/dir.go",
+        "file:internal/devscopeutil/dir_test.go",
+        "file:internal/detectors/frameworks.go",
+        "file:internal/detectors/frameworks_test.go",
+        "file:internal/detectors/registry.go"
+      ],
+      "4": [
+        "file:internal/cfutil/agent.go",
+        "file:internal/cfutil/agent_test.go",
+        "file:internal/cfutil/config.go",
+        "file:internal/cfutil/discover.go",
+        "file:internal/cfutil/discover_test.go",
+        "file:internal/jenkinsutil/client.go",
+        "file:internal/jenkinsutil/client_test.go",
+        "file:internal/jenkinsutil/config.go",
+        "file:internal/nginxutil/agent.go",
+        "file:internal/nginxutil/agent_test.go",
+        "file:internal/ngrokutil/agent.go",
+        "file:internal/ngrokutil/agent_test.go",
+        "file:internal/ngrokutil/config.go",
+        "file:internal/routeutil/discover.go",
+        "file:internal/routeutil/discover_test.go",
+        "file:internal/routeutil/openapi.go",
+        "file:internal/routeutil/route.go",
+        "file:internal/routeutil/scan_django.go",
+        "file:internal/routeutil/scan_express.go",
+        "file:internal/routeutil/scan_fastapi.go",
+        "file:internal/routeutil/scan_flask.go",
+        "file:internal/routeutil/scan_go.go",
+        "file:internal/routeutil/scan_laravel.go",
+        "file:internal/routeutil/scan_laravel_test.go",
+        "file:internal/routeutil/scan_nestjs.go",
+        "file:internal/routeutil/scan_next_nuxt.go",
+        "file:internal/routeutil/scan_node_extra.go",
+        "file:internal/routeutil/scan_rails.go",
+        "file:internal/routeutil/scan_rust.go",
+        "file:internal/routeutil/scan_spring.go",
+        "file:internal/routeutil/stacks.go",
+        "file:internal/routeutil/walk.go",
+        "file:internal/sshutil/agent.go",
+        "file:internal/sshutil/agent_test.go",
+        "file:internal/sshutil/config.go",
+        "file:internal/wsutil/config.go",
+        "file:internal/wsutil/config_test.go",
+        "file:internal/wsutil/session.go",
+        "file:internal/wsutil/session_test.go",
+        "file:internal/jsonutil/jsonutil.go",
+        "file:internal/jsonutil/jsonutil_test.go",
+        "file:internal/jwtutil/jwtutil.go",
+        "file:internal/jwtutil/jwtutil_test.go"
+      ]
+    }
+  },
+  "nonCodeFiles": {
+    "documentation": [
+      {
+        "id": "document:.github/ISSUE_TEMPLATE/bug_report.md",
+        "name": "bug_report.md",
+        "type": "document",
+        "summary": "Template de issue para reportar bugs, pedindo passos de reprodução, comportamento esperado, ambiente (OS, versão do DevScope/Go, Docker/PM2) e logs com `--debug`."
+      },
+      {
+        "id": "document:.github/ISSUE_TEMPLATE/detector_request.md",
+        "name": "detector_request.md",
+        "type": "document",
+        "summary": "Template de issue para pedir suporte a um novo framework/stack, listando os arquivos marcadores (package.json, go.mod, composer.json etc.) usados na detecção."
+      },
+      {
+        "id": "document:.github/ISSUE_TEMPLATE/feature_request.md",
+        "name": "feature_request.md",
+        "type": "document",
+        "summary": "Template de issue para sugerir melhorias, com seções de problema, solução proposta, alternativas e contexto."
+      },
+      {
+        "id": "document:Animation.md",
+        "name": "Animation.md",
+        "type": "document",
+        "summary": "Guia extenso (116 seções) de ASCII/Unicode art e técnicas de animação para TUIs em Go: caracteres de desenho, frames, FPS, tick, easing, partículas, spinners, double buffer e delta time."
+      },
+      {
+        "id": "document:CHANGELOG.md",
+        "name": "CHANGELOG.md",
+        "type": "document",
+        "summary": "Histórico de versões no formato Keep a Changelog, de 0.1.0 até 1.6.3 e a seção Unreleased, com itens Added/Changed/Fixed."
+      },
+      {
+        "id": "document:CODE_OF_CONDUCT.md",
+        "name": "CODE_OF_CONDUCT.md",
+        "type": "document",
+        "summary": "Código de conduta do projeto adaptado do Contributor Covenant 2.1, definindo comportamentos esperados, inaceitáveis e como reportar abusos."
+      },
+      {
+        "id": "document:README.md",
+        "name": "README.md",
+        "type": "document",
+        "summary": "README principal do DevScope (\"o htop dos seus projetos\"): instalação via scripts, tour em 30 segundos, recursos de Git e Docker, os 15 módulos, atalhos, preferências, instalação avançada e como funciona."
+      },
+      {
+        "id": "document:docs/ARCHITECTURE.md",
+        "name": "ARCHITECTURE.md",
+        "type": "document",
+        "summary": "Documento de arquitetura: problema e princípios, decisões (Go + Bubble Tea, snapshot imutável, pipeline de descoberta, plugins de detecção, health checks), descrição de cada pacote em `internal/`, fluxo de execução, concorrência, testes, CI/CD e distribuição."
+      },
+      {
+        "id": "document:docs/DESIGN.md",
+        "name": "DESIGN.md",
+        "type": "document",
+        "summary": "Padrão de telas da TUI: fundação em `foundation.go`, navegação por módulos, lista+detalhe, gaveta, faixa de abertura, regras de responsividade, anatomia da tela, teclado, vocabulário Braille, cores, estados, microcópia, anti-padrões e checklist de entrega."
+      },
+      {
+        "id": "document:docs/ROADMAP.md",
+        "name": "ROADMAP.md",
+        "type": "document",
+        "summary": "Roadmap por versões (MVP v0.0.1, v0.1 a v0.3 concluídas, v1.0 em progresso, v2.0 planejada) com entregas, pendências, timeline estimada e critérios de release."
+      },
+      {
+        "id": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+        "name": "2026-08-12-git-pull-conflict.md",
+        "type": "document",
+        "summary": "Plano de implementação em 3 tarefas para tratar pull divergente (Merge/Rebase) e resolução de conflitos (Ours/Theirs/editor/Continue/Abort) na aba Git, com novas funções do collector e mudanças na UI."
+      },
+      {
+        "id": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+        "name": "2026-08-12-git-pull-conflict-design.md",
+        "type": "document",
+        "summary": "Especificação de design para pull com divergência e modo de conflito na aba Git: fluxo, atalhos o/t/e/a/c/x, API nova do collector, pontos de toque na UI e critérios de sucesso."
+      }
+    ],
+    "infrastructure": [
+      {
+        "id": "pipeline:.github/workflows/ci.yml",
+        "name": "ci.yml",
+        "type": "pipeline",
+        "summary": "Workflow do GitHub Actions que, em push/PR para main/master, roda `go test ./... -race`, o `make build` e uma matriz de build para amd64 e arm64."
+      },
+      {
+        "id": "pipeline:.github/workflows/release.yml",
+        "name": "release.yml",
+        "type": "pipeline",
+        "summary": "Workflow de release disparado por tags `v*` que executa o GoReleaser v2 para publicar binários multiplataforma no GitHub Releases."
+      },
+      {
+        "id": "pipeline:Makefile",
+        "name": "Makefile",
+        "type": "pipeline",
+        "summary": "Makefile com os alvos build, build-all, test, lint, clean, install, install-dev, run, dev e deps; compila `./cmd/devscope` estaticamente injetando versão, commit e data via ldflags."
+      }
+    ],
+    "data": [],
+    "config": [
+      {
+        "id": "config:.goreleaser.yaml",
+        "name": ".goreleaser.yaml",
+        "type": "config",
+        "summary": "Configuração do GoReleaser v2 que compila `./cmd/devscope` sem CGO para linux/darwin/windows em amd64/arm64, injeta versão/commit/data via ldflags e empacota tar.gz/zip com checksums SHA-256."
+      },
+      {
+        "id": "config:go.mod",
+        "name": "go.mod",
+        "type": "config",
+        "summary": "Módulo Go `github.com/devscope/devscope` (Go 1.24.2) com dependências diretas Bubble Tea, Bubbles, Lip Gloss, Cobra, Viper, gorilla/websocket, go-toml e yaml.v3."
+      },
+      {
+        "id": "config:docs/media/tapes/docker.json",
+        "name": "docker.json",
+        "type": "config",
+        "summary": "Lista de 5 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `docker.mp4` do README."
+      },
+      {
+        "id": "config:docs/media/tapes/git.json",
+        "name": "git.json",
+        "type": "config",
+        "summary": "Lista de 8 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `git.mp4` do README."
+      },
+      {
+        "id": "config:docs/media/tapes/overview.json",
+        "name": "overview.json",
+        "type": "config",
+        "summary": "Lista de 2 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `overview.mp4` do README."
+      },
+      {
+        "id": "config:configs/devscope.example.yaml",
+        "name": "devscope.example.yaml",
+        "type": "config",
+        "summary": "Exemplo de configuração do DevScope: caminhos e profundidade do scan, diretórios ignorados, intervalos de refresh (scan, métricas, health, git), tema da UI, timeouts de health e projetos fixados."
+      }
+    ]
+  },
+  "clusters": [
+    {
+      "nodes": [
+        "file:internal/ui/container_deps.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_detail.go",
+        "file:internal/ui/container_messages.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_detail.go",
+        "file:internal/ui/container_stats.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_images.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_messages.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_ports.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/container_stats.go",
+        "file:internal/ui/containers_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/containers_tab.go",
+        "file:internal/ui/dashboard.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/gha_detail.go",
+        "file:internal/ui/gha_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    },
+    {
+      "nodes": [
+        "file:internal/ui/git_graph.go",
+        "file:internal/ui/git_tab.go",
+        "file:internal/app/app.go",
+        "file:internal/core/models.go",
+        "file:internal/core/state.go"
+      ],
+      "edgeCount": 11
+    }
+  ],
+  "layers": {
+    "count": 9,
+    "list": [
+      {
+        "id": "layer:entry",
+        "name": "Entrada e CLI",
+        "description": "Binário cmd/devscope, comandos Cobra (root, scan), bootstrap da aplicação em internal/app e versão em pkg/version, que ligam scanner, collectors e a TUI."
+      },
+      {
+        "id": "layer:ui",
+        "name": "Interface TUI",
+        "description": "Programa Bubble Tea/Lip Gloss em internal/ui: dashboard, sidebar de projetos, abas de módulos (containers, Git, GHA, K8s, Swarm, banco, túneis, API, rotas), modais, tema e estilos."
+      },
+      {
+        "id": "layer:ui-relax",
+        "name": "Modo Relax",
+        "description": "Cenas animadas ASCII/braille do modo relax (aquário, galáxia, tetris, fogos etc.) e seu motor de animação, isoladas do restante da TUI."
+      },
+      {
+        "id": "layer:collectors",
+        "name": "Collectors",
+        "description": "Coleta de dados por projeto em internal/collectors: Docker, Compose, Swarm, Kubernetes, Git, GitHub Actions, portas, PM2, Nginx, SSL, banco de dados e saúde, orquestrados pelo manager."
+      },
+      {
+        "id": "layer:integrations",
+        "name": "Integrações e Utilitários",
+        "description": "Pacotes *util com clientes e agentes para serviços externos (Cloudflare, Jenkins, ngrok, SSH, Nginx, WebSocket, banco), descoberta de rotas por framework e helpers JSON/JWT sobre o diretório .devscope."
+      },
+      {
+        "id": "layer:discovery",
+        "name": "Descoberta e Métricas",
+        "description": "Scanner que descobre projetos e runtimes no disco, detectores de frameworks por marcadores e métricas de host/disco multiplataforma."
+      },
+      {
+        "id": "layer:core",
+        "name": "Núcleo e Configuração",
+        "description": "Modelos e estado compartilhado do domínio (internal/core) e carregamento de configuração Viper e preferências do usuário (internal/config)."
+      },
+      {
+        "id": "layer:infrastructure",
+        "name": "Build, CI e Distribuição",
+        "description": "Workflows do GitHub Actions, GoReleaser, Makefile, go.mod, scripts de instalação e o exemplo de configuração devscope.example.yaml."
+      },
+      {
+        "id": "layer:documentation",
+        "name": "Documentação",
+        "description": "README, CHANGELOG, arquitetura, design, roadmap, specs em docs/superpowers, templates de issue e o ferramental de gravação das demos em docs/media."
+      }
+    ]
+  },
+  "nodeSummaryIndex": {
+    "file:internal/app/app.go": {
+      "name": "app.go",
+      "type": "file",
+      "summary": "Ponto de entrada do runtime: redireciona logs, carrega config, cria o StateStore, inicia os collectors e executa a TUI Bubble Tea com tratamento de sinais."
+    },
+    "file:internal/core/models.go": {
+      "name": "models.go",
+      "type": "file",
+      "summary": "Define os modelos de domínio compartilhados (Project, Container, GitInfo, Snapshot, HostMetrics etc.) e enums de status usados por collectors e UI."
+    },
+    "file:internal/core/state.go": {
+      "name": "state.go",
+      "type": "file",
+      "summary": "StateStore thread-safe que guarda o Snapshot global e oferece atualizações atômicas de projetos, Git, runtime e métricas do host."
+    },
+    "file:internal/core/state_test.go": {
+      "name": "state_test.go",
+      "type": "file",
+      "summary": "Testes do StateStore cobrindo concorrência, preservação de dados Git em SetProjects e cópia profunda do Snapshot."
+    },
+    "file:internal/jenkinsutil/client.go": {
+      "name": "client.go",
+      "type": "file",
+      "summary": "Cliente HTTP da API REST do Jenkins: ping, listagem de jobs, builds, console, disparo e parada de builds com crumb CSRF, além de formatadores de status."
+    },
+    "file:internal/jenkinsutil/client_test.go": {
+      "name": "client_test.go",
+      "type": "file",
+      "summary": "Testes do pacote jenkinsutil cobrindo config do projeto, mascaramento de token, mapeamento de cores e o cliente contra um servidor httptest."
+    },
+    "file:internal/jsonutil/jsonutil.go": {
+      "name": "jsonutil.go",
+      "type": "file",
+      "summary": "Utilitários de manipulação de JSON: validar, formatar, minificar, ordenar chaves, remover nulos, converter de/para YAML/TOML/XML, buscar chaves e gerar diff."
+    },
+    "file:internal/jsonutil/jsonutil_test.go": {
+      "name": "jsonutil_test.go",
+      "type": "file",
+      "summary": "Testes das funções de jsonutil: pretty/minify/validate, sort/strip, conversões YAML/TOML/XML, busca e diff."
+    },
+    "file:internal/jwtutil/jwtutil.go": {
+      "name": "jwtutil.go",
+      "type": "file",
+      "summary": "Utilitários de JWT: decodificar, exibir claims com dicas de tempo, verificar e assinar tokens HMAC e gerar claims iniciais."
+    },
+    "file:internal/jwtutil/jwtutil_test.go": {
+      "name": "jwtutil_test.go",
+      "type": "file",
+      "summary": "Testes do ciclo assinar/verificar/decodificar JWT e da geração de claims."
+    },
+    "file:internal/nginxutil/agent.go": {
+      "name": "agent.go",
+      "type": "file",
+      "summary": "Detecta, parseia e edita configs nginx de um projeto (entradas single e hub com .inc), seguindo includes reais e gerando novos server{}/location{}."
+    },
+    "file:internal/nginxutil/agent_test.go": {
+      "name": "agent_test.go",
+      "type": "file",
+      "summary": "Testes de detecção, descoberta e criação de configs nginx single/hub, incluindo fallbacks de include e proteção contra path escape."
+    },
+    "file:internal/ngrokutil/agent.go": {
+      "name": "agent.go",
+      "type": "file",
+      "summary": "Integração com o agente ngrok: detecta binário, consulta a API local, lista túneis e requisições, e inicia/para túneis via API ou processo."
+    },
+    "file:internal/ngrokutil/agent_test.go": {
+      "name": "agent_test.go",
+      "type": "file",
+      "summary": "Testes do pacote ngrokutil: mesclagem de túneis, persistência de config, sugestão de porta e sanitização de nomes."
+    },
+    "file:internal/sshutil/agent.go": {
+      "name": "agent.go",
+      "type": "file",
+      "summary": "Gerencia túneis SSH (local, remoto, dinâmico) como processos em segundo plano, com logs, sugestão de alvo via remotes Git e formatação de forwards."
+    },
+    "file:internal/sshutil/agent_test.go": {
+      "name": "agent_test.go",
+      "type": "file",
+      "summary": "Testes do pacote sshutil: modos, parsing de bind, argumentos ssh, mesclagem de túneis, config e sugestão de alvo."
+    },
+    "file:internal/ui/anim.go": {
+      "name": "anim.go",
+      "type": "file",
+      "summary": "Vocabulário de animação da TUI: spinners e pulsos Braille que codificam status pela altura, além do agendamento do tick de 10fps."
+    },
+    "file:internal/ui/anim_test.go": {
+      "name": "anim_test.go",
+      "type": "file",
+      "summary": "Testes de animação: ciclo do spinner, pulso/arco, badges de túnel e GitHub Actions e intervalo do tick."
+    },
+    "file:internal/ui/api_auth_test.go": {
+      "name": "api_auth_test.go",
+      "type": "file",
+      "summary": "Testes da aba de autenticação do cliente de API: alternância de tipo, edição de token Bearer e campos Basic."
+    },
+    "file:internal/ui/api_client.go": {
+      "name": "api_client.go",
+      "type": "file",
+      "summary": "Camada HTTP do cliente de API estilo Postman: parse de headers, auth, envio assíncrono via tea.Cmd e formatação de respostas e erros de rede."
+    },
+    "file:internal/ui/api_client_test.go": {
+      "name": "api_client_test.go",
+      "type": "file",
+      "summary": "Testes da camada HTTP do cliente de API: headers, auth, truncamento e envio GET via httptest."
+    },
+    "file:internal/ui/api_json_highlight.go": {
+      "name": "api_json_highlight.go",
+      "type": "file",
+      "summary": "Lexer JSON mínimo e tolerante para colorir o corpo da requisição no editor da TUI."
+    },
+    "file:internal/ui/api_json_highlight_test.go": {
+      "name": "api_json_highlight_test.go",
+      "type": "file",
+      "summary": "Testes do lexer de realce JSON: distinção chave/string e saída ANSI."
+    },
+    "file:internal/ui/api_kv.go": {
+      "name": "api_kv.go",
+      "type": "file",
+      "summary": "Tabela chave/valor de params e headers do cliente de API, como vista sincronizada da URL e do bloco de headers, mais geração de comando curl."
+    },
+    "file:internal/ui/api_screen.go": {
+      "name": "api_screen.go",
+      "type": "file",
+      "summary": "Renderização da tela do cliente de API no estilo Postman: cabeçalho, abas numeradas, painéis de requisição/resposta e barra de comandos."
+    },
+    "file:internal/ui/api_select_test.go": {
+      "name": "api_select_test.go",
+      "type": "file",
+      "summary": "Testes de seleção de texto nos campos do cliente de API (selecionar tudo, Shift+seleção, realce)."
+    },
+    "file:internal/ui/api_tab_test.go": {
+      "name": "api_tab_test.go",
+      "type": "file",
+      "summary": "Suíte de testes da aba de API: navegação, foco, sincronização params/URL, headers, envio, curl e layout da tela."
+    },
+    "file:internal/ui/confirm_modal.go": {
+      "name": "confirm_modal.go",
+      "type": "file",
+      "summary": "Modal compartilhado de confirmação y/n para ações destrutivas (containers, túneis, branches)."
+    },
+    "file:internal/ui/confirm_modal_test.go": {
+      "name": "confirm_modal_test.go",
+      "type": "file",
+      "summary": "Testes dos modais de confirmação de exclusão de containers, túneis, branches Git e escolha de estratégia de pull."
+    },
+    "file:internal/ui/container_detail_code.go": {
+      "name": "container_detail_code.go",
+      "type": "file",
+      "summary": "Realce de sintaxe por aba do detalhe de container: logs (carimbo/nível), YAML, env com mascaramento de segredos, docker top e Dockerfile."
+    },
+    "file:internal/ui/container_detail_code_test.go": {
+      "name": "container_detail_code_test.go",
+      "type": "file",
+      "summary": "Testes do realce e layout do detalhe de container: texto visível preservado, segredos mascarados, barras de stats e teclas de navegação."
+    },
+    "file:internal/ui/container_detail_layout.go": {
+      "name": "container_detail_layout.go",
+      "type": "file",
+      "summary": "Alinhamento das linhas do detalhe de container: colunas de env, blocos de configuração por indentação e tabelas do docker top."
+    },
+    "file:internal/ui/container_detail_views.go": {
+      "name": "container_detail_views.go",
+      "type": "file",
+      "summary": "Views da tela de detalhe de container: chrome no padrão dos módulos, cabeçalho, barra de comandos e corpo único com numeração, busca e realce."
+    },
+    "file:internal/ui/dashboard_test.go": {
+      "name": "dashboard_test.go",
+      "type": "file",
+      "summary": "Suíte extensa de testes do dashboard e da tela de containers: larguras de tabela, sidebar, métricas, estados vazios, logs, stats e faixa de selecionado."
+    },
+    "file:internal/ui/deploy.go": {
+      "name": "deploy.go",
+      "type": "file",
+      "summary": "Execução do script de deploy do projeto via tea.ExecProcess e abertura da URL principal do projeto no navegador."
+    },
+    "file:internal/ui/editor.go": {
+      "name": "editor.go",
+      "type": "file",
+      "summary": "Componente de editor de texto embutido no estilo VS Code (cursor, seleção, ctrl+palavra, rolagem horizontal) reutilizado pelas ferramentas JSON/JWT."
+    },
+    "file:internal/ui/foundation.go": {
+      "name": "foundation.go",
+      "type": "file",
+      "summary": "Fundação do design system da TUI: medição de colunas visíveis sem quebrar ANSI, filetes, cabeçalhos de seção, títulos, fatos, hints e panelBox, além dos níveis de densidade."
+    },
+    "file:internal/ui/foundation_test.go": {
+      "name": "foundation_test.go",
+      "type": "file",
+      "summary": "Testes do design system: larguras exatas de filetes/caixas, contagem de colunas, glifos de coluna única, glifos banidos no código e níveis de densidade."
+    },
+    "file:internal/ui/fuzzy.go": {
+      "name": "fuzzy.go",
+      "type": "file",
+      "summary": "Handlers de teclado para o prompt de busca fuzzy e diálogos de confirmação (deploy, remoção de container, fechar porta)."
+    },
+    "file:internal/ui/git_cache.go": {
+      "name": "git_cache.go",
+      "type": "file",
+      "summary": "Cache e saneamento de branches Git para a UI, com denylist de branches excluídas para evitar que reapareçam a partir de dados obsoletos."
+    },
+    "file:internal/ui/git_cache_test.go": {
+      "name": "git_cache_test.go",
+      "type": "file",
+      "summary": "Testes da denylist e da remoção de branches Git do cache."
+    },
+    "file:internal/ui/git_drawer.go": {
+      "name": "git_drawer.go",
+      "type": "file",
+      "summary": "Gaveta inferior da tela Git (log de comandos e stash): altura, abrir/fechar/alternar e atalhos da barra de comandos."
+    },
+    "file:internal/ui/git_drawer_test.go": {
+      "name": "git_drawer_test.go",
+      "type": "file",
+      "summary": "Testes da gaveta da tela Git: abertura por tecla, foco, log após comandos e encaixe em todos os tamanhos de terminal."
+    },
+    "file:internal/ui/help_screen.go": {
+      "name": "help_screen.go",
+      "type": "file",
+      "summary": "Tela de ajuda em sobreposição: tabela de atalhos por grupo de módulos, régua colorida e distribuição dos blocos em colunas equilibradas."
+    },
+    "file:internal/ui/jenkins_tab.go": {
+      "name": "jenkins_tab.go",
+      "type": "file",
+      "summary": "Módulo Jenkins completo da TUI: carga assíncrona de jobs/builds/console, visões geral/pipelines/builds, sparklines de atividade, disparo/parada de builds e formulário de configurações."
+    },
+    "file:internal/ui/jenkins_tab_test.go": {
+      "name": "jenkins_tab_test.go",
+      "type": "file",
+      "summary": "Testes do módulo Jenkins: presença nas abas e sidebar, landing, configurações, pipelines, gráfico de atividade e mascaramento do token."
+    },
+    "file:internal/ui/json_tab.go": {
+      "name": "json_tab.go",
+      "type": "file",
+      "summary": "Ferramenta JSON da TUI: editor de entrada, ações (pretty, minify, sort, strip nulls, diff, conversão YAML/TOML/XML), busca de chaves e integração com a área de transferência."
+    },
+    "file:internal/ui/json_tab_test.go": {
+      "name": "json_tab_test.go",
+      "type": "file",
+      "summary": "Testes da ferramenta JSON: ausência na navegação, entrar/sair, ação pretty, seleção e dashboard."
+    },
+    "file:internal/ui/jwt_tab.go": {
+      "name": "jwt_tab.go",
+      "type": "file",
+      "summary": "Ferramenta JWT da TUI: decodificar, verificar, assinar e gerar tokens com seleção de algoritmo, segredo mascarado, coloração das partes e cópia para a área de transferência."
+    },
+    "file:internal/ui/jwt_tab_test.go": {
+      "name": "jwt_tab_test.go",
+      "type": "file",
+      "summary": "Testes da ferramenta JWT: navegação, decodificação e assinatura, cache do token, rolagem e dashboard."
+    },
+    "file:internal/ui/keymap_test.go": {
+      "name": "keymap_test.go",
+      "type": "file",
+      "summary": "Testes de consistência do keymap: compara teclas tratadas no código com as prometidas na ajuda e verifica vocabulário uniforme entre módulos."
+    },
+    "file:internal/ui/module_caps.go": {
+      "name": "module_caps.go",
+      "type": "file",
+      "summary": "Detecção de capacidades do projeto (Docker, Jenkins, K8s, nginx, ferramentas no PATH) para ocultar módulos irrelevantes da sidebar e da navegação por tab."
+    },
+    "file:internal/ui/module_caps_test.go": {
+      "name": "module_caps_test.go",
+      "type": "file",
+      "summary": "Testes das capacidades de módulo: ocultação de irrelevantes, grupos vazios, mostrar todos, ciclo de tabs, probe e preservação da aba ativa."
+    },
+    "file:internal/ui/module_landing_test.go": {
+      "name": "module_landing_test.go",
+      "type": "file",
+      "summary": "Testes das landings de todos os módulos: sem caixas, respondem às três perguntas, cabem no terminal e comunicam estado honestamente."
+    },
+    "file:internal/ui/module_shell.go": {
+      "name": "module_shell.go",
+      "type": "file",
+      "summary": "Casca comum dos módulos: barra de contexto, trilho direito, caixa de ações alinhada e cálculos de largura/altura da tela."
+    },
+    "file:internal/ui/module_shell_test.go": {
+      "name": "module_shell_test.go",
+      "type": "file",
+      "summary": "Testes da casca de módulos: alinhamento da caixa de ações, largura da coluna AÇÕES e abas de monitoramento."
+    },
+    "file:internal/ui/nginx_tab.go": {
+      "name": "nginx_tab.go",
+      "type": "file",
+      "summary": "Módulo nginx da TUI: descoberta de sites/hubs/.inc, abas ROTAS/ARQUIVO, wizard de criação de .conf/.inc e exclusão de sites."
+    },
+    "file:internal/ui/nginx_tab_test.go": {
+      "name": "nginx_tab_test.go",
+      "type": "file",
+      "summary": "Testes do módulo nginx: landing, criação via wizard, drill-down em hub com .inc e varredura de outros projetos."
+    },
+    "file:internal/ui/nginx_view.go": {
+      "name": "nginx_view.go",
+      "type": "file",
+      "summary": "Renderiza o console do Nginx na TUI: cabeçalho de identificação do projeto/hub, régua numerada com contadores, tabela de rotas responsiva e painel do arquivo de configuração com numeração e realce de sintaxe."
+    },
+    "file:internal/ui/nginx_view_test.go": {
+      "name": "nginx_view_test.go",
+      "type": "file",
+      "summary": "Testes do console do Nginx: verifica que o layout cabe em qualquer terminal, que as colunas não excedem o painel, a navegação por teclas, o realce que só pinta e a marcação de rotas de outros projetos."
+    },
+    "file:internal/ui/ngrok_tab.go": {
+      "name": "ngrok_tab.go",
+      "type": "file",
+      "summary": "Implementa a aba Ngrok da TUI: carregamento assíncrono de túneis e requisições do agente, tabela de túneis, painéis de detalhes/requisições/logs, configuração, assistente (wizard) modal de criação e ações de iniciar, parar, reiniciar, duplicar, excluir, copiar URL e abrir no navegador."
+    },
+    "file:internal/ui/ngrok_tab_test.go": {
+      "name": "ngrok_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Ngrok: inclusão na lista de abas, tela inicial e abertura, atalho na barra lateral, edição da porta como texto no wizard, propagação de domínio e região, renderização e layout da tabela de túneis e modais."
+    },
+    "file:internal/ui/overview_tab_test.go": {
+      "name": "overview_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Overview: layout do dashboard, faixa de alerta só quando há problema, caixas que se ajustam ao conteúdo e rótulo de ambiente do projeto."
+    },
+    "file:internal/ui/paths.go": {
+      "name": "paths.go",
+      "type": "file",
+      "summary": "Helper mínimo que compara dois caminhos de sistema de arquivos após normalizá-los com filepath.Clean, usado para casar containers com projetos."
+    },
+    "file:internal/ui/project_cwd_test.go": {
+      "name": "project_cwd_test.go",
+      "type": "file",
+      "summary": "Teste que valida a detecção do projeto correspondente ao diretório de trabalho atual (findProjectForCwd)."
+    },
+    "file:internal/ui/relax.go": {
+      "name": "relax.go",
+      "type": "file",
+      "summary": "Tela Relax: registro tabular de todas as cenas animadas (nome, glifo, passo e render), troca de cena com crossfade, barra lateral com seleção, banner RELAX! em arco-íris e utilidades de cor HSL, centralização e hash determinístico."
+    },
+    "file:internal/ui/relax_aquarium.go": {
+      "name": "relax_aquarium.go",
+      "type": "file",
+      "summary": "Cena Relax de aquário: peixes desenhados por partes com cauda animada por ângulo, algas balançando, bolhas subindo e feixes de luz na água, renderizados em Braille."
+    },
+    "file:internal/ui/relax_ast.go": {
+      "name": "relax_ast.go",
+      "type": "file",
+      "summary": "Cena Relax 'Asteroids Idle': nave em piloto automático com inércia que vagueia, mira e atira em asteroides que se partem, em ciclos de ~30s com física por frame e correção de aspecto da célula."
+    },
+    "file:internal/ui/relax_blackhole.go": {
+      "name": "relax_blackhole.go",
+      "type": "file",
+      "summary": "Cena Relax de buraco negro: horizonte de eventos, anel de fóton, disco de acreção com lente gravitacional e efeito Doppler, fluxos de gás com rastro e estrelas de fundo deslocadas pela lente."
+    },
+    "file:internal/ui/relax_braille.go": {
+      "name": "relax_braille.go",
+      "type": "file",
+      "summary": "Camada de desenho Braille compartilhada pelas cenas Relax: converte cada célula em 2×4 subpixels, mantém nível de cor por ponto com média por célula e oferece primitivas (disco, elipse, triângulo, quadrilátero) e rampas de cor."
+    },
+    "file:internal/ui/relax_burst.go": {
+      "name": "relax_burst.go",
+      "type": "file",
+      "summary": "Cena Relax de supernova: partículas caem em espiral até a estrela estourar, deixando uma estrela azul que apaga devagar; ciclo dirigido por máquina de fases com quatro famílias de cor."
+    },
+    "file:internal/ui/relax_cat.go": {
+      "name": "relax_cat.go",
+      "type": "file",
+      "summary": "Cena Relax de gato dormindo: line art Braille embutida colorida com gradiente de pelo e manchas brancas, respiração contínua, corrida periódica da ponta do rabo e 'zzz' subindo."
+    },
+    "file:internal/ui/relax_chess.go": {
+      "name": "relax_chess.go",
+      "type": "file",
+      "summary": "Cena Relax de uma dama de xadrez girando: sólido de revolução com caneluras e colar de contas para quebrar a simetria, desenhado com z-buffer próprio e brilho especular."
+    },
+    "file:internal/ui/relax_city.go": {
+      "name": "relax_city.go",
+      "type": "file",
+      "summary": "Cena Relax de cidade dormindo: silhueta de prédios à noite com janelas que acendem e apagam com fade em tempos próprios, carro na rua e poste com defeito."
+    },
+    "file:internal/ui/relax_clouds.go": {
+      "name": "relax_clouds.go",
+      "type": "file",
+      "summary": "Cena Relax de nuvens: céu com ciclo de dia de ~4 minutos interpolando paletas de manhã a noite, e iluminação de nuvens por comparação de densidade na direção do sol."
+    },
+    "file:internal/ui/relax_coffee.go": {
+      "name": "relax_coffee.go",
+      "type": "file",
+      "summary": "Cena Relax de café visto de cima: bule entra, inclina e enche a xícara, depois o nível baixa em goles com pausas, com ondas na superfície e parede interna em sombra."
+    },
+    "file:internal/ui/relax_cube.go": {
+      "name": "relax_cube.go",
+      "type": "file",
+      "summary": "Cena Relax de cubo mágico 3D em Braille: 27 cubinhos com adesivos, giro de camada animado e projeção em perspectiva; embaralha registrando os movimentos e os desfaz em ordem inversa."
+    },
+    "file:internal/ui/relax_dragon.go": {
+      "name": "relax_dragon.go",
+      "type": "file",
+      "summary": "Cena Relax de dragão batendo asa contra a lua: anatomia procedural (tronco, pescoço, cabeça, cauda, asas com dedos e membrana) em curvas com espessura, golpe de asa assimétrico, jato de fogo, brasas, morros, nuvens e estrelas."
+    },
+    "file:internal/ui/relax_drop.go": {
+      "name": "relax_drop.go",
+      "type": "file",
+      "summary": "Cena Relax de gota na poça: a gota cai, forma coroa e gera pacotes de onda cuja soma produz interferência real, renderizada pela cor da superfície."
+    },
+    "file:internal/ui/relax_engine.go": {
+      "name": "relax_engine.go",
+      "type": "file",
+      "summary": "Motor de animação do Relax: relógio único com passo fixo consumido de um acumulador de tempo real, sub-relógios para física em sub-passos, fade/crossfade global com easing e escurecimento de estilos até a cor de fundo."
+    },
+    "file:internal/ui/relax_fall.go": {
+      "name": "relax_fall.go",
+      "type": "file",
+      "summary": "Cena Relax de folhas caindo e pétalas voando: sistema de partículas com dois presets, posições em per-mille, rajadas de vento com easing e física em sub-passos com taxa média de spawn preservada."
+    },
+    "file:internal/ui/relax_fire.go": {
+      "name": "relax_fire.go",
+      "type": "file",
+      "summary": "Cena Relax de fogueira: autômato de fogo estilo Doom em subpixels Braille, com calor propagando para cima, decaimento por hash e brasas soltas."
+    },
+    "file:internal/ui/relax_fireworks.go": {
+      "name": "relax_fireworks.go",
+      "type": "file",
+      "summary": "Cena Relax de fogos de artifício: foguetes sobem de trás do morro e estouram em formatos (coração, estrela, anel) amostrados de curvas fechadas, refletidos num lago."
+    },
+    "file:internal/ui/relax_fox.go": {
+      "name": "relax_fox.go",
+      "type": "file",
+      "summary": "Cena Relax de raposa e vaga-lumes: sprite Braille com teto de tamanho e cauda animada, serra ao fundo, capim balançando ao vento e vaga-lumes com halo em meio-tom num buffer de paleta indexada."
+    },
+    "file:internal/ui/relax_galaxy.go": {
+      "name": "relax_galaxy.go",
+      "type": "file",
+      "summary": "Cena Relax de galáxia: milhares de estrelas em subpixels Braille percorrendo órbitas elípticas precessantes que formam braços espirais, com bulbo, berçários, disco exponencial e supernovas ocasionais."
+    },
+    "file:internal/ui/relax_hourglass.go": {
+      "name": "relax_hourglass.go",
+      "type": "file",
+      "summary": "Cena Relax de ampulheta cósmica: estrelas descem em vórtice pelo bulbo, passam pelo gargalo e formam um disco espiral embaixo; a ampulheta vira com rotação de π e espelhamento sem emenda."
+    },
+    "file:internal/ui/relax_invaders.go": {
+      "name": "relax_invaders.go",
+      "type": "file",
+      "summary": "Cena Relax de Space Invaders jogando sozinho: sprites clássicos em bitmap Braille, simulação em subpixels com tiros, erosão de escudos, explosões e nova onda ao redimensionar."
+    },
+    "file:internal/collectors/compose.go": {
+      "name": "compose.go",
+      "type": "file",
+      "summary": "Integra o DevScope ao Docker Compose: localiza o arquivo compose do projeto, lê nomes de serviços e portas publicadas e executa up/build/down/restart/logs capturando a saída para não quebrar a TUI."
+    },
+    "file:internal/collectors/compose_edit.go": {
+      "name": "compose_edit.go",
+      "type": "file",
+      "summary": "Mescla serviços YAML (documento completo ou mapa de um único serviço) no arquivo compose do projeto, incluindo volumes nomeados de nível superior, e gera templates de serviço a partir de imagens."
+    },
+    "file:internal/collectors/compose_edit_test.go": {
+      "name": "compose_edit_test.go",
+      "type": "file",
+      "summary": "Testes unitários da mesclagem de YAML no compose: criação do arquivo, merge de serviços, volumes de nível superior e template de serviço."
+    },
+    "file:internal/collectors/compose_presets.go": {
+      "name": "compose_presets.go",
+      "type": "file",
+      "summary": "Catálogo de presets de serviços compose (Postgres, MySQL, Redis, Node etc.) e renderizadores que produzem snippets YAML realistas com portas, env, volumes e healthcheck, com fallback para o manifesto da imagem local ou snippet mínimo."
+    },
+    "file:internal/collectors/compose_presets_test.go": {
+      "name": "compose_presets_test.go",
+      "type": "file",
+      "summary": "Testes dos presets de compose: geração de YAML para Postgres, Redis e Node, imagens desconhecidas, nome base da imagem e conversão de portas/env a partir da config da imagem."
+    },
+    "file:internal/collectors/compose_test.go": {
+      "name": "compose_test.go",
+      "type": "file",
+      "summary": "Testes da leitura de portas de host em arquivos compose (ignorando healthchecks) e da detecção do arquivo compose do projeto."
+    },
+    "file:internal/collectors/database.go": {
+      "name": "database.go",
+      "type": "file",
+      "summary": "Detecta bancos Postgres/MySQL ligados a um projeto (containers, .env, credenciais manuais em .devscope/database.json) e executa listagem de tabelas, descrição de schema e consultas SQL via `docker exec` ou cliente local psql/mysql."
+    },
+    "file:internal/collectors/database_test.go": {
+      "name": "database_test.go",
+      "type": "file",
+      "summary": "Testes de parsing de DATABASE_URL, detecção do engine de banco por imagem do container, descoberta de bancos do projeto e escape de literais SQL."
+    },
+    "file:internal/collectors/docker.go": {
+      "name": "docker.go",
+      "type": "file",
+      "summary": "Coleta containers Docker (docker ps + inspect), extrai metadados de compose, políticas de restart e saúde, e atribui cada container ao projeto mais provável via pontuação de caminhos, incluindo serviços compose sem container."
+    },
+    "file:internal/collectors/docker_actions.go": {
+      "name": "docker_actions.go",
+      "type": "file",
+      "summary": "Wrappers finos sobre o CLI do Docker para ações de ciclo de vida de containers (pause, start, stop, restart, rm, logs, restart policy, shell exec) e para religar containers ao projeto após uma ação."
+    },
+    "file:internal/collectors/docker_close_port.go": {
+      "name": "docker_close_port.go",
+      "type": "file",
+      "summary": "Fecha uma porta publicada no host recriando o container sem aquele binding, preservando imagem, env, cmd, binds, redes e demais portas."
+    },
+    "file:internal/collectors/docker_deps.go": {
+      "name": "docker_deps.go",
+      "type": "file",
+      "summary": "Lê relações depends_on do arquivo compose do projeto (forma lista e forma mapa com condition), ordenadas por serviço, para o grafo de dependências de containers."
+    },
+    "file:internal/collectors/docker_detail.go": {
+      "name": "docker_detail.go",
+      "type": "file",
+      "summary": "Fornece detalhes de um container para a TUI: stats, volumes, env, config, processos (top), serviço compose, arquivo compose e Dockerfile associados, resolvendo o build context a partir do compose."
+    },
+    "file:internal/collectors/docker_detail_test.go": {
+      "name": "docker_detail_test.go",
+      "type": "file",
+      "summary": "Testes da resolução do Dockerfile a partir do bloco build do compose e da normalização do caminho do Dockerfile."
+    },
+    "file:internal/collectors/docker_hub.go": {
+      "name": "docker_hub.go",
+      "type": "file",
+      "summary": "Cliente da API pública do Docker Hub: busca paginada de repositórios, detalhes, tags recentes e utilitários de formatação (contadores, bytes, tempo relativo em português, resumo do README)."
+    },
+    "file:internal/collectors/docker_hub_test.go": {
+      "name": "docker_hub_test.go",
+      "type": "file",
+      "summary": "Testes dos utilitários do Docker Hub: URLs públicas, split namespace/nome, formatação de contadores, bytes e tempo relativo, resumo do README e composição repo:tag."
+    },
+    "file:internal/collectors/docker_images.go": {
+      "name": "docker_images.go",
+      "type": "file",
+      "summary": "Lista imagens Docker locais de nível superior, enriquece com labels de projeto compose (inclusive imagens dangling de rebuilds) e remove imagens via `docker rmi`."
+    },
+    "file:internal/collectors/docker_stats.go": {
+      "name": "docker_stats.go",
+      "type": "file",
+      "summary": "Coleta CPU% e memória dos containers via `docker stats --no-stream`, converte unidades de tamanho e agrega as métricas nos projetos."
+    },
+    "file:internal/collectors/docker_stats_test.go": {
+      "name": "docker_stats_test.go",
+      "type": "file",
+      "summary": "Testes de parsing de CPU/memória, aplicação de stats aos projetos, parsing/formatação de portas de containers, status degradado e ordenação de projetos fixados."
+    },
+    "file:internal/collectors/docker_test.go": {
+      "name": "docker_test.go",
+      "type": "file",
+      "summary": "Testes da atribuição de containers a projetos: pontuação de match por compose root e mounts, parsing de linhas do docker ps, restart policies, recuperação de órfãos e serviços compose ausentes."
+    },
+    "file:internal/collectors/gha.go": {
+      "name": "gha.go",
+      "type": "file",
+      "summary": "Integração completa com GitHub Actions via CLI `gh`: catálogo de processos/workflows do projeto, templates, listagem de runs/jobs/logs, timeline com barras Braille, heatmap de falhas, estimativa de billing, disparo de workflow_dispatch com inputs, notas por run e ações cancel/rerun."
+    },
+    "file:internal/collectors/gha_test.go": {
+      "name": "gha_test.go",
+      "type": "file",
+      "summary": "Testes da integração com GitHub Actions: sanitização de nomes, criação/remoção de processos, sincronização do catálogo, URLs, templates, parsing de runs/jobs, heatmap/billing, inputs de workflow_dispatch e notas."
+    },
+    "file:internal/collectors/git.go": {
+      "name": "git.go",
+      "type": "file",
+      "summary": "Coletor e executor Git do DevScope: lê status, branches, commits, stashes, remotes e diffs (incluindo conflitos) e oferece operações como checkout, commit, pull/push, merge, cherry-pick, resolução de conflitos e atualização do estado dos projetos."
+    },
+    "file:internal/collectors/git_graph.go": {
+      "name": "git_graph.go",
+      "type": "file",
+      "summary": "Extrai o DAG de commits (parents, refs, metadados) via git log para o layout próprio do grafo de branches e coleta estatísticas de linhas por arquivo de um commit."
+    },
+    "file:internal/collectors/git_test.go": {
+      "name": "git_test.go",
+      "type": "file",
+      "summary": "Suíte de testes de integração do coletor Git usando repositórios temporários: resumo, ordenação de branches, commits, diffs, origem de branch, pull, criação/renomeação/remoção de branch, cherry-pick, staging e fluxos de conflito."
+    },
+    "file:internal/collectors/health.go": {
+      "name": "health.go",
+      "type": "file",
+      "summary": "Executa health checks HTTP/TCP concorrentes para cada projeto, inferindo alvos a partir de portas do projeto, containers e PORT do .env, e registra status e latência."
+    },
+    "file:internal/collectors/integration_test.go": {
+      "name": "integration_test.go",
+      "type": "file",
+      "summary": "Testes de integração leves para detecção de script de deploy e parsing de configuração do nginx."
+    },
+    "file:internal/collectors/k8s.go": {
+      "name": "k8s.go",
+      "type": "file",
+      "summary": "Integração com Kubernetes via `kubectl`: contextos, namespaces, pods, deployments, services, eventos, describe/YAML, apply, delete, scale, logs, descoberta de manifestos do projeto e templates mínimos de Deployment/Service."
+    },
+    "file:internal/collectors/k8s_test.go": {
+      "name": "k8s_test.go",
+      "type": "file",
+      "summary": "Testes unitários dos helpers de Kubernetes: templates de Deployment/Service e descoberta de manifests no projeto."
+    },
+    "file:internal/collectors/nginx.go": {
+      "name": "nginx.go",
+      "type": "file",
+      "summary": "Coletor que lê configurações de sites nginx, extrai domínios e proxies e os associa aos projetos por porta."
+    },
+    "file:internal/collectors/pm2.go": {
+      "name": "pm2.go",
+      "type": "file",
+      "summary": "Coletor de workers PM2 via `pm2 jlist`, vinculando processos aos projetos pelo diretório de trabalho."
+    },
+    "file:internal/collectors/ports.go": {
+      "name": "ports.go",
+      "type": "file",
+      "summary": "Coletor de portas: parsing do docker ps, leitura de /proc/net/tcp, probe HTTP de prévia e detecção de conflitos de porta entre projetos."
+    },
+    "file:internal/collectors/ports_test.go": {
+      "name": "ports_test.go",
+      "type": "file",
+      "summary": "Testes da detecção de conflitos de porta de host entre dois e três projetos."
+    },
+    "file:internal/collectors/project_status.go": {
+      "name": "project_status.go",
+      "type": "file",
+      "summary": "Deriva o status agregado dos projetos (rodando/parado/degradado), detecta scripts de deploy e ordena projetos fixados primeiro."
+    },
+    "file:internal/collectors/projects_filter.go": {
+      "name": "projects_filter.go",
+      "type": "file",
+      "summary": "Filtra a lista de projetos removendo duplicatas por caminho e projetos aninhados em outros."
+    },
+    "file:internal/collectors/registry_inspect.go": {
+      "name": "registry_inspect.go",
+      "type": "file",
+      "summary": "Cliente anônimo da Registry API do Docker Hub que resolve manifests e extrai portas, env e volumes da configuração de imagens públicas."
+    },
+    "file:internal/collectors/registry_inspect_test.go": {
+      "name": "registry_inspect_test.go",
+      "type": "file",
+      "summary": "Testes do parsing de blobs de configuração de imagem e da separação de referências repositório/tag."
+    },
+    "file:internal/collectors/shell.go": {
+      "name": "shell.go",
+      "type": "file",
+      "summary": "Monta comandos para abrir o shell, agentes de IA de terminal e apps externos no diretório do projeto."
+    },
+    "file:internal/collectors/shell_test.go": {
+      "name": "shell_test.go",
+      "type": "file",
+      "summary": "Testes dos construtores de comando de shell, agente de IA e apps externos (incluindo modo destacado com \"&\")."
+    },
+    "file:internal/collectors/ssl.go": {
+      "name": "ssl.go",
+      "type": "file",
+      "summary": "Coletor de certificados Let's Encrypt locais, associando-os aos projetos pelos domínios."
+    },
+    "file:internal/collectors/swarm.go": {
+      "name": "swarm.go",
+      "type": "file",
+      "summary": "Camada completa de integração com Docker Swarm via CLI: modelos, listagem de nós/serviços/tasks/stacks/redes/secrets/configs, inspeção e ações de gestão do cluster."
+    },
+    "file:internal/collectors/swarm_test.go": {
+      "name": "swarm_test.go",
+      "type": "file",
+      "summary": "Testes dos helpers de Swarm: réplicas, status de serviço, vínculo com projeto e descoberta de compose para stack deploy."
+    },
+    "file:internal/dbutil/config_test.go": {
+      "name": "config_test.go",
+      "type": "file",
+      "summary": "Teste de ida e volta (save/load) e upsert da configuração de conexões de banco do pacote dbutil."
+    },
+    "file:internal/ui/api_tab.go": {
+      "name": "api_tab.go",
+      "type": "file",
+      "summary": "Cliente HTTP estilo Postman dentro da TUI: edição de URL/params/headers/auth/body com editor multilinha, envio assíncrono, histórico e busca na resposta."
+    },
+    "file:internal/ui/compose_messages.go": {
+      "name": "compose_messages.go",
+      "type": "file",
+      "summary": "Mensagens e comandos Bubble Tea para up/build/down/restart do docker compose, com barra de progresso animada."
+    },
+    "file:internal/ui/container_deps.go": {
+      "name": "container_deps.go",
+      "type": "file",
+      "summary": "Tela de árvore de dependências entre serviços compose, com status de cada serviço."
+    },
+    "file:internal/ui/container_detail.go": {
+      "name": "container_detail.go",
+      "type": "file",
+      "summary": "Tela de detalhe do container com abas numeradas, rolagem bidirecional, busca e acompanhamento ao vivo dos logs."
+    },
+    "file:internal/ui/container_images.go": {
+      "name": "container_images.go",
+      "type": "file",
+      "summary": "Tela de imagens Docker com escopos (repositório, projeto, todas), tabela e modal de remoção."
+    },
+    "file:internal/ui/container_messages.go": {
+      "name": "container_messages.go",
+      "type": "file",
+      "summary": "Mensagens e comandos assíncronos das ações de container (start/stop/restart/pause/remove/shell), carregamento das abas de detalhe e refresh do Docker."
+    },
+    "file:internal/ui/container_ports.go": {
+      "name": "container_ports.go",
+      "type": "file",
+      "summary": "Tela de portas publicadas do container com prévia HTTP, abrir no navegador e fechamento de porta."
+    },
+    "file:internal/ui/container_stats.go": {
+      "name": "container_stats.go",
+      "type": "file",
+      "summary": "Tela de estatísticas ao vivo do container com régua de valores e histogramas de CPU, memória e rede."
+    },
+    "file:internal/ui/containers_tab.go": {
+      "name": "containers_tab.go",
+      "type": "file",
+      "summary": "Aba de containers: lista rolável com faixas de estado em Braille animadas, filtros, preview de logs/recursos e roteamento para as subviews."
+    },
+    "file:internal/ui/dashboard.go": {
+      "name": "dashboard.go",
+      "type": "file",
+      "summary": "Tela principal do dashboard: métricas do host, lista de projetos com status, painel contextual do selecionado (stack, runtime, git) e rodapé de atalhos."
+    },
+    "file:internal/ui/db_tab.go": {
+      "name": "db_tab.go",
+      "type": "file",
+      "summary": "Cliente de banco de dados na TUI: listagem e filtro de tabelas, schema, editor de query SQL e painel de resultados."
+    },
+    "file:internal/ui/db_tab_test.go": {
+      "name": "db_tab_test.go",
+      "type": "file",
+      "summary": "Testes de integração da UI da ferramenta de banco: presença nas abas e sidebar, navegação landing/cliente e filtro."
+    },
+    "file:internal/ui/docker_add.go": {
+      "name": "docker_add.go",
+      "type": "file",
+      "summary": "Assistente para adicionar serviços ao docker-compose buscando imagens e tags no Docker Hub e gerando YAML editável."
+    },
+    "file:internal/ui/docker_add_render.go": {
+      "name": "docker_add_render.go",
+      "type": "file",
+      "summary": "Renderização do assistente de adicionar container: busca no Docker Hub, seleção de imagem/tag, métricas e edição do serviço compose."
+    },
+    "file:internal/ui/docker_add_test.go": {
+      "name": "docker_add_test.go",
+      "type": "file",
+      "summary": "Testes do fluxo de adicionar container via Docker Hub, cobrindo presets, editor de YAML, paginação e cache de detalhes."
+    },
+    "file:internal/ui/gha_detail.go": {
+      "name": "gha_detail.go",
+      "type": "file",
+      "summary": "Tela dedicada de processo do GitHub Actions com sub-abas Overview, Runs, Jobs, Logs e YAML, além das ações de rerun e navegador."
+    },
+    "file:internal/ui/gha_tab.go": {
+      "name": "gha_tab.go",
+      "type": "file",
+      "summary": "Estado, mensagens e lógica de teclado da aba GitHub Actions: coleta de runs/workflows, filtros, disparo de workflows, cancelamento, notas e logs."
+    },
+    "file:internal/ui/gha_tab_test.go": {
+      "name": "gha_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba GitHub Actions cobrindo landing, central, painéis, filtros, cancelamento, disparo e intervalo de ticks."
+    },
+    "file:internal/ui/gha_views.go": {
+      "name": "gha_views.go",
+      "type": "file",
+      "summary": "Views da aba GitHub Actions: landing, central com tabela de processos/runs/workflows, painéis de uso e ações, e modais de setup, criação, disparo, logs e YAML."
+    },
+    "file:internal/ui/git_compose.go": {
+      "name": "git_compose.go",
+      "type": "file",
+      "summary": "Modal multilinha de composição de mensagem de commit na aba Git."
+    },
+    "file:internal/ui/git_graph.go": {
+      "name": "git_graph.go",
+      "type": "file",
+      "summary": "Visão de grafo de commits da aba Git com painéis de lista, detalhe e arquivos, seletor de branch e glifos de desenho do grafo."
+    },
+    "file:internal/ui/git_messages.go": {
+      "name": "git_messages.go",
+      "type": "file",
+      "summary": "Mensagens assíncronas e ações Git da aba: stage, checkout, merge, pull, push, cherry-pick, resolução de conflitos e log de comandos."
+    },
+    "file:internal/ui/git_prompt.go": {
+      "name": "git_prompt.go",
+      "type": "file",
+      "summary": "Prompts e confirmações da aba Git para criar, renomear, excluir e mesclar branches, escolher estratégia de pull e abrir PR."
+    },
+    "file:internal/ui/git_tab.go": {
+      "name": "git_tab.go",
+      "type": "file",
+      "summary": "Núcleo da aba Git: renderização das colunas de branches/commits/arquivos, histórico de branch, detalhe de commit com árvore e diff, busca, navegação e atalhos."
+    },
+    "file:internal/ui/git_tab_test.go": {
+      "name": "git_tab_test.go",
+      "type": "file",
+      "summary": "Testes extensivos da aba Git cobrindo layout, árvore de arquivos, conflitos, diff, busca, histórico, commit detail, compose e cabeçalho."
+    },
+    "file:internal/ui/graph_features_test.go": {
+      "name": "graph_features_test.go",
+      "type": "file",
+      "summary": "Testes das visões gráficas: imagens e dependências de containers, layout do grafo de commits e navegação/seletor de branch do grafo."
+    },
+    "file:internal/ui/graph_layout.go": {
+      "name": "graph_layout.go",
+      "type": "file",
+      "summary": "Algoritmo de layout do grafo de commits (lanes, cores e células de conexão), portado do git-graph."
+    },
+    "file:internal/ui/helpers.go": {
+      "name": "helpers.go",
+      "type": "file",
+      "summary": "Utilitários compartilhados da UI: cálculo de alturas, janela horizontal ANSI, quebra de texto, ordenação de projetos, rótulos e estilos de status Git."
+    },
+    "file:internal/ui/k8s_tab.go": {
+      "name": "k8s_tab.go",
+      "type": "file",
+      "summary": "Aba Kubernetes completa: landing, visão geral, tabela de recursos, logs, YAML, describe, eventos, editor de manifests e ações de apply, scale e delete."
+    },
+    "file:internal/ui/k8s_tab_test.go": {
+      "name": "k8s_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Kubernetes cobrindo landing, sidebar, editor, layout da visão geral, contexto de produção e estilos."
+    },
+    "file:internal/ui/logs_tab.go": {
+      "name": "logs_tab.go",
+      "type": "file",
+      "summary": "Aba Logs do projeto: carrega logs do compose/container e os exibe coloridos com modo follow."
+    },
+    "file:internal/ui/module_landing.go": {
+      "name": "module_landing.go",
+      "type": "file",
+      "summary": "Componente padronizado de landing (abertura) dos módulos com faixa de estado, fatos, prévia do projeto e ações."
+    },
+    "file:internal/ui/overview_tab.go": {
+      "name": "overview_tab.go",
+      "type": "file",
+      "summary": "Dashboard da Visão Geral do projeto com alertas, stack/runtime, containers, módulos, saúde, Git e atividade."
+    },
+    "file:internal/ui/project_load.go": {
+      "name": "project_load.go",
+      "type": "file",
+      "summary": "Carregamento assíncrono de Git e Docker ao abrir um projeto."
+    },
+    "file:internal/ui/project_messages.go": {
+      "name": "project_messages.go",
+      "type": "file",
+      "summary": "Ações de projeto que suspendem a TUI: shell, agente de IA com seletor, edição de config e atalhos de aplicativos."
+    },
+    "file:internal/ui/project_sidebar.go": {
+      "name": "project_sidebar.go",
+      "type": "file",
+      "summary": "Sidebar de navegação do projeto com bloco de marca, grupos de módulos, ícones, cores e medidores."
+    },
+    "file:internal/ui/swarm_tab.go": {
+      "name": "swarm_tab.go",
+      "type": "file",
+      "summary": "Estado, mensagens e teclado da aba Docker Swarm: coleta do cluster, navegação, formulários e ações de scale, update, deploy, remove e tokens."
+    },
+    "file:internal/ui/swarm_tab_test.go": {
+      "name": "swarm_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Docker Swarm cobrindo landing, central, abas de tipo, navegação e formulário de scale."
+    },
+    "file:internal/ui/swarm_views.go": {
+      "name": "swarm_views.go",
+      "type": "file",
+      "summary": "Views da aba Docker Swarm: landing, central com tabela de nodes/services/stacks/tasks, painéis laterais e modais."
+    },
+    "file:internal/ui/user_config_screen.go": {
+      "name": "user_config_screen.go",
+      "type": "file",
+      "summary": "Tela de preferências do usuário para tema, atalhos de aplicativos e agente de IA, com salvar e reset com backup."
+    },
+    "file:pkg/version/version.go": {
+      "name": "version.go",
+      "type": "file",
+      "summary": "Variáveis de versão, commit e data de build injetadas via ldflags e função que as formata."
+    },
+    "file:cmd/devscope/main.go": {
+      "name": "main.go",
+      "type": "file",
+      "summary": "Ponto de entrada do binário devscope: apenas delega para commands.Execute e encerra o processo com código de erro em caso de falha."
+    },
+    "file:internal/collectors/manager.go": {
+      "name": "manager.go",
+      "type": "file",
+      "summary": "Orquestrador dos coletores em segundo plano: faz o scan rápido inicial, roda loops periódicos de scanner, Docker, health e métricas do host e publica tudo no StateStore compartilhado."
+    },
+    "file:internal/collectors/project_enrich.go": {
+      "name": "project_enrich.go",
+      "type": "file",
+      "summary": "Funções de enriquecimento por projeto: religa containers, estatísticas Docker, workers PM2, health checks e Git a um projeto específico ou a todos (para o CLI scan)."
+    },
+    "file:internal/commands/root.go": {
+      "name": "root.go",
+      "type": "file",
+      "summary": "Define o comando raiz Cobra 'devscope' com flags --config/--debug, que abre a TUI via app.Run, e registra os subcomandos version, scan e watch."
+    },
+    "file:internal/commands/scan.go": {
+      "name": "scan.go",
+      "type": "file",
+      "summary": "Subcomandos Cobra 'scan' (imprime snapshot JSON dos projetos enriquecidos e métricas do host) e 'watch' (reimprime periodicamente um resumo textual dos projetos)."
+    },
+    "file:internal/commands/scan_test.go": {
+      "name": "scan_test.go",
+      "type": "file",
+      "summary": "Testes do subcomando scan: valida a saída JSON do snapshot contra um diretório temporário e verifica que scan está registrado no comando raiz."
+    },
+    "file:internal/config/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Modelo de configuração do DevScope (scan, refresh, UI, health, ferramentas e atalhos de apps) carregado via Viper a partir de config.yaml, com defaults e caminhos de config/log."
+    },
+    "file:internal/config/userconfig.go": {
+      "name": "userconfig.go",
+      "type": "file",
+      "summary": "Gerencia o user_config.txt comentado (tema, atalhos de apps e agente de IA): cria, renderiza, faz parse tolerante a erros, reseta com backup e altera chaves preservando comentários."
+    },
+    "file:internal/config/userconfig_test.go": {
+      "name": "userconfig_test.go",
+      "type": "file",
+      "summary": "Testes do user_config.txt: round-trip render/parse, tolerância a JSON quebrado, rejeição de slot inválido, preservação de comentários ao trocar tema e comentários finais."
+    },
+    "file:internal/detectors/frameworks.go": {
+      "name": "frameworks.go",
+      "type": "file",
+      "summary": "Implementações concretas de Detector para 14 stacks (NestJS, Laravel, Django, Next, Nuxt, Vue, React, Node, PHP, Go, Rust, Python, Java, Docker) baseadas em arquivos marcadores e dependências do package.json/composer."
+    },
+    "file:internal/detectors/frameworks_test.go": {
+      "name": "frameworks_test.go",
+      "type": "file",
+      "summary": "Testes de detecção de frameworks com diretórios temporários contendo marcadores de NestJS, Laravel, Go, Docker-only e Django."
+    },
+    "file:internal/detectors/registry.go": {
+      "name": "registry.go",
+      "type": "file",
+      "summary": "Registro global de detectores de framework: interface Detector, tipo FrameworkInfo, registro por prioridade e funções DetectAll/DetectMatches; o init registra todos os detectores."
+    },
+    "file:internal/metrics/disk_unix.go": {
+      "name": "disk_unix.go",
+      "type": "file",
+      "summary": "Implementação Unix de getDiskSpace usando syscall.Statfs para obter espaço total e livre do disco."
+    },
+    "file:internal/metrics/disk_windows.go": {
+      "name": "disk_windows.go",
+      "type": "file",
+      "summary": "Implementação Windows de getDiskSpace via chamada à API GetDiskFreeSpaceExW da kernel32.dll."
+    },
+    "file:internal/metrics/host.go": {
+      "name": "host.go",
+      "type": "file",
+      "summary": "Coletor de métricas do host (CPU, memória, swap, disco, uptime, load average, processos, containers Docker, usuários logados e SO) lendo /proc no Linux e comandos no Windows."
+    },
+    "file:internal/scanner/discover_test.go": {
+      "name": "discover_test.go",
+      "type": "file",
+      "summary": "Testes de descoberta: garante que MergeDiscovered preserva projetos existentes e que FastScan encontra projetos em diretório temporário."
+    },
+    "file:internal/scanner/markers.go": {
+      "name": "markers.go",
+      "type": "file",
+      "summary": "Leitura e classificação de marcadores de projeto em diretórios (.git, package.json, compose, go.mod etc.), detecção de módulos/subpastas de serviço e palpite de framework/linguagem."
+    },
+    "file:internal/scanner/runtime.go": {
+      "name": "runtime.go",
+      "type": "file",
+      "summary": "Descobre raízes de projeto a partir de serviços em execução (labels do docker compose, caminhos de containers Docker e PM2) e resolve a raiz subindo diretórios até achar um marcador."
+    },
+    "file:internal/scanner/runtime_test.go": {
+      "name": "runtime_test.go",
+      "type": "file",
+      "summary": "Testes de resolução de raiz de projeto: ResolveProjectRoot com e sem marcador e filtragem de caminhos existentes."
+    },
+    "file:internal/scanner/scanner.go": {
+      "name": "scanner.go",
+      "type": "file",
+      "summary": "Scanner de projetos: percorre os caminhos configurados com cache por fingerprint, faz scan rápido ou profundo com detecção de frameworks e módulos, mescla projetos descobertos em runtime e enriquece em paralelo."
+    },
+    "file:internal/scanner/scanner_test.go": {
+      "name": "scanner_test.go",
+      "type": "file",
+      "summary": "Testes do scanner: marcadores rápidos, scan que ignora subpastas e acha múltiplas raízes, identificação de subpastas de serviço, FocusedProjectPath e ProjectStubAt."
+    },
+    "file:internal/ui/containers_tab_test.go": {
+      "name": "containers_tab_test.go",
+      "type": "file",
+      "summary": "Suíte extensa da aba de containers da TUI: cursor e seleção, atalhos Shift+U/D/R para compose e restart policy, portas, colunas, estados visuais, layout dividido e estabilidade do detalhe."
+    },
+    "file:internal/ui/help_screen_test.go": {
+      "name": "help_screen_test.go",
+      "type": "file",
+      "summary": "Testes da tela de ajuda: cores dos grupos alinhadas à sidebar, um bloco por tela, encaixe em qualquer tamanho de terminal, teclas de navegação e grafia de Shift."
+    },
+    "file:internal/ui/project_cwd.go": {
+      "name": "project_cwd.go",
+      "type": "file",
+      "summary": "Abre direto o projeto correspondente ao diretório de trabalho atual, resolvendo a raiz via scanner e posicionando a App na aba Git desse projeto."
+    },
+    "file:internal/ui/theme_test.go": {
+      "name": "theme_test.go",
+      "type": "file",
+      "summary": "Testes de temas da TUI: catálogo de temas, seletor que salva ou restaura com Esc, conversão hex→RGB e renderização do popup de temas."
+    },
+    "file:internal/ui/tools_config_test.go": {
+      "name": "tools_config_test.go",
+      "type": "file",
+      "summary": "Testes da integração de ferramentas configuráveis: agente de IA no dashboard, seletor de IA, atalhos de apps por dígito, painel de edição do user_config e atalho Ctrl+O."
+    },
+    "file:internal/ui/relax_jackpot.go": {
+      "name": "relax_jackpot.go",
+      "type": "file",
+      "summary": "Cena 'Jackpoint' do modo Relax: um caça-níquel em Braille que sorteia, gira três rolos com curva de freio, exibe prêmios com partículas (moedas, cartas, TNT, HAHAHA) e recomeça sozinho."
+    },
+    "file:internal/ui/relax_moon.go": {
+      "name": "relax_moon.go",
+      "type": "file",
+      "summary": "Cena da Lua do modo Relax: renderiza uma lua esférica em Braille com iluminação por normal, mares, crateras, fase contínua, libração e nuvens finas."
+    },
+    "file:internal/ui/relax_motion.go": {
+      "name": "relax_motion.go",
+      "type": "file",
+      "summary": "Helpers de movimento compartilhados pelas cenas do Relax: lerp, lerp angular, smoothDamp independente do passo, funções de easing, clamps e value noise 1D."
+    },
+    "file:internal/ui/relax_nebula.go": {
+      "name": "relax_nebula.go",
+      "type": "file",
+      "summary": "Cena da Nebulosa do modo Relax: duas nuvens de emissão (hidrogênio rosa e oxigênio azul) mais camada de poeira subtrativa, calculadas por ondas planas separáveis sem trigonometria no laço interno."
+    },
+    "file:internal/ui/relax_ridge.go": {
+      "name": "relax_ridge.go",
+      "type": "file",
+      "summary": "Cena 'Montanha com nuvens' do modo Relax: cinco cadeias de morro com perspectiva aérea e nuvens desenhadas entre as cadeias conforme a profundidade."
+    },
+    "file:internal/ui/relax_sea.go": {
+      "name": "relax_sea.go",
+      "type": "file",
+      "summary": "Cena 'Mar à noite' do modo Relax: horizonte pontilhado com cúmulos à deriva, lua e ondas em perspectiva com o reflexo da lua quebrando em cada crista."
+    },
+    "file:internal/ui/relax_sky.go": {
+      "name": "relax_sky.go",
+      "type": "file",
+      "summary": "Cena Starfield do modo Relax: céu noturno em ciclos de ~30s com estrelas em três camadas, cometas, estrelas cadentes, constelações raras, aurora e crista de coníferas."
+    },
+    "file:internal/ui/relax_smoke.go": {
+      "name": "relax_smoke.go",
+      "type": "file",
+      "summary": "Cena 'Fumaça colorida' do modo Relax: um pote solta fumaça de duas cores por 5s, advectada por curl noise que sobe, abre e se dissipa em 15s antes de um novo par de cores."
+    },
+    "file:internal/ui/relax_sword.go": {
+      "name": "relax_sword.go",
+      "type": "file",
+      "summary": "Gerador de planetas do modo Relax (arquivo legado 'sword'): sorteia por tabela de raridade variantes como planeta com anel, cubo, Terra, unicórnio, mundo plano, rosquinha ou nave, renderizadas em Braille com iluminação real."
+    },
+    "file:internal/ui/relax_test.go": {
+      "name": "relax_test.go",
+      "type": "file",
+      "summary": "Suíte de testes do modo Relax: cobre alternância com Ctrl+T, navegação entre cenas, loop de animação único, crossfade, passo fixo do motor e o comportamento de cada cena (céu, tetris, mar, jackpot, planeta, V4, fumaça, gato, raposa, dragão)."
+    },
+    "file:internal/ui/relax_tetris.go": {
+      "name": "relax_tetris.go",
+      "type": "file",
+      "summary": "Cena de Tetris automático do modo Relax: heurística clássica escolhe rotação e coluna, a peça desce em ritmo lento e linhas cheias se dissolvem do meio para as bordas."
+    },
+    "file:internal/ui/relax_tetris_draw.go": {
+      "name": "relax_tetris_draw.go",
+      "type": "file",
+      "summary": "Desenho das peças do Tetris do Relax em Braille: cada bloco é 6×4 subpixels com bisel (aresta clara em cima/esquerda, escura embaixo/direita) para dar volume."
+    },
+    "file:internal/ui/relax_tree.go": {
+      "name": "relax_tree.go",
+      "type": "file",
+      "summary": "Cena 'Copa ao vento' do modo Relax: árvore em Braille com meio-tom por densidade de luz; a estrutura é pré-calculada e por frame só vento e sombra deformam a amostragem (domain warp)."
+    },
+    "file:internal/ui/relax_v4.go": {
+      "name": "relax_v4.go",
+      "type": "file",
+      "summary": "Cena 'Motor V4' do modo Relax: corte animado de um motor de quatro cilindros com pistões, bielas, virabrequim, válvulas e comando, simulando partida, marcha lenta e aceleradas em ciclo de quatro tempos."
+    },
+    "file:internal/ui/responsive_test.go": {
+      "name": "responsive_test.go",
+      "type": "file",
+      "summary": "Testes de responsividade da UI: renderiza dezenas de cenas (dashboard, módulos, containers, git, ajuda, tema, relax) em vários tamanhos e verifica ausência de overflow, degradação ordenada de colunas e dicas de teclas."
+    },
+    "file:internal/ui/shell_return.go": {
+      "name": "shell_return.go",
+      "type": "file",
+      "summary": "Renderiza a mensagem exibida ao voltar de um shell externo, pedindo Enter para retornar ao DevScope e mostrando o erro quando houver."
+    },
+    "file:internal/ui/small_terminal_test.go": {
+      "name": "small_terminal_test.go",
+      "type": "file",
+      "summary": "Testes que garantem que a view cabe em terminais pequenos e que a sidebar mantém a aba ativa visível."
+    },
+    "file:internal/ui/spark.go": {
+      "name": "spark.go",
+      "type": "file",
+      "summary": "Sparklines e ondas em Braille: sparkHistory guarda janelas de métricas 0–100, brailleSpark empacota duas amostras por célula e statusWave desenha ondas animadas por status de container."
+    },
+    "file:internal/ui/spark_test.go": {
+      "name": "spark_test.go",
+      "type": "file",
+      "summary": "Testes das sparklines Braille, da janela do sparkHistory, dos alertas/faixa de métricas do host e das larguras e formas distintas do statusWave."
+    },
+    "file:internal/ui/ssh_tab.go": {
+      "name": "ssh_tab.go",
+      "type": "file",
+      "summary": "Aba SSH do painel de projeto: lista túneis SSH (-L/-R/-D) mesclando config e processos vivos, mostra detalhes, logs, histórico e configuração, e oferece um assistente para criar, iniciar, parar, reiniciar, excluir e copiar túneis."
+    },
+    "file:internal/ui/ssh_tab_test.go": {
+      "name": "ssh_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba SSH: presença em AllTabs, landing e abertura do cliente, atalho da sidebar, ciclo de modos no assistente, render da tabela de túneis e conversão do assistente em TunnelConfig."
+    },
+    "file:internal/ui/styles.go": {
+      "name": "styles.go",
+      "type": "file",
+      "summary": "Define a paleta de cores (primária, status, JSON, frameworks) e os estilos Lip Gloss globais reutilizados por toda a interface do DevScope."
+    },
+    "file:internal/ui/theme.go": {
+      "name": "theme.go",
+      "type": "file",
+      "summary": "Sistema de temas da UI: catálogo de temas selecionáveis, aplicação de paleta com reconstrução dos estilos, cores do terminal (OSC) e enquadramento/recorte da tela do app."
+    },
+    "file:internal/ui/tunnel_modals.go": {
+      "name": "tunnel_modals.go",
+      "type": "file",
+      "summary": "Primitivas visuais compartilhadas pelos modais de túnel (SSH, ngrok, Cloudflare, WebSocket): cabeçalho do modal, caixa, badge de status, par chave-valor e linha de métricas."
+    },
+    "file:internal/ui/views.go": {
+      "name": "views.go",
+      "type": "file",
+      "summary": "Declara os enums de navegação da UI (View, subviews do dashboard e Tab) com nomes em português e a lista AllTabs que fixa a ordem do Tab igual à da sidebar."
+    },
+    "file:internal/ui/ws_compose.go": {
+      "name": "ws_compose.go",
+      "type": "file",
+      "summary": "Modal de composição de mensagens WebSocket: editor com foco cíclico entre texto, tipo, Enviar e Cancelar, envio da mensagem e render sobre o fundo da aba."
+    },
+    "file:internal/cfutil/agent.go": {
+      "name": "agent.go",
+      "type": "file",
+      "summary": "Gerencia o ciclo de vida de túneis Cloudflare via CLI cloudflared: instalação, login, criação/remoção de túneis nomeados, rota DNS, início/parada de processos e captura da URL pública a partir dos logs."
+    },
+    "file:internal/cfutil/agent_test.go": {
+      "name": "agent_test.go",
+      "type": "file",
+      "summary": "Testes unitários do pacote cfutil cobrindo merge de túneis, persistência de configuração, normalização de URL/modo, montagem de argumentos e extração da URL pública."
+    },
+    "file:internal/cfutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Persiste a configuração de túneis Cloudflare por projeto em .devscope/cloudflare.json e mescla túneis configurados com processos vivos, incluindo histórico e contagem de túneis de outros projetos."
+    },
+    "file:internal/cfutil/discover.go": {
+      "name": "discover.go",
+      "type": "file",
+      "summary": "Descobre processos cloudflared em execução na máquina lendo /proc, sondando portas de métricas e enriquecendo os dados com URL pública e uptime; também identifica e encerra túneis de outros projetos."
+    },
+    "file:internal/cfutil/discover_test.go": {
+      "name": "discover_test.go",
+      "type": "file",
+      "summary": "Testes que validam o parsing de linhas de comando do cloudflared (quick, token, named), a detecção do binário e o filtro de túneis estrangeiros."
+    },
+    "file:internal/dbutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Armazena credenciais de banco de dados concedidas manualmente pelo usuário em .devscope/database.json, com operações de carregar, salvar, inserir/atualizar e remover."
+    },
+    "file:internal/devscopeutil/dir.go": {
+      "name": "dir.go",
+      "type": "file",
+      "summary": "Cria o diretório .devscope por projeto e garante que ele seja ignorado no .gitignore, pois guarda arquivos com senhas e tokens."
+    },
+    "file:internal/devscopeutil/dir_test.go": {
+      "name": "dir_test.go",
+      "type": "file",
+      "summary": "Testes que verificam a criação do .devscope e a inclusão sem duplicatas da entrada no .gitignore, preservando o conteúdo existente."
+    },
+    "file:internal/jenkinsutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Persiste a configuração Jenkins do projeto (URL, usuário, token) em .devscope e oferece helpers para checar configuração, extrair host e mascarar o token."
+    },
+    "file:internal/ngrokutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Persiste túneis ngrok por projeto em .devscope/ngrok.json e mescla túneis configurados com os túneis ativos da API local do ngrok, mantendo histórico."
+    },
+    "file:internal/routeutil/discover.go": {
+      "name": "discover.go",
+      "type": "file",
+      "summary": "Ponto central da descoberta de rotas HTTP: combina specs OpenAPI (arquivos e HTTP) com scanners por stack e deduplica/ordena o resultado por método e caminho."
+    },
+    "file:internal/routeutil/discover_test.go": {
+      "name": "discover_test.go",
+      "type": "file",
+      "summary": "Testes de integração da descoberta de rotas usando projetos temporários com OpenAPI e várias stacks, além da detecção de frameworks e parsing de OpenAPI em YAML."
+    },
+    "file:internal/routeutil/openapi.go": {
+      "name": "openapi.go",
+      "type": "file",
+      "summary": "Carrega e interpreta especificações OpenAPI/Swagger (JSON ou YAML) a partir de arquivos conhecidos do projeto ou de endpoints HTTP locais, convertendo operações em rotas."
+    },
+    "file:internal/routeutil/route.go": {
+      "name": "route.go",
+      "type": "file",
+      "summary": "Define o modelo Route e a interface Scanner, mantendo um registro global de scanners de rotas registrados no init para cada stack suportada."
+    },
+    "file:internal/routeutil/scan_django.go": {
+      "name": "scan_django.go",
+      "type": "file",
+      "summary": "Scanner de rotas Django que lê urls.py e extrai padrões path/re_path em rotas HTTP."
+    },
+    "file:internal/routeutil/scan_express.go": {
+      "name": "scan_express.go",
+      "type": "file",
+      "summary": "Scanner de rotas Express que detecta chamadas app/router.METHOD em arquivos JS/TS."
+    },
+    "file:internal/routeutil/scan_fastapi.go": {
+      "name": "scan_fastapi.go",
+      "type": "file",
+      "summary": "Scanner de rotas FastAPI que identifica arquivos com instância FastAPI/APIRouter e extrai decorators @app.METHOD."
+    },
+    "file:internal/routeutil/scan_flask.go": {
+      "name": "scan_flask.go",
+      "type": "file",
+      "summary": "Scanner de rotas Flask que extrai decorators @app.route/@bp.route com seus métodos HTTP."
+    },
+    "file:internal/routeutil/scan_go.go": {
+      "name": "scan_go.go",
+      "type": "file",
+      "summary": "Scanner de rotas para frameworks Go (net/http, gin, echo, chi, fiber) que extrai método e caminho de chamadas de registro de handlers."
+    },
+    "file:internal/routeutil/scan_laravel.go": {
+      "name": "scan_laravel.go",
+      "type": "file",
+      "summary": "Scanner de rotas Laravel que percorre routes/*.php, trata grupos com prefixo/middleware, rotas encadeadas e marca rotas protegidas por auth."
+    },
+    "file:internal/routeutil/scan_laravel_test.go": {
+      "name": "scan_laravel_test.go",
+      "type": "file",
+      "summary": "Teste que valida a detecção de rotas Laravel privadas (middleware auth) e de rotas com chamadas encadeadas."
+    },
+    "file:internal/routeutil/scan_nestjs.go": {
+      "name": "scan_nestjs.go",
+      "type": "file",
+      "summary": "Scanner de rotas para NestJS: detecta o framework pelas dependências e extrai rotas por regex dos decorators @Controller e @Get/@Post/etc., marcando handlers protegidos por @UseGuards."
+    },
+    "file:internal/routeutil/scan_next_nuxt.go": {
+      "name": "scan_next_nuxt.go",
+      "type": "file",
+      "summary": "Scanners de rotas para Next.js (App Router e pages/api) e Nuxt (server/api), derivando caminhos HTTP a partir da estrutura de arquivos do projeto."
+    },
+    "file:internal/routeutil/scan_node_extra.go": {
+      "name": "scan_node_extra.go",
+      "type": "file",
+      "summary": "Scanner de rotas para Fastify, Hono e Koa, que reutiliza uma regex no estilo Express para capturar chamadas de verbo HTTP."
+    },
+    "file:internal/routeutil/scan_rails.go": {
+      "name": "scan_rails.go",
+      "type": "file",
+      "summary": "Scanner de rotas para Ruby on Rails que lê config/routes.rb e extrai verbos explícitos e declarações resources/resource."
+    },
+    "file:internal/routeutil/scan_rust.go": {
+      "name": "scan_rust.go",
+      "type": "file",
+      "summary": "Scanner de rotas para projetos Rust (Axum e Actix), extraindo rotas de chamadas .route() e de atributos #[get(...)]."
+    },
+    "file:internal/routeutil/scan_spring.go": {
+      "name": "scan_spring.go",
+      "type": "file",
+      "summary": "Scanner de rotas para Spring Boot que combina @RequestMapping de classe com @GetMapping/@PostMapping etc. para montar os caminhos dos endpoints."
+    },
+    "file:internal/routeutil/stacks.go": {
+      "name": "stacks.go",
+      "type": "file",
+      "summary": "Detecta quais stacks de rotas se aplicam a um projeto, unindo frameworks já conhecidos com marcadores no disco (artisan, manage.py, go.mod, Cargo.toml, pom.xml) e normalizando os nomes."
+    },
+    "file:internal/routeutil/walk.go": {
+      "name": "walk.go",
+      "type": "file",
+      "summary": "Helpers compartilhados pelos scanners de rotas: percorre a árvore do projeto ignorando diretórios pesados, verifica arquivos/frameworks e junta prefixos de rota."
+    },
+    "file:internal/sshutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Persistência por projeto dos túneis SSH (local/remote/dynamic) em .devscope, com upsert/remoção e fusão da configuração salva com os túneis ssh vivos detectados."
+    },
+    "file:internal/ui/app.go": {
+      "name": "app.go",
+      "type": "file",
+      "summary": "Modelo raiz Bubble Tea do DevScope: guarda o estado global da TUI, roteia mensagens e teclas entre dashboard, projeto e módulos, e compõe a tela com header, painel lateral, conteúdo da aba e barra de status."
+    },
+    "file:internal/ui/cf_tab.go": {
+      "name": "cf_tab.go",
+      "type": "file",
+      "summary": "Aba do módulo Cloudflare Tunnel: lista túneis quick/named do projeto e da conta, mostra detalhes e logs, e oferece wizard para criar, iniciar, parar, rotear DNS e excluir túneis via cloudflared."
+    },
+    "file:internal/ui/cf_tab_test.go": {
+      "name": "cf_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Cloudflare Tunnel cobrindo presença na lista de abas, landing, atalho da sidebar, wizard modal, tela de configuração e modal de exclusão."
+    },
+    "file:internal/ui/landing_probe.go": {
+      "name": "landing_probe.go",
+      "type": "file",
+      "summary": "Sondagem assíncrona das landings dos módulos: consulta CLIs e configs (cloudflared, ngrok, ssh, nginx, Jenkins, GHA, Kubernetes, Swarm) fora do View e entrega os resultados por mensagem."
+    },
+    "file:internal/ui/routes_tab.go": {
+      "name": "routes_tab.go",
+      "type": "file",
+      "summary": "Aba do módulo Rotas/API: dispara a descoberta de rotas do projeto via routeutil e renderiza cards, tabela filtrável por método/caminho/auth e um inspetor da rota selecionada."
+    },
+    "file:internal/ui/routes_tab_test.go": {
+      "name": "routes_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba Rotas cobrindo navegação landing/esc, abertura do cliente de API com preset, filtros por caminho e auth e exibição na sidebar."
+    },
+    "file:internal/ui/ws_tab.go": {
+      "name": "ws_tab.go",
+      "type": "file",
+      "summary": "Aba do módulo WebSocket: gerencia URLs salvas por projeto, conecta via wsutil, envia frames, registra mensagens/latência e renderiza visão geral em três colunas, inspetor, histórico e filtros."
+    },
+    "file:internal/ui/ws_tab_test.go": {
+      "name": "ws_tab_test.go",
+      "type": "file",
+      "summary": "Testes da aba WebSocket cobrindo landing, filtros e busca, ciclo de portas, composição de mensagens, popup de todas as conexões e troca de conexão sem rascunho obsoleto."
+    },
+    "file:internal/wsutil/config.go": {
+      "name": "config.go",
+      "type": "file",
+      "summary": "Persistência por projeto das URLs WebSocket salvas em .devscope/ws.json, com deduplicação e limpeza das entradas."
+    },
+    "file:internal/wsutil/config_test.go": {
+      "name": "config_test.go",
+      "type": "file",
+      "summary": "Testes de ida e volta do salvamento/carregamento da configuração WebSocket e do caso de arquivo inexistente."
+    },
+    "file:internal/wsutil/session.go": {
+      "name": "session.go",
+      "type": "file",
+      "summary": "Cliente WebSocket baseado em gorilla/websocket: Dial com headers customizados, envio de texto/binário/ping, loop de leitura que emite eventos e formatação do handshake."
+    },
+    "file:internal/wsutil/session_test.go": {
+      "name": "session_test.go",
+      "type": "file",
+      "summary": "Testes do cliente WebSocket: normalização de URL e um round-trip de Dial/envio/recebimento contra um servidor httptest."
+    },
+    "pipeline:.github/workflows/ci.yml": {
+      "name": "ci.yml",
+      "type": "pipeline",
+      "summary": "Workflow do GitHub Actions que, em push/PR para main/master, roda `go test ./... -race`, o `make build` e uma matriz de build para amd64 e arm64."
+    },
+    "pipeline:.github/workflows/release.yml": {
+      "name": "release.yml",
+      "type": "pipeline",
+      "summary": "Workflow de release disparado por tags `v*` que executa o GoReleaser v2 para publicar binários multiplataforma no GitHub Releases."
+    },
+    "document:.github/ISSUE_TEMPLATE/bug_report.md": {
+      "name": "bug_report.md",
+      "type": "document",
+      "summary": "Template de issue para reportar bugs, pedindo passos de reprodução, comportamento esperado, ambiente (OS, versão do DevScope/Go, Docker/PM2) e logs com `--debug`."
+    },
+    "document:.github/ISSUE_TEMPLATE/detector_request.md": {
+      "name": "detector_request.md",
+      "type": "document",
+      "summary": "Template de issue para pedir suporte a um novo framework/stack, listando os arquivos marcadores (package.json, go.mod, composer.json etc.) usados na detecção."
+    },
+    "document:.github/ISSUE_TEMPLATE/feature_request.md": {
+      "name": "feature_request.md",
+      "type": "document",
+      "summary": "Template de issue para sugerir melhorias, com seções de problema, solução proposta, alternativas e contexto."
+    },
+    "config:.goreleaser.yaml": {
+      "name": ".goreleaser.yaml",
+      "type": "config",
+      "summary": "Configuração do GoReleaser v2 que compila `./cmd/devscope` sem CGO para linux/darwin/windows em amd64/arm64, injeta versão/commit/data via ldflags e empacota tar.gz/zip com checksums SHA-256."
+    },
+    "document:Animation.md": {
+      "name": "Animation.md",
+      "type": "document",
+      "summary": "Guia extenso (116 seções) de ASCII/Unicode art e técnicas de animação para TUIs em Go: caracteres de desenho, frames, FPS, tick, easing, partículas, spinners, double buffer e delta time."
+    },
+    "document:CHANGELOG.md": {
+      "name": "CHANGELOG.md",
+      "type": "document",
+      "summary": "Histórico de versões no formato Keep a Changelog, de 0.1.0 até 1.6.3 e a seção Unreleased, com itens Added/Changed/Fixed."
+    },
+    "document:CODE_OF_CONDUCT.md": {
+      "name": "CODE_OF_CONDUCT.md",
+      "type": "document",
+      "summary": "Código de conduta do projeto adaptado do Contributor Covenant 2.1, definindo comportamentos esperados, inaceitáveis e como reportar abusos."
+    },
+    "pipeline:Makefile": {
+      "name": "Makefile",
+      "type": "pipeline",
+      "summary": "Makefile com os alvos build, build-all, test, lint, clean, install, install-dev, run, dev e deps; compila `./cmd/devscope` estaticamente injetando versão, commit e data via ldflags."
+    },
+    "document:README.md": {
+      "name": "README.md",
+      "type": "document",
+      "summary": "README principal do DevScope (\"o htop dos seus projetos\"): instalação via scripts, tour em 30 segundos, recursos de Git e Docker, os 15 módulos, atalhos, preferências, instalação avançada e como funciona."
+    },
+    "config:go.mod": {
+      "name": "go.mod",
+      "type": "config",
+      "summary": "Módulo Go `github.com/devscope/devscope` (Go 1.24.2) com dependências diretas Bubble Tea, Bubbles, Lip Gloss, Cobra, Viper, gorilla/websocket, go-toml e yaml.v3."
+    },
+    "document:docs/ARCHITECTURE.md": {
+      "name": "ARCHITECTURE.md",
+      "type": "document",
+      "summary": "Documento de arquitetura: problema e princípios, decisões (Go + Bubble Tea, snapshot imutável, pipeline de descoberta, plugins de detecção, health checks), descrição de cada pacote em `internal/`, fluxo de execução, concorrência, testes, CI/CD e distribuição."
+    },
+    "document:docs/DESIGN.md": {
+      "name": "DESIGN.md",
+      "type": "document",
+      "summary": "Padrão de telas da TUI: fundação em `foundation.go`, navegação por módulos, lista+detalhe, gaveta, faixa de abertura, regras de responsividade, anatomia da tela, teclado, vocabulário Braille, cores, estados, microcópia, anti-padrões e checklist de entrega."
+    },
+    "document:docs/ROADMAP.md": {
+      "name": "ROADMAP.md",
+      "type": "document",
+      "summary": "Roadmap por versões (MVP v0.0.1, v0.1 a v0.3 concluídas, v1.0 em progresso, v2.0 planejada) com entregas, pendências, timeline estimada e critérios de release."
+    },
+    "config:docs/media/tapes/docker.json": {
+      "name": "docker.json",
+      "type": "config",
+      "summary": "Lista de 5 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `docker.mp4` do README."
+    },
+    "config:docs/media/tapes/git.json": {
+      "name": "git.json",
+      "type": "config",
+      "summary": "Lista de 8 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `git.mp4` do README."
+    },
+    "config:docs/media/tapes/overview.json": {
+      "name": "overview.json",
+      "type": "config",
+      "summary": "Lista de 2 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `overview.mp4` do README."
+    },
+    "file:docs/media/tapes/record.sh": {
+      "name": "record.sh",
+      "type": "file",
+      "summary": "Script Bash que regrava os GIFs/MP4 do README: compila o binário num container Go, monta uma imagem VHS com git e docker CLI, cria projetos fictícios (loja-api, painel-web, frete-service, blog) com histórico Git e containers, grava cada tape e aplica zoom com `zoom.py`."
+    },
+    "config:configs/devscope.example.yaml": {
+      "name": "devscope.example.yaml",
+      "type": "config",
+      "summary": "Exemplo de configuração do DevScope: caminhos e profundidade do scan, diretórios ignorados, intervalos de refresh (scan, métricas, health, git), tema da UI, timeouts de health e projetos fixados."
+    },
+    "file:docs/media/tapes/head.tape": {
+      "name": "head.tape",
+      "type": "file",
+      "summary": "Cabeçalho VHS compartilhado que define shell, fonte, dimensões 1400x800, tema TokyoNight e velocidade de digitação, limpando o terminal sem gravar."
+    },
+    "file:docs/media/tapes/docker.tape": {
+      "name": "docker.tape",
+      "type": "file",
+      "summary": "Roteiro VHS da demo de Docker: abre o DevScope, entra nos containers, navega pelo detalhe, menus e ações de start/restart, gerando `docker.mp4`."
+    },
+    "file:docs/media/tapes/git.tape": {
+      "name": "git.tape",
+      "type": "file",
+      "summary": "Roteiro VHS da demo de Git: navega pela aba Git, grafo de commits (Ctrl+G), branches, staging e cria um commit com mensagem, gerando `git.mp4`."
+    },
+    "file:docs/media/tapes/overview.tape": {
+      "name": "overview.tape",
+      "type": "file",
+      "summary": "Roteiro VHS da visão geral: lista de projetos, filtro `/`, paleta Ctrl+P, abas do projeto, ajuda `?` e seletor de tema, gerando `overview.mp4` e uma captura."
+    },
+    "file:docs/media/tapes/zoom.py": {
+      "name": "zoom.py",
+      "type": "file",
+      "summary": "Script Python que aplica zoom suave (smoothstep) por segmentos de tempo a um vídeo do VHS usando Pillow e ffmpeg, gerando o MP4 final e um GIF otimizado abaixo de 10 MB, com modo `--preview`."
+    },
+    "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md": {
+      "name": "2026-08-12-git-pull-conflict.md",
+      "type": "document",
+      "summary": "Plano de implementação em 3 tarefas para tratar pull divergente (Merge/Rebase) e resolução de conflitos (Ours/Theirs/editor/Continue/Abort) na aba Git, com novas funções do collector e mudanças na UI."
+    },
+    "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md": {
+      "name": "2026-08-12-git-pull-conflict-design.md",
+      "type": "document",
+      "summary": "Especificação de design para pull com divergência e modo de conflito na aba Git: fluxo, atalhos o/t/e/a/c/x, API nova do collector, pontos de toque na UI e critérios de sucesso."
+    },
+    "file:scripts/install.ps1": {
+      "name": "install.ps1",
+      "type": "file",
+      "summary": "Instalador PowerShell para Windows: obtém a última release do GitHub, detecta a arquitetura, baixa o zip, valida o checksum SHA-256, extrai `devscope.exe` para `%USERPROFILE%\\.devscope\\bin` e adiciona ao PATH do usuário."
+    },
+    "file:scripts/install.sh": {
+      "name": "install.sh",
+      "type": "file",
+      "summary": "Instalador Bash para Linux/macOS/Windows (MSYS): detecta OS e arquitetura, baixa o asset da release, verifica SHA-256, instala o binário (com sudo se preciso) e adiciona o diretório ao PATH no profile do shell."
+    }
+  },
+  "totalNodes": 294,
+  "totalEdges": 3203
+}

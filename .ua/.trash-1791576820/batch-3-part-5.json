@@ -1,0 +1,1219 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_fireworks.go",
+   "type": "file",
+   "name": "relax_fireworks.go",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "summary": "Cena Relax de fogos de artifício: foguetes sobem de trás do morro e estouram em formatos (coração, estrela, anel) amostrados de curvas fechadas, refletidos num lago.",
+   "tags": [
+    "relax",
+    "animacao",
+    "particulas",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fireworks.go:relaxFwShapePt",
+   "type": "function",
+   "name": "relaxFwShapePt",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "lineRange": [
+    104,
+    132
+   ],
+   "summary": "Devolve o ponto normalizado da curva de um formato de explosão em f∈[0,1).",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fireworks.go:relaxFwBurst",
+   "type": "function",
+   "name": "relaxFwBurst",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "lineRange": [
+    134,
+    196
+   ],
+   "summary": "Explode um foguete gerando faíscas segundo o formato e a paleta sorteados.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fireworks.go:stepRelaxFireworks",
+   "type": "function",
+   "name": "stepRelaxFireworks",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "lineRange": [
+    198,
+    259
+   ],
+   "summary": "Avança um passo da simulação da cena fogos de artifício, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fireworks.go:relaxFireworksFrames",
+   "type": "function",
+   "name": "relaxFireworksFrames",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "lineRange": [
+    261,
+    292
+   ],
+   "summary": "Renderiza um quadro da cena fogos de artifício no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fireworks.go:relaxFireworksDraw",
+   "type": "function",
+   "name": "relaxFireworksDraw",
+   "filePath": "internal/ui/relax_fireworks.go",
+   "lineRange": [
+    294,
+    394
+   ],
+   "summary": "Desenha morro, foguetes, faíscas e o reflexo tremido no lago.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_fox.go",
+   "type": "file",
+   "name": "relax_fox.go",
+   "filePath": "internal/ui/relax_fox.go",
+   "summary": "Cena Relax de raposa e vaga-lumes: sprite Braille com teto de tamanho e cauda animada, serra ao fundo, capim balançando ao vento e vaga-lumes com halo em meio-tom num buffer de paleta indexada.",
+   "tags": [
+    "relax",
+    "animacao",
+    "sprite",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxTone",
+   "type": "function",
+   "name": "relaxFxTone",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    157,
+    194
+   ],
+   "summary": "Resolve a cor de um subponto da raposa pela posição, com luz de cima à esquerda e meio-tom.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxCells",
+   "type": "function",
+   "name": "relaxFxCells",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    199,
+    232
+   ],
+   "summary": "Resolve a cor de cada célula do sprite tornando a raposa opaca.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFoxAt",
+   "type": "function",
+   "name": "relaxFoxAt",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    237,
+    289
+   ],
+   "summary": "Devolve o sprite da raposa no maior tamanho que cabe, mantendo a proporção e um teto.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxNewFly",
+   "type": "function",
+   "name": "relaxFxNewFly",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    349,
+    364
+   ],
+   "summary": "Cria um vaga-lume com posição e ritmo de brilho sorteados.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxNewBlade",
+   "type": "function",
+   "name": "relaxFxNewBlade",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    366,
+    388
+   ],
+   "summary": "Cria uma folha de capim da camada da frente ou de trás.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxInit",
+   "type": "function",
+   "name": "relaxFxInit",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    390,
+    406
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena raposa e vaga-lumes para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxDiscreteTick",
+   "type": "function",
+   "name": "relaxFxDiscreteTick",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    411,
+    421
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena raposa e vaga-lumes: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxAdvance",
+   "type": "function",
+   "name": "relaxFxAdvance",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    428,
+    469
+   ],
+   "summary": "Avança a simulação da cena raposa e vaga-lumes por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFoxFrames",
+   "type": "function",
+   "name": "relaxFoxFrames",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    480,
+    504
+   ],
+   "summary": "Renderiza um quadro da cena raposa e vaga-lumes no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFoxScene",
+   "type": "function",
+   "name": "relaxFoxScene",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    509,
+    625
+   ],
+   "summary": "Desenha o quadro inteiro da frente para o fundo: capim, raposa, vaga-lumes e serra.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxDrawHill",
+   "type": "function",
+   "name": "relaxFxDrawHill",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    629,
+    673
+   ],
+   "summary": "Desenha uma cadeia de morros com três harmônicas preenchidas até o chão.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxDrawGrass",
+   "type": "function",
+   "name": "relaxFxDrawGrass",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    678,
+    711
+   ],
+   "summary": "Desenha uma camada de capim curvada pelo vento.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_fox.go:relaxFxDrawFlies",
+   "type": "function",
+   "name": "relaxFxDrawFlies",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    717,
+    759
+   ],
+   "summary": "Desenha os vaga-lumes com halo em meio-tom.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/ui/relax_fox.go:relaxFoxState",
+   "type": "class",
+   "name": "relaxFoxState",
+   "filePath": "internal/ui/relax_fox.go",
+   "lineRange": [
+    326,
+    347
+   ],
+   "summary": "Estado mutável da cena raposa e vaga-lumes: entidades, contadores e parâmetros sorteados do ciclo atual.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_galaxy.go",
+   "type": "file",
+   "name": "relax_galaxy.go",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "summary": "Cena Relax de galáxia: milhares de estrelas em subpixels Braille percorrendo órbitas elípticas precessantes que formam braços espirais, com bulbo, berçários, disco exponencial e supernovas ocasionais.",
+   "tags": [
+    "relax",
+    "animacao",
+    "astronomia",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxyInit",
+   "type": "function",
+   "name": "relaxGalaxyInit",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    90,
+    129
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena galáxia para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxyAdvance",
+   "type": "function",
+   "name": "relaxGalaxyAdvance",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    135,
+    159
+   ],
+   "summary": "Avança a simulação da cena galáxia por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxyFrames",
+   "type": "function",
+   "name": "relaxGalaxyFrames",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    171,
+    241
+   ],
+   "summary": "Renderiza um quadro da cena galáxia no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxySupernova",
+   "type": "function",
+   "name": "relaxGalaxySupernova",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    245,
+    267
+   ],
+   "summary": "Desenha o clarão de supernova com núcleo branco e quatro raios.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxyStars",
+   "type": "function",
+   "name": "relaxGalaxyStars",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    271,
+    337
+   ],
+   "summary": "Desenha bulbo, estrelas em órbita e berçários.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_galaxy.go:relaxGalaxyDisk",
+   "type": "function",
+   "name": "relaxGalaxyDisk",
+   "filePath": "internal/ui/relax_galaxy.go",
+   "lineRange": [
+    342,
+    417
+   ],
+   "summary": "Pinta o brilho de superfície: disco exponencial com espiral logarítmica, barra central e faixa de poeira.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_hourglass.go",
+   "type": "file",
+   "name": "relax_hourglass.go",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "summary": "Cena Relax de ampulheta cósmica: estrelas descem em vórtice pelo bulbo, passam pelo gargalo e formam um disco espiral embaixo; a ampulheta vira com rotação de π e espelhamento sem emenda.",
+   "tags": [
+    "relax",
+    "animacao",
+    "simulacao",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgHalf",
+   "type": "function",
+   "name": "relaxHgHalf",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    44,
+    57
+   ],
+   "summary": "Meia-largura do vidro da ampulheta na altura y.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgSpan",
+   "type": "function",
+   "name": "relaxHgSpan",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    62,
+    80
+   ],
+   "summary": "Inverso do perfil: alturas entre as quais o vidro comporta um raio.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgNewStar",
+   "type": "function",
+   "name": "relaxHgNewStar",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    142,
+    156
+   ],
+   "summary": "Cria uma estrela-grão no bulbo superior.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgAdvance",
+   "type": "function",
+   "name": "relaxHgAdvance",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    172,
+    232
+   ],
+   "summary": "Avança a simulação da cena ampulheta cósmica por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgTurn",
+   "type": "function",
+   "name": "relaxHgTurn",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    247,
+    269
+   ],
+   "summary": "Fecha a virada espelhando as estrelas e transformando o disco em vórtice.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgPos",
+   "type": "function",
+   "name": "relaxHgPos",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    272,
+    286
+   ],
+   "summary": "Posição local de uma estrela antes da rotação da virada.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHourglassFrames",
+   "type": "function",
+   "name": "relaxHourglassFrames",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    290,
+    315
+   ],
+   "summary": "Renderiza um quadro da cena ampulheta cósmica no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgDraw",
+   "type": "function",
+   "name": "relaxHgDraw",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    317,
+    388
+   ],
+   "summary": "Desenha estrelas, vidro e estrutura da ampulheta com a rotação atual.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgGlassDraw",
+   "type": "function",
+   "name": "relaxHgGlassDraw",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    408,
+    444
+   ],
+   "summary": "Desenha o vidro com espessura, realce especular e aros.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgFrame",
+   "type": "function",
+   "name": "relaxHgFrame",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    450,
+    491
+   ],
+   "summary": "Desenha bases, colar do gargalo e montantes da ampulheta.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_hourglass.go:relaxHgPost",
+   "type": "function",
+   "name": "relaxHgPost",
+   "filePath": "internal/ui/relax_hourglass.go",
+   "lineRange": [
+    496,
+    508
+   ],
+   "summary": "Desenha um montante torneado com gradiente de luz.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_invaders.go",
+   "type": "file",
+   "name": "relax_invaders.go",
+   "filePath": "internal/ui/relax_invaders.go",
+   "summary": "Cena Relax de Space Invaders jogando sozinho: sprites clássicos em bitmap Braille, simulação em subpixels com tiros, erosão de escudos, explosões e nova onda ao redimensionar.",
+   "tags": [
+    "relax",
+    "animacao",
+    "jogo",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvParse",
+   "type": "function",
+   "name": "relaxInvParse",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    25,
+    40
+   ],
+   "summary": "Converte bitmap textual ('#' = pixel aceso) em sprite.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvNewWave",
+   "type": "function",
+   "name": "relaxInvNewWave",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    150,
+    165
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena Space Invaders para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvResize",
+   "type": "function",
+   "name": "relaxInvResize",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    169,
+    190
+   ],
+   "summary": "Refaz a cena no novo tamanho do palco, começando outra onda.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvErode",
+   "type": "function",
+   "name": "relaxInvErode",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    207,
+    239
+   ],
+   "summary": "Abre um buraco no escudo e indica se algo foi atingido.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:stepRelaxInvaders",
+   "type": "function",
+   "name": "stepRelaxInvaders",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    241,
+    386
+   ],
+   "summary": "Avança um passo da simulação da cena Space Invaders, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvBoom",
+   "type": "function",
+   "name": "relaxInvBoom",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    388,
+    397
+   ],
+   "summary": "Gera partículas de explosão numa posição.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvStepParts",
+   "type": "function",
+   "name": "relaxInvStepParts",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    399,
+    410
+   ],
+   "summary": "Avança e expira as partículas de explosão.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvBlit",
+   "type": "function",
+   "name": "relaxInvBlit",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    412,
+    421
+   ],
+   "summary": "Desenha um sprite no buffer Braille na posição indicada.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_invaders.go:relaxInvadersFrames",
+   "type": "function",
+   "name": "relaxInvadersFrames",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    423,
+    501
+   ],
+   "summary": "Renderiza um quadro da cena Space Invaders no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/ui/relax_invaders.go:relaxInvadersState",
+   "type": "class",
+   "name": "relaxInvadersState",
+   "filePath": "internal/ui/relax_invaders.go",
+   "lineRange": [
+    119,
+    148
+   ],
+   "summary": "Estado mutável da cena Space Invaders: entidades, contadores e parâmetros sorteados do ciclo atual.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "function:internal/ui/relax_fireworks.go:relaxFwShapePt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "function:internal/ui/relax_fireworks.go:relaxFwBurst",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "function:internal/ui/relax_fireworks.go:stepRelaxFireworks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "function:internal/ui/relax_fireworks.go:relaxFireworksFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "function:internal/ui/relax_fireworks.go:relaxFireworksDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxTone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxCells",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFoxAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxNewFly",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxNewBlade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFoxFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFoxScene",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxDrawHill",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxDrawGrass",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "function:internal/ui/relax_fox.go:relaxFxDrawFlies",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "class:internal/ui/relax_fox.go:relaxFoxState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxyInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxyAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxyFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxySupernova",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxyStars",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "function:internal/ui/relax_galaxy.go:relaxGalaxyDisk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgHalf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgSpan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgNewStar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgTurn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgPos",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHourglassFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgGlassDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgFrame",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "function:internal/ui/relax_hourglass.go:relaxHgPost",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvParse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvNewWave",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvResize",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvErode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:stepRelaxInvaders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvBoom",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvStepParts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvBlit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "function:internal/ui/relax_invaders.go:relaxInvadersFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "class:internal/ui/relax_invaders.go:relaxInvadersState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_fireworks.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_fox.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_galaxy.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_hourglass.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_invaders.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

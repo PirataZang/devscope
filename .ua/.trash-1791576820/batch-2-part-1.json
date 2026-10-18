@@ -1,0 +1,2457 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/container_detail_code.go",
+   "type": "file",
+   "name": "container_detail_code.go",
+   "filePath": "internal/ui/container_detail_code.go",
+   "summary": "Realce de sintaxe por aba do detalhe de container: logs (carimbo/nível), YAML, env com mascaramento de segredos, docker top e Dockerfile.",
+   "tags": [
+    "syntax-highlight",
+    "container",
+    "utility",
+    "security"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightDetailLine",
+   "type": "function",
+   "name": "highlightDetailLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    14,
+    31
+   ],
+   "summary": "Despacha o realce de uma linha para o highlighter adequado conforme a aba aberta do detalhe do container (logs, YAML, env, top, Dockerfile).",
+   "tags": [
+    "syntax-highlight",
+    "dispatcher",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightLogLine",
+   "type": "function",
+   "name": "highlightLogLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    35,
+    49
+   ],
+   "summary": "Realça uma linha de log separando carimbo de tempo, nível e mensagem, destacando o nível para facilitar a varredura visual.",
+   "tags": [
+    "syntax-highlight",
+    "logs",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:splitLogTimestamp",
+   "type": "function",
+   "name": "splitLogTimestamp",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    53,
+    63
+   ],
+   "summary": "Reconhece um carimbo de tempo RFC3339 ou hh:mm:ss no início da linha de log e o separa do restante.",
+   "tags": [
+    "parsing",
+    "logs",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:looksLikeTimestamp",
+   "type": "function",
+   "name": "looksLikeTimestamp",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    65,
+    81
+   ],
+   "summary": "Heurística que verifica se um token tem formato de carimbo de tempo de log.",
+   "tags": [
+    "parsing",
+    "heuristic",
+    "logs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:splitLogLevel",
+   "type": "function",
+   "name": "splitLogLevel",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    84,
+    104
+   ],
+   "summary": "Identifica o nível de log (ERROR, WARN, INFO...) após o carimbo, com ou sem colchetes, e devolve o estilo Lip Gloss correspondente.",
+   "tags": [
+    "parsing",
+    "logs",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightYAMLLine",
+   "type": "function",
+   "name": "highlightYAMLLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    108,
+    132
+   ],
+   "summary": "Realça linhas YAML destacando chaves e esmaecendo marcadores de lista e comentários, útil para ler compose/inspect.",
+   "tags": [
+    "syntax-highlight",
+    "yaml",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightEnvLine",
+   "type": "function",
+   "name": "highlightEnvLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    136,
+    151
+   ],
+   "summary": "Realça linhas KEY=VALUE de variáveis de ambiente e mascara valores de variáveis que parecem segredos.",
+   "tags": [
+    "syntax-highlight",
+    "security",
+    "env"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:envLooksSecret",
+   "type": "function",
+   "name": "envLooksSecret",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    153,
+    162
+   ],
+   "summary": "Decide pelo nome da variável (TOKEN, PASSWORD, SECRET, KEY...) se o valor deve ser mascarado.",
+   "tags": [
+    "security",
+    "heuristic",
+    "env"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightTopLine",
+   "type": "function",
+   "name": "highlightTopLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    175,
+    188
+   ],
+   "summary": "Destaca o cabeçalho e a coluna de PID na saída do `docker top`.",
+   "tags": [
+    "syntax-highlight",
+    "docker",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:highlightDockerfileLine",
+   "type": "function",
+   "name": "highlightDockerfileLine",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    192,
+    211
+   ],
+   "summary": "Realça a instrução de cada linha de Dockerfile, mantendo os argumentos em estilo neutro.",
+   "tags": [
+    "syntax-highlight",
+    "dockerfile",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code.go:countLogLevels",
+   "type": "function",
+   "name": "countLogLevels",
+   "filePath": "internal/ui/container_detail_code.go",
+   "lineRange": [
+    222,
+    233
+   ],
+   "summary": "Conta linhas de erro e aviso nos logs para alimentar o título da aba de logs.",
+   "tags": [
+    "logs",
+    "metrics",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/container_detail_code_test.go",
+   "type": "file",
+   "name": "container_detail_code_test.go",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "summary": "Testes do realce e layout do detalhe de container: texto visível preservado, segredos mascarados, barras de stats e teclas de navegação.",
+   "tags": [
+    "test",
+    "syntax-highlight",
+    "container"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestHighlightKeepsVisibleText",
+   "type": "function",
+   "name": "TestHighlightKeepsVisibleText",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    14,
+    27
+   ],
+   "summary": "Garante que o realce das abas não altera o texto visível das linhas.",
+   "tags": [
+    "test",
+    "syntax-highlight",
+    "ansi"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestEnvSecretsAreMasked",
+   "type": "function",
+   "name": "TestEnvSecretsAreMasked",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    29,
+    41
+   ],
+   "summary": "Verifica que variáveis com nomes de segredo têm o valor mascarado.",
+   "tags": [
+    "test",
+    "security",
+    "env"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestHistoryBarsFillWidth",
+   "type": "function",
+   "name": "TestHistoryBarsFillWidth",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    45,
+    58
+   ],
+   "summary": "Verifica que as barras de histórico de stats ocupam toda a largura disponível.",
+   "tags": [
+    "test",
+    "chart",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestStatsScaleTopSteps",
+   "type": "function",
+   "name": "TestStatsScaleTopSteps",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    60,
+    69
+   ],
+   "summary": "Verifica a escala de passos no topo do gráfico de stats.",
+   "tags": [
+    "test",
+    "chart",
+    "metrics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestContainerDetailNavigationKeys",
+   "type": "function",
+   "name": "TestContainerDetailNavigationKeys",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    72,
+    100
+   ],
+   "summary": "Testa as teclas de navegação entre abas e rolagem no detalhe do container.",
+   "tags": [
+    "test",
+    "keyboard",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_code_test.go:TestLayoutAlignsTabularContent",
+   "type": "function",
+   "name": "TestLayoutAlignsTabularContent",
+   "filePath": "internal/ui/container_detail_code_test.go",
+   "lineRange": [
+    103,
+    120
+   ],
+   "summary": "Verifica que o layout alinha conteúdo tabular e de configuração.",
+   "tags": [
+    "test",
+    "layout",
+    "alignment"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/container_detail_layout.go",
+   "type": "file",
+   "name": "container_detail_layout.go",
+   "filePath": "internal/ui/container_detail_layout.go",
+   "summary": "Alinhamento das linhas do detalhe de container: colunas de env, blocos de configuração por indentação e tabelas do docker top.",
+   "tags": [
+    "layout",
+    "alignment",
+    "container",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail_layout.go:layoutDetailLines",
+   "type": "function",
+   "name": "layoutDetailLines",
+   "filePath": "internal/ui/container_detail_layout.go",
+   "lineRange": [
+    10,
+    20
+   ],
+   "summary": "Reorganiza as linhas do detalhe do container conforme a aba ativa, aplicando o alinhamento apropriado.",
+   "tags": [
+    "layout",
+    "dispatcher",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_layout.go:alignOnSeparator",
+   "type": "function",
+   "name": "alignOnSeparator",
+   "filePath": "internal/ui/container_detail_layout.go",
+   "lineRange": [
+    24,
+    44
+   ],
+   "summary": "Alinha valores em coluna após um separador (ex.: '=' em env), com teto de padding para evitar que uma chave longa desalinhe tudo.",
+   "tags": [
+    "layout",
+    "alignment",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_layout.go:alignConfigBlocks",
+   "type": "function",
+   "name": "alignConfigBlocks",
+   "filePath": "internal/ui/container_detail_layout.go",
+   "lineRange": [
+    48,
+    66
+   ],
+   "summary": "Alinha pares 'chave: valor' por nível de indentação, tratando blocos aninhados (Labels, Mounts, Ports) de forma independente.",
+   "tags": [
+    "layout",
+    "alignment",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_layout.go:alignTableColumns",
+   "type": "function",
+   "name": "alignTableColumns",
+   "filePath": "internal/ui/container_detail_layout.go",
+   "lineRange": [
+    82,
+    119
+   ],
+   "summary": "Alinha a saída tabular do `docker top` pelas colunas do cabeçalho, deixando a última coluna (comando) livre.",
+   "tags": [
+    "layout",
+    "table",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/container_detail_views.go",
+   "type": "file",
+   "name": "container_detail_views.go",
+   "filePath": "internal/ui/container_detail_views.go",
+   "summary": "Views da tela de detalhe de container: chrome no padrão dos módulos, cabeçalho, barra de comandos e corpo único com numeração, busca e realce.",
+   "tags": [
+    "rendering",
+    "component",
+    "container",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:renderContainerDetailChrome",
+   "type": "function",
+   "name": "renderContainerDetailChrome",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    15,
+    28
+   ],
+   "summary": "Monta a tela de detalhe do container no padrão dos módulos: barra de identificação, régua de abas numeradas e barra de comandos.",
+   "tags": [
+    "rendering",
+    "component",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:renderContainerDetailHeader",
+   "type": "function",
+   "name": "renderContainerDetailHeader",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    32,
+    50
+   ],
+   "summary": "Renderiza o cabeçalho com nome, estado e portas do container aberto.",
+   "tags": [
+    "rendering",
+    "header",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:containerDetailContainer",
+   "type": "function",
+   "name": "containerDetailContainer",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    53,
+    64
+   ],
+   "summary": "Localiza o container atualmente aberto na lista de containers do projeto selecionado.",
+   "tags": [
+    "lookup",
+    "container",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:renderContainerDetailCommandBar",
+   "type": "function",
+   "name": "renderContainerDetailCommandBar",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    68,
+    100
+   ],
+   "summary": "Renderiza a barra de comandos por extenso (até duas linhas) do detalhe do container, substituindo a antiga coluna AÇÕES.",
+   "tags": [
+    "rendering",
+    "keybindings",
+    "container"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:renderContainerDetailRichBody",
+   "type": "function",
+   "name": "renderContainerDetailRichBody",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    106,
+    160
+   ],
+   "summary": "Renderiza o corpo do detalhe em painel único de largura cheia, com numeração de linhas, busca, rolagem e realce por conteúdo.",
+   "tags": [
+    "rendering",
+    "viewport",
+    "container"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:renderContainerDetailCodeLine",
+   "type": "function",
+   "name": "renderContainerDetailCodeLine",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    164,
+    175
+   ],
+   "summary": "Aplica o corte horizontal e depois o realce em uma linha de código, preservando os escapes ANSI.",
+   "tags": [
+    "rendering",
+    "syntax-highlight",
+    "ansi"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail_views.go:containerDetailEmptyHint",
+   "type": "function",
+   "name": "containerDetailEmptyHint",
+   "filePath": "internal/ui/container_detail_views.go",
+   "lineRange": [
+    177,
+    188
+   ],
+   "summary": "Gera a mensagem de estado vazio adequada à aba ativa do detalhe do container.",
+   "tags": [
+    "empty-state",
+    "rendering",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/dashboard_test.go",
+   "type": "file",
+   "name": "dashboard_test.go",
+   "filePath": "internal/ui/dashboard_test.go",
+   "summary": "Suíte extensa de testes do dashboard e da tela de containers: larguras de tabela, sidebar, métricas, estados vazios, logs, stats e faixa de selecionado.",
+   "tags": [
+    "test",
+    "dashboard",
+    "layout",
+    "container"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestFilterNestedProjects",
+   "type": "function",
+   "name": "TestFilterNestedProjects",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    16,
+    26
+   ],
+   "summary": "Testa a remoção de projetos aninhados dentro de outros projetos.",
+   "tags": [
+    "test",
+    "dashboard",
+    "filter"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectRowNeverExceedsTableWidth",
+   "type": "function",
+   "name": "TestProjectRowNeverExceedsTableWidth",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    28,
+    57
+   ],
+   "summary": "Garante que linhas de projeto nunca excedem a largura da tabela.",
+   "tags": [
+    "test",
+    "dashboard",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestTableColumnsScaleWithWidth",
+   "type": "function",
+   "name": "TestTableColumnsScaleWithWidth",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    61,
+    77
+   ],
+   "summary": "Verifica que as colunas da tabela escalam com a largura do terminal.",
+   "tags": [
+    "test",
+    "dashboard",
+    "responsive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestElideLeftKeepsTail",
+   "type": "function",
+   "name": "TestElideLeftKeepsTail",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    80,
+    94
+   ],
+   "summary": "Verifica que o corte à esquerda preserva o final do caminho.",
+   "tags": [
+    "test",
+    "text",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestScrollbarColumn",
+   "type": "function",
+   "name": "TestScrollbarColumn",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    96,
+    108
+   ],
+   "summary": "Testa o cálculo da coluna de scrollbar.",
+   "tags": [
+    "test",
+    "scroll",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestFitKeybindsNeverOverflows",
+   "type": "function",
+   "name": "TestFitKeybindsNeverOverflows",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    110,
+    121
+   ],
+   "summary": "Garante que a barra de atalhos nunca transborda a largura.",
+   "tags": [
+    "test",
+    "keybindings",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestDashboardShowsProjectPathAndStack",
+   "type": "function",
+   "name": "TestDashboardShowsProjectPathAndStack",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    129,
+    145
+   ],
+   "summary": "Verifica que o dashboard mostra caminho e stack do projeto.",
+   "tags": [
+    "test",
+    "dashboard",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestEndpointPrefersDomainOverPort",
+   "type": "function",
+   "name": "TestEndpointPrefersDomainOverPort",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    148,
+    159
+   ],
+   "summary": "Verifica que o endpoint exibido prefere domínio a porta.",
+   "tags": [
+    "test",
+    "dashboard",
+    "url"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestStatusPulseIsAnimatedAndDistinct",
+   "type": "function",
+   "name": "TestStatusPulseIsAnimatedAndDistinct",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    163,
+    200
+   ],
+   "summary": "Verifica que o pulso de status é animado e distinto por estado.",
+   "tags": [
+    "test",
+    "animation",
+    "status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectStatusDots",
+   "type": "function",
+   "name": "TestProjectStatusDots",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    202,
+    216
+   ],
+   "summary": "Testa os indicadores de status dos projetos.",
+   "tags": [
+    "test",
+    "status",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestDashboardEmptyStates",
+   "type": "function",
+   "name": "TestDashboardEmptyStates",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    219,
+    237
+   ],
+   "summary": "Verifica os estados vazios do dashboard.",
+   "tags": [
+    "test",
+    "empty-state",
+    "dashboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestDashboardProjectsViewport",
+   "type": "function",
+   "name": "TestDashboardProjectsViewport",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    239,
+    248
+   ],
+   "summary": "Testa o viewport da lista de projetos do dashboard.",
+   "tags": [
+    "test",
+    "viewport",
+    "dashboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectFilterInlineLive",
+   "type": "function",
+   "name": "TestProjectFilterInlineLive",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    250,
+    287
+   ],
+   "summary": "Testa o filtro inline de projetos aplicado ao vivo.",
+   "tags": [
+    "test",
+    "filter",
+    "dashboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestCurrentProjectUsesPathWhenIDsAreEmpty",
+   "type": "function",
+   "name": "TestCurrentProjectUsesPathWhenIDsAreEmpty",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    289,
+    301
+   ],
+   "summary": "Garante que o projeto atual é resolvido pelo caminho quando os IDs estão vazios.",
+   "tags": [
+    "test",
+    "state",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestOverlayCenteredRendersPopup",
+   "type": "function",
+   "name": "TestOverlayCenteredRendersPopup",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    303,
+    312
+   ],
+   "summary": "Testa a renderização centralizada de popups sobrepostos.",
+   "tags": [
+    "test",
+    "overlay",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsVerticalTabs",
+   "type": "function",
+   "name": "TestProjectSidebarShowsVerticalTabs",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    314,
+    348
+   ],
+   "summary": "Verifica que a sidebar do projeto mostra as abas verticais.",
+   "tags": [
+    "test",
+    "sidebar",
+    "tabs"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsLiveMeta",
+   "type": "function",
+   "name": "TestProjectSidebarShowsLiveMeta",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    350,
+    386
+   ],
+   "summary": "Verifica que a sidebar mostra metadados ao vivo do projeto.",
+   "tags": [
+    "test",
+    "sidebar",
+    "metrics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectPanelKeepsFixedHeight",
+   "type": "function",
+   "name": "TestProjectPanelKeepsFixedHeight",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    388,
+    403
+   ],
+   "summary": "Garante que o painel do projeto mantém altura fixa.",
+   "tags": [
+    "test",
+    "layout",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectRuntimeMetricsUsesOnlyProjectProcesses",
+   "type": "function",
+   "name": "TestProjectRuntimeMetricsUsesOnlyProjectProcesses",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    405,
+    418
+   ],
+   "summary": "Verifica que as métricas de runtime consideram só processos do projeto.",
+   "tags": [
+    "test",
+    "metrics",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestProjectViewHidesHostMetricsBar",
+   "type": "function",
+   "name": "TestProjectViewHidesHostMetricsBar",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    420,
+    442
+   ],
+   "summary": "Verifica que a visão de projeto oculta a barra de métricas do host.",
+   "tags": [
+    "test",
+    "metrics",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestDashboardKeepsHostMetricsBar",
+   "type": "function",
+   "name": "TestDashboardKeepsHostMetricsBar",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    444,
+    459
+   ],
+   "summary": "Verifica que o dashboard mantém a barra de métricas do host.",
+   "tags": [
+    "test",
+    "metrics",
+    "dashboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestMetricUsageStyleThresholds",
+   "type": "function",
+   "name": "TestMetricUsageStyleThresholds",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    461,
+    480
+   ],
+   "summary": "Testa os limiares de cor das métricas de uso.",
+   "tags": [
+    "test",
+    "metrics",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestTinySidebarFitsPanelHeight",
+   "type": "function",
+   "name": "TestTinySidebarFitsPanelHeight",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    482,
+    505
+   ],
+   "summary": "Garante que a sidebar mínima cabe na altura do painel.",
+   "tags": [
+    "test",
+    "sidebar",
+    "responsive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestOverviewCompactOnShortTerminal",
+   "type": "function",
+   "name": "TestOverviewCompactOnShortTerminal",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    507,
+    527
+   ],
+   "summary": "Verifica o modo compacto da visão geral em terminais baixos.",
+   "tags": [
+    "test",
+    "responsive",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestCompactContainerRowFitsContent",
+   "type": "function",
+   "name": "TestCompactContainerRowFitsContent",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    539,
+    549
+   ],
+   "summary": "Garante que a linha compacta de container cabe no conteúdo.",
+   "tags": [
+    "test",
+    "container",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestRenderContainersMainShowsBottomBoxes",
+   "type": "function",
+   "name": "TestRenderContainersMainShowsBottomBoxes",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    551,
+    600
+   ],
+   "summary": "Verifica que a tela de containers mostra as caixas inferiores.",
+   "tags": [
+    "test",
+    "container",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestParseDockerStatsSample",
+   "type": "function",
+   "name": "TestParseDockerStatsSample",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    602,
+    613
+   ],
+   "summary": "Testa o parsing de uma amostra de docker stats.",
+   "tags": [
+    "test",
+    "docker",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerDetailFillsTerminalHeight",
+   "type": "function",
+   "name": "TestContainerDetailFillsTerminalHeight",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    615,
+    626
+   ],
+   "summary": "Garante que o detalhe do container ocupa toda a altura do terminal.",
+   "tags": [
+    "test",
+    "container",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerLogLineFitsPanel",
+   "type": "function",
+   "name": "TestContainerLogLineFitsPanel",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    628,
+    640
+   ],
+   "summary": "Garante que linhas de log cabem no painel.",
+   "tags": [
+    "test",
+    "logs",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestCompactContainerDetailTabsFitOneLine",
+   "type": "function",
+   "name": "TestCompactContainerDetailTabsFitOneLine",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    642,
+    655
+   ],
+   "summary": "Verifica que as abas do detalhe compacto cabem em uma linha.",
+   "tags": [
+    "test",
+    "container",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerDetailActiveTabNeverTruncated",
+   "type": "function",
+   "name": "TestContainerDetailActiveTabNeverTruncated",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    657,
+    669
+   ],
+   "summary": "Garante que a aba ativa do detalhe nunca é truncada.",
+   "tags": [
+    "test",
+    "container",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestFitProjectPanelKeepsExactHeight",
+   "type": "function",
+   "name": "TestFitProjectPanelKeepsExactHeight",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    671,
+    680
+   ],
+   "summary": "Garante que o ajuste do painel de projeto mantém altura exata.",
+   "tags": [
+    "test",
+    "layout",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerDetailScrollReachesLastLine",
+   "type": "function",
+   "name": "TestContainerDetailScrollReachesLastLine",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    682,
+    702
+   ],
+   "summary": "Verifica que a rolagem do detalhe alcança a última linha.",
+   "tags": [
+    "test",
+    "scroll",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerLogsOpenAtLatestLine",
+   "type": "function",
+   "name": "TestContainerLogsOpenAtLatestLine",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    704,
+    725
+   ],
+   "summary": "Verifica que os logs abrem na linha mais recente.",
+   "tags": [
+    "test",
+    "logs",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerLogsUseDedicatedFullScreen",
+   "type": "function",
+   "name": "TestContainerLogsUseDedicatedFullScreen",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    727,
+    761
+   ],
+   "summary": "Verifica que os logs usam a tela cheia dedicada.",
+   "tags": [
+    "test",
+    "logs",
+    "container"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerFilesUseDedicatedFullScreen",
+   "type": "function",
+   "name": "TestContainerFilesUseDedicatedFullScreen",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    763,
+    787
+   ],
+   "summary": "Verifica que os arquivos do container usam tela cheia dedicada.",
+   "tags": [
+    "test",
+    "container",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerStatsDashboard",
+   "type": "function",
+   "name": "TestContainerStatsDashboard",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    789,
+    830
+   ],
+   "summary": "Testa o dashboard de estatísticas do container.",
+   "tags": [
+    "test",
+    "metrics",
+    "container"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerDetailSearchJumpsToMatch",
+   "type": "function",
+   "name": "TestContainerDetailSearchJumpsToMatch",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    846,
+    859
+   ],
+   "summary": "Verifica que a busca no detalhe salta para a correspondência.",
+   "tags": [
+    "test",
+    "search",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestContainerDetailFollowAppendsAndStaysAtEnd",
+   "type": "function",
+   "name": "TestContainerDetailFollowAppendsAndStaysAtEnd",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    861,
+    882
+   ],
+   "summary": "Verifica que o modo follow acrescenta logs e permanece no fim.",
+   "tags": [
+    "test",
+    "logs",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestDashboardHeaderAlwaysShowsMetrics",
+   "type": "function",
+   "name": "TestDashboardHeaderAlwaysShowsMetrics",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    891,
+    928
+   ],
+   "summary": "Garante que o cabeçalho do dashboard sempre mostra métricas.",
+   "tags": [
+    "test",
+    "dashboard",
+    "header"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestThemePickerOnlyOnDashboard",
+   "type": "function",
+   "name": "TestThemePickerOnlyOnDashboard",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    932,
+    962
+   ],
+   "summary": "Garante que o seletor de tema só aparece no dashboard.",
+   "tags": [
+    "test",
+    "theme",
+    "dashboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:selectedStripProject",
+   "type": "function",
+   "name": "selectedStripProject",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    966,
+    978
+   ],
+   "summary": "Helper que monta um projeto de exemplo para os testes da faixa de selecionado.",
+   "tags": [
+    "test",
+    "fixture",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestSelectedStripFallsBackToMainFramework",
+   "type": "function",
+   "name": "TestSelectedStripFallsBackToMainFramework",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    994,
+    1010
+   ],
+   "summary": "Verifica que a faixa de selecionado recorre ao framework principal.",
+   "tags": [
+    "test",
+    "dashboard",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestSelectedStripHasStableHeightAndWidth",
+   "type": "function",
+   "name": "TestSelectedStripHasStableHeightAndWidth",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    1026,
+    1052
+   ],
+   "summary": "Garante altura e largura estáveis da faixa de selecionado.",
+   "tags": [
+    "test",
+    "layout",
+    "dashboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/dashboard_test.go:TestViewportReservesRoomForSelectedStrip",
+   "type": "function",
+   "name": "TestViewportReservesRoomForSelectedStrip",
+   "filePath": "internal/ui/dashboard_test.go",
+   "lineRange": [
+    1056,
+    1067
+   ],
+   "summary": "Verifica que o viewport reserva espaço para a faixa de selecionado.",
+   "tags": [
+    "test",
+    "viewport",
+    "layout"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightDetailLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightLogLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:splitLogTimestamp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:looksLikeTimestamp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:splitLogLevel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightYAMLLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightEnvLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:envLooksSecret",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightTopLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:highlightDockerfileLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "function:internal/ui/container_detail_code.go:countLogLevels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestHighlightKeepsVisibleText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestHighlightKeepsVisibleText",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestEnvSecretsAreMasked",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestEnvSecretsAreMasked",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestHistoryBarsFillWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestHistoryBarsFillWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestStatsScaleTopSteps",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestStatsScaleTopSteps",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestContainerDetailNavigationKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestContainerDetailNavigationKeys",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestLayoutAlignsTabularContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "function:internal/ui/container_detail_code_test.go:TestLayoutAlignsTabularContent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_layout.go",
+   "target": "function:internal/ui/container_detail_layout.go:layoutDetailLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_layout.go",
+   "target": "function:internal/ui/container_detail_layout.go:alignOnSeparator",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_layout.go",
+   "target": "function:internal/ui/container_detail_layout.go:alignConfigBlocks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_layout.go",
+   "target": "function:internal/ui/container_detail_layout.go:alignTableColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailChrome",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:containerDetailContainer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailCommandBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailRichBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailCodeLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "function:internal/ui/container_detail_views.go:containerDetailEmptyHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFilterNestedProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFilterNestedProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectRowNeverExceedsTableWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectRowNeverExceedsTableWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestTableColumnsScaleWithWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestTableColumnsScaleWithWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestElideLeftKeepsTail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestElideLeftKeepsTail",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestScrollbarColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestScrollbarColumn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFitKeybindsNeverOverflows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFitKeybindsNeverOverflows",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardShowsProjectPathAndStack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardShowsProjectPathAndStack",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestEndpointPrefersDomainOverPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestEndpointPrefersDomainOverPort",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestStatusPulseIsAnimatedAndDistinct",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestStatusPulseIsAnimatedAndDistinct",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectStatusDots",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectStatusDots",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardEmptyStates",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardEmptyStates",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardProjectsViewport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardProjectsViewport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectFilterInlineLive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectFilterInlineLive",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCurrentProjectUsesPathWhenIDsAreEmpty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCurrentProjectUsesPathWhenIDsAreEmpty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestOverlayCenteredRendersPopup",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestOverlayCenteredRendersPopup",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsVerticalTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsVerticalTabs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsLiveMeta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsLiveMeta",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectPanelKeepsFixedHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectPanelKeepsFixedHeight",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectRuntimeMetricsUsesOnlyProjectProcesses",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectRuntimeMetricsUsesOnlyProjectProcesses",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectViewHidesHostMetricsBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestProjectViewHidesHostMetricsBar",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardKeepsHostMetricsBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardKeepsHostMetricsBar",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestMetricUsageStyleThresholds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestMetricUsageStyleThresholds",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestTinySidebarFitsPanelHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestTinySidebarFitsPanelHeight",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestOverviewCompactOnShortTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestOverviewCompactOnShortTerminal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCompactContainerRowFitsContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCompactContainerRowFitsContent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestRenderContainersMainShowsBottomBoxes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestRenderContainersMainShowsBottomBoxes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestParseDockerStatsSample",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestParseDockerStatsSample",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailFillsTerminalHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailFillsTerminalHeight",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogLineFitsPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogLineFitsPanel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCompactContainerDetailTabsFitOneLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestCompactContainerDetailTabsFitOneLine",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailActiveTabNeverTruncated",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailActiveTabNeverTruncated",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFitProjectPanelKeepsExactHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestFitProjectPanelKeepsExactHeight",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailScrollReachesLastLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailScrollReachesLastLine",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogsOpenAtLatestLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogsOpenAtLatestLine",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogsUseDedicatedFullScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerLogsUseDedicatedFullScreen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerFilesUseDedicatedFullScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerFilesUseDedicatedFullScreen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerStatsDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerStatsDashboard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailSearchJumpsToMatch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailSearchJumpsToMatch",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailFollowAppendsAndStaysAtEnd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestContainerDetailFollowAppendsAndStaysAtEnd",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardHeaderAlwaysShowsMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestDashboardHeaderAlwaysShowsMetrics",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestThemePickerOnlyOnDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestThemePickerOnlyOnDashboard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:selectedStripProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestSelectedStripFallsBackToMainFramework",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestSelectedStripFallsBackToMainFramework",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestSelectedStripHasStableHeightAndWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestSelectedStripHasStableHeightAndWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestViewportReservesRoomForSelectedStrip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "function:internal/ui/dashboard_test.go:TestViewportReservesRoomForSelectedStrip",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail_code_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/dashboard_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestHighlightKeepsVisibleText",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestHighlightKeepsVisibleText",
+   "target": "function:internal/ui/container_detail_code.go:highlightDetailLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestEnvSecretsAreMasked",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestEnvSecretsAreMasked",
+   "target": "function:internal/ui/container_detail_code.go:highlightDetailLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestHistoryBarsFillWidth",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_code_test.go:TestLayoutAlignsTabularContent",
+   "target": "function:internal/ui/container_detail_layout.go:layoutDetailLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_views.go:renderContainerDetailChrome",
+   "target": "function:internal/ui/foundation.go:clampRenderedHeight",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_views.go:renderContainerDetailRichBody",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_views.go:renderContainerDetailRichBody",
+   "target": "function:internal/ui/container_detail_code.go:countLogLevels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail_views.go:renderContainerDetailCodeLine",
+   "target": "function:internal/ui/container_detail_code.go:highlightDetailLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestScrollbarColumn",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestFitKeybindsNeverOverflows",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestDashboardShowsProjectPathAndStack",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestDashboardEmptyStates",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestProjectFilterInlineLive",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsVerticalTabs",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestProjectSidebarShowsLiveMeta",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestProjectViewHidesHostMetricsBar",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestDashboardKeepsHostMetricsBar",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestTinySidebarFitsPanelHeight",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestOverviewCompactOnShortTerminal",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestRenderContainersMainShowsBottomBoxes",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestContainerLogLineFitsPanel",
+   "target": "function:internal/ui/container_detail_views.go:renderContainerDetailCodeLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestContainerLogsUseDedicatedFullScreen",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestContainerFilesUseDedicatedFullScreen",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestContainerStatsDashboard",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestDashboardHeaderAlwaysShowsMetrics",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/dashboard_test.go:TestSelectedStripFallsBackToMainFramework",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail_code.go",
+   "target": "file:internal/ui/container_detail_code_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/container_detail_layout.go",
+   "target": "file:internal/ui/container_detail_code_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/container_detail_views.go",
+   "target": "file:internal/ui/dashboard_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

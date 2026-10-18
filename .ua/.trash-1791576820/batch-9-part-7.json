@@ -1,0 +1,259 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/routeutil/scan_go.go",
+   "type": "file",
+   "name": "scan_go.go",
+   "filePath": "internal/routeutil/scan_go.go",
+   "summary": "Scanner de rotas para frameworks Go (net/http, gin, echo, chi, fiber) que extrai método e caminho de chamadas de registro de handlers.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "golang",
+    "regex-parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_go.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_go.go",
+   "lineRange": [
+    29,
+    59
+   ],
+   "summary": "Percorre o projeto e extrai rotas de frameworks Go via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_go.go:goMethods",
+   "type": "function",
+   "name": "goMethods",
+   "filePath": "internal/routeutil/scan_go.go",
+   "lineRange": [
+    61,
+    76
+   ],
+   "summary": "Mapeia o nome da função de registro para métodos HTTP.",
+   "tags": [
+    "utility",
+    "http",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_go.go:goPath",
+   "type": "function",
+   "name": "goPath",
+   "filePath": "internal/routeutil/scan_go.go",
+   "lineRange": [
+    78,
+    90
+   ],
+   "summary": "Converte parâmetros de caminho Go (:id, {id}) ao formato padrão.",
+   "tags": [
+    "utility",
+    "url",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_laravel.go",
+   "type": "file",
+   "name": "scan_laravel.go",
+   "filePath": "internal/routeutil/scan_laravel.go",
+   "summary": "Scanner de rotas Laravel que percorre routes/*.php, trata grupos com prefixo/middleware, rotas encadeadas e marca rotas protegidas por auth.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "laravel",
+    "php",
+    "regex-parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_laravel.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_laravel.go",
+   "lineRange": [
+    28,
+    47
+   ],
+   "summary": "Percorre o projeto e extrai rotas de Laravel via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_laravel.go:scanLaravelFile",
+   "type": "function",
+   "name": "scanLaravelFile",
+   "filePath": "internal/routeutil/scan_laravel.go",
+   "lineRange": [
+    49,
+    129
+   ],
+   "summary": "Analisa um arquivo de rotas Laravel rastreando grupos, prefixos e middleware auth.",
+   "tags": [
+    "parser",
+    "laravel",
+    "golang"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/routeutil/scan_laravel.go:laravelLineLooksPrivate",
+   "type": "function",
+   "name": "laravelLineLooksPrivate",
+   "filePath": "internal/routeutil/scan_laravel.go",
+   "lineRange": [
+    131,
+    141
+   ],
+   "summary": "Heurística que indica se uma linha de rota Laravel usa middleware de autenticação.",
+   "tags": [
+    "heuristic",
+    "security",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_laravel_test.go",
+   "type": "file",
+   "name": "scan_laravel_test.go",
+   "filePath": "internal/routeutil/scan_laravel_test.go",
+   "summary": "Teste que valida a detecção de rotas Laravel privadas (middleware auth) e de rotas com chamadas encadeadas.",
+   "tags": [
+    "test",
+    "laravel",
+    "route-discovery",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_laravel_test.go:TestLaravelPrivateAndChainedRoutes",
+   "type": "function",
+   "name": "TestLaravelPrivateAndChainedRoutes",
+   "filePath": "internal/routeutil/scan_laravel_test.go",
+   "lineRange": [
+    8,
+    58
+   ],
+   "summary": "Valida rotas Laravel privadas e encadeadas.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/routeutil/scan_go.go",
+   "target": "function:internal/routeutil/scan_go.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_go.go",
+   "target": "function:internal/routeutil/scan_go.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_go.go",
+   "target": "function:internal/routeutil/scan_go.go:goMethods",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_go.go",
+   "target": "function:internal/routeutil/scan_go.go:goPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "function:internal/routeutil/scan_laravel.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "function:internal/routeutil/scan_laravel.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "function:internal/routeutil/scan_laravel.go:scanLaravelFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "function:internal/routeutil/scan_laravel.go:laravelLineLooksPrivate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel_test.go",
+   "target": "function:internal/routeutil/scan_laravel_test.go:TestLaravelPrivateAndChainedRoutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel_test.go",
+   "target": "function:internal/routeutil/scan_laravel_test.go:TestLaravelPrivateAndChainedRoutes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "file:internal/routeutil/scan_laravel_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/routeutil/scan_go.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_laravel.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  }
+ ]
+}

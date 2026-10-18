@@ -1,0 +1,1235 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/docker_detail.go",
+   "type": "file",
+   "name": "docker_detail.go",
+   "filePath": "internal/collectors/docker_detail.go",
+   "summary": "Fornece detalhes de um container para a TUI: stats, volumes, env, config, processos (top), serviço compose, arquivo compose e Dockerfile associados, resolvendo o build context a partir do compose.",
+   "tags": [
+    "docker",
+    "containers",
+    "inspection",
+    "collector"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/collectors/docker_detail.go:dockerInspectRow",
+   "type": "class",
+   "name": "dockerInspectRow",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    12,
+    37
+   ],
+   "summary": "Subconjunto tipado do JSON de docker inspect usado nas telas de detalhe do container.",
+   "tags": [
+    "data-model",
+    "docker",
+    "struct",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerContainerStats",
+   "type": "function",
+   "name": "DockerContainerStats",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    39,
+    50
+   ],
+   "summary": "Retorna um snapshot formatado de CPU, memória, rede, I/O de bloco e PIDs do container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerContainerVolumes",
+   "type": "function",
+   "name": "DockerContainerVolumes",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    53,
+    77
+   ],
+   "summary": "Retorna volumes nomeados e origens de bind mounts do container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerContainerEnv",
+   "type": "function",
+   "name": "DockerContainerEnv",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    79,
+    89
+   ],
+   "summary": "Retorna as variáveis de ambiente do container, uma por linha.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerContainerConfig",
+   "type": "function",
+   "name": "DockerContainerConfig",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    91,
+    139
+   ],
+   "summary": "Renderiza um resumo textual da configuração do container (imagem, comando, restart, labels, portas, mounts, redes).",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerContainerTop",
+   "type": "function",
+   "name": "DockerContainerTop",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    141,
+    154
+   ],
+   "summary": "Retorna a lista de processos do container via docker top.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerComposeServiceName",
+   "type": "function",
+   "name": "DockerComposeServiceName",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    156,
+    163
+   ],
+   "summary": "Retorna o nome do serviço compose a partir dos labels do container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:ComposeFileForContainer",
+   "type": "function",
+   "name": "ComposeFileForContainer",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    165,
+    179
+   ],
+   "summary": "Descobre o arquivo compose do container pelos labels, com fallback para o projeto.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:ReadFileContent",
+   "type": "function",
+   "name": "ReadFileContent",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    181,
+    197
+   ],
+   "summary": "Lê um arquivo limitado a maxBytes, truncando o conteúdo.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:ReadComposeForContainer",
+   "type": "function",
+   "name": "ReadComposeForContainer",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    199,
+    206
+   ],
+   "summary": "Retorna caminho e conteúdo do arquivo compose associado ao container.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:DockerfileForContainer",
+   "type": "function",
+   "name": "DockerfileForContainer",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    208,
+    232
+   ],
+   "summary": "Localiza e lê o Dockerfile do container via build do compose ou raiz do projeto.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:dockerInspect",
+   "type": "function",
+   "name": "dockerInspect",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    234,
+    247
+   ],
+   "summary": "Executa docker inspect e decodifica a primeira linha em dockerInspectRow.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail.go:dockerfileFromCompose",
+   "type": "function",
+   "name": "dockerfileFromCompose",
+   "filePath": "internal/collectors/docker_detail.go",
+   "lineRange": [
+    249,
+    308
+   ],
+   "summary": "Resolve o caminho do Dockerfile do serviço a partir do bloco build (string ou mapa context/dockerfile) do compose.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/collectors/docker_detail_test.go",
+   "type": "file",
+   "name": "docker_detail_test.go",
+   "filePath": "internal/collectors/docker_detail_test.go",
+   "summary": "Testes da resolução do Dockerfile a partir do bloco build do compose e da normalização do caminho do Dockerfile.",
+   "tags": [
+    "test",
+    "docker",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail_test.go:TestDockerfileFromCompose",
+   "type": "function",
+   "name": "TestDockerfileFromCompose",
+   "filePath": "internal/collectors/docker_detail_test.go",
+   "lineRange": [
+    9,
+    39
+   ],
+   "summary": "Testa a resolução do Dockerfile a partir do bloco build do compose.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_detail_test.go:TestResolveDockerfilePath",
+   "type": "function",
+   "name": "TestResolveDockerfilePath",
+   "filePath": "internal/collectors/docker_detail_test.go",
+   "lineRange": [
+    41,
+    56
+   ],
+   "summary": "Testa a normalização do caminho do Dockerfile.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_hub.go",
+   "type": "file",
+   "name": "docker_hub.go",
+   "filePath": "internal/collectors/docker_hub.go",
+   "summary": "Cliente da API pública do Docker Hub: busca paginada de repositórios, detalhes, tags recentes e utilitários de formatação (contadores, bytes, tempo relativo em português, resumo do README).",
+   "tags": [
+    "docker-hub",
+    "http-client",
+    "formatting",
+    "api-client"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/collectors/docker_hub.go:DockerHubRepo",
+   "type": "class",
+   "name": "DockerHubRepo",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    13,
+    20
+   ],
+   "summary": "Resultado de busca de repositório no Docker Hub.",
+   "tags": [
+    "data-model",
+    "docker-hub",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/docker_hub.go:DockerHubSearchPage",
+   "type": "class",
+   "name": "DockerHubSearchPage",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    22,
+    26
+   ],
+   "summary": "Página de resultados da busca no Docker Hub com total e indicação de próxima página.",
+   "tags": [
+    "data-model",
+    "docker-hub",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/docker_hub.go:DockerHubDetails",
+   "type": "class",
+   "name": "DockerHubDetails",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    29,
+    45
+   ],
+   "summary": "Metadados ricos do repositório selecionado (descrição, pulls, stars, tamanho, arquiteturas).",
+   "tags": [
+    "data-model",
+    "docker-hub",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/docker_hub.go:DockerHubTag",
+   "type": "class",
+   "name": "DockerHubTag",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    48,
+    52
+   ],
+   "summary": "Tag de repositório do Docker Hub na lista de tags recentes.",
+   "tags": [
+    "data-model",
+    "docker-hub",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:SearchDockerHub",
+   "type": "function",
+   "name": "SearchDockerHub",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    102,
+    108
+   ],
+   "summary": "Consulta a primeira página da API pública de busca do Docker Hub.",
+   "tags": [
+    "docker-hub",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:SearchDockerHubPage",
+   "type": "function",
+   "name": "SearchDockerHubPage",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    111,
+    149
+   ],
+   "summary": "Consulta uma página específica da busca do Docker Hub.",
+   "tags": [
+    "docker-hub",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:FetchDockerHubDetails",
+   "type": "function",
+   "name": "FetchDockerHubDetails",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    152,
+    194
+   ],
+   "summary": "Carrega metadados do repositório e de uma tag representativa (tamanho/arquiteturas).",
+   "tags": [
+    "docker-hub",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:ListDockerHubTags",
+   "type": "function",
+   "name": "ListDockerHubTags",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    205,
+    240
+   ],
+   "summary": "Retorna as tags recentes de um repositório, das mais novas para as mais antigas.",
+   "tags": [
+    "docker-hub",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:ImageRepoName",
+   "type": "function",
+   "name": "ImageRepoName",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    243,
+    245
+   ],
+   "summary": "Remove tag/digest de uma referência de imagem.",
+   "tags": [
+    "docker-hub",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:WithImageTag",
+   "type": "function",
+   "name": "WithImageTag",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    248,
+    258
+   ],
+   "summary": "Compõe repo:tag, retornando o repo puro quando a tag é vazia.",
+   "tags": [
+    "docker-hub",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:fetchHubTagInfo",
+   "type": "function",
+   "name": "fetchHubTagInfo",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    260,
+    306
+   ],
+   "summary": "Busca a tag latest (ou a mais recente) para obter tamanho e arquiteturas da imagem.",
+   "tags": [
+    "docker-hub",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:hubGetJSON",
+   "type": "function",
+   "name": "hubGetJSON",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    308,
+    319
+   ],
+   "summary": "Faz GET HTTP com timeout e decodifica o JSON da resposta do Hub.",
+   "tags": [
+    "docker-hub",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:SplitDockerHubRepo",
+   "type": "function",
+   "name": "SplitDockerHubRepo",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    322,
+    333
+   ],
+   "summary": "Separa namespace e nome do repositório, usando library/ para imagens oficiais.",
+   "tags": [
+    "docker-hub",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:FormatDockerHubRepo",
+   "type": "function",
+   "name": "FormatDockerHubRepo",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    336,
+    341
+   ],
+   "summary": "Formata namespace/nome para exibição, omitindo library/.",
+   "tags": [
+    "docker-hub",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:DockerHubURL",
+   "type": "function",
+   "name": "DockerHubURL",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    344,
+    354
+   ],
+   "summary": "Retorna a URL pública do Docker Hub para um repositório.",
+   "tags": [
+    "docker-hub",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:parseHubTime",
+   "type": "function",
+   "name": "parseHubTime",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    366,
+    382
+   ],
+   "summary": "Interpreta timestamps do Hub em vários formatos RFC3339.",
+   "tags": [
+    "docker-hub",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:HubOverviewExcerpt",
+   "type": "function",
+   "name": "HubOverviewExcerpt",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    385,
+    410
+   ],
+   "summary": "Limpa o markdown do README do Hub em um resumo curto em texto puro.",
+   "tags": [
+    "docker-hub",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:FormatHubCount",
+   "type": "function",
+   "name": "FormatHubCount",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    413,
+    430
+   ],
+   "summary": "Formata contadores grandes do Hub (pulls/stars) com sufixos k/M/B.",
+   "tags": [
+    "docker-hub",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:FormatHubBytes",
+   "type": "function",
+   "name": "FormatHubBytes",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    433,
+    455
+   ],
+   "summary": "Formata o tamanho comprimido da imagem em unidades legíveis.",
+   "tags": [
+    "docker-hub",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub.go:FormatHubRelative",
+   "type": "function",
+   "name": "FormatHubRelative",
+   "filePath": "internal/collectors/docker_hub.go",
+   "lineRange": [
+    458,
+    480
+   ],
+   "summary": "Retorna tempo relativo curto em português (ex.: há 3 dias).",
+   "tags": [
+    "docker-hub",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_hub_test.go",
+   "type": "file",
+   "name": "docker_hub_test.go",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "summary": "Testes dos utilitários do Docker Hub: URLs públicas, split namespace/nome, formatação de contadores, bytes e tempo relativo, resumo do README e composição repo:tag.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "formatting"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub_test.go:TestDockerHubURL",
+   "type": "function",
+   "name": "TestDockerHubURL",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "lineRange": [
+    9,
+    22
+   ],
+   "summary": "Testa a URL pública do Docker Hub para imagens oficiais e de namespace.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub_test.go:TestSplitDockerHubRepo",
+   "type": "function",
+   "name": "TestSplitDockerHubRepo",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "lineRange": [
+    24,
+    33
+   ],
+   "summary": "Testa a separação de namespace e nome do repositório.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub_test.go:TestFormatHubCountAndBytes",
+   "type": "function",
+   "name": "TestFormatHubCountAndBytes",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "lineRange": [
+    35,
+    45
+   ],
+   "summary": "Testa a formatação de contadores e tamanhos.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub_test.go:TestHubOverviewExcerpt",
+   "type": "function",
+   "name": "TestHubOverviewExcerpt",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "lineRange": [
+    47,
+    56
+   ],
+   "summary": "Testa o resumo em texto puro do README do Hub.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_hub_test.go:TestWithImageTag",
+   "type": "function",
+   "name": "TestWithImageTag",
+   "filePath": "internal/collectors/docker_hub_test.go",
+   "lineRange": [
+    68,
+    81
+   ],
+   "summary": "Testa a composição repo:tag.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "class:internal/collectors/docker_detail.go:dockerInspectRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerStats",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerVolumes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerVolumes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerEnv",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerEnv",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerTop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerTop",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerComposeServiceName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerComposeServiceName",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ComposeFileForContainer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ComposeFileForContainer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ReadFileContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ReadFileContent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ReadComposeForContainer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:ReadComposeForContainer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerfileForContainer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:DockerfileForContainer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:dockerInspect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "function:internal/collectors/docker_detail.go:dockerfileFromCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail_test.go",
+   "target": "function:internal/collectors/docker_detail_test.go:TestDockerfileFromCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_detail_test.go",
+   "target": "function:internal/collectors/docker_detail_test.go:TestResolveDockerfilePath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubRepo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubSearchPage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubSearchPage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubDetails",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubDetails",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubTag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "class:internal/collectors/docker_hub.go:DockerHubTag",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SearchDockerHub",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SearchDockerHub",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SearchDockerHubPage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SearchDockerHubPage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FetchDockerHubDetails",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FetchDockerHubDetails",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:ListDockerHubTags",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:ListDockerHubTags",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:ImageRepoName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:ImageRepoName",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:WithImageTag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:WithImageTag",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:fetchHubTagInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:hubGetJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SplitDockerHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:SplitDockerHubRepo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatDockerHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatDockerHubRepo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:DockerHubURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:DockerHubURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:parseHubTime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:HubOverviewExcerpt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:HubOverviewExcerpt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubCount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubCount",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubBytes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubBytes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubRelative",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubRelative",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_hub_test.go",
+   "target": "function:internal/collectors/docker_hub_test.go:TestDockerHubURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub_test.go",
+   "target": "function:internal/collectors/docker_hub_test.go:TestSplitDockerHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub_test.go",
+   "target": "function:internal/collectors/docker_hub_test.go:TestFormatHubCountAndBytes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub_test.go",
+   "target": "function:internal/collectors/docker_hub_test.go:TestHubOverviewExcerpt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_hub_test.go",
+   "target": "function:internal/collectors/docker_hub_test.go:TestWithImageTag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/collectors/docker_detail.go:ComposeFileForContainer",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_detail.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/collectors/docker_hub.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

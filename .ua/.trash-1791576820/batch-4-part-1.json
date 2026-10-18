@@ -1,0 +1,863 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/compose.go",
+   "type": "file",
+   "name": "compose.go",
+   "filePath": "internal/collectors/compose.go",
+   "summary": "Integra o DevScope ao Docker Compose: localiza o arquivo compose do projeto, lê nomes de serviços e portas publicadas e executa up/build/down/restart/logs capturando a saída para não quebrar a TUI.",
+   "tags": [
+    "docker-compose",
+    "collector",
+    "command-runner",
+    "containers"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "function",
+   "name": "ComposeFile",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    22,
+    33
+   ],
+   "summary": "Retorna o primeiro arquivo compose (docker-compose/compose .yml/.yaml) encontrado no diretório do projeto.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "type": "function",
+   "name": "ListComposeServiceNames",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    36,
+    58
+   ],
+   "summary": "Lê as chaves de serviços definidas no arquivo compose do projeto.",
+   "tags": [
+    "docker-compose",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ParseComposePorts",
+   "type": "function",
+   "name": "ParseComposePorts",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    61,
+    113
+   ],
+   "summary": "Extrai as portas de host publicadas nos serviços do compose, ignorando trechos de healthcheck.",
+   "tags": [
+    "docker-compose",
+    "parser",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:runCompose",
+   "type": "function",
+   "name": "runCompose",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    115,
+    140
+   ],
+   "summary": "Executa `docker compose -f <arquivo> <ação>` no diretório do projeto capturando a saída e truncando a mensagem de erro.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeUp",
+   "type": "function",
+   "name": "ComposeUp",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    142,
+    144
+   ],
+   "summary": "Sobe os serviços do compose em modo detached.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeBuild",
+   "type": "function",
+   "name": "ComposeBuild",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    147,
+    149
+   ],
+   "summary": "Reconstrói as imagens e sobe os serviços com `docker compose up -d --build`.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeDown",
+   "type": "function",
+   "name": "ComposeDown",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    151,
+    153
+   ],
+   "summary": "Derruba os serviços do compose do projeto.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeRestart",
+   "type": "function",
+   "name": "ComposeRestart",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    155,
+    157
+   ],
+   "summary": "Reinicia os serviços do compose do projeto.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose.go:ComposeLogs",
+   "type": "function",
+   "name": "ComposeLogs",
+   "filePath": "internal/collectors/compose.go",
+   "lineRange": [
+    160,
+    176
+   ],
+   "summary": "Retorna os logs recentes de todos os serviços do compose, limitados por tail.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/compose_edit.go",
+   "type": "file",
+   "name": "compose_edit.go",
+   "filePath": "internal/collectors/compose_edit.go",
+   "summary": "Mescla serviços YAML (documento completo ou mapa de um único serviço) no arquivo compose do projeto, incluindo volumes nomeados de nível superior, e gera templates de serviço a partir de imagens.",
+   "tags": [
+    "docker-compose",
+    "yaml",
+    "editing",
+    "containers"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:MergeComposeYAML",
+   "type": "function",
+   "name": "MergeComposeYAML",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    14,
+    68
+   ],
+   "summary": "Mescla serviços (e volumes de topo) de um texto YAML no arquivo compose do projeto, criando-o quando não existe.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:parseComposeServices",
+   "type": "function",
+   "name": "parseComposeServices",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    70,
+    83
+   ],
+   "summary": "Interpreta o YAML como documento com `services:` ou como mapa de serviço único e retorna o mapa de serviços.",
+   "tags": [
+    "docker-compose",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:asStringMap",
+   "type": "function",
+   "name": "asStringMap",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    85,
+    98
+   ],
+   "summary": "Converte um valor YAML genérico em map[string]any, retornando erro para tipos incompatíveis.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:ComposeServiceTemplate",
+   "type": "function",
+   "name": "ComposeServiceTemplate",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    102,
+    105
+   ],
+   "summary": "Retorna um snippet YAML inicial de serviço para uma imagem, delegando a BuildComposeServiceYAML.",
+   "tags": [
+    "docker-compose",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:ensureStringMap",
+   "type": "function",
+   "name": "ensureStringMap",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    107,
+    119
+   ],
+   "summary": "Garante que a chave do documento contenha um mapa, criando-o quando ausente.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:parseComposeTopLevelVolumes",
+   "type": "function",
+   "name": "parseComposeTopLevelVolumes",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    121,
+    134
+   ],
+   "summary": "Extrai a seção `volumes:` de nível superior de um texto YAML compose.",
+   "tags": [
+    "docker-compose",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit.go:serviceNameFromImage",
+   "type": "function",
+   "name": "serviceNameFromImage",
+   "filePath": "internal/collectors/compose_edit.go",
+   "lineRange": [
+    136,
+    158
+   ],
+   "summary": "Deriva um nome de serviço válido a partir da referência de imagem, removendo registry, namespace e tag.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/compose_edit_test.go",
+   "type": "file",
+   "name": "compose_edit_test.go",
+   "filePath": "internal/collectors/compose_edit_test.go",
+   "summary": "Testes unitários da mesclagem de YAML no compose: criação do arquivo, merge de serviços, volumes de nível superior e template de serviço.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit_test.go:TestMergeComposeYAMLCreatesAndMerges",
+   "type": "function",
+   "name": "TestMergeComposeYAMLCreatesAndMerges",
+   "filePath": "internal/collectors/compose_edit_test.go",
+   "lineRange": [
+    10,
+    48
+   ],
+   "summary": "Testa a criação do compose e a mesclagem de novos serviços.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_edit_test.go:TestMergeComposeYAMLMergesVolumes",
+   "type": "function",
+   "name": "TestMergeComposeYAMLMergesVolumes",
+   "filePath": "internal/collectors/compose_edit_test.go",
+   "lineRange": [
+    60,
+    82
+   ],
+   "summary": "Testa a mesclagem de volumes nomeados de nível superior.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/compose_presets.go",
+   "type": "file",
+   "name": "compose_presets.go",
+   "filePath": "internal/collectors/compose_presets.go",
+   "summary": "Catálogo de presets de serviços compose (Postgres, MySQL, Redis, Node etc.) e renderizadores que produzem snippets YAML realistas com portas, env, volumes e healthcheck, com fallback para o manifesto da imagem local ou snippet mínimo.",
+   "tags": [
+    "docker-compose",
+    "presets",
+    "yaml",
+    "code-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:MatchComposePreset",
+   "type": "function",
+   "name": "MatchComposePreset",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    172,
+    186
+   ],
+   "summary": "Procura um preset conhecido pelo nome base da imagem.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:BuildComposeServiceYAML",
+   "type": "function",
+   "name": "BuildComposeServiceYAML",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    190,
+    215
+   ],
+   "summary": "Gera um snippet compose realista para a imagem usando preset, manifesto da imagem local ou template mínimo, informando a origem.",
+   "tags": [
+    "docker-compose",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:ComposeServiceYAMLFromPreset",
+   "type": "function",
+   "name": "ComposeServiceYAMLFromPreset",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    218,
+    228
+   ],
+   "summary": "Retorna YAML apenas quando um preset local corresponde à imagem, sem acesso à rede.",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:renderComposeFromPreset",
+   "type": "function",
+   "name": "renderComposeFromPreset",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    245,
+    303
+   ],
+   "summary": "Renderiza o YAML de serviço com portas, environment, volumes, working_dir, command, healthcheck e volumes nomeados de topo.",
+   "tags": [
+    "docker-compose",
+    "formatting",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:isComposeNamedVolume",
+   "type": "function",
+   "name": "isComposeNamedVolume",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    306,
+    318
+   ],
+   "summary": "Indica se a origem de um volume é um volume nomeado que deve ser declarado em `volumes:` de topo.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:composeImageBaseName",
+   "type": "function",
+   "name": "composeImageBaseName",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    320,
+    340
+   ],
+   "summary": "Normaliza a referência de imagem para seu nome base (sem registry, namespace, tag ou digest).",
+   "tags": [
+    "docker-compose",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:portsFromExposed",
+   "type": "function",
+   "name": "portsFromExposed",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    342,
+    361
+   ],
+   "summary": "Converte as portas EXPOSE da imagem em mapeamentos host:container ordenados.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:envMapFromSlice",
+   "type": "function",
+   "name": "envMapFromSlice",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    363,
+    396
+   ],
+   "summary": "Converte o env KEY=VALUE da imagem em mapa, filtrando variáveis de sistema irrelevantes.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets.go:volumesFromSet",
+   "type": "function",
+   "name": "volumesFromSet",
+   "filePath": "internal/collectors/compose_presets.go",
+   "lineRange": [
+    398,
+    416
+   ],
+   "summary": "Converte os volumes declarados da imagem em entradas volume-nomeado:caminho para o serviço.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ParseComposePorts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ParseComposePorts",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:runCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeUp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeUp",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeBuild",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeDown",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeDown",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeRestart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeRestart",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "function:internal/collectors/compose.go:ComposeLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:MergeComposeYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:MergeComposeYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:parseComposeServices",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:asStringMap",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:ComposeServiceTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:ComposeServiceTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:ensureStringMap",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:parseComposeTopLevelVolumes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "function:internal/collectors/compose_edit.go:serviceNameFromImage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit_test.go",
+   "target": "function:internal/collectors/compose_edit_test.go:TestMergeComposeYAMLCreatesAndMerges",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_edit_test.go",
+   "target": "function:internal/collectors/compose_edit_test.go:TestMergeComposeYAMLMergesVolumes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:MatchComposePreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:MatchComposePreset",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:BuildComposeServiceYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:BuildComposeServiceYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:ComposeServiceYAMLFromPreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:ComposeServiceYAMLFromPreset",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:renderComposeFromPreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:isComposeNamedVolume",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:composeImageBaseName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:portsFromExposed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:envMapFromSlice",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "function:internal/collectors/compose_presets.go:volumesFromSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "target": "function:internal/collectors/compose_edit.go:parseComposeServices",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/compose_edit.go:MergeComposeYAML",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/compose_edit.go:ComposeServiceTemplate",
+   "target": "function:internal/collectors/compose_presets.go:BuildComposeServiceYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "function:internal/collectors/compose_presets.go:BuildComposeServiceYAML",
+   "target": "function:internal/collectors/compose_edit.go:serviceNameFromImage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/compose_presets.go:renderComposeFromPreset",
+   "target": "function:internal/collectors/compose_edit.go:serviceNameFromImage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/compose_presets.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/collectors/compose_edit.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/collectors/compose.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

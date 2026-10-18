@@ -1,0 +1,219 @@
+{
+ "nodes": [
+  {
+   "id": "config:.goreleaser.yaml",
+   "type": "config",
+   "name": ".goreleaser.yaml",
+   "summary": "Configuração do GoReleaser v2 que compila `./cmd/devscope` sem CGO para linux/darwin/windows em amd64/arm64, injeta versão/commit/data via ldflags e empacota tar.gz/zip com checksums SHA-256.",
+   "tags": [
+    "configuration",
+    "build-system",
+    "release",
+    "goreleaser",
+    "cross-compile"
+   ],
+   "complexity": "simple",
+   "filePath": ".goreleaser.yaml",
+   "languageNotes": "Os ldflags `-X` sobrescrevem variáveis de pacote Go (`pkg/version`) em tempo de link, sem gerar código."
+  },
+  {
+   "id": "document:Animation.md",
+   "type": "document",
+   "name": "Animation.md",
+   "summary": "Guia extenso (116 seções) de ASCII/Unicode art e técnicas de animação para TUIs em Go: caracteres de desenho, frames, FPS, tick, easing, partículas, spinners, double buffer e delta time.",
+   "tags": [
+    "documentation",
+    "animação",
+    "tui",
+    "unicode",
+    "guia"
+   ],
+   "complexity": "complex",
+   "filePath": "Animation.md"
+  },
+  {
+   "id": "document:CHANGELOG.md",
+   "type": "document",
+   "name": "CHANGELOG.md",
+   "summary": "Histórico de versões no formato Keep a Changelog, de 0.1.0 até 1.6.3 e a seção Unreleased, com itens Added/Changed/Fixed.",
+   "tags": [
+    "documentation",
+    "changelog",
+    "release",
+    "versionamento"
+   ],
+   "complexity": "complex",
+   "filePath": "CHANGELOG.md"
+  },
+  {
+   "id": "document:CODE_OF_CONDUCT.md",
+   "type": "document",
+   "name": "CODE_OF_CONDUCT.md",
+   "summary": "Código de conduta do projeto adaptado do Contributor Covenant 2.1, definindo comportamentos esperados, inaceitáveis e como reportar abusos.",
+   "tags": [
+    "documentation",
+    "comunidade",
+    "governança",
+    "development"
+   ],
+   "complexity": "simple",
+   "filePath": "CODE_OF_CONDUCT.md"
+  },
+  {
+   "id": "pipeline:Makefile",
+   "type": "pipeline",
+   "name": "Makefile",
+   "summary": "Makefile com os alvos build, build-all, test, lint, clean, install, install-dev, run, dev e deps; compila `./cmd/devscope` estaticamente injetando versão, commit e data via ldflags.",
+   "tags": [
+    "build-system",
+    "makefile",
+    "infrastructure",
+    "developer-tooling"
+   ],
+   "complexity": "moderate",
+   "filePath": "Makefile"
+  },
+  {
+   "id": "document:README.md",
+   "type": "document",
+   "name": "README.md",
+   "summary": "README principal do DevScope (\"o htop dos seus projetos\"): instalação via scripts, tour em 30 segundos, recursos de Git e Docker, os 15 módulos, atalhos, preferências, instalação avançada e como funciona.",
+   "tags": [
+    "documentation",
+    "entry-point",
+    "overview",
+    "instalação"
+   ],
+   "complexity": "complex",
+   "filePath": "README.md"
+  },
+  {
+   "id": "config:go.mod",
+   "type": "config",
+   "name": "go.mod",
+   "summary": "Módulo Go `github.com/devscope/devscope` (Go 1.24.2) com dependências diretas Bubble Tea, Bubbles, Lip Gloss, Cobra, Viper, gorilla/websocket, go-toml e yaml.v3.",
+   "tags": [
+    "configuration",
+    "go-modules",
+    "dependências",
+    "build-system"
+   ],
+   "complexity": "simple",
+   "filePath": "go.mod"
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:.goreleaser.yaml",
+   "target": "file:cmd/devscope/main.go",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.goreleaser.yaml",
+   "target": "file:pkg/version/version.go",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:Animation.md",
+   "target": "file:internal/ui/anim.go",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CHANGELOG.md",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:CODE_OF_CONDUCT.md",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "pipeline:Makefile",
+   "target": "file:cmd/devscope/main.go",
+   "type": "deploys",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "pipeline:Makefile",
+   "target": "file:pkg/version/version.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:cmd/devscope/main.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:scripts/install.sh",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:scripts/install.ps1",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "config:configs/devscope.example.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "file:docs/media/tapes/record.sh",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/ARCHITECTURE.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/DESIGN.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:README.md",
+   "target": "document:docs/ROADMAP.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:go.mod",
+   "target": "file:cmd/devscope/main.go",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

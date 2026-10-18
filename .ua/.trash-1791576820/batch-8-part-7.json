@@ -1,0 +1,1726 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/spark_test.go",
+   "type": "file",
+   "name": "spark_test.go",
+   "filePath": "internal/ui/spark_test.go",
+   "summary": "Testes das sparklines Braille, da janela do sparkHistory, dos alertas/faixa de métricas do host e das larguras e formas distintas do statusWave.",
+   "tags": [
+    "test",
+    "braille-rendering",
+    "metrics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestBrailleSparkPacksTwoSamplesPerCell",
+   "type": "function",
+   "name": "TestBrailleSparkPacksTwoSamplesPerCell",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    12,
+    33
+   ],
+   "summary": "Verifica que brailleSpark empacota duas amostras por célula e preenche à esquerda.",
+   "tags": [
+    "test",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestSparkHistoryKeepsWindow",
+   "type": "function",
+   "name": "TestSparkHistoryKeepsWindow",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    35,
+    46
+   ],
+   "summary": "Verifica que o sparkHistory mantém a janela de amostras.",
+   "tags": [
+    "test",
+    "data-structure"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestHostAlertOnlyWhenCritical",
+   "type": "function",
+   "name": "TestHostAlertOnlyWhenCritical",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    49,
+    59
+   ],
+   "summary": "Garante que o alerta de host só aparece em níveis críticos.",
+   "tags": [
+    "test",
+    "metrics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestHostStripOnlyWhenTall",
+   "type": "function",
+   "name": "TestHostStripOnlyWhenTall",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    63,
+    83
+   ],
+   "summary": "Garante que a faixa de métricas do host só aparece em terminais altos.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestStatusWaveWidthInDotColumns",
+   "type": "function",
+   "name": "TestStatusWaveWidthInDotColumns",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    87,
+    97
+   ],
+   "summary": "Verifica a largura do statusWave em colunas de pontos.",
+   "tags": [
+    "test",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark_test.go:TestStatusWaveShapesAreDistinct",
+   "type": "function",
+   "name": "TestStatusWaveShapesAreDistinct",
+   "filePath": "internal/ui/spark_test.go",
+   "lineRange": [
+    100,
+    125
+   ],
+   "summary": "Verifica que cada status gera uma forma de onda distinta e animada.",
+   "tags": [
+    "test",
+    "animation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/ssh_tab.go",
+   "type": "file",
+   "name": "ssh_tab.go",
+   "filePath": "internal/ui/ssh_tab.go",
+   "summary": "Aba SSH do painel de projeto: lista túneis SSH (-L/-R/-D) mesclando config e processos vivos, mostra detalhes, logs, histórico e configuração, e oferece um assistente para criar, iniciar, parar, reiniciar, excluir e copiar túneis.",
+   "tags": [
+    "api-handler",
+    "component",
+    "ssh-tunnel",
+    "wizard",
+    "tui"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Segue o padrão Bubble Tea: comandos assíncronos (tea.Cmd) retornam mensagens sshLoadedMsg/sshActionMsg tratadas em handleSSHMsg."
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:openSSHClient",
+   "type": "function",
+   "name": "openSSHClient",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    59,
+    74
+   ],
+   "summary": "Abre o cliente SSH do projeto: semeia defaults e dispara o carregamento dos túneis.",
+   "tags": [
+    "lifecycle",
+    "command"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:seedSSHDefaults",
+   "type": "function",
+   "name": "seedSSHDefaults",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    78,
+    124
+   ],
+   "summary": "Preenche o assistente com túnel remoto (-R) na porta do projeto e sugere o destino SSH pelos remotes Git.",
+   "tags": [
+    "defaults",
+    "ssh-tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "type": "function",
+   "name": "refreshSSH",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    135,
+    152
+   ],
+   "summary": "Comando assíncrono que carrega a config do projeto, lista túneis vivos e os mescla.",
+   "tags": [
+    "async",
+    "command"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:handleSSHMsg",
+   "type": "function",
+   "name": "handleSSHMsg",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    154,
+    190
+   ],
+   "summary": "Trata mensagens de carregamento e ação da aba SSH, atualizando túneis e status.",
+   "tags": [
+    "event-handler",
+    "bubbletea"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHLanding",
+   "type": "function",
+   "name": "renderSSHLanding",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    192,
+    231
+   ],
+   "summary": "Renderiza a tela inicial da aba SSH antes de abrir o cliente.",
+   "tags": [
+    "rendering",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHTab",
+   "type": "function",
+   "name": "renderSSHTab",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    233,
+    267
+   ],
+   "summary": "Renderiza a aba SSH completa: cabeçalho, navegação, conteúdo e modais.",
+   "tags": [
+    "rendering",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHCommands",
+   "type": "function",
+   "name": "renderSSHCommands",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    269,
+    284
+   ],
+   "summary": "Renderiza a lista de comandos/atalhos disponíveis na aba.",
+   "tags": [
+    "rendering",
+    "keybinding"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshHints",
+   "type": "function",
+   "name": "sshHints",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    286,
+    308
+   ],
+   "summary": "Monta as dicas de teclas conforme o contexto da aba SSH.",
+   "tags": [
+    "keybinding",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHHeader",
+   "type": "function",
+   "name": "renderSSHHeader",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    310,
+    329
+   ],
+   "summary": "Renderiza o cabeçalho da aba SSH com contagens de túneis.",
+   "tags": [
+    "rendering",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHNav",
+   "type": "function",
+   "name": "renderSSHNav",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    331,
+    365
+   ],
+   "summary": "Renderiza a navegação entre as subviews Túneis e Config.",
+   "tags": [
+    "rendering",
+    "navigation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshCounts",
+   "type": "function",
+   "name": "sshCounts",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    367,
+    376
+   ],
+   "summary": "Conta túneis ativos, parados e com erro.",
+   "tags": [
+    "aggregation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHTunnelsView",
+   "type": "function",
+   "name": "renderSSHTunnelsView",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    381,
+    399
+   ],
+   "summary": "Renderiza a view de túneis em largura total com tabela, detalhes e logs.",
+   "tags": [
+    "rendering",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshColumns",
+   "type": "function",
+   "name": "sshColumns",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    403,
+    413
+   ],
+   "summary": "Calcula larguras das colunas da tabela conforme o espaço.",
+   "tags": [
+    "layout",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHTunnelTable",
+   "type": "function",
+   "name": "renderSSHTunnelTable",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    415,
+    452
+   ],
+   "summary": "Renderiza a tabela de túneis com cursor e rolagem.",
+   "tags": [
+    "rendering",
+    "table"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHRow",
+   "type": "function",
+   "name": "renderSSHRow",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    454,
+    484
+   ],
+   "summary": "Renderiza uma linha da tabela com status, nome, modo e encaminhamento formatado.",
+   "tags": [
+    "rendering",
+    "table"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshTunnelDot",
+   "type": "function",
+   "name": "sshTunnelDot",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    486,
+    495
+   ],
+   "summary": "Escolhe o indicador de status de um túnel.",
+   "tags": [
+    "rendering",
+    "status"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshModeLabel",
+   "type": "function",
+   "name": "sshModeLabel",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    499,
+    508
+   ],
+   "summary": "Traduz o modo local/remote/dynamic para o flag do ssh (-L/-R/-D).",
+   "tags": [
+    "formatting",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHDetailsPane",
+   "type": "function",
+   "name": "renderSSHDetailsPane",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    519,
+    555
+   ],
+   "summary": "Renderiza o painel de detalhes explicando a direção do encaminhamento.",
+   "tags": [
+    "rendering",
+    "ssh-tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshModeExplain",
+   "type": "function",
+   "name": "sshModeExplain",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    559,
+    568
+   ],
+   "summary": "Explica em texto a direção de -L, -R e -D.",
+   "tags": [
+    "documentation",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHLogsPane",
+   "type": "function",
+   "name": "renderSSHLogsPane",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    570,
+    597
+   ],
+   "summary": "Renderiza os logs recentes do túnel selecionado.",
+   "tags": [
+    "rendering",
+    "logs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshSetupLines",
+   "type": "function",
+   "name": "sshSetupLines",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    610,
+    630
+   ],
+   "summary": "Monta linhas de diagnóstico do ssh instalado e sua versão.",
+   "tags": [
+    "diagnostics",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshHistoryLines",
+   "type": "function",
+   "name": "sshHistoryLines",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    632,
+    655
+   ],
+   "summary": "Monta as linhas do histórico de túneis do projeto.",
+   "tags": [
+    "formatting",
+    "history"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:renderSSHWizard",
+   "type": "function",
+   "name": "renderSSHWizard",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    659,
+    680
+   ],
+   "summary": "Renderiza o modal do assistente de novo túnel.",
+   "tags": [
+    "rendering",
+    "wizard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshSignificantArgs",
+   "type": "function",
+   "name": "sshSignificantArgs",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    684,
+    697
+   ],
+   "summary": "Filtra os argumentos relevantes do comando ssh para exibição.",
+   "tags": [
+    "formatting",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardFields",
+   "type": "function",
+   "name": "sshWizardFields",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    699,
+    740
+   ],
+   "summary": "Lista os campos do assistente conforme o modo selecionado.",
+   "tags": [
+    "wizard",
+    "form"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshPortHint",
+   "type": "function",
+   "name": "sshPortHint",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    743,
+    756
+   ],
+   "summary": "Sugere dica de porta para o campo do assistente.",
+   "tags": [
+    "wizard",
+    "hint"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardSpec",
+   "type": "function",
+   "name": "sshWizardSpec",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    769,
+    781
+   ],
+   "summary": "Monta a especificação de bind/encaminhamento a partir dos campos do assistente.",
+   "tags": [
+    "wizard",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardValue",
+   "type": "function",
+   "name": "sshWizardValue",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    783,
+    801
+   ],
+   "summary": "Devolve o valor exibido de um campo do assistente.",
+   "tags": [
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardCycle",
+   "type": "function",
+   "name": "sshWizardCycle",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    805,
+    831
+   ],
+   "summary": "Alterna valores cíclicos de um campo (modo, auto-start etc.).",
+   "tags": [
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:beginSSHWizard",
+   "type": "function",
+   "name": "beginSSHWizard",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    842,
+    875
+   ],
+   "summary": "Abre o assistente com valores iniciais e porta sugerida.",
+   "tags": [
+    "wizard",
+    "lifecycle"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardText",
+   "type": "function",
+   "name": "sshWizardText",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    877,
+    892
+   ],
+   "summary": "Lê o texto atual de um campo do assistente.",
+   "tags": [
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:setSSHWizardText",
+   "type": "function",
+   "name": "setSSHWizardText",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    894,
+    913
+   ],
+   "summary": "Grava o texto editado em um campo do assistente.",
+   "tags": [
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshWizardFocusField",
+   "type": "function",
+   "name": "sshWizardFocusField",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    915,
+    935
+   ],
+   "summary": "Move o foco entre os campos do assistente.",
+   "tags": [
+    "wizard",
+    "focus"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:cycleSSHMode",
+   "type": "function",
+   "name": "cycleSSHMode",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    937,
+    946
+   ],
+   "summary": "Alterna o modo do túnel entre local, remote e dynamic.",
+   "tags": [
+    "wizard",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:handleSSHKeys",
+   "type": "function",
+   "name": "handleSSHKeys",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    955,
+    1027
+   ],
+   "summary": "Trata o teclado da aba SSH: navegação, iniciar, parar, reiniciar, excluir, copiar e abrir assistente.",
+   "tags": [
+    "event-handler",
+    "keybinding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshMove",
+   "type": "function",
+   "name": "sshMove",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1029,
+    1045
+   ],
+   "summary": "Move o cursor da tabela de túneis com limites.",
+   "tags": [
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:updateSSHWizard",
+   "type": "function",
+   "name": "updateSSHWizard",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1047,
+    1127
+   ],
+   "summary": "Trata o teclado dentro do assistente: edição, foco, ciclos, confirmação e cancelamento.",
+   "tags": [
+    "event-handler",
+    "wizard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshTunnelFromWizard",
+   "type": "function",
+   "name": "sshTunnelFromWizard",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1129,
+    1161
+   ],
+   "summary": "Converte e valida os campos do assistente em TunnelConfig.",
+   "tags": [
+    "validation",
+    "wizard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshCreateAndStart",
+   "type": "function",
+   "name": "sshCreateAndStart",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1163,
+    1195
+   ],
+   "summary": "Salva o túnel novo na config do projeto e o inicia de forma assíncrona.",
+   "tags": [
+    "command",
+    "persistence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshStartSelected",
+   "type": "function",
+   "name": "sshStartSelected",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1197,
+    1231
+   ],
+   "summary": "Inicia o túnel selecionado.",
+   "tags": [
+    "command",
+    "ssh-tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshStopSelected",
+   "type": "function",
+   "name": "sshStopSelected",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1233,
+    1246
+   ],
+   "summary": "Para o túnel selecionado.",
+   "tags": [
+    "command",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshRestartSelected",
+   "type": "function",
+   "name": "sshRestartSelected",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1248,
+    1268
+   ],
+   "summary": "Reinicia o túnel selecionado (para e inicia).",
+   "tags": [
+    "command",
+    "ssh-tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshDeleteSelected",
+   "type": "function",
+   "name": "sshDeleteSelected",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1270,
+    1283
+   ],
+   "summary": "Remove o túnel selecionado da config, parando-o antes.",
+   "tags": [
+    "command",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab.go:sshCopyForward",
+   "type": "function",
+   "name": "sshCopyForward",
+   "filePath": "internal/ui/ssh_tab.go",
+   "lineRange": [
+    1285,
+    1300
+   ],
+   "summary": "Copia para a área de transferência o encaminhamento do túnel selecionado.",
+   "tags": [
+    "command",
+    "clipboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/ssh_tab_test.go",
+   "type": "file",
+   "name": "ssh_tab_test.go",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "summary": "Testes da aba SSH: presença em AllTabs, landing e abertura do cliente, atalho da sidebar, ciclo de modos no assistente, render da tabela de túneis e conversão do assistente em TunnelConfig.",
+   "tags": [
+    "test",
+    "ssh-tunnel",
+    "wizard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestAllTabsIncludesSSH",
+   "type": "function",
+   "name": "TestAllTabsIncludesSSH",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Verifica que AllTabs inclui a aba SSH na ordem correta.",
+   "tags": [
+    "test",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestSSHLandingAndOpen",
+   "type": "function",
+   "name": "TestSSHLandingAndOpen",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    28,
+    56
+   ],
+   "summary": "Testa a landing da aba SSH e a abertura do cliente.",
+   "tags": [
+    "test",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestSSHSidebarKey",
+   "type": "function",
+   "name": "TestSSHSidebarKey",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    58,
+    64
+   ],
+   "summary": "Verifica o atalho da sidebar para a aba SSH.",
+   "tags": [
+    "test",
+    "keybinding"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestSSHWizardCyclesMode",
+   "type": "function",
+   "name": "TestSSHWizardCyclesMode",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    66,
+    115
+   ],
+   "summary": "Testa o ciclo de modos do assistente e os argumentos ssh gerados.",
+   "tags": [
+    "test",
+    "wizard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelsRender",
+   "type": "function",
+   "name": "TestSSHTunnelsRender",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    117,
+    133
+   ],
+   "summary": "Verifica o render da tabela de túneis SSH.",
+   "tags": [
+    "test",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelFromWizard",
+   "type": "function",
+   "name": "TestSSHTunnelFromWizard",
+   "filePath": "internal/ui/ssh_tab_test.go",
+   "lineRange": [
+    135,
+    148
+   ],
+   "summary": "Verifica a conversão dos campos do assistente em TunnelConfig.",
+   "tags": [
+    "test",
+    "validation"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestBrailleSparkPacksTwoSamplesPerCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestBrailleSparkPacksTwoSamplesPerCell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestSparkHistoryKeepsWindow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestSparkHistoryKeepsWindow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestHostAlertOnlyWhenCritical",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestHostAlertOnlyWhenCritical",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestHostStripOnlyWhenTall",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestHostStripOnlyWhenTall",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestStatusWaveWidthInDotColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestStatusWaveWidthInDotColumns",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestStatusWaveShapesAreDistinct",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "function:internal/ui/spark_test.go:TestStatusWaveShapesAreDistinct",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/spark_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:openSSHClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:seedSSHDefaults",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:handleSSHMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHCommands",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHTunnelsView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHTunnelTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshTunnelDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshModeLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHDetailsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshModeExplain",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHLogsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshSetupLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshHistoryLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:renderSSHWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshSignificantArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardFields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshPortHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardSpec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:beginSSHWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:setSSHWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshWizardFocusField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:cycleSSHMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:handleSSHKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:updateSSHWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshTunnelFromWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshCreateAndStart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshStartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshStopSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshRestartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshDeleteSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "function:internal/ui/ssh_tab.go:sshCopyForward",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/sshutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/sshutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/sshutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestAllTabsIncludesSSH",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestAllTabsIncludesSSH",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHLandingAndOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHLandingAndOpen",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHSidebarKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHSidebarKey",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHWizardCyclesMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHWizardCyclesMode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelsRender",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelsRender",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelFromWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelFromWizard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/sshutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/sshutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ssh_tab_test.go",
+   "target": "file:internal/sshutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:seedSSHDefaults",
+   "target": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:seedSSHDefaults",
+   "target": "function:internal/sshutil/agent.go:SuggestSSHTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "target": "function:internal/sshutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "target": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "target": "function:internal/sshutil/config.go:CountForeignLive",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "target": "function:internal/sshutil/config.go:MergeTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:refreshSSH",
+   "target": "function:internal/sshutil/config.go:MergeTunnelsAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHRow",
+   "target": "function:internal/sshutil/agent.go:FormatForward",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHLogsPane",
+   "target": "function:internal/sshutil/agent.go:RecentLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshSetupLines",
+   "target": "function:internal/sshutil/agent.go:Available",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshSetupLines",
+   "target": "function:internal/sshutil/agent.go:Version",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshWizardSpec",
+   "target": "function:internal/sshutil/agent.go:ParseBind",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:beginSSHWizard",
+   "target": "function:internal/sshutil/agent.go:SuggestPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshTunnelFromWizard",
+   "target": "function:internal/sshutil/config.go:NormalizeMode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshCreateAndStart",
+   "target": "function:internal/sshutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshCreateAndStart",
+   "target": "function:internal/sshutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshStopSelected",
+   "target": "function:internal/sshutil/agent.go:StopTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:sshCreateAndStart",
+   "target": "function:internal/ui/ssh_tab.go:sshTunnelFromWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHWizard",
+   "target": "function:internal/ui/tunnel_modals.go:tunnelModalChrome",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHWizard",
+   "target": "function:internal/ui/tunnel_modals.go:tunnelModalBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHDetailsPane",
+   "target": "function:internal/ui/tunnel_modals.go:tunnelStatusBadge",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab.go:renderSSHWizard",
+   "target": "function:internal/ui/ssh_tab.go:sshModeExplain",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab_test.go:TestSSHWizardCyclesMode",
+   "target": "function:internal/sshutil/agent.go:TunnelArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/ssh_tab_test.go:TestSSHTunnelFromWizard",
+   "target": "function:internal/ui/ssh_tab.go:sshTunnelFromWizard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/spark_test.go:TestBrailleSparkPacksTwoSamplesPerCell",
+   "target": "function:internal/ui/spark.go:brailleSpark",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/spark_test.go:TestStatusWaveWidthInDotColumns",
+   "target": "function:internal/ui/spark.go:statusWave",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/spark_test.go:TestStatusWaveShapesAreDistinct",
+   "target": "function:internal/ui/spark.go:statusWave",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/ui/ssh_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/ssh_tab.go",
+   "target": "file:internal/ui/tunnel_modals.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

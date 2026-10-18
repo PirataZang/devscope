@@ -1,0 +1,210 @@
+{
+ "nodes": [
+  {
+   "id": "document:docs/ARCHITECTURE.md",
+   "type": "document",
+   "name": "ARCHITECTURE.md",
+   "summary": "Documento de arquitetura: problema e princípios, decisões (Go + Bubble Tea, snapshot imutável, pipeline de descoberta, plugins de detecção, health checks), descrição de cada pacote em `internal/`, fluxo de execução, concorrência, testes, CI/CD e distribuição.",
+   "tags": [
+    "documentation",
+    "arquitetura",
+    "design-decisions",
+    "concorrência"
+   ],
+   "complexity": "complex",
+   "filePath": "docs/ARCHITECTURE.md"
+  },
+  {
+   "id": "document:docs/DESIGN.md",
+   "type": "document",
+   "name": "DESIGN.md",
+   "summary": "Padrão de telas da TUI: fundação em `foundation.go`, navegação por módulos, lista+detalhe, gaveta, faixa de abertura, regras de responsividade, anatomia da tela, teclado, vocabulário Braille, cores, estados, microcópia, anti-padrões e checklist de entrega.",
+   "tags": [
+    "documentation",
+    "design-system",
+    "tui",
+    "ux",
+    "guia"
+   ],
+   "complexity": "complex",
+   "filePath": "docs/DESIGN.md"
+  },
+  {
+   "id": "document:docs/ROADMAP.md",
+   "type": "document",
+   "name": "ROADMAP.md",
+   "summary": "Roadmap por versões (MVP v0.0.1, v0.1 a v0.3 concluídas, v1.0 em progresso, v2.0 planejada) com entregas, pendências, timeline estimada e critérios de release.",
+   "tags": [
+    "documentation",
+    "roadmap",
+    "planejamento",
+    "release"
+   ],
+   "complexity": "moderate",
+   "filePath": "docs/ROADMAP.md"
+  }
+ ],
+ "edges": [
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:cmd/devscope/main.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/app/app.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/config/config.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/core/models.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/detectors/registry.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/collectors/manager.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/ui/app.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/commands/root.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "file:internal/metrics/host.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "pipeline:.github/workflows/ci.yml",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "pipeline:.github/workflows/release.yml",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ARCHITECTURE.md",
+   "target": "pipeline:Makefile",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/foundation.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/spark.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/anim.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/module_landing.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/git_drawer.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/container_detail_views.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/keymap_test.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/DESIGN.md",
+   "target": "file:internal/ui/responsive_test.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ROADMAP.md",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/ROADMAP.md",
+   "target": "document:CHANGELOG.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

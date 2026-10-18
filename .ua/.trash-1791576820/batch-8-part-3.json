@@ -1,0 +1,992 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_sky.go",
+   "type": "file",
+   "name": "relax_sky.go",
+   "filePath": "internal/ui/relax_sky.go",
+   "summary": "Cena Starfield do modo Relax: céu noturno em ciclos de ~30s com estrelas em três camadas, cometas, estrelas cadentes, constelações raras, aurora e crista de coníferas.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "procedural-generation",
+    "simulation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Estado em per-mille (0–1000) mapeado ao tamanho do palco, adaptando-se ao terminal sem recalcular a cena."
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyNewCycle",
+   "type": "function",
+   "name": "relaxSkyNewCycle",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    93,
+    219
+   ],
+   "summary": "Sorteia um céu novo: agrupamentos de estrelas, regiões vazias e o roteiro de eventos do ciclo.",
+   "tags": [
+    "procedural-generation",
+    "random"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkySpawnComet",
+   "type": "function",
+   "name": "relaxSkySpawnComet",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    221,
+    248
+   ],
+   "summary": "Cria um cometa com trajetória, velocidade e cauda sorteadas.",
+   "tags": [
+    "factory",
+    "random"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyShootingStar",
+   "type": "function",
+   "name": "relaxSkyShootingStar",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    252,
+    265
+   ],
+   "summary": "Dispara uma estrela cadente rápida no céu.",
+   "tags": [
+    "effect",
+    "random"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyDiscreteTick",
+   "type": "function",
+   "name": "relaxSkyDiscreteTick",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    277,
+    337
+   ],
+   "summary": "Processa os eventos discretos de cada tick de 100ms: cometas, estrelas cadentes, constelações e troca de ciclo.",
+   "tags": [
+    "state-machine",
+    "simulation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyAdvance",
+   "type": "function",
+   "name": "relaxSkyAdvance",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    344,
+    360
+   ],
+   "summary": "Avança o céu por um passo fracionário, aplicando a deriva contínua e os ticks discretos acumulados.",
+   "tags": [
+    "simulation",
+    "fixed-step"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyPickConstellation",
+   "type": "function",
+   "name": "relaxSkyPickConstellation",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    371,
+    397
+   ],
+   "summary": "Escolhe estrelas próximas para formar uma constelação rara.",
+   "tags": [
+    "procedural-generation",
+    "random"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:brightness",
+   "type": "function",
+   "name": "brightness",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    402,
+    415
+   ],
+   "summary": "Calcula o brilho atual de uma estrela pela cintilação senoidal com fase e ritmo próprios.",
+   "tags": [
+    "math",
+    "animation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyFrames",
+   "type": "function",
+   "name": "relaxSkyFrames",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    478,
+    598
+   ],
+   "summary": "Renderiza o céu completo: estrelas em camadas, cometas, constelações, aurora e crista de árvores, com fade do ciclo.",
+   "tags": [
+    "rendering",
+    "braille-rendering"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyRidgeLine",
+   "type": "function",
+   "name": "relaxSkyRidgeLine",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    604,
+    614
+   ],
+   "summary": "Gera a altura de uma crista por coluna com três harmônicas e duas oitavas de ruído.",
+   "tags": [
+    "procedural-generation",
+    "math"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyRidge",
+   "type": "function",
+   "name": "relaxSkyRidge",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    617,
+    640
+   ],
+   "summary": "Constrói a crista da frente com coníferas recortadas proporcionais ao palco.",
+   "tags": [
+    "procedural-generation",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyDash",
+   "type": "function",
+   "name": "relaxSkyDash",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    643,
+    655
+   ],
+   "summary": "Liga duas estrelas com um traço pontilhado tênue para desenhar constelações.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyAuroraDraw",
+   "type": "function",
+   "name": "relaxSkyAuroraDraw",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    657,
+    684
+   ],
+   "summary": "Desenha cortinas de aurora acima da crista com fade.",
+   "tags": [
+    "rendering",
+    "effect"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sky.go:relaxSkyStatus",
+   "type": "function",
+   "name": "relaxSkyStatus",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    686,
+    699
+   ],
+   "summary": "Monta a linha de status descrevendo o que acontece no céu.",
+   "tags": [
+    "status",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_sky.go:relaxSkyState",
+   "type": "class",
+   "name": "relaxSkyState",
+   "filePath": "internal/ui/relax_sky.go",
+   "lineRange": [
+    59,
+    89
+   ],
+   "summary": "Estado do céu: estrelas, cometas, constelação, relógio do ciclo e eventos agendados, com método fade.",
+   "tags": [
+    "data-model",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/relax_smoke.go",
+   "type": "file",
+   "name": "relax_smoke.go",
+   "filePath": "internal/ui/relax_smoke.go",
+   "summary": "Cena 'Fumaça colorida' do modo Relax: um pote solta fumaça de duas cores por 5s, advectada por curl noise que sobe, abre e se dissipa em 15s antes de um novo par de cores.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "particle-system",
+    "simulation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Usa o rotacional de um campo de ruído (curl noise), livre de divergência, para turbulência realista."
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkPalette",
+   "type": "function",
+   "name": "smkPalette",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    70,
+    87
+   ],
+   "summary": "Monta a paleta de cores da fumaça a partir de um matiz.",
+   "tags": [
+    "color",
+    "palette"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkLaunch",
+   "type": "function",
+   "name": "smkLaunch",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    133,
+    147
+   ],
+   "summary": "Inicia um novo lançamento sorteando um par de cores distintas e reiniciando o jato.",
+   "tags": [
+    "state-machine",
+    "random"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkNewPuff",
+   "type": "function",
+   "name": "smkNewPuff",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    164,
+    194
+   ],
+   "summary": "Cria um puff de fumaça na boca do pote com cor, velocidade e tamanho iniciais.",
+   "tags": [
+    "factory",
+    "particle-system"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkCurl",
+   "type": "function",
+   "name": "smkCurl",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    200,
+    211
+   ],
+   "summary": "Calcula o rotacional (curl) de um campo de ruído, dando turbulência livre de divergência.",
+   "tags": [
+    "math",
+    "noise"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkAdvance",
+   "type": "function",
+   "name": "smkAdvance",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    214,
+    277
+   ],
+   "summary": "Integra os puffs: empuxo, curl noise, expansão e dissipação, emitindo durante o jato e relançando no fim do ciclo.",
+   "tags": [
+    "simulation",
+    "particle-system"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:relaxSmokeFrames",
+   "type": "function",
+   "name": "relaxSmokeFrames",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    281,
+    292
+   ],
+   "summary": "Ponto de entrada de render da fumaça, avançando pelo tempo real.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkDraw",
+   "type": "function",
+   "name": "smkDraw",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    294,
+    380
+   ],
+   "summary": "Rasteriza os puffs em densidade e cor, com núcleo denso e bordas soltas, e desenha o pote.",
+   "tags": [
+    "rendering",
+    "color-blending"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkCanister",
+   "type": "function",
+   "name": "smkCanister",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    384,
+    402
+   ],
+   "summary": "Desenha o pote no chão com quina iluminada e bico aceso na cor do jato.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkStatus",
+   "type": "function",
+   "name": "smkStatus",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    406,
+    416
+   ],
+   "summary": "Descreve a fase do ciclo e o nome das duas cores atuais.",
+   "tags": [
+    "status",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_smoke.go:smkHueName",
+   "type": "function",
+   "name": "smkHueName",
+   "filePath": "internal/ui/relax_smoke.go",
+   "lineRange": [
+    428,
+    440
+   ],
+   "summary": "Converte um matiz em nome de cor em português.",
+   "tags": [
+    "utility",
+    "color"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_sword.go",
+   "type": "file",
+   "name": "relax_sword.go",
+   "filePath": "internal/ui/relax_sword.go",
+   "summary": "Gerador de planetas do modo Relax (arquivo legado 'sword'): sorteia por tabela de raridade variantes como planeta com anel, cubo, Terra, unicórnio, mundo plano, rosquinha ou nave, renderizadas em Braille com iluminação real.",
+   "tags": [
+    "relax-scene",
+    "procedural-generation",
+    "braille-rendering",
+    "animation",
+    "shading"
+   ],
+   "complexity": "complex",
+   "languageNotes": "O torus usa z-buffer para resolver oclusão; a esfera reconstrói a normal por subpixel."
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlPickVariant",
+   "type": "function",
+   "name": "relaxPlPickVariant",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    71,
+    84
+   ],
+   "summary": "Sorteia a variante do planeta respeitando a tabela de raridade.",
+   "tags": [
+    "random",
+    "probability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlBuildPalette",
+   "type": "function",
+   "name": "relaxPlBuildPalette",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    124,
+    171
+   ],
+   "summary": "Constrói a paleta do planeta conforme o tipo de superfície (rochoso, gasoso, gelado, lava).",
+   "tags": [
+    "color",
+    "palette"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlGenerate",
+   "type": "function",
+   "name": "relaxPlGenerate",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    232,
+    363
+   ],
+   "summary": "Gera um planeta novo: variante, superfície, cores, manchas, anel de asteroides e parâmetros de luz.",
+   "tags": [
+    "procedural-generation",
+    "factory"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxSwAdvance",
+   "type": "function",
+   "name": "relaxSwAdvance",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    390,
+    413
+   ],
+   "summary": "Avança a cena do planeta: rotação, varredura de luz, rajadas e transição entre gerações.",
+   "tags": [
+    "simulation",
+    "animation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxSwordFrames",
+   "type": "function",
+   "name": "relaxSwordFrames",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    425,
+    488
+   ],
+   "summary": "Ponto de entrada de render: escolhe o desenho da variante e compõe estrelas, anel e planeta.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawSphere",
+   "type": "function",
+   "name": "relaxPlDrawSphere",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    492,
+    611
+   ],
+   "summary": "Desenha o planeta esférico em Braille com normal por subpixel, terminador em degradê, manchas e nuvens.",
+   "tags": [
+    "rendering",
+    "shading"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlBaseAlbedo",
+   "type": "function",
+   "name": "relaxPlBaseAlbedo",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    614,
+    630
+   ],
+   "summary": "Calcula o albedo base de um ponto da superfície conforme o tipo de planeta.",
+   "tags": [
+    "shading",
+    "math"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawHorn",
+   "type": "function",
+   "name": "relaxPlDrawHorn",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    643,
+    683
+   ],
+   "summary": "Desenha o chifre espiralado arco-íris da variante unicórnio.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawCube",
+   "type": "function",
+   "name": "relaxPlDrawCube",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    690,
+    804
+   ],
+   "summary": "Desenha a variante cúbica (Minecraft) com faces iluminadas e textura em blocos.",
+   "tags": [
+    "rendering",
+    "3d"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawFlat",
+   "type": "function",
+   "name": "relaxPlDrawFlat",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    810,
+    862
+   ],
+   "summary": "Desenha o mundo plano como disco de viés com relevo e espessura na borda.",
+   "tags": [
+    "rendering",
+    "3d"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawDonut",
+   "type": "function",
+   "name": "relaxPlDrawDonut",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    868,
+    934
+   ],
+   "summary": "Desenha a variante torus varrendo (u,v) com z-buffer para resolver oclusão.",
+   "tags": [
+    "rendering",
+    "3d"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawShip",
+   "type": "function",
+   "name": "relaxPlDrawShip",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    940,
+    972
+   ],
+   "summary": "Desenha uma nave passando devagar com casco, cabine, asas e fogo do motor.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawStars",
+   "type": "function",
+   "name": "relaxPlDrawStars",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    976,
+    1005
+   ],
+   "summary": "Desenha o fundo estrelado, ocultando o que a esfera cobre.",
+   "tags": [
+    "rendering",
+    "background"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sword.go:relaxPlDrawRing",
+   "type": "function",
+   "name": "relaxPlDrawRing",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    1009,
+    1040
+   ],
+   "summary": "Desenha o cinturão de asteroides como elipse inclinada, metade da frente ou de trás.",
+   "tags": [
+    "rendering",
+    "3d"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/ui/relax_sword.go:relaxSwordState",
+   "type": "class",
+   "name": "relaxSwordState",
+   "filePath": "internal/ui/relax_sword.go",
+   "lineRange": [
+    192,
+    228
+   ],
+   "summary": "Estado do gerador de planetas: variante, paleta, manchas, asteroides, luz e fade de geração.",
+   "tags": [
+    "data-model",
+    "state"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyNewCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkySpawnComet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyShootingStar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyPickConstellation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:brightness",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyRidgeLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyRidge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyDash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyAuroraDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "function:internal/ui/relax_sky.go:relaxSkyStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "class:internal/ui/relax_sky.go:relaxSkyState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkPalette",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkLaunch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkNewPuff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkCurl",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:relaxSmokeFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkCanister",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "function:internal/ui/relax_smoke.go:smkHueName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlPickVariant",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlBuildPalette",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlGenerate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxSwAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxSwordFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawSphere",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlBaseAlbedo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawHorn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawCube",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawFlat",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawDonut",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawShip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawStars",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "function:internal/ui/relax_sword.go:relaxPlDrawRing",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "class:internal/ui/relax_sword.go:relaxSwordState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_sky.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_smoke.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_sword.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

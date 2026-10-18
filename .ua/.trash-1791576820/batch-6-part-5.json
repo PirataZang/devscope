@@ -1,0 +1,2305 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/git_messages.go",
+   "type": "file",
+   "name": "git_messages.go",
+   "filePath": "internal/ui/git_messages.go",
+   "summary": "Mensagens assíncronas e ações Git da aba: stage, checkout, merge, pull, push, cherry-pick, resolução de conflitos e log de comandos.",
+   "tags": [
+    "event-handler",
+    "git",
+    "service",
+    "bubbletea"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:maybeRefreshGitWorkingTree",
+   "type": "function",
+   "name": "maybeRefreshGitWorkingTree",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    59,
+    83
+   ],
+   "summary": "Dispara refresh do working tree Git quando o intervalo mínimo expirou.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:handleGitWTRefreshed",
+   "type": "function",
+   "name": "handleGitWTRefreshed",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    85,
+    117
+   ],
+   "summary": "Aplica o resultado do refresh do working tree preservando cursor e seleção.",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:requestGitWorkingTreeDiff",
+   "type": "function",
+   "name": "requestGitWorkingTreeDiff",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    119,
+    128
+   ],
+   "summary": "Solicita o diff de um arquivo do working tree.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:requestGitConflictDiff",
+   "type": "function",
+   "name": "requestGitConflictDiff",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    130,
+    142
+   ],
+   "summary": "Solicita o diff de um arquivo em conflito.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:pushGitActivity",
+   "type": "function",
+   "name": "pushGitActivity",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    144,
+    160
+   ],
+   "summary": "Registra uma ação Git concluída no feed de atividade.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:appendGitCommandLog",
+   "type": "function",
+   "name": "appendGitCommandLog",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    162,
+    214
+   ],
+   "summary": "Adiciona a saída de um comando Git ao log de comandos, extraindo links (ex.: URL de PR).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:loadGitCommitDetail",
+   "type": "function",
+   "name": "loadGitCommitDetail",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    234,
+    243
+   ],
+   "summary": "Cria o comando assíncrono que carrega o detalhe de um commit.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitAddFile",
+   "type": "function",
+   "name": "gitAddFile",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    255,
+    283
+   ],
+   "summary": "Faz stage ou unstage do arquivo selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitAddAll",
+   "type": "function",
+   "name": "gitAddAll",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    285,
+    318
+   ],
+   "summary": "Faz stage ou unstage de todos os arquivos do working tree.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitCheckoutBranch",
+   "type": "function",
+   "name": "gitCheckoutBranch",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    320,
+    331
+   ],
+   "summary": "Faz checkout de uma branch de forma assíncrona.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "type": "function",
+   "name": "gitMergeBranch",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    363,
+    383
+   ],
+   "summary": "Faz merge de uma branch na atual, tratando conflitos.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitPull",
+   "type": "function",
+   "name": "gitPull",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    385,
+    398
+   ],
+   "summary": "Executa git pull na branch atual.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitPullMerge",
+   "type": "function",
+   "name": "gitPullMerge",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    400,
+    412
+   ],
+   "summary": "Executa pull com estratégia de merge a partir de uma origem.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitPullRebase",
+   "type": "function",
+   "name": "gitPullRebase",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    414,
+    426
+   ],
+   "summary": "Executa pull com estratégia de rebase a partir de uma origem.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitPush",
+   "type": "function",
+   "name": "gitPush",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    428,
+    450
+   ],
+   "summary": "Executa git push da branch atual, configurando upstream quando necessário.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitCherryPickPaste",
+   "type": "function",
+   "name": "gitCherryPickPaste",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    452,
+    481
+   ],
+   "summary": "Aplica via cherry-pick os commits copiados no buffer.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:handleGitCommitsLoaded",
+   "type": "function",
+   "name": "handleGitCommitsLoaded",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    483,
+    495
+   ],
+   "summary": "Aplica a lista de commits carregada para a branch visualizada.",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:handleGitCommitDetailLoaded",
+   "type": "function",
+   "name": "handleGitCommitDetailLoaded",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    497,
+    530
+   ],
+   "summary": "Aplica o detalhe do commit carregado e solicita o diff do primeiro arquivo.",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:requestGitCommitFileDiff",
+   "type": "function",
+   "name": "requestGitCommitFileDiff",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    532,
+    554
+   ],
+   "summary": "Solicita o diff de um arquivo de um commit, usando cache quando disponível.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:handleGitCommitDiffLoaded",
+   "type": "function",
+   "name": "handleGitCommitDiffLoaded",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    556,
+    572
+   ],
+   "summary": "Aplica e armazena em cache o diff de arquivo de commit carregado.",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:conflictStatusMsg",
+   "type": "function",
+   "name": "conflictStatusMsg",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    584,
+    598
+   ],
+   "summary": "Monta a mensagem de status adequada ao tipo de conflito (merge, rebase, cherry-pick).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:enterGitConflictMode",
+   "type": "function",
+   "name": "enterGitConflictMode",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    600,
+    618
+   ],
+   "summary": "Entra no modo de resolução de conflitos quando há arquivos não mesclados.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "type": "function",
+   "name": "handleGitActionDone",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    627,
+    807
+   ],
+   "summary": "Processa o resultado de qualquer ação Git assíncrona: atualiza estado, notificações, log e conflitos.",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitCherryPickCopy",
+   "type": "function",
+   "name": "gitCherryPickCopy",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    809,
+    842
+   ],
+   "summary": "Copia os commits selecionados para o buffer de cherry-pick.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:toggleGitCommitSelection",
+   "type": "function",
+   "name": "toggleGitCommitSelection",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    844,
+    859
+   ],
+   "summary": "Marca ou desmarca o commit sob o cursor para cherry-pick.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:isGitCommitInCherryBuffer",
+   "type": "function",
+   "name": "isGitCommitInCherryBuffer",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    874,
+    884
+   ],
+   "summary": "Verifica se um commit está no buffer de cherry-pick.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitCherryPickSummary",
+   "type": "function",
+   "name": "gitCherryPickSummary",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    886,
+    899
+   ],
+   "summary": "Resume o conteúdo do buffer de cherry-pick para exibição.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:updateGitConflict",
+   "type": "function",
+   "name": "updateGitConflict",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    908,
+    941
+   ],
+   "summary": "Trata as teclas do modo de conflito (ours, theirs, both, diff, editar, abortar).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitConflictSelectedFile",
+   "type": "function",
+   "name": "gitConflictSelectedFile",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    943,
+    952
+   ],
+   "summary": "Retorna o arquivo em conflito selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitResolveOurs",
+   "type": "function",
+   "name": "gitResolveOurs",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    954,
+    967
+   ],
+   "summary": "Resolve o conflito do arquivo mantendo a versão local (ours).",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitResolveTheirs",
+   "type": "function",
+   "name": "gitResolveTheirs",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    969,
+    982
+   ],
+   "summary": "Resolve o conflito do arquivo mantendo a versão remota (theirs).",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitResolveBoth",
+   "type": "function",
+   "name": "gitResolveBoth",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    984,
+    997
+   ],
+   "summary": "Resolve o conflito do arquivo mantendo ambas as versões.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:openGitConflictDiff",
+   "type": "function",
+   "name": "openGitConflictDiff",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    999,
+    1015
+   ],
+   "summary": "Abre a tela de diff do arquivo em conflito.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:updateGitConflictDiff",
+   "type": "function",
+   "name": "updateGitConflictDiff",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    1017,
+    1043
+   ],
+   "summary": "Trata as teclas da tela de diff de conflito (scroll e resolução).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitConflictEdit",
+   "type": "function",
+   "name": "gitConflictEdit",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    1065,
+    1084
+   ],
+   "summary": "Abre o arquivo em conflito no editor externo.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_messages.go:gitCompactError",
+   "type": "function",
+   "name": "gitCompactError",
+   "filePath": "internal/ui/git_messages.go",
+   "lineRange": [
+    1088,
+    1113
+   ],
+   "summary": "Compacta mensagens de erro do Git para caber na linha de notificação.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/git_prompt.go",
+   "type": "file",
+   "name": "git_prompt.go",
+   "filePath": "internal/ui/git_prompt.go",
+   "summary": "Prompts e confirmações da aba Git para criar, renomear, excluir e mesclar branches, escolher estratégia de pull e abrir PR.",
+   "tags": [
+    "component",
+    "git",
+    "modal",
+    "event-handler"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:targetGitBranch",
+   "type": "function",
+   "name": "targetGitBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    25,
+    39
+   ],
+   "summary": "Retorna a branch alvo de uma operação (marcada ou sob o cursor).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:selectedGitBranch",
+   "type": "function",
+   "name": "selectedGitBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    41,
+    51
+   ],
+   "summary": "Retorna a branch sob o cursor na lista de branches.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:startGitNewBranch",
+   "type": "function",
+   "name": "startGitNewBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    53,
+    69
+   ],
+   "summary": "Abre o prompt para criar uma nova branch.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:startGitRenameBranch",
+   "type": "function",
+   "name": "startGitRenameBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    71,
+    88
+   ],
+   "summary": "Abre o prompt para renomear a branch selecionada.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:startGitDeleteBranch",
+   "type": "function",
+   "name": "startGitDeleteBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    90,
+    108
+   ],
+   "summary": "Abre a confirmação para excluir a branch selecionada.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:startGitMerge",
+   "type": "function",
+   "name": "startGitMerge",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    110,
+    128
+   ],
+   "summary": "Abre a confirmação de merge da branch selecionada na atual.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:gitToggleMarkedBranch",
+   "type": "function",
+   "name": "gitToggleMarkedBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    130,
+    143
+   ],
+   "summary": "Marca ou desmarca a branch selecionada como origem de operações.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:gitPullSourceBranch",
+   "type": "function",
+   "name": "gitPullSourceBranch",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    145,
+    158
+   ],
+   "summary": "Determina a branch de origem para pull (marcada ou upstream).",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:gitOpenPullRequest",
+   "type": "function",
+   "name": "gitOpenPullRequest",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    160,
+    177
+   ],
+   "summary": "Abre o fluxo de criação de pull request para a branch.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:updateGitPrompt",
+   "type": "function",
+   "name": "updateGitPrompt",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    179,
+    255
+   ],
+   "summary": "Trata as teclas do prompt de texto do Git com edição no cursor e envio da ação.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:updateGitConfirm",
+   "type": "function",
+   "name": "updateGitConfirm",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    264,
+    317
+   ],
+   "summary": "Trata as teclas do modal de confirmação Git (incluindo escolha da estratégia de pull).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:renderGitConfirm",
+   "type": "function",
+   "name": "renderGitConfirm",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    319,
+    350
+   ],
+   "summary": "Renderiza o modal de confirmação de operação Git.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:renderPullStrategyBox",
+   "type": "function",
+   "name": "renderPullStrategyBox",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    352,
+    368
+   ],
+   "summary": "Renderiza a caixa de escolha entre merge e rebase no pull.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_prompt.go:renderGitPrompt",
+   "type": "function",
+   "name": "renderGitPrompt",
+   "filePath": "internal/ui/git_prompt.go",
+   "lineRange": [
+    370,
+    448
+   ],
+   "summary": "Renderiza o modal de prompt de texto do Git com cursor.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:maybeRefreshGitWorkingTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:handleGitWTRefreshed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:requestGitWorkingTreeDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:requestGitConflictDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:pushGitActivity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:appendGitCommandLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:loadGitCommitDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitAddFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitAddAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitCheckoutBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitPull",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitPullMerge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitPullRebase",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitPush",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitCherryPickPaste",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:handleGitCommitsLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:handleGitCommitDetailLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:requestGitCommitFileDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:handleGitCommitDiffLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:conflictStatusMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:enterGitConflictMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitCherryPickCopy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:toggleGitCommitSelection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:isGitCommitInCherryBuffer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitCherryPickSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:updateGitConflict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitConflictSelectedFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitResolveOurs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitResolveTheirs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitResolveBoth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:openGitConflictDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:updateGitConflictDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitConflictEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "function:internal/ui/git_messages.go:gitCompactError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:targetGitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:selectedGitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:startGitNewBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:startGitRenameBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:startGitDeleteBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:startGitMerge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:gitToggleMarkedBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:gitPullSourceBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:gitOpenPullRequest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:updateGitPrompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:updateGitConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:renderGitConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:renderPullStrategyBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "function:internal/ui/git_prompt.go:renderGitPrompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:maybeRefreshGitWorkingTree",
+   "target": "function:internal/collectors/git.go:RefreshProjectGitFiles",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitWTRefreshed",
+   "target": "function:internal/ui/git_tab.go:snapWTFileTreeCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitWTRefreshed",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitWTRefreshed",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:requestGitWorkingTreeDiff",
+   "target": "function:internal/collectors/git.go:CollectWorkingTreeDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:requestGitConflictDiff",
+   "target": "function:internal/collectors/git.go:CollectConflictDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:loadGitCommitDetail",
+   "target": "function:internal/collectors/git.go:CollectCommitFiles",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:loadGitCommitDetail",
+   "target": "function:internal/collectors/git.go:CollectCommitFullMessage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddFile",
+   "target": "function:internal/ui/git_tab.go:selectedWTFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddFile",
+   "target": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddFile",
+   "target": "function:internal/collectors/git.go:GitUnstage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddFile",
+   "target": "function:internal/collectors/git.go:GitAdd",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddAll",
+   "target": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddAll",
+   "target": "function:internal/collectors/git.go:GitUnstage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitAddAll",
+   "target": "function:internal/collectors/git.go:GitAdd",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitCheckoutBranch",
+   "target": "function:internal/collectors/git.go:GitCheckout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "target": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "target": "function:internal/collectors/git.go:GitCheckout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "target": "function:internal/collectors/git.go:GitMerge",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPull",
+   "target": "function:internal/ui/git_prompt.go:gitPullSourceBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPull",
+   "target": "function:internal/collectors/git.go:GitPullOrigin",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPullMerge",
+   "target": "function:internal/collectors/git.go:GitPullOriginMerge",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPullRebase",
+   "target": "function:internal/collectors/git.go:GitPullOriginRebase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPush",
+   "target": "function:internal/collectors/git.go:GitPush",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPush",
+   "target": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPush",
+   "target": "function:internal/collectors/git.go:GitDefaultPRBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitPush",
+   "target": "function:internal/collectors/git.go:GitHubCompareURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitCherryPickPaste",
+   "target": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitCherryPickPaste",
+   "target": "function:internal/collectors/git.go:GitCheckout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitCherryPickPaste",
+   "target": "function:internal/collectors/git.go:GitCherryPick",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:conflictStatusMsg",
+   "target": "function:internal/collectors/git.go:GitUnmergedCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:enterGitConflictMode",
+   "target": "function:internal/collectors/git.go:GitOpInProgress",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:enterGitConflictMode",
+   "target": "function:internal/collectors/git.go:GitConflictSides",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:enterGitConflictMode",
+   "target": "function:internal/ui/git_tab.go:focusFirstConflict",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/collectors/git.go:RefreshProjectGit",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/collectors/git.go:GitIsFFImpossible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/collectors/git.go:GitIsConflictError",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/collectors/git.go:GitOpInProgress",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:handleGitActionDone",
+   "target": "function:internal/ui/git_tab.go:focusFirstConflict",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitCherryPickCopy",
+   "target": "function:internal/collectors/git.go:GitResolveHash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitConflictSelectedFile",
+   "target": "function:internal/ui/git_tab.go:selectedWTFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitResolveOurs",
+   "target": "function:internal/collectors/git.go:GitCheckoutOurs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitResolveTheirs",
+   "target": "function:internal/collectors/git.go:GitCheckoutTheirs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:gitResolveBoth",
+   "target": "function:internal/collectors/git.go:GitResolveBoth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:openGitConflictDiff",
+   "target": "function:internal/ui/git_tab.go:selectedWTFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_messages.go:updateGitConflictDiff",
+   "target": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:selectedGitBranch",
+   "target": "function:internal/ui/git_tab.go:filteredGitBranches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:startGitRenameBranch",
+   "target": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:gitPullSourceBranch",
+   "target": "function:internal/collectors/git.go:GitBranchOrigin",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:gitOpenPullRequest",
+   "target": "function:internal/collectors/git.go:GitDefaultPRBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:gitOpenPullRequest",
+   "target": "function:internal/collectors/git.go:GitHubCompareURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:updateGitConfirm",
+   "target": "function:internal/ui/git_messages.go:gitPullMerge",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:updateGitConfirm",
+   "target": "function:internal/ui/git_messages.go:gitPullRebase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:updateGitConfirm",
+   "target": "function:internal/ui/git_messages.go:gitMergeBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:renderGitConfirm",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_prompt.go:renderPullStrategyBox",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_messages.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/git_prompt.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

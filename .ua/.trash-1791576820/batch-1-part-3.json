@@ -1,0 +1,2579 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/nginxutil/agent.go",
+   "type": "file",
+   "name": "agent.go",
+   "filePath": "internal/nginxutil/agent.go",
+   "summary": "Detecta, parseia e edita configs nginx de um projeto (entradas single e hub com .inc), seguindo includes reais e gerando novos server{}/location{}.",
+   "tags": [
+    "nginx",
+    "parser",
+    "config-generation",
+    "infrastructure"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/nginxutil/agent.go:Layout",
+   "type": "class",
+   "name": "Layout",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    44,
+    48
+   ],
+   "summary": "Descreve onde a config nginx do projeto mora no disco: arquivo raiz, pasta de entradas e extensão.",
+   "tags": [
+    "data-model",
+    "struct",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/nginxutil/agent.go:Site",
+   "type": "class",
+   "name": "Site",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    54,
+    67
+   ],
+   "summary": "Arquivo .conf/.inc parseado de forma best-effort via regex, podendo ser entrada single, hub ou location de um hub.",
+   "tags": [
+    "data-model",
+    "struct",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/nginxutil/agent.go:NewSite",
+   "type": "class",
+   "name": "NewSite",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    70,
+    77
+   ],
+   "summary": "Campos de criação de um .conf single: um server{} completo com proxy_pass ou root.",
+   "tags": [
+    "data-model",
+    "struct",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/nginxutil/agent.go:NewConf",
+   "type": "class",
+   "name": "NewConf",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    83,
+    88
+   ],
+   "summary": "Campos do modal de criação de nível 1, com nome, kind (single/hub) e campos específicos do kind.",
+   "tags": [
+    "data-model",
+    "struct",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/nginxutil/agent.go:NewLocation",
+   "type": "class",
+   "name": "NewLocation",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    93,
+    98
+   ],
+   "summary": "Campos de uma .inc dentro de um hub, gerando um bloco location{} sob o server{} do hub.",
+   "tags": [
+    "data-model",
+    "struct",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:Detect",
+   "type": "function",
+   "name": "Detect",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    102,
+    105
+   ],
+   "summary": "Checagem barata para a landing screen: indica se o projeto parece ter config nginx.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:findLayout",
+   "type": "function",
+   "name": "findLayout",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    107,
+    129
+   ],
+   "summary": "Localiza o arquivo raiz e a pasta de entradas nginx do projeto, seguindo includes ou varrendo conteúdo.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:findAnyRootConf",
+   "type": "function",
+   "name": "findAnyRootConf",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    133,
+    149
+   ],
+   "summary": "Encontra qualquer .conf com cara de nginx na raiz quando não há main.conf/nginx.conf.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:includedDir",
+   "type": "function",
+   "name": "includedDir",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    155,
+    166
+   ],
+   "summary": "Lê as diretivas include de um arquivo para descobrir a pasta real de entradas de nível 1.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:resolveIncludeDir",
+   "type": "function",
+   "name": "resolveIncludeDir",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    175,
+    202
+   ],
+   "summary": "Resolve a pasta de um include testando várias bases, inclusive caindo para o nome final quando o caminho é de dentro do container.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:scanForSitesDir",
+   "type": "function",
+   "name": "scanForSitesDir",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    207,
+    242
+   ],
+   "summary": "Último recurso: escolhe a subpasta com mais arquivos que parecem blocos server{}.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:dominantExt",
+   "type": "function",
+   "name": "dominantExt",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    248,
+    266
+   ],
+   "summary": "Determina a extensão predominante (.conf ou .inc) entre os arquivos de uma pasta.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:Discover",
+   "type": "function",
+   "name": "Discover",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    269,
+    294
+   ],
+   "summary": "Descobre o layout nginx do projeto e parseia todas as entradas de nível 1.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:DiscoverHubIncs",
+   "type": "function",
+   "name": "DiscoverHubIncs",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    297,
+    320
+   ],
+   "summary": "Lista e parseia as .inc (locations) incluídas por um hub.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:parseTopEntry",
+   "type": "function",
+   "name": "parseTopEntry",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    335,
+    346
+   ],
+   "summary": "Parseia uma entrada de nível 1 classificando-a como single ou hub.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:parseSingle",
+   "type": "function",
+   "name": "parseSingle",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    348,
+    371
+   ],
+   "summary": "Extrai server_name, listen, proxy_pass, root e SSL de um .conf single via regex.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:parseInc",
+   "type": "function",
+   "name": "parseInc",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    376,
+    392
+   ],
+   "summary": "Extrai caminho de location e destino de um arquivo .inc de hub.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:CreateConf",
+   "type": "function",
+   "name": "CreateConf",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    397,
+    467
+   ],
+   "summary": "Cria um novo .conf de nível 1 (single ou hub), validando duplicidade e garantindo o include no arquivo raiz.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:CreateInc",
+   "type": "function",
+   "name": "CreateInc",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    472,
+    496
+   ],
+   "summary": "Cria uma nova .inc (location) dentro da pasta de um hub existente.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:DeleteSite",
+   "type": "function",
+   "name": "DeleteSite",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    500,
+    507
+   ],
+   "summary": "Remove um arquivo de site rejeitando caminhos que escapem da pasta do projeto.",
+   "tags": [
+    "api",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:ensureInclude",
+   "type": "function",
+   "name": "ensureInclude",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    509,
+    522
+   ],
+   "summary": "Adiciona a diretiva include ao arquivo raiz quando ainda não há glob cobrindo a pasta.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:renderSite",
+   "type": "function",
+   "name": "renderSite",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    524,
+    553
+   ],
+   "summary": "Gera o texto de um server{} single com proxy_pass ou root e SSL opcional.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:renderHub",
+   "type": "function",
+   "name": "renderHub",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    557,
+    569
+   ],
+   "summary": "Gera o texto de um server{} hub que inclui a pasta de .inc.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:renderLocation",
+   "type": "function",
+   "name": "renderLocation",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    574,
+    603
+   ],
+   "summary": "Gera o bloco location{} (ou redirect+location para pasta estática) de uma .inc.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:sslCertLines",
+   "type": "function",
+   "name": "sslCertLines",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    605,
+    617
+   ],
+   "summary": "Gera as linhas ssl_certificate/ssl_certificate_key para um server_name.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:normalizeTarget",
+   "type": "function",
+   "name": "normalizeTarget",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    621,
+    630
+   ],
+   "summary": "Normaliza o destino de proxy_pass adicionando esquema http:// quando ausente.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:normalizeLocationPath",
+   "type": "function",
+   "name": "normalizeLocationPath",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    634,
+    649
+   ],
+   "summary": "Normaliza o caminho de location garantindo barras inicial e final.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent.go:sanitizeName",
+   "type": "function",
+   "name": "sanitizeName",
+   "filePath": "internal/nginxutil/agent.go",
+   "lineRange": [
+    651,
+    662
+   ],
+   "summary": "Sanitiza um nome para uso seguro como nome de arquivo de config.",
+   "tags": [
+    "helper",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/nginxutil/agent_test.go",
+   "type": "file",
+   "name": "agent_test.go",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "summary": "Testes de detecção, descoberta e criação de configs nginx single/hub, incluindo fallbacks de include e proteção contra path escape.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "function",
+   "name": "writeProject",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    10,
+    20
+   ],
+   "summary": "Helper que cria um projeto temporário com arquivos nginx a partir de um mapa caminho→conteúdo.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestDetectAndDiscover",
+   "type": "function",
+   "name": "TestDetectAndDiscover",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    26,
+    67
+   ],
+   "summary": "Testa a detecção e descoberta de entradas nginx em um projeto típico.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestCreateConfSingleWritesFileAndSkipsIncludeWhenGlobPresent",
+   "type": "function",
+   "name": "TestCreateConfSingleWritesFileAndSkipsIncludeWhenGlobPresent",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    69,
+    91
+   ],
+   "summary": "Verifica que criar um single grava o arquivo e não duplica o include quando já há glob.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestCreateConfAddsIncludeWhenMissing",
+   "type": "function",
+   "name": "TestCreateConfAddsIncludeWhenMissing",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    93,
+    119
+   ],
+   "summary": "Verifica que CreateConf adiciona o include ao arquivo raiz quando ausente.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestCreateConfRejectsDuplicateAndMissingTarget",
+   "type": "function",
+   "name": "TestCreateConfRejectsDuplicateAndMissingTarget",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    121,
+    132
+   ],
+   "summary": "Verifica a rejeição de entradas duplicadas e sem destino.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestDiscoverAnyDirName",
+   "type": "function",
+   "name": "TestDiscoverAnyDirName",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    143,
+    166
+   ],
+   "summary": "Verifica que a pasta de entradas é encontrada independentemente do nome.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestDiscoverIncludeWithContainerPathFallsBackToBasename",
+   "type": "function",
+   "name": "TestDiscoverIncludeWithContainerPathFallsBackToBasename",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    172,
+    195
+   ],
+   "summary": "Verifica o fallback para o nome final da pasta quando o include usa caminho de container.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestCreateConfHubThenCreateInc",
+   "type": "function",
+   "name": "TestCreateConfHubThenCreateInc",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    202,
+    260
+   ],
+   "summary": "Testa a criação de um hub seguida de locations .inc dentro dele.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestCreateIncRejectsNonHub",
+   "type": "function",
+   "name": "TestCreateIncRejectsNonHub",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    262,
+    271
+   ],
+   "summary": "Verifica que CreateInc recusa entradas que não são hub.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/nginxutil/agent_test.go:TestDiscoverHubWithServerBlockAndSiblingFolder",
+   "type": "function",
+   "name": "TestDiscoverHubWithServerBlockAndSiblingFolder",
+   "filePath": "internal/nginxutil/agent_test.go",
+   "lineRange": [
+    278,
+    337
+   ],
+   "summary": "Testa a descoberta de hub com server{} próprio e pasta de .inc irmã na raiz.",
+   "tags": [
+    "test",
+    "nginx",
+    "parser"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ngrokutil/agent.go",
+   "type": "file",
+   "name": "agent.go",
+   "filePath": "internal/ngrokutil/agent.go",
+   "summary": "Integração com o agente ngrok: detecta binário, consulta a API local, lista túneis e requisições, e inicia/para túneis via API ou processo.",
+   "tags": [
+    "ngrok",
+    "tunnel",
+    "api-client",
+    "process-management"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/ngrokutil/agent.go:Tunnel",
+   "type": "class",
+   "name": "Tunnel",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    19,
+    34
+   ],
+   "summary": "Visão mesclada de um túnel ngrok ativo no agente com a config do projeto.",
+   "tags": [
+    "data-model",
+    "struct",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ngrokutil/agent.go:Request",
+   "type": "class",
+   "name": "Request",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    36,
+    46
+   ],
+   "summary": "Requisição HTTP capturada pelo inspetor do agente ngrok.",
+   "tags": [
+    "data-model",
+    "struct",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ngrokutil/agent.go:AgentInfo",
+   "type": "class",
+   "name": "AgentInfo",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    48,
+    52
+   ],
+   "summary": "Estado do agente local do ngrok (online, endereço, erro).",
+   "tags": [
+    "data-model",
+    "struct",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:Available",
+   "type": "function",
+   "name": "Available",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    54,
+    57
+   ],
+   "summary": "Indica se o binário ngrok está disponível no PATH.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:Version",
+   "type": "function",
+   "name": "Version",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    59,
+    72
+   ],
+   "summary": "Retorna a versão instalada do ngrok.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "function",
+   "name": "AgentBase",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    74,
+    79
+   ],
+   "summary": "Retorna a URL base da API local do agente ngrok.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "function",
+   "name": "PingAgent",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    81,
+    93
+   ],
+   "summary": "Verifica se a API local do agente ngrok está respondendo.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "type": "function",
+   "name": "ListLiveTunnels",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    95,
+    149
+   ],
+   "summary": "Lista os túneis ativos consultando /api/tunnels do agente ngrok.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:ListHTTPRequests",
+   "type": "function",
+   "name": "ListHTTPRequests",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    151,
+    215
+   ],
+   "summary": "Lista as requisições HTTP recentes capturadas pelo agente ngrok.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "function",
+   "name": "StartTunnel",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    220,
+    232
+   ],
+   "summary": "Sobe um túnel a partir da TunnelConfig, via API do agente ou iniciando o processo ngrok.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "function",
+   "name": "StopTunnel",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    234,
+    254
+   ],
+   "summary": "Encerra um túnel pela API do agente ou matando o processo iniciado.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:startViaAPI",
+   "type": "function",
+   "name": "startViaAPI",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    268,
+    289
+   ],
+   "summary": "Cria um túnel por POST na API do agente incluindo domínio e região.",
+   "tags": [
+    "helper",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:StartArgs",
+   "type": "function",
+   "name": "StartArgs",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    293,
+    305
+   ],
+   "summary": "Monta os argumentos de linha de comando do ngrok, usados também como preview na tela.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:startProcess",
+   "type": "function",
+   "name": "startProcess",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    307,
+    322
+   ],
+   "summary": "Inicia o processo ngrok em segundo plano quando o agente está offline.",
+   "tags": [
+    "helper",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:agentGET",
+   "type": "function",
+   "name": "agentGET",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    324,
+    339
+   ],
+   "summary": "Executa um GET na API local do agente ngrok.",
+   "tags": [
+    "helper",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:parseAddrPort",
+   "type": "function",
+   "name": "parseAddrPort",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    341,
+    350
+   ],
+   "summary": "Extrai a porta numérica de um endereço local.",
+   "tags": [
+    "helper",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:sanitizeName",
+   "type": "function",
+   "name": "sanitizeName",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    371,
+    386
+   ],
+   "summary": "Sanitiza um nome de túnel para caracteres aceitos pelo ngrok.",
+   "tags": [
+    "helper",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "function",
+   "name": "SuggestPort",
+   "filePath": "internal/ngrokutil/agent.go",
+   "lineRange": [
+    389,
+    407
+   ],
+   "summary": "Sugere uma porta local provável a partir das portas do projeto ou do framework.",
+   "tags": [
+    "api",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ngrokutil/agent_test.go",
+   "type": "file",
+   "name": "agent_test.go",
+   "filePath": "internal/ngrokutil/agent_test.go",
+   "summary": "Testes do pacote ngrokutil: mesclagem de túneis, persistência de config, sugestão de porta e sanitização de nomes.",
+   "tags": [
+    "test",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent_test.go:TestMergeTunnels",
+   "type": "function",
+   "name": "TestMergeTunnels",
+   "filePath": "internal/ngrokutil/agent_test.go",
+   "lineRange": [
+    9,
+    46
+   ],
+   "summary": "Verifica a mesclagem de túneis ativos com a config do projeto, excluindo túneis de outros projetos.",
+   "tags": [
+    "test",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ngrokutil/agent_test.go:TestSaveLoadProject",
+   "type": "function",
+   "name": "TestSaveLoadProject",
+   "filePath": "internal/ngrokutil/agent_test.go",
+   "lineRange": [
+    48,
+    61
+   ],
+   "summary": "Verifica a gravação e leitura da config ngrok do projeto.",
+   "tags": [
+    "test",
+    "ngrok",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/sshutil/agent.go",
+   "type": "file",
+   "name": "agent.go",
+   "filePath": "internal/sshutil/agent.go",
+   "summary": "Gerencia túneis SSH (local, remoto, dinâmico) como processos em segundo plano, com logs, sugestão de alvo via remotes Git e formatação de forwards.",
+   "tags": [
+    "ssh",
+    "tunnel",
+    "process-management",
+    "concorrencia"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/sshutil/agent.go:Tunnel",
+   "type": "class",
+   "name": "Tunnel",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    16,
+    29
+   ],
+   "summary": "Visão mesclada de um processo ssh ativo com a config de túnel do projeto.",
+   "tags": [
+    "data-model",
+    "struct",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:Available",
+   "type": "function",
+   "name": "Available",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    50,
+    53
+   ],
+   "summary": "Indica se o binário ssh está disponível no PATH.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:Version",
+   "type": "function",
+   "name": "Version",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    55,
+    66
+   ],
+   "summary": "Retorna a versão do cliente ssh instalado.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:SuggestPort",
+   "type": "function",
+   "name": "SuggestPort",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    68,
+    86
+   ],
+   "summary": "Sugere uma porta local provável a partir das portas do projeto ou do framework.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:FormatForward",
+   "type": "function",
+   "name": "FormatForward",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    88,
+    99
+   ],
+   "summary": "Formata a descrição legível de um forward local, remoto ou dinâmico.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "type": "function",
+   "name": "ListLiveTunnels",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    101,
+    124
+   ],
+   "summary": "Lista os túneis ssh em execução gerenciados pelo processo atual.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:StartTunnel",
+   "type": "function",
+   "name": "StartTunnel",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    126,
+    206
+   ],
+   "summary": "Inicia um processo ssh de túnel em segundo plano, capturando saída e rastreando o estado.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:StopTunnel",
+   "type": "function",
+   "name": "StopTunnel",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    208,
+    233
+   ],
+   "summary": "Encerra o processo ssh de um túnel pelo nome.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:RecentLogs",
+   "type": "function",
+   "name": "RecentLogs",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    235,
+    254
+   ],
+   "summary": "Retorna as linhas de log mais recentes de um túnel ssh.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:TunnelArgs",
+   "type": "function",
+   "name": "TunnelArgs",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    257,
+    260
+   ],
+   "summary": "Expõe os argumentos do comando ssh para preview na tela.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:tunnelArgs",
+   "type": "function",
+   "name": "tunnelArgs",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    262,
+    286
+   ],
+   "summary": "Monta os argumentos ssh (-L/-R/-D, keepalive, ExitOnForwardFailure) a partir da config.",
+   "tags": [
+    "helper",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:SuggestSSHTarget",
+   "type": "function",
+   "name": "SuggestSSHTarget",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    289,
+    296
+   ],
+   "summary": "Sugere user@host a partir de remotes Git que não sejam hosts públicos.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:parseGitSSHTarget",
+   "type": "function",
+   "name": "parseGitSSHTarget",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    298,
+    340
+   ],
+   "summary": "Extrai user@host de uma URL de remote Git SSH ou ssh://.",
+   "tags": [
+    "helper",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "type": "function",
+   "name": "DefaultRemoteTunnel",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    352,
+    366
+   ],
+   "summary": "Cria uma TunnelConfig reversa padrão expondo a porta do projeto no host remoto.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:consumeOutput",
+   "type": "function",
+   "name": "consumeOutput",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    368,
+    385
+   ],
+   "summary": "Lê a saída do processo ssh e armazena as linhas no buffer de logs do túnel.",
+   "tags": [
+    "helper",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:sanitizeName",
+   "type": "function",
+   "name": "sanitizeName",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    387,
+    402
+   ],
+   "summary": "Sanitiza um nome de túnel ssh.",
+   "tags": [
+    "helper",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:formatUptime",
+   "type": "function",
+   "name": "formatUptime",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    404,
+    416
+   ],
+   "summary": "Formata há quanto tempo um túnel está ativo.",
+   "tags": [
+    "helper",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent.go:ParseBind",
+   "type": "function",
+   "name": "ParseBind",
+   "filePath": "internal/sshutil/agent.go",
+   "lineRange": [
+    435,
+    456
+   ],
+   "summary": "Separa \"host:porta\" ou \":porta\" em host e porta.",
+   "tags": [
+    "api",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:Layout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:Layout",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:Site",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:Site",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewSite",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewSite",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewConf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewConf",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewLocation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "class:internal/nginxutil/agent.go:NewLocation",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:Detect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:Detect",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:findLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:findAnyRootConf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:includedDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:resolveIncludeDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:scanForSitesDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:dominantExt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:Discover",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:Discover",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:DiscoverHubIncs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:DiscoverHubIncs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:parseTopEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:parseSingle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:parseInc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:CreateConf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:CreateConf",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:CreateInc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:CreateInc",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:DeleteSite",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:DeleteSite",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:ensureInclude",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:renderSite",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:renderHub",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:renderLocation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:sslCertLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:normalizeTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:normalizeLocationPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "function:internal/nginxutil/agent.go:sanitizeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:Detect",
+   "target": "function:internal/nginxutil/agent.go:findLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:findLayout",
+   "target": "function:internal/nginxutil/agent.go:findAnyRootConf",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:findLayout",
+   "target": "function:internal/nginxutil/agent.go:includedDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:findLayout",
+   "target": "function:internal/nginxutil/agent.go:scanForSitesDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:includedDir",
+   "target": "function:internal/nginxutil/agent.go:resolveIncludeDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:resolveIncludeDir",
+   "target": "function:internal/nginxutil/agent.go:dominantExt",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:Discover",
+   "target": "function:internal/nginxutil/agent.go:findLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:Discover",
+   "target": "function:internal/nginxutil/agent.go:parseTopEntry",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:DiscoverHubIncs",
+   "target": "function:internal/nginxutil/agent.go:parseInc",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:parseTopEntry",
+   "target": "function:internal/nginxutil/agent.go:parseSingle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:parseTopEntry",
+   "target": "function:internal/nginxutil/agent.go:resolveIncludeDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:findLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:renderHub",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:parseSingle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:renderSite",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateConf",
+   "target": "function:internal/nginxutil/agent.go:ensureInclude",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateInc",
+   "target": "function:internal/nginxutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateInc",
+   "target": "function:internal/nginxutil/agent.go:renderLocation",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:CreateInc",
+   "target": "function:internal/nginxutil/agent.go:parseInc",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:renderSite",
+   "target": "function:internal/nginxutil/agent.go:normalizeTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:renderSite",
+   "target": "function:internal/nginxutil/agent.go:sslCertLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:renderHub",
+   "target": "function:internal/nginxutil/agent.go:sslCertLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:renderLocation",
+   "target": "function:internal/nginxutil/agent.go:normalizeLocationPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent.go:renderLocation",
+   "target": "function:internal/nginxutil/agent.go:normalizeTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestDetectAndDiscover",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestCreateConfSingleWritesFileAndSkipsIncludeWhenGlobPresent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestCreateConfAddsIncludeWhenMissing",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestCreateConfRejectsDuplicateAndMissingTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestDiscoverAnyDirName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestDiscoverIncludeWithContainerPathFallsBackToBasename",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestCreateConfHubThenCreateInc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestCreateIncRejectsNonHub",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/nginxutil/agent_test.go",
+   "target": "function:internal/nginxutil/agent_test.go:TestDiscoverHubWithServerBlockAndSiblingFolder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/nginxutil/agent_test.go:TestDetectAndDiscover",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent_test.go:TestCreateConfSingleWritesFileAndSkipsIncludeWhenGlobPresent",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent_test.go:TestCreateConfRejectsDuplicateAndMissingTarget",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent_test.go:TestCreateConfHubThenCreateInc",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/nginxutil/agent_test.go:TestCreateIncRejectsNonHub",
+   "target": "function:internal/nginxutil/agent_test.go:writeProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:Tunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:Tunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:Request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:Request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:AgentInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "class:internal/ngrokutil/agent.go:AgentInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:Available",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:Available",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:Version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:Version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:ListHTTPRequests",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:ListHTTPRequests",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:startViaAPI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StartArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:StartArgs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:startProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:agentGET",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:parseAddrPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:sanitizeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "function:internal/ngrokutil/agent.go:SuggestPort",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:PingAgent",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "target": "function:internal/ngrokutil/agent.go:agentGET",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:ListLiveTunnels",
+   "target": "function:internal/ngrokutil/agent.go:parseAddrPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:ListHTTPRequests",
+   "target": "function:internal/ngrokutil/agent.go:agentGET",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "target": "function:internal/ngrokutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "target": "function:internal/ngrokutil/agent.go:startViaAPI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StartTunnel",
+   "target": "function:internal/ngrokutil/agent.go:startProcess",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "target": "function:internal/ngrokutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StopTunnel",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:startViaAPI",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:StartArgs",
+   "target": "function:internal/ngrokutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:startProcess",
+   "target": "function:internal/ngrokutil/agent.go:StartArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:startProcess",
+   "target": "function:internal/ngrokutil/agent.go:PingAgent",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ngrokutil/agent.go:agentGET",
+   "target": "function:internal/ngrokutil/agent.go:AgentBase",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ngrokutil/agent_test.go",
+   "target": "function:internal/ngrokutil/agent_test.go:TestMergeTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ngrokutil/agent_test.go",
+   "target": "function:internal/ngrokutil/agent_test.go:TestSaveLoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "class:internal/sshutil/agent.go:Tunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "class:internal/sshutil/agent.go:Tunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:Available",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:Available",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:Version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:Version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:SuggestPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:SuggestPort",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:FormatForward",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:FormatForward",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:StartTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:StartTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:StopTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:StopTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:RecentLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:RecentLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:TunnelArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:TunnelArgs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:tunnelArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:SuggestSSHTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:SuggestSSHTarget",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:parseGitSSHTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:consumeOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:sanitizeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:formatUptime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:ParseBind",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "function:internal/sshutil/agent.go:ParseBind",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "target": "function:internal/sshutil/agent.go:formatUptime",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:ListLiveTunnels",
+   "target": "function:internal/sshutil/agent.go:FormatForward",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:StartTunnel",
+   "target": "function:internal/sshutil/agent.go:tunnelArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:StartTunnel",
+   "target": "function:internal/sshutil/agent.go:consumeOutput",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:StopTunnel",
+   "target": "function:internal/sshutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:RecentLogs",
+   "target": "function:internal/sshutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:TunnelArgs",
+   "target": "function:internal/sshutil/agent.go:tunnelArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:SuggestSSHTarget",
+   "target": "function:internal/sshutil/agent.go:parseGitSSHTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "target": "function:internal/sshutil/agent.go:SuggestPort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/agent.go:DefaultRemoteTunnel",
+   "target": "function:internal/sshutil/agent.go:sanitizeName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/nginxutil/agent.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ngrokutil/agent.go",
+   "target": "file:internal/ngrokutil/agent_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/sshutil/agent.go",
+   "target": "file:internal/sshutil/agent_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

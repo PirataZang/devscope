@@ -1,0 +1,4547 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/gha.go",
+   "type": "file",
+   "name": "gha.go",
+   "filePath": "internal/collectors/gha.go",
+   "summary": "Integração completa com GitHub Actions via CLI `gh`: catálogo de processos/workflows do projeto, templates, listagem de runs/jobs/logs, timeline com barras Braille, heatmap de falhas, estimativa de billing, disparo de workflow_dispatch com inputs, notas por run e ações cancel/rerun.",
+   "tags": [
+    "github-actions",
+    "ci-cd",
+    "collector",
+    "command-runner",
+    "formatting"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Usa json.Number e um decoder com UseNumber para preservar IDs de 64 bits do GitHub sem notação científica."
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHACatalog",
+   "type": "class",
+   "name": "GHACatalog",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    24,
+    27
+   ],
+   "summary": "Registro central do projeto com os processos (pipelines) gerenciados.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAProcess",
+   "type": "class",
+   "name": "GHAProcess",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    30,
+    35
+   ],
+   "summary": "Pipeline gerenciado pelo DevScope, correspondente a um arquivo de workflow.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAWorkflow",
+   "type": "class",
+   "name": "GHAWorkflow",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    37,
+    42
+   ],
+   "summary": "Workflow do GitHub Actions retornado pelo gh.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHARun",
+   "type": "class",
+   "name": "GHARun",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    44,
+    57
+   ],
+   "summary": "Execução (run) de workflow com status, conclusão, branch, evento e timestamps.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAJob",
+   "type": "class",
+   "name": "GHAJob",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    60,
+    68
+   ],
+   "summary": "Job dentro de uma run de workflow (linha de matrix ou job nomeado).",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAStep",
+   "type": "class",
+   "name": "GHAStep",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    71,
+    78
+   ],
+   "summary": "Step dentro de um job.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAWorkflowInput",
+   "type": "class",
+   "name": "GHAWorkflowInput",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    81,
+    88
+   ],
+   "summary": "Input de workflow_dispatch lido do YAML.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHANote",
+   "type": "class",
+   "name": "GHANote",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    91,
+    96
+   ],
+   "summary": "Anotação curta associada a uma run (incidente etc.).",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHANotesFile",
+   "type": "class",
+   "name": "GHANotesFile",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    98,
+    101
+   ],
+   "summary": "Arquivo persistido com as notas de runs do projeto.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAFailBucket",
+   "type": "class",
+   "name": "GHAFailBucket",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    104,
+    107
+   ],
+   "summary": "Contagem de falhas por processo para o card de heatmap.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAMinuteBucket",
+   "type": "class",
+   "name": "GHAMinuteBucket",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    110,
+    113
+   ],
+   "summary": "Minutos faturáveis estimados por workflow.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAActionsBilling",
+   "type": "class",
+   "name": "GHAActionsBilling",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    116,
+    125
+   ],
+   "summary": "Cota de Actions da conta/organização obtida da API de billing do GitHub.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/gha.go:GHAInfo",
+   "type": "class",
+   "name": "GHAInfo",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    127,
+    133
+   ],
+   "summary": "Estado da integração GHA do projeto: disponibilidade do gh, autenticação e owner/repo.",
+   "tags": [
+    "data-model",
+    "github-actions",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAAvailable",
+   "type": "function",
+   "name": "GHAAvailable",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    135,
+    138
+   ],
+   "summary": "Indica se o CLI gh está no PATH.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAInstallHint",
+   "type": "function",
+   "name": "GHAInstallHint",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    141,
+    143
+   ],
+   "summary": "Retorna instruções curtas de instalação do gh para a plataforma atual.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAAuthLoginCmd",
+   "type": "function",
+   "name": "GHAAuthLoginCmd",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    146,
+    149
+   ],
+   "summary": "Monta o comando interativo de login do GitHub CLI (navegador + device flow).",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAAuthStatusOK",
+   "type": "function",
+   "name": "GHAAuthStatusOK",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    151,
+    157
+   ],
+   "summary": "Verifica se o gh está autenticado.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:runGH",
+   "type": "function",
+   "name": "runGH",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    159,
+    185
+   ],
+   "summary": "Executa o gh com timeout no diretório do projeto e retorna a saída ou erro descritivo.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHARepoInfo",
+   "type": "function",
+   "name": "GHARepoInfo",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    187,
+    218
+   ],
+   "summary": "Resolve owner/repo pelo remote ou `gh repo view` e o status de autenticação do gh.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAActionsURL",
+   "type": "function",
+   "name": "GHAActionsURL",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    221,
+    231
+   ],
+   "summary": "Monta a URL do navegador para a área Actions ou um workflow específico.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHARunURL",
+   "type": "function",
+   "name": "GHARunURL",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    234,
+    239
+   ],
+   "summary": "Monta a URL do navegador para uma run específica.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHACatalogPath",
+   "type": "function",
+   "name": "GHACatalogPath",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    241,
+    243
+   ],
+   "summary": "Retorna o caminho do catálogo de processos em .devscope.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAWorkflowsDir",
+   "type": "function",
+   "name": "GHAWorkflowsDir",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    245,
+    247
+   ],
+   "summary": "Retorna o diretório .github/workflows do projeto.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:LoadGHACatalog",
+   "type": "function",
+   "name": "LoadGHACatalog",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    249,
+    266
+   ],
+   "summary": "Carrega o catálogo de processos do disco, retornando vazio quando ausente.",
+   "tags": [
+    "github-actions",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:SaveGHACatalog",
+   "type": "function",
+   "name": "SaveGHACatalog",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    268,
+    281
+   ],
+   "summary": "Persiste o catálogo de processos em JSON garantindo o diretório .devscope.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:SyncGHACatalogFromDisk",
+   "type": "function",
+   "name": "SyncGHACatalogFromDisk",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    284,
+    324
+   ],
+   "summary": "Descobre arquivos de workflow e os mescla no catálogo.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAListLocalWorkflowFiles",
+   "type": "function",
+   "name": "GHAListLocalWorkflowFiles",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    326,
+    332
+   ],
+   "summary": "Lista os workflows locais do projeto como processos.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:sanitizeGHAProcessName",
+   "type": "function",
+   "name": "sanitizeGHAProcessName",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    334,
+    355
+   ],
+   "summary": "Normaliza o nome do processo em slug seguro para nome de arquivo.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAWorkflowTemplate",
+   "type": "function",
+   "name": "GHAWorkflowTemplate",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    358,
+    420
+   ],
+   "summary": "Retorna o corpo YAML de um novo workflow conforme o template escolhido.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHACreateProcess",
+   "type": "function",
+   "name": "GHACreateProcess",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    422,
+    468
+   ],
+   "summary": "Cria o arquivo de workflow e registra o processo no catálogo.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHADeleteProcess",
+   "type": "function",
+   "name": "GHADeleteProcess",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    470,
+    494
+   ],
+   "summary": "Remove o arquivo de workflow e a entrada do processo no catálogo.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAReadProcessFile",
+   "type": "function",
+   "name": "GHAReadProcessFile",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    496,
+    510
+   ],
+   "summary": "Lê o conteúdo de um arquivo de workflow por caminho relativo ou nome.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAListWorkflows",
+   "type": "function",
+   "name": "GHAListWorkflows",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    512,
+    519
+   ],
+   "summary": "Lista os workflows do repositório via gh.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAListRuns",
+   "type": "function",
+   "name": "GHAListRuns",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    521,
+    532
+   ],
+   "summary": "Lista as runs recentes do repositório via gh.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHARunLogs",
+   "type": "function",
+   "name": "GHARunLogs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    534,
+    552
+   ],
+   "summary": "Retorna os logs completos de uma run.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHARunFailedLogs",
+   "type": "function",
+   "name": "GHARunFailedLogs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    555,
+    571
+   ],
+   "summary": "Retorna apenas os logs dos steps com falha de uma run.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAListRunJobs",
+   "type": "function",
+   "name": "GHAListRunJobs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    574,
+    583
+   ],
+   "summary": "Retorna os jobs e steps de uma run.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:FormatGHAJobsText",
+   "type": "function",
+   "name": "FormatGHAJobsText",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    586,
+    588
+   ],
+   "summary": "Renderiza jobs/steps para a aba Jobs da TUI.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:FormatGHATimelineText",
+   "type": "function",
+   "name": "FormatGHATimelineText",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    591,
+    632
+   ],
+   "summary": "Renderiza a timeline fila→jobs→steps com barra de duração em Braille.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:ghaDurationSec",
+   "type": "function",
+   "name": "ghaDurationSec",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    634,
+    647
+   ],
+   "summary": "Calcula a duração em segundos entre dois timestamps do GitHub.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:parseGHATime",
+   "type": "function",
+   "name": "parseGHATime",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    649,
+    660
+   ],
+   "summary": "Interpreta timestamps do GitHub ignorando valores zero.",
+   "tags": [
+    "github-actions",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:ghaFmtDur",
+   "type": "function",
+   "name": "ghaFmtDur",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    662,
+    675
+   ],
+   "summary": "Formata uma duração em segundos em texto curto (s/m/h).",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:BrailleBar",
+   "type": "function",
+   "name": "BrailleBar",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    681,
+    710
+   ],
+   "summary": "Preenche uma barra de largura fixa com caracteres Braille conforme a fração 0..1.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:ghaBar",
+   "type": "function",
+   "name": "ghaBar",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    712,
+    724
+   ],
+   "summary": "Gera a barra Braille proporcional à duração em relação ao máximo.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:truncateRunes",
+   "type": "function",
+   "name": "truncateRunes",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    726,
+    735
+   ],
+   "summary": "Trunca uma string por runas adicionando reticências.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAFailHeatmap",
+   "type": "function",
+   "name": "GHAFailHeatmap",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    738,
+    760
+   ],
+   "summary": "Conta falhas por workflow nas n runs mais recentes.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHABillingEstimate",
+   "type": "function",
+   "name": "GHABillingEstimate",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    763,
+    786
+   ],
+   "summary": "Estima minutos por workflow a partir de startedAt→updatedAt das runs concluídas.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:FormatGHABilling",
+   "type": "function",
+   "name": "FormatGHABilling",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    788,
+    805
+   ],
+   "summary": "Formata os buckets de minutos estimados em texto.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:SumGHAMinutes",
+   "type": "function",
+   "name": "SumGHAMinutes",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    807,
+    813
+   ],
+   "summary": "Soma os minutos de todos os buckets.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAMinutesFromRuns",
+   "type": "function",
+   "name": "GHAMinutesFromRuns",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    816,
+    818
+   ],
+   "summary": "Soma os minutos estimados das runs informadas.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:FormatGHAMinutes",
+   "type": "function",
+   "name": "FormatGHAMinutes",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    820,
+    828
+   ],
+   "summary": "Formata minutos em texto curto.",
+   "tags": [
+    "github-actions",
+    "formatting",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAFetchActionsBilling",
+   "type": "function",
+   "name": "GHAFetchActionsBilling",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    831,
+    879
+   ],
+   "summary": "Carrega minutos incluídos/usados de Actions do owner (organização e depois usuário).",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:ghaBillingDaysLeft",
+   "type": "function",
+   "name": "ghaBillingDaysLeft",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    881,
+    898
+   ],
+   "summary": "Calcula os dias restantes do ciclo de faturamento via API de billing.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:jsonNumberFloat",
+   "type": "function",
+   "name": "jsonNumberFloat",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    900,
+    913
+   ],
+   "summary": "Converte json.Number em float64 tolerando falhas.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:ghaStatusMark",
+   "type": "function",
+   "name": "ghaStatusMark",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    922,
+    937
+   ],
+   "summary": "Mapeia status/conclusão de run ou job em um marcador visual.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHATriggerWorkflow",
+   "type": "function",
+   "name": "GHATriggerWorkflow",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    939,
+    941
+   ],
+   "summary": "Dispara um workflow via workflow_dispatch.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHATriggerWorkflowRef",
+   "type": "function",
+   "name": "GHATriggerWorkflowRef",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    944,
+    946
+   ],
+   "summary": "Dispara workflow_dispatch em uma branch/tag específica.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHATriggerWorkflowRefInputs",
+   "type": "function",
+   "name": "GHATriggerWorkflowRefInputs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    949,
+    964
+   ],
+   "summary": "Dispara workflow_dispatch com inputs opcionais -f chave=valor.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAParseWorkflowInputs",
+   "type": "function",
+   "name": "GHAParseWorkflowInputs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    967,
+    973
+   ],
+   "summary": "Lê os inputs de workflow_dispatch de um arquivo de workflow local.",
+   "tags": [
+    "github-actions",
+    "parser",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:parseWorkflowDispatchInputs",
+   "type": "function",
+   "name": "parseWorkflowDispatchInputs",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    975,
+    1043
+   ],
+   "summary": "Faz parsing do YAML do workflow extraindo inputs de workflow_dispatch (tipo, default, required, options).",
+   "tags": [
+    "github-actions",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GitBranchAheadCount",
+   "type": "function",
+   "name": "GitBranchAheadCount",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1046,
+    1054
+   ],
+   "summary": "Conta commits locais que não estão em origin/<branch>.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GitPushBranch",
+   "type": "function",
+   "name": "GitPushBranch",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1057,
+    1063
+   ],
+   "summary": "Faz push da branch para origin, definindo upstream se necessário.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHANotesPath",
+   "type": "function",
+   "name": "GHANotesPath",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1065,
+    1067
+   ],
+   "summary": "Retorna o caminho do arquivo de notas de runs em .devscope.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:LoadGHANotes",
+   "type": "function",
+   "name": "LoadGHANotes",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1069,
+    1086
+   ],
+   "summary": "Carrega as notas de runs do disco.",
+   "tags": [
+    "github-actions",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:SaveGHANote",
+   "type": "function",
+   "name": "SaveGHANote",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1088,
+    1118
+   ],
+   "summary": "Cria ou atualiza a nota de uma run e persiste o arquivo.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHANoteForRun",
+   "type": "function",
+   "name": "GHANoteForRun",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1120,
+    1131
+   ],
+   "summary": "Retorna o texto da nota de uma run, se houver.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:DeleteGHANote",
+   "type": "function",
+   "name": "DeleteGHANote",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1133,
+    1150
+   ],
+   "summary": "Remove a nota de uma run e persiste o arquivo.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHACancelRun",
+   "type": "function",
+   "name": "GHACancelRun",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1152,
+    1154
+   ],
+   "summary": "Cancela uma run em andamento via gh.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHARerun",
+   "type": "function",
+   "name": "GHARerun",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1156,
+    1158
+   ],
+   "summary": "Reexecuta uma run via gh.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:GHAOpenRunURL",
+   "type": "function",
+   "name": "GHAOpenRunURL",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1160,
+    1178
+   ],
+   "summary": "Abre a URL da run no navegador padrão do sistema.",
+   "tags": [
+    "github-actions",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:jsonScalarID",
+   "type": "function",
+   "name": "jsonScalarID",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1187,
+    1211
+   ],
+   "summary": "Converte IDs do GitHub em string com todos os dígitos, sem notação científica.",
+   "tags": [
+    "github-actions",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:parseGHAWorkflowJSON",
+   "type": "function",
+   "name": "parseGHAWorkflowJSON",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1213,
+    1234
+   ],
+   "summary": "Decodifica a saída JSON do gh em GHAWorkflow.",
+   "tags": [
+    "github-actions",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:parseGHARunJSON",
+   "type": "function",
+   "name": "parseGHARunJSON",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1236,
+    1273
+   ],
+   "summary": "Decodifica a saída JSON do gh em GHARun preservando IDs grandes.",
+   "tags": [
+    "github-actions",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha.go:parseGHAJobsJSON",
+   "type": "function",
+   "name": "parseGHAJobsJSON",
+   "filePath": "internal/collectors/gha.go",
+   "lineRange": [
+    1275,
+    1323
+   ],
+   "summary": "Decodifica a saída JSON de jobs/steps do gh em GHAJob.",
+   "tags": [
+    "github-actions",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/collectors/gha_test.go",
+   "type": "file",
+   "name": "gha_test.go",
+   "filePath": "internal/collectors/gha_test.go",
+   "summary": "Testes da integração com GitHub Actions: sanitização de nomes, criação/remoção de processos, sincronização do catálogo, URLs, templates, parsing de runs/jobs, heatmap/billing, inputs de workflow_dispatch e notas.",
+   "tags": [
+    "test",
+    "github-actions",
+    "ci-cd"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestGHACreateAndDeleteProcess",
+   "type": "function",
+   "name": "TestGHACreateAndDeleteProcess",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    17,
+    47
+   ],
+   "summary": "Testa a criação e remoção de processos de workflow.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestSyncGHACatalogFromDisk",
+   "type": "function",
+   "name": "TestSyncGHACatalogFromDisk",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    49,
+    65
+   ],
+   "summary": "Testa a sincronização do catálogo com os workflows em disco.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestGHAActionsURL",
+   "type": "function",
+   "name": "TestGHAActionsURL",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    67,
+    76
+   ],
+   "summary": "Testa a URL da área Actions.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestGHARunURL",
+   "type": "function",
+   "name": "TestGHARunURL",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    78,
+    87
+   ],
+   "summary": "Testa a URL de uma run.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestGHAWorkflowTemplate",
+   "type": "function",
+   "name": "TestGHAWorkflowTemplate",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    99,
+    108
+   ],
+   "summary": "Testa os templates de workflow.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestParseGHARunJSONKeepsFullDatabaseID",
+   "type": "function",
+   "name": "TestParseGHARunJSONKeepsFullDatabaseID",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    110,
+    123
+   ],
+   "summary": "Testa a preservação de IDs grandes de runs.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestParseAndFormatGHAJobs",
+   "type": "function",
+   "name": "TestParseAndFormatGHAJobs",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    132,
+    142
+   ],
+   "summary": "Testa o parsing e formatação de jobs.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestGHAFailHeatmapAndBilling",
+   "type": "function",
+   "name": "TestGHAFailHeatmapAndBilling",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    144,
+    167
+   ],
+   "summary": "Testa o heatmap de falhas e a estimativa de billing.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/gha_test.go:TestParseWorkflowDispatchInputs",
+   "type": "function",
+   "name": "TestParseWorkflowDispatchInputs",
+   "filePath": "internal/collectors/gha_test.go",
+   "lineRange": [
+    169,
+    191
+   ],
+   "summary": "Testa o parsing de inputs de workflow_dispatch.",
+   "tags": [
+    "test",
+    "github-actions",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/git.go",
+   "type": "file",
+   "name": "git.go",
+   "filePath": "internal/collectors/git.go",
+   "summary": "Coletor e executor Git do DevScope: lê status, branches, commits, stashes, remotes e diffs (incluindo conflitos) e oferece operações como checkout, commit, pull/push, merge, cherry-pick, resolução de conflitos e atualização do estado dos projetos.",
+   "tags": [
+    "git",
+    "collector",
+    "command-runner",
+    "version-control"
+   ],
+   "complexity": "complex",
+   "languageNotes": "CollectAt dispara seis goroutines coordenadas por sync.WaitGroup para paralelizar chamadas ao git."
+  },
+  {
+   "id": "function:internal/collectors/git.go:Collect",
+   "type": "function",
+   "name": "Collect",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    17,
+    19
+   ],
+   "summary": "Atalho que coleta as informações Git completas do caminho.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectGitSummary",
+   "type": "function",
+   "name": "CollectGitSummary",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    22,
+    38
+   ],
+   "summary": "Lê apenas .git/HEAD para obter a branch no dashboard sem rodar git.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectAt",
+   "type": "function",
+   "name": "CollectAt",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    40,
+    137
+   ],
+   "summary": "Coleta em paralelo branch, último commit, remote, arquivos, branches, stash e upstream (ahead/behind) do repositório.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/git.go:parseGitStashes",
+   "type": "function",
+   "name": "parseGitStashes",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    139,
+    163
+   ],
+   "summary": "Interpreta a saída de `git stash list` em entradas GitStash.",
+   "tags": [
+    "git",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:collectGitRemotes",
+   "type": "function",
+   "name": "collectGitRemotes",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    165,
+    185
+   ],
+   "summary": "Lista os remotes do repositório com suas URLs.",
+   "tags": [
+    "git",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectConflictDiff",
+   "type": "function",
+   "name": "CollectConflictDiff",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    188,
+    221
+   ],
+   "summary": "Gera uma visão em diff dos lados ours (:2) e theirs (:3) de um arquivo em conflito.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:formatConflictMarkersDiff",
+   "type": "function",
+   "name": "formatConflictMarkersDiff",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    223,
+    250
+   ],
+   "summary": "Converte marcadores de conflito do arquivo em diff colorível com rótulos ours/theirs.",
+   "tags": [
+    "git",
+    "formatting",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitResolveBoth",
+   "type": "function",
+   "name": "GitResolveBoth",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    253,
+    268
+   ],
+   "summary": "Mantém os dois lados dos marcadores de conflito (ours e depois theirs) e faz stage do arquivo.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:keepBothConflictSides",
+   "type": "function",
+   "name": "keepBothConflictSides",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    270,
+    280
+   ],
+   "summary": "Remove os marcadores de conflito mantendo o conteúdo de ambos os lados.",
+   "tags": [
+    "git",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectWorkingTreeDiff",
+   "type": "function",
+   "name": "CollectWorkingTreeDiff",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    292,
+    326
+   ],
+   "summary": "Retorna o diff unstaged, staged ou contra HEAD de um arquivo, incluindo não rastreados.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:collectGitFiles",
+   "type": "function",
+   "name": "collectGitFiles",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    328,
+    357
+   ],
+   "summary": "Interpreta `git status --porcelain` em status de staging e worktree por arquivo.",
+   "tags": [
+    "git",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectCommitsAt",
+   "type": "function",
+   "name": "CollectCommitsAt",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    359,
+    367
+   ],
+   "summary": "Retorna os commits de uma branch até o limite.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectCommitFiles",
+   "type": "function",
+   "name": "CollectCommitFiles",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    369,
+    379
+   ],
+   "summary": "Lista os arquivos alterados por um commit.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectCommitFullMessage",
+   "type": "function",
+   "name": "CollectCommitFullMessage",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    381,
+    391
+   ],
+   "summary": "Retorna a mensagem completa de um commit.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:CollectCommitFileDiff",
+   "type": "function",
+   "name": "CollectCommitFileDiff",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    393,
+    402
+   ],
+   "summary": "Retorna o diff de um arquivo específico em um commit.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:parseCommitFileChanges",
+   "type": "function",
+   "name": "parseCommitFileChanges",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    404,
+    424
+   ],
+   "summary": "Interpreta a saída name-status em mudanças de arquivo do commit.",
+   "tags": [
+    "git",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:collectGitCommits",
+   "type": "function",
+   "name": "collectGitCommits",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    426,
+    446
+   ],
+   "summary": "Executa git log na branch e converte em GitCommit.",
+   "tags": [
+    "git",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:isTrunkBranch",
+   "type": "function",
+   "name": "isTrunkBranch",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    456,
+    466
+   ],
+   "summary": "Indica se a branch é tronco (main/master/develop ou padrão do remote).",
+   "tags": [
+    "git",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:findBranchBase",
+   "type": "function",
+   "name": "findBranchBase",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    468,
+    487
+   ],
+   "summary": "Encontra o merge-base da branch com o tronco mais próximo.",
+   "tags": [
+    "git",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitRemoteBranchNames",
+   "type": "function",
+   "name": "GitRemoteBranchNames",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    491,
+    513
+   ],
+   "summary": "Retorna nomes curtos das branches em origin ordenados por data do commit, excluindo origin/HEAD.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCurrentBranchName",
+   "type": "function",
+   "name": "GitCurrentBranchName",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    516,
+    518
+   ],
+   "summary": "Alias fino da branch atual usado pela UI de disparo de Actions.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:collectGitBranches",
+   "type": "function",
+   "name": "collectGitBranches",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    520,
+    558
+   ],
+   "summary": "Lista branches locais com upstream, ahead/behind e data, ordenadas com a atual primeiro.",
+   "tags": [
+    "git",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:gitDiffOutput",
+   "type": "function",
+   "name": "gitDiffOutput",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    571,
+    582
+   ],
+   "summary": "Executa git diff mantendo stdout mesmo quando o git sai com código 1.",
+   "tags": [
+    "git",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitExec",
+   "type": "function",
+   "name": "GitExec",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    590,
+    592
+   ],
+   "summary": "Executa git e retorna stdout/stderr combinados para o log de comandos.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:gitRunOutput",
+   "type": "function",
+   "name": "gitRunOutput",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    594,
+    606
+   ],
+   "summary": "Executa git retornando a saída combinada e erro enriquecido com a mensagem.",
+   "tags": [
+    "git",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCheckout",
+   "type": "function",
+   "name": "GitCheckout",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    608,
+    613
+   ],
+   "summary": "Faz checkout de uma branch.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitAdd",
+   "type": "function",
+   "name": "GitAdd",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    616,
+    622
+   ],
+   "summary": "Faz stage dos arquivos informados ou de tudo (git add -A).",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitUnstage",
+   "type": "function",
+   "name": "GitUnstage",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    625,
+    631
+   ],
+   "summary": "Remove arquivos do índice ou faz unstage de tudo.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCherryPick",
+   "type": "function",
+   "name": "GitCherryPick",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    633,
+    639
+   ],
+   "summary": "Aplica commits via cherry-pick.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitResolveHash",
+   "type": "function",
+   "name": "GitResolveHash",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    641,
+    647
+   ],
+   "summary": "Resolve uma ref para hash de commit.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "function",
+   "name": "GitCurrentBranch",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    649,
+    651
+   ],
+   "summary": "Retorna a branch atual do repositório.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitBranchCreate",
+   "type": "function",
+   "name": "GitBranchCreate",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    653,
+    663
+   ],
+   "summary": "Cria uma branch a partir de uma ref opcional.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCommit",
+   "type": "function",
+   "name": "GitCommit",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    667,
+    692
+   ],
+   "summary": "Cria commit com mensagem multilinha, fazendo `git add -u` se nada estiver em stage.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitBranchDelete",
+   "type": "function",
+   "name": "GitBranchDelete",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    694,
+    706
+   ],
+   "summary": "Remove uma branch local.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitBranchRename",
+   "type": "function",
+   "name": "GitBranchRename",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    708,
+    718
+   ],
+   "summary": "Renomeia uma branch local.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitPull",
+   "type": "function",
+   "name": "GitPull",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    720,
+    722
+   ],
+   "summary": "Executa git pull no repositório.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitBranchOrigin",
+   "type": "function",
+   "name": "GitBranchOrigin",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    725,
+    776
+   ],
+   "summary": "Infere a branch de onde a atual provavelmente se originou (ex.: develop).",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitPullOrigin",
+   "type": "function",
+   "name": "GitPullOrigin",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    778,
+    784
+   ],
+   "summary": "Atualiza a branch atual a partir de origin/<branch-origem> em fast-forward.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitPullOriginMerge",
+   "type": "function",
+   "name": "GitPullOriginMerge",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    786,
+    792
+   ],
+   "summary": "Puxa a branch de origem do remote com merge.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitPullOriginRebase",
+   "type": "function",
+   "name": "GitPullOriginRebase",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    794,
+    800
+   ],
+   "summary": "Puxa a branch de origem do remote com rebase.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitIsFFImpossible",
+   "type": "function",
+   "name": "GitIsFFImpossible",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    803,
+    811
+   ],
+   "summary": "Indica se o pull falhou porque as históricas divergiram (sem fast-forward).",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitIsConflictError",
+   "type": "function",
+   "name": "GitIsConflictError",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    814,
+    825
+   ],
+   "summary": "Indica se a saída do git aponta conflitos não resolvidos.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitFileUnmerged",
+   "type": "function",
+   "name": "GitFileUnmerged",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    828,
+    835
+   ],
+   "summary": "Indica se os códigos XY do porcelain representam um caminho em conflito.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitOpInProgress",
+   "type": "function",
+   "name": "GitOpInProgress",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    838,
+    858
+   ],
+   "summary": "Detecta merge, rebase ou cherry-pick em andamento no repositório.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCheckoutOurs",
+   "type": "function",
+   "name": "GitCheckoutOurs",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    860,
+    869
+   ],
+   "summary": "Resolve o conflito do arquivo com a versão ours e faz stage.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitCheckoutTheirs",
+   "type": "function",
+   "name": "GitCheckoutTheirs",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    871,
+    880
+   ],
+   "summary": "Resolve o conflito do arquivo com a versão theirs e faz stage.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitContinue",
+   "type": "function",
+   "name": "GitContinue",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    882,
+    894
+   ],
+   "summary": "Continua a operação de merge/rebase/cherry-pick em andamento.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitAbort",
+   "type": "function",
+   "name": "GitAbort",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    896,
+    908
+   ],
+   "summary": "Aborta a operação de merge/rebase/cherry-pick em andamento.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitConflictSides",
+   "type": "function",
+   "name": "GitConflictSides",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    911,
+    935
+   ],
+   "summary": "Retorna rótulos para --ours/--theirs durante uma operação em andamento.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:conflictRefLabel",
+   "type": "function",
+   "name": "conflictRefLabel",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    937,
+    955
+   ],
+   "summary": "Gera o rótulo legível (branch ou hash curto) de uma ref de conflito.",
+   "tags": [
+    "git",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitUnmergedCount",
+   "type": "function",
+   "name": "GitUnmergedCount",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    958,
+    966
+   ],
+   "summary": "Conta quantos arquivos ainda estão em conflito.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitPush",
+   "type": "function",
+   "name": "GitPush",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    973,
+    983
+   ],
+   "summary": "Faz push da branch atual, definindo upstream quando necessário.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitMerge",
+   "type": "function",
+   "name": "GitMerge",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    985,
+    995
+   ],
+   "summary": "Faz merge da branch informada na atual.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitRemoteOrigin",
+   "type": "function",
+   "name": "GitRemoteOrigin",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    998,
+    1000
+   ],
+   "summary": "Retorna remote.origin.url do repositório.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:ParseGitHubRepo",
+   "type": "function",
+   "name": "ParseGitHubRepo",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1002,
+    1019
+   ],
+   "summary": "Extrai owner e repo de URLs de remote do GitHub (SSH ou HTTPS).",
+   "tags": [
+    "git",
+    "parser",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitDefaultPRBase",
+   "type": "function",
+   "name": "GitDefaultPRBase",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1021,
+    1037
+   ],
+   "summary": "Determina a branch base padrão para PR pelo upstream ou candidatas main/master/develop.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitHubCompareURL",
+   "type": "function",
+   "name": "GitHubCompareURL",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1039,
+    1048
+   ],
+   "summary": "Monta a URL de comparação/criação de PR no GitHub.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:GitWorkTreeRoot",
+   "type": "function",
+   "name": "GitWorkTreeRoot",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1050,
+    1052
+   ],
+   "summary": "Retorna a raiz do worktree Git do caminho.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:RefreshGitBranches",
+   "type": "function",
+   "name": "RefreshGitBranches",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1054,
+    1066
+   ],
+   "summary": "Atualiza branch, branches e commits reaproveitando o GitInfo anterior.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:RefreshProjectGit",
+   "type": "function",
+   "name": "RefreshProjectGit",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1068,
+    1079
+   ],
+   "summary": "Recoleta o Git do projeto e grava no StateStore.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:RefreshProjectGitFiles",
+   "type": "function",
+   "name": "RefreshProjectGitFiles",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1082,
+    1123
+   ],
+   "summary": "Atualiza apenas o status dos arquivos do worktree no StateStore (poll barato na aba Git).",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/git.go:preserveGitForProjects",
+   "type": "function",
+   "name": "preserveGitForProjects",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1125,
+    1145
+   ],
+   "summary": "Preserva o GitInfo completo já carregado ao substituir projetos que só têm resumo.",
+   "tags": [
+    "git",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git.go:gitRepoRoot",
+   "type": "function",
+   "name": "gitRepoRoot",
+   "filePath": "internal/collectors/git.go",
+   "lineRange": [
+    1156,
+    1168
+   ],
+   "summary": "Resolve a raiz do repositório Git que contém o caminho.",
+   "tags": [
+    "git",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/git_graph.go",
+   "type": "file",
+   "name": "git_graph.go",
+   "filePath": "internal/collectors/git_graph.go",
+   "summary": "Extrai o DAG de commits (parents, refs, metadados) via git log para o layout próprio do grafo de branches e coleta estatísticas de linhas por arquivo de um commit.",
+   "tags": [
+    "git",
+    "graph",
+    "collector",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/collectors/git_graph.go:DAGCommit",
+   "type": "class",
+   "name": "DAGCommit",
+   "filePath": "internal/collectors/git_graph.go",
+   "lineRange": [
+    11,
+    21
+   ],
+   "summary": "Relações de parentesco e metadados brutos de um commit para calcular o layout do grafo (lanes, curvas).",
+   "tags": [
+    "data-model",
+    "git",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/git_graph.go:GitCommitFileStat",
+   "type": "class",
+   "name": "GitCommitFileStat",
+   "filePath": "internal/collectors/git_graph.go",
+   "lineRange": [
+    101,
+    105
+   ],
+   "summary": "Contagem de linhas adicionadas/removidas de um arquivo em um commit.",
+   "tags": [
+    "data-model",
+    "git",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/git_graph.go:GitLogDAG",
+   "type": "function",
+   "name": "GitLogDAG",
+   "filePath": "internal/collectors/git_graph.go",
+   "lineRange": [
+    29,
+    94
+   ],
+   "summary": "Lê o git log em ordem topológica com parents e refs para montar o DAG, opcionalmente restrito a refs.",
+   "tags": [
+    "git",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/git_graph.go:CollectCommitFileStats",
+   "type": "function",
+   "name": "CollectCommitFileStats",
+   "filePath": "internal/collectors/git_graph.go",
+   "lineRange": [
+    108,
+    128
+   ],
+   "summary": "Retorna as contagens +/- por arquivo de um commit via `git show --numstat`.",
+   "tags": [
+    "git",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHACatalog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHACatalog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAProcess",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAWorkflow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAWorkflow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHARun",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHARun",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAJob",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAJob",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAStep",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAStep",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAWorkflowInput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAWorkflowInput",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHANote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHANote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHANotesFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHANotesFile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAFailBucket",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAFailBucket",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAMinuteBucket",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAMinuteBucket",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAActionsBilling",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAActionsBilling",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "class:internal/collectors/gha.go:GHAInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAvailable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAvailable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAInstallHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAInstallHint",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAuthLoginCmd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAuthLoginCmd",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAuthStatusOK",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAAuthStatusOK",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:runGH",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARepoInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARepoInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAActionsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAActionsURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACatalogPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACatalogPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAWorkflowsDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAWorkflowsDir",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:LoadGHACatalog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:LoadGHACatalog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SaveGHACatalog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SaveGHACatalog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SyncGHACatalogFromDisk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SyncGHACatalogFromDisk",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListLocalWorkflowFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListLocalWorkflowFiles",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:sanitizeGHAProcessName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAWorkflowTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAWorkflowTemplate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACreateProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACreateProcess",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHADeleteProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHADeleteProcess",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAReadProcessFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAReadProcessFile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListWorkflows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListWorkflows",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListRuns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListRuns",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunFailedLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARunFailedLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListRunJobs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAListRunJobs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHAJobsText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHAJobsText",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHATimelineText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHATimelineText",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:ghaDurationSec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:parseGHATime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:ghaFmtDur",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:BrailleBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:BrailleBar",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:ghaBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:truncateRunes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAFailHeatmap",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAFailHeatmap",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHABillingEstimate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHABillingEstimate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHABilling",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHABilling",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SumGHAMinutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SumGHAMinutes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAMinutesFromRuns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAMinutesFromRuns",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHAMinutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:FormatGHAMinutes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAFetchActionsBilling",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAFetchActionsBilling",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:ghaBillingDaysLeft",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:jsonNumberFloat",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:ghaStatusMark",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflowRef",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflowRef",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflowRefInputs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHATriggerWorkflowRefInputs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAParseWorkflowInputs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAParseWorkflowInputs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:parseWorkflowDispatchInputs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GitBranchAheadCount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GitBranchAheadCount",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GitPushBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GitPushBranch",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHANotesPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHANotesPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:LoadGHANotes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:LoadGHANotes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SaveGHANote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:SaveGHANote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHANoteForRun",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHANoteForRun",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:DeleteGHANote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:DeleteGHANote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACancelRun",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHACancelRun",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARerun",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHARerun",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAOpenRunURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:GHAOpenRunURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:jsonScalarID",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:parseGHAWorkflowJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:parseGHARunJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "function:internal/collectors/gha.go:parseGHAJobsJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "file:internal/devscopeutil/dir.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "file:internal/devscopeutil/dir_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestGHACreateAndDeleteProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestSyncGHACatalogFromDisk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestGHAActionsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestGHARunURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestGHAWorkflowTemplate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestParseGHARunJSONKeepsFullDatabaseID",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestParseAndFormatGHAJobs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestGHAFailHeatmapAndBilling",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/gha_test.go",
+   "target": "function:internal/collectors/gha_test.go:TestParseWorkflowDispatchInputs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:Collect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:Collect",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectGitSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectGitSummary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectAt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:parseGitStashes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:collectGitRemotes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectConflictDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectConflictDiff",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:formatConflictMarkersDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitResolveBoth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitResolveBoth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:keepBothConflictSides",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectWorkingTreeDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectWorkingTreeDiff",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:collectGitFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitsAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitsAt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFiles",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFullMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFullMessage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFileDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:CollectCommitFileDiff",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:parseCommitFileChanges",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:collectGitCommits",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:isTrunkBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:findBranchBase",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitRemoteBranchNames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitRemoteBranchNames",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCurrentBranchName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCurrentBranchName",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:collectGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:gitDiffOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitExec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitExec",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:gitRunOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckout",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitAdd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitAdd",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitUnstage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitUnstage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCherryPick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCherryPick",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitResolveHash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitResolveHash",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCurrentBranch",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchCreate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchCreate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCommit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCommit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchDelete",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchRename",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchRename",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPull",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPull",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchOrigin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitBranchOrigin",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOrigin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOrigin",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOriginMerge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOriginMerge",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOriginRebase",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPullOriginRebase",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitIsFFImpossible",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitIsFFImpossible",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitIsConflictError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitIsConflictError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitFileUnmerged",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitFileUnmerged",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitOpInProgress",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitOpInProgress",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckoutOurs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckoutOurs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckoutTheirs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitCheckoutTheirs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitContinue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitContinue",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitAbort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitAbort",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitConflictSides",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitConflictSides",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:conflictRefLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitUnmergedCount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitUnmergedCount",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPush",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitPush",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitMerge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitMerge",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitRemoteOrigin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitRemoteOrigin",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:ParseGitHubRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:ParseGitHubRepo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitDefaultPRBase",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitDefaultPRBase",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitHubCompareURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitHubCompareURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitWorkTreeRoot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:GitWorkTreeRoot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshGitBranches",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshProjectGit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshProjectGit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshProjectGitFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:RefreshProjectGitFiles",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:preserveGitForProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "function:internal/collectors/git.go:gitRepoRoot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "class:internal/collectors/git_graph.go:DAGCommit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "class:internal/collectors/git_graph.go:DAGCommit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "class:internal/collectors/git_graph.go:GitCommitFileStat",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "class:internal/collectors/git_graph.go:GitCommitFileStat",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "function:internal/collectors/git_graph.go:GitLogDAG",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "function:internal/collectors/git_graph.go:GitLogDAG",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "function:internal/collectors/git_graph.go:CollectCommitFileStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/git_graph.go",
+   "target": "function:internal/collectors/git_graph.go:CollectCommitFileStats",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/gha.go:GHARepoInfo",
+   "target": "function:internal/collectors/git.go:ParseGitHubRepo",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/gha.go:SaveGHACatalog",
+   "target": "function:internal/devscopeutil/dir.go:EnsureDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/gha.go:GitPushBranch",
+   "target": "function:internal/collectors/git.go:gitRunOutput",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/gha.go:SaveGHANote",
+   "target": "function:internal/devscopeutil/dir.go:EnsureDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/gha.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "function:internal/collectors/git.go:RefreshProjectGit",
+   "target": "function:internal/core/state.go:UpdateProjectGit",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/git.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

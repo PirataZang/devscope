@@ -1,0 +1,930 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/deploy.go",
+   "type": "file",
+   "name": "deploy.go",
+   "filePath": "internal/ui/deploy.go",
+   "summary": "Execução do script de deploy do projeto via tea.ExecProcess e abertura da URL principal do projeto no navegador.",
+   "tags": [
+    "deploy",
+    "process",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/deploy.go:deployCommand",
+   "type": "function",
+   "name": "deployCommand",
+   "filePath": "internal/ui/deploy.go",
+   "lineRange": [
+    26,
+    40
+   ],
+   "summary": "Constrói o exec.Cmd que executa o script de deploy do projeto no diretório correto.",
+   "tags": [
+    "deploy",
+    "process",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/deploy.go:projectPrimaryURL",
+   "type": "function",
+   "name": "projectPrimaryURL",
+   "filePath": "internal/ui/deploy.go",
+   "lineRange": [
+    51,
+    65
+   ],
+   "summary": "Determina a URL principal do projeto, preferindo domínios configurados e caindo para portas expostas.",
+   "tags": [
+    "url",
+    "project",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/editor.go",
+   "type": "file",
+   "name": "editor.go",
+   "filePath": "internal/ui/editor.go",
+   "summary": "Componente de editor de texto embutido no estilo VS Code (cursor, seleção, ctrl+palavra, rolagem horizontal) reutilizado pelas ferramentas JSON/JWT.",
+   "tags": [
+    "component",
+    "editor",
+    "keyboard",
+    "rendering"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/ui/editor.go:editorState",
+   "type": "class",
+   "name": "editorState",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    13,
+    18
+   ],
+   "summary": "Estado de um editor de texto embutido: cursor, âncora de seleção e rolagem horizontal, com métodos de seleção e movimento.",
+   "tags": [
+    "data-model",
+    "editor",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/editor.go:selRange",
+   "type": "function",
+   "name": "selRange",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    24,
+    36
+   ],
+   "summary": "Calcula o intervalo ordenado da seleção atual do editor, quando existir.",
+   "tags": [
+    "editor",
+    "selection",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/editor.go:deleteSelection",
+   "type": "function",
+   "name": "deleteSelection",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    38,
+    54
+   ],
+   "summary": "Remove o texto selecionado e reposiciona o cursor, devolvendo o novo texto.",
+   "tags": [
+    "editor",
+    "selection",
+    "mutation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/editor.go:move",
+   "type": "function",
+   "name": "move",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    56,
+    71
+   ],
+   "summary": "Move o cursor do editor, opcionalmente estendendo a seleção (shift).",
+   "tags": [
+    "editor",
+    "cursor",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/editor.go:editorApplyKey",
+   "type": "function",
+   "name": "editorApplyKey",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    74,
+    292
+   ],
+   "summary": "Trata navegação e edição no estilo VS Code (setas, ctrl+palavra, shift-seleção, home/end, backspace, colar), devolvendo o novo texto e se a tecla foi consumida.",
+   "tags": [
+    "editor",
+    "keyboard",
+    "event-handler"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/editor.go:renderEditorLines",
+   "type": "function",
+   "name": "renderEditorLines",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    296,
+    308
+   ],
+   "summary": "Renderiza o texto do editor com cursor, seleção, rolagem horizontal e realce JSON opcional.",
+   "tags": [
+    "editor",
+    "rendering",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/editor.go:renderEditorLinesPainted",
+   "type": "function",
+   "name": "renderEditorLinesPainted",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    312,
+    402
+   ],
+   "summary": "Variante do renderizador do editor que recebe a função de pintura de fora, permitindo que cada tela defina o realce de suas linhas.",
+   "tags": [
+    "editor",
+    "rendering",
+    "strategy"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/editor.go:hScrollDelta",
+   "type": "function",
+   "name": "hScrollDelta",
+   "filePath": "internal/ui/editor.go",
+   "lineRange": [
+    411,
+    421
+   ],
+   "summary": "Calcula o novo deslocamento de rolagem horizontal, limitado ao comprimento da maior linha.",
+   "tags": [
+    "scroll",
+    "utility",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/foundation.go",
+   "type": "file",
+   "name": "foundation.go",
+   "filePath": "internal/ui/foundation.go",
+   "summary": "Fundação do design system da TUI: medição de colunas visíveis sem quebrar ANSI, filetes, cabeçalhos de seção, títulos, fatos, hints e panelBox, além dos níveis de densidade.",
+   "tags": [
+    "design-system",
+    "utility",
+    "layout",
+    "ansi"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/foundation.go:padRightVisible",
+   "type": "function",
+   "name": "padRightVisible",
+   "filePath": "internal/ui/foundation.go",
+   "lineRange": [
+    52,
+    64
+   ],
+   "summary": "Ajusta uma string estilizada para exatamente N colunas visíveis, cortando com '…' ou completando com espaços sem quebrar escapes ANSI.",
+   "tags": [
+    "layout",
+    "ansi",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation.go:stripANSI",
+   "type": "function",
+   "name": "stripANSI",
+   "filePath": "internal/ui/foundation.go",
+   "lineRange": [
+    87,
+    104
+   ],
+   "summary": "Remove sequências de escape ANSI, devolvendo apenas o texto visível para medição e comparação.",
+   "tags": [
+    "ansi",
+    "utility",
+    "text"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation.go:clampRenderedHeight",
+   "type": "function",
+   "name": "clampRenderedHeight",
+   "filePath": "internal/ui/foundation.go",
+   "lineRange": [
+    122,
+    131
+   ],
+   "summary": "Limita um bloco já renderizado à altura do terminal; último passo de toda tela cheia.",
+   "tags": [
+    "layout",
+    "utility",
+    "viewport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation.go:sectionHeader",
+   "type": "function",
+   "name": "sectionHeader",
+   "filePath": "internal/ui/foundation.go",
+   "lineRange": [
+    165,
+    175
+   ],
+   "summary": "Cabeçalho de seção sem caixa: título em negrito na cor do contexto seguido de um filete até o fim da linha.",
+   "tags": [
+    "component",
+    "layout",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation.go:panelBox",
+   "type": "function",
+   "name": "panelBox",
+   "filePath": "internal/ui/foundation.go",
+   "lineRange": [
+    240,
+    293
+   ],
+   "summary": "Caixa com título embutido na borda superior e foco visível; recurso de último caso para áreas interativas.",
+   "tags": [
+    "component",
+    "design-system",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/foundation_test.go",
+   "type": "file",
+   "name": "foundation_test.go",
+   "filePath": "internal/ui/foundation_test.go",
+   "summary": "Testes do design system: larguras exatas de filetes/caixas, contagem de colunas, glifos de coluna única, glifos banidos no código e níveis de densidade.",
+   "tags": [
+    "test",
+    "design-system",
+    "layout"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestRuleNeverExceedsWidth",
+   "type": "function",
+   "name": "TestRuleNeverExceedsWidth",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    16,
+    33
+   ],
+   "summary": "Garante que o filete nunca excede a largura pedida.",
+   "tags": [
+    "test",
+    "design-system",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestSectionHeaderFitsAndKeepsTitle",
+   "type": "function",
+   "name": "TestSectionHeaderFitsAndKeepsTitle",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    35,
+    56
+   ],
+   "summary": "Verifica que o cabeçalho de seção cabe e preserva o título.",
+   "tags": [
+    "test",
+    "design-system",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestPanelTitleUsesSeparatorAndSkipsEmpty",
+   "type": "function",
+   "name": "TestPanelTitleUsesSeparatorAndSkipsEmpty",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    58,
+    75
+   ],
+   "summary": "Verifica que o título de painel usa separador e ignora partes vazias.",
+   "tags": [
+    "test",
+    "design-system",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestPanelBoxRendersExactBox",
+   "type": "function",
+   "name": "TestPanelBoxRendersExactBox",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    87,
+    103
+   ],
+   "summary": "Verifica que panelBox renderiza uma caixa com dimensões exatas.",
+   "tags": [
+    "test",
+    "design-system",
+    "component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestPadRightVisibleCountsColumnsNotBytes",
+   "type": "function",
+   "name": "TestPadRightVisibleCountsColumnsNotBytes",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    105,
+    116
+   ],
+   "summary": "Garante que padRightVisible conta colunas visíveis e não bytes.",
+   "tags": [
+    "test",
+    "ansi",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestGlyphVocabularyIsSingleColumn",
+   "type": "function",
+   "name": "TestGlyphVocabularyIsSingleColumn",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    121,
+    133
+   ],
+   "summary": "Garante que o vocabulário de glifos ocupa uma única coluna.",
+   "tags": [
+    "test",
+    "glyphs",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestTabGlyphsAreSingleColumn",
+   "type": "function",
+   "name": "TestTabGlyphsAreSingleColumn",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    137,
+    146
+   ],
+   "summary": "Garante que os glifos das abas ocupam uma única coluna.",
+   "tags": [
+    "test",
+    "glyphs",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestNoBannedGlyphInSource",
+   "type": "function",
+   "name": "TestNoBannedGlyphInSource",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    151,
+    175
+   ],
+   "summary": "Varre o código-fonte para garantir que glifos banidos não são usados.",
+   "tags": [
+    "test",
+    "lint",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestDensityTiers",
+   "type": "function",
+   "name": "TestDensityTiers",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    179,
+    204
+   ],
+   "summary": "Testa os níveis de densidade (compacto, mínimo) por tamanho de terminal.",
+   "tags": [
+    "test",
+    "responsive",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/foundation_test.go:TestFactLabelsFitTheColumn",
+   "type": "function",
+   "name": "TestFactLabelsFitTheColumn",
+   "filePath": "internal/ui/foundation_test.go",
+   "lineRange": [
+    209,
+    224
+   ],
+   "summary": "Garante que os rótulos de fatos cabem na coluna.",
+   "tags": [
+    "test",
+    "layout",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/fuzzy.go",
+   "type": "file",
+   "name": "fuzzy.go",
+   "filePath": "internal/ui/fuzzy.go",
+   "summary": "Handlers de teclado para o prompt de busca fuzzy e diálogos de confirmação (deploy, remoção de container, fechar porta).",
+   "tags": [
+    "event-handler",
+    "confirmation",
+    "keyboard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/fuzzy.go:updateFuzzy",
+   "type": "function",
+   "name": "updateFuzzy",
+   "filePath": "internal/ui/fuzzy.go",
+   "lineRange": [
+    8,
+    29
+   ],
+   "summary": "Trata as teclas do prompt de busca fuzzy de projetos, filtrando a lista e confirmando ou cancelando.",
+   "tags": [
+    "event-handler",
+    "search",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/fuzzy.go:updateDeployConfirm",
+   "type": "function",
+   "name": "updateDeployConfirm",
+   "filePath": "internal/ui/fuzzy.go",
+   "lineRange": [
+    31,
+    43
+   ],
+   "summary": "Trata a confirmação (s/n) antes de executar o script de deploy do projeto.",
+   "tags": [
+    "event-handler",
+    "confirmation",
+    "deploy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/fuzzy.go:updateContainerRemoveConfirm",
+   "type": "function",
+   "name": "updateContainerRemoveConfirm",
+   "filePath": "internal/ui/fuzzy.go",
+   "lineRange": [
+    45,
+    60
+   ],
+   "summary": "Trata a confirmação de remoção de um container antes de disparar o comando.",
+   "tags": [
+    "event-handler",
+    "confirmation",
+    "container"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/fuzzy.go:updateContainerClosePortConfirm",
+   "type": "function",
+   "name": "updateContainerClosePortConfirm",
+   "filePath": "internal/ui/fuzzy.go",
+   "lineRange": [
+    62,
+    79
+   ],
+   "summary": "Trata a confirmação para fechar uma porta/encerrar o processo que a ocupa a partir da tela de containers.",
+   "tags": [
+    "event-handler",
+    "confirmation",
+    "ports"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/deploy.go",
+   "target": "function:internal/ui/deploy.go:deployCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/deploy.go",
+   "target": "function:internal/ui/deploy.go:projectPrimaryURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "class:internal/ui/editor.go:editorState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:selRange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:deleteSelection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:move",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:editorApplyKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:renderEditorLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:renderEditorLinesPainted",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "function:internal/ui/editor.go:hScrollDelta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "function:internal/ui/foundation.go:padRightVisible",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "function:internal/ui/foundation.go:clampRenderedHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "function:internal/ui/foundation.go:sectionHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestRuleNeverExceedsWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestRuleNeverExceedsWidth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestSectionHeaderFitsAndKeepsTitle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestSectionHeaderFitsAndKeepsTitle",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPanelTitleUsesSeparatorAndSkipsEmpty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPanelTitleUsesSeparatorAndSkipsEmpty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPanelBoxRendersExactBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPanelBoxRendersExactBox",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPadRightVisibleCountsColumnsNotBytes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestPadRightVisibleCountsColumnsNotBytes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestGlyphVocabularyIsSingleColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestGlyphVocabularyIsSingleColumn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestTabGlyphsAreSingleColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestTabGlyphsAreSingleColumn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestNoBannedGlyphInSource",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestNoBannedGlyphInSource",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestDensityTiers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestDensityTiers",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestFactLabelsFitTheColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/foundation_test.go",
+   "target": "function:internal/ui/foundation_test.go:TestFactLabelsFitTheColumn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/fuzzy.go",
+   "target": "function:internal/ui/fuzzy.go:updateFuzzy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/fuzzy.go",
+   "target": "function:internal/ui/fuzzy.go:updateDeployConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/fuzzy.go",
+   "target": "function:internal/ui/fuzzy.go:updateContainerRemoveConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/fuzzy.go",
+   "target": "function:internal/ui/fuzzy.go:updateContainerClosePortConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/deploy.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/deploy.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/deploy.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/editor.go:editorApplyKey",
+   "target": "function:internal/ui/json_tab.go:copyToClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/editor.go:editorApplyKey",
+   "target": "function:internal/ui/json_tab.go:readClipboard",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/foundation_test.go:TestSectionHeaderFitsAndKeepsTitle",
+   "target": "function:internal/ui/foundation.go:sectionHeader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/foundation_test.go:TestSectionHeaderFitsAndKeepsTitle",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/foundation_test.go:TestPanelBoxRendersExactBox",
+   "target": "function:internal/ui/foundation.go:panelBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/foundation_test.go:TestPadRightVisibleCountsColumnsNotBytes",
+   "target": "function:internal/ui/foundation.go:padRightVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/foundation_test.go:TestFactLabelsFitTheColumn",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/foundation.go",
+   "target": "file:internal/ui/foundation_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "file:internal/ui/json_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/editor.go",
+   "target": "file:internal/ui/jwt_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

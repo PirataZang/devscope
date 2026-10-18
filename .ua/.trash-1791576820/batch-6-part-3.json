@@ -1,0 +1,2302 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/gha_tab_test.go",
+   "type": "file",
+   "name": "gha_tab_test.go",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "summary": "Testes da aba GitHub Actions cobrindo landing, central, painéis, filtros, cancelamento, disparo e intervalo de ticks.",
+   "tags": [
+    "test",
+    "github-actions",
+    "ci-cd"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestAllTabsIncludesActions",
+   "type": "function",
+   "name": "TestAllTabsIncludesActions",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    15,
+    29
+   ],
+   "summary": "Testa que a lista de abas inclui o módulo GitHub Actions.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestSidebarShowsActionsInCodigo",
+   "type": "function",
+   "name": "TestSidebarShowsActionsInCodigo",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    31,
+    37
+   ],
+   "summary": "Testa que a sidebar mostra Actions no grupo Código.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHALandingEnterAndEsc",
+   "type": "function",
+   "name": "TestGHALandingEnterAndEsc",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    39,
+    68
+   ],
+   "summary": "Testa que Enter entra na central do GitHub Actions a partir da landing e Esc volta.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAControlCenterRenders",
+   "type": "function",
+   "name": "TestGHAControlCenterRenders",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    70,
+    112
+   ],
+   "summary": "Testa a renderização da central de controle do GitHub Actions com dados simulados.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAUsagePanelAndCard",
+   "type": "function",
+   "name": "TestGHAUsagePanelAndCard",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    114,
+    149
+   ],
+   "summary": "Testa o painel e o chip de uso de minutos do GitHub Actions.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAKindCycle",
+   "type": "function",
+   "name": "TestGHAKindCycle",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    151,
+    157
+   ],
+   "summary": "Testa a ciclagem dos tipos de lista do GitHub Actions.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAEnterOpensProcessDetail",
+   "type": "function",
+   "name": "TestGHAEnterOpensProcessDetail",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    159,
+    187
+   ],
+   "summary": "Testa que Enter na tabela de processos abre a tela de detalhe do processo.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAProcessStatusFromRuns",
+   "type": "function",
+   "name": "TestGHAProcessStatusFromRuns",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    189,
+    200
+   ],
+   "summary": "Testa a derivação do status do processo a partir dos runs.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHATabCyclesPanels",
+   "type": "function",
+   "name": "TestGHATabCyclesPanels",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    202,
+    216
+   ],
+   "summary": "Testa que Tab cicla entre os painéis tabela, resumo e ações.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAKindSwitchOnlyOnTable",
+   "type": "function",
+   "name": "TestGHAKindSwitchOnlyOnTable",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    218,
+    229
+   ],
+   "summary": "Testa que a troca de tipo de lista só ocorre com foco na tabela.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHASetupModalWhenNoGH",
+   "type": "function",
+   "name": "TestGHASetupModalWhenNoGH",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    231,
+    249
+   ],
+   "summary": "Testa que o modal de setup aparece quando o gh CLI não está instalado.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHASetupModalAuth",
+   "type": "function",
+   "name": "TestGHASetupModalAuth",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    251,
+    258
+   ],
+   "summary": "Testa o modal de setup quando o gh CLI não está autenticado.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesRemote",
+   "type": "function",
+   "name": "TestGHAOpenBrowserUsesRemote",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    260,
+    277
+   ],
+   "summary": "Testa que abrir no navegador usa a URL do remoto Git.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAAskStopJobConfirm",
+   "type": "function",
+   "name": "TestGHAAskStopJobConfirm",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    279,
+    316
+   ],
+   "summary": "Testa o fluxo de confirmação para cancelar um run ativo.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAAskStopAllJobs",
+   "type": "function",
+   "name": "TestGHAAskStopAllJobs",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    318,
+    337
+   ],
+   "summary": "Testa a confirmação de cancelamento de todos os runs ativos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHARunIsActive",
+   "type": "function",
+   "name": "TestGHARunIsActive",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    339,
+    346
+   ],
+   "summary": "Testa a detecção de runs ativos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesSelectedRun",
+   "type": "function",
+   "name": "TestGHAOpenBrowserUsesSelectedRun",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    348,
+    379
+   ],
+   "summary": "Testa que abrir no navegador usa a URL do run selecionado.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHATickIntervalFasterWhenActive",
+   "type": "function",
+   "name": "TestGHATickIntervalFasterWhenActive",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    381,
+    395
+   ],
+   "summary": "Testa que o intervalo de tick encurta quando há runs ativos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHATickKeepsChainOnConfirm",
+   "type": "function",
+   "name": "TestGHATickKeepsChainOnConfirm",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    397,
+    403
+   ],
+   "summary": "Testa que o tick mantém a cadeia de atualização durante confirmações.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHABeginTriggerSelectsBranch",
+   "type": "function",
+   "name": "TestGHABeginTriggerSelectsBranch",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    405,
+    436
+   ],
+   "summary": "Testa que o formulário de disparo pré-seleciona a branch atual.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_tab_test.go:TestGHAFilteredRunsScopeAndProcess",
+   "type": "function",
+   "name": "TestGHAFilteredRunsScopeAndProcess",
+   "filePath": "internal/ui/gha_tab_test.go",
+   "lineRange": [
+    438,
+    478
+   ],
+   "summary": "Testa a filtragem de runs por escopo e por processo.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/gha_views.go",
+   "type": "file",
+   "name": "gha_views.go",
+   "filePath": "internal/ui/gha_views.go",
+   "summary": "Views da aba GitHub Actions: landing, central com tabela de processos/runs/workflows, painéis de uso e ações, e modais de setup, criação, disparo, logs e YAML.",
+   "tags": [
+    "component",
+    "github-actions",
+    "renderizacao",
+    "ci-cd"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHALanding",
+   "type": "function",
+   "name": "renderGHALanding",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    16,
+    58
+   ],
+   "summary": "Renderiza a landing do módulo GitHub Actions com estado do gh CLI, autenticação e prévia dos workflows.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaLandingLines",
+   "type": "function",
+   "name": "ghaLandingLines",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    60,
+    94
+   ],
+   "summary": "Gera as linhas de prévia dos workflows do projeto exibidas na landing.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHATab",
+   "type": "function",
+   "name": "renderGHATab",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    96,
+    126
+   ],
+   "summary": "Renderiza a aba GitHub Actions escolhendo entre landing, central, detalhe, logs ou formulários.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaConfirmOpts",
+   "type": "function",
+   "name": "ghaConfirmOpts",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    128,
+    183
+   ],
+   "summary": "Monta as opções do modal de confirmação para as ações destrutivas do GitHub Actions.",
+   "tags": [
+    "confirmacao",
+    "acao-destrutiva",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaResult",
+   "type": "function",
+   "name": "ghaResult",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    189,
+    216
+   ],
+   "summary": "Traduz status e conclusion de um run em glifo, rótulo e estilo coloridos.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaParseTime",
+   "type": "function",
+   "name": "ghaParseTime",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    225,
+    238
+   ],
+   "summary": "Interpreta o primeiro timestamp válido entre os valores informados.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaRunDuration",
+   "type": "function",
+   "name": "ghaRunDuration",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    251,
+    269
+   ],
+   "summary": "Calcula a duração de um run, ou o tempo decorrido se ainda estiver rodando.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaCounters",
+   "type": "function",
+   "name": "ghaCounters",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    271,
+    285
+   ],
+   "summary": "Conta runs em execução, com sucesso, com falha e outros.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHACluster",
+   "type": "function",
+   "name": "renderGHACluster",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    287,
+    316
+   ],
+   "summary": "Compõe a central do GitHub Actions com cabeçalho, abas de tipo, tabela e trilho lateral.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHAHeader",
+   "type": "function",
+   "name": "renderGHAHeader",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    320,
+    343
+   ],
+   "summary": "Renderiza o cabeçalho com repositório, conexão e uso de minutos.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaConnChip",
+   "type": "function",
+   "name": "ghaConnChip",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    345,
+    357
+   ],
+   "summary": "Gera o chip de estado de conexão/autenticação do gh CLI.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaUsageChip",
+   "type": "function",
+   "name": "ghaUsageChip",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    361,
+    378
+   ],
+   "summary": "Gera o chip compacto de minutos restantes do GitHub Actions.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHAKindTabs",
+   "type": "function",
+   "name": "renderGHAKindTabs",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    382,
+    420
+   ],
+   "summary": "Desenha as abas Processos/Runs/Workflows com os contadores à direita.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHATable",
+   "type": "function",
+   "name": "renderGHATable",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    422,
+    458
+   ],
+   "summary": "Renderiza a tabela principal do tipo de lista ativo com scroll.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaColumns",
+   "type": "function",
+   "name": "ghaColumns",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    466,
+    488
+   ],
+   "summary": "Calcula as larguras das colunas da tabela conforme a largura disponível.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaTableHeader",
+   "type": "function",
+   "name": "ghaTableHeader",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    490,
+    511
+   ],
+   "summary": "Renderiza o cabeçalho da tabela do GitHub Actions.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHARow",
+   "type": "function",
+   "name": "renderGHARow",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    513,
+    583
+   ],
+   "summary": "Renderiza uma linha da tabela (processo, run ou workflow) com status colorido e marcações.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaResultFor",
+   "type": "function",
+   "name": "ghaResultFor",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    586,
+    599
+   ],
+   "summary": "Devolve o par status/conclusion já traduzido para a linha informada.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaProcResult",
+   "type": "function",
+   "name": "ghaProcResult",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    603,
+    617
+   ],
+   "summary": "Traduz o estado ao vivo de um processo em glifo, rótulo e estilo.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaProcConclusion",
+   "type": "function",
+   "name": "ghaProcConclusion",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    621,
+    630
+   ],
+   "summary": "Converte o estado do processo no par que ghaResult entende.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaWorkflowState",
+   "type": "function",
+   "name": "ghaWorkflowState",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    632,
+    647
+   ],
+   "summary": "Traduz o estado do workflow (ativo/desativado) para rótulo legível.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHASummary",
+   "type": "function",
+   "name": "renderGHASummary",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    649,
+    687
+   ],
+   "summary": "Renderiza o painel de resumo do item selecionado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHARightRail",
+   "type": "function",
+   "name": "renderGHARightRail",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    691,
+    701
+   ],
+   "summary": "Compõe o trilho direito com resumo, uso e ações.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaContextLines",
+   "type": "function",
+   "name": "ghaContextLines",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    705,
+    716
+   ],
+   "summary": "Gera as linhas de contexto do repositório para o painel lateral.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "type": "function",
+   "name": "renderGHAUsagePanel",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    718,
+    787
+   ],
+   "summary": "Renderiza o painel de uso de minutos do GitHub Actions com barras por workflow.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHAActionsPanel",
+   "type": "function",
+   "name": "renderGHAActionsPanel",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    789,
+    806
+   ],
+   "summary": "Renderiza o painel de ações rápidas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:ghaHints",
+   "type": "function",
+   "name": "ghaHints",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    812,
+    858
+   ],
+   "summary": "Monta a linha de dicas de teclas conforme a tela e o foco atuais.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHASetupBox",
+   "type": "function",
+   "name": "renderGHASetupBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    860,
+    905
+   ],
+   "summary": "Renderiza o modal de setup quando o gh CLI está ausente ou sem autenticação.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHACreateBox",
+   "type": "function",
+   "name": "renderGHACreateBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    907,
+    930
+   ],
+   "summary": "Renderiza o modal de criação de workflow.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHATriggerBox",
+   "type": "function",
+   "name": "renderGHATriggerBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    932,
+    1017
+   ],
+   "summary": "Renderiza o modal de disparo de workflow com branch e inputs.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHAYAMLBox",
+   "type": "function",
+   "name": "renderGHAYAMLBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    1019,
+    1040
+   ],
+   "summary": "Renderiza a sobreposição com o YAML do workflow.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHALogsBox",
+   "type": "function",
+   "name": "renderGHALogsBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    1042,
+    1072
+   ],
+   "summary": "Renderiza a sobreposição com os logs do run.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/gha_views.go:renderGHADetailBox",
+   "type": "function",
+   "name": "renderGHADetailBox",
+   "filePath": "internal/ui/gha_views.go",
+   "lineRange": [
+    1074,
+    1086
+   ],
+   "summary": "Renderiza a sobreposição de inspeção do item selecionado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestAllTabsIncludesActions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestSidebarShowsActionsInCodigo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHALandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAControlCenterRenders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAUsagePanelAndCard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAKindCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAEnterOpensProcessDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAProcessStatusFromRuns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHATabCyclesPanels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAKindSwitchOnlyOnTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHASetupModalWhenNoGH",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHASetupModalAuth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesRemote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAAskStopJobConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAAskStopAllJobs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHARunIsActive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesSelectedRun",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHATickIntervalFasterWhenActive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHATickKeepsChainOnConfirm",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHABeginTriggerSelectsBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "function:internal/ui/gha_tab_test.go:TestGHAFilteredRunsScopeAndProcess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHALanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaLandingLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHATab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaConfirmOpts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaParseTime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaRunDuration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaCounters",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHACluster",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHAHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaConnChip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaUsageChip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHAKindTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHATable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaTableHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHARow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaResultFor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaProcResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaProcConclusion",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaWorkflowState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHASummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHARightRail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaContextLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHAActionsPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:ghaHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHASetupBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHACreateBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHATriggerBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHAYAMLBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHALogsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "function:internal/ui/gha_views.go:renderGHADetailBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHALandingEnterAndEsc",
+   "target": "function:internal/ui/gha_views.go:renderGHALanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHALandingEnterAndEsc",
+   "target": "function:internal/ui/gha_tab.go:handleGHAKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAControlCenterRenders",
+   "target": "function:internal/ui/gha_views.go:renderGHATab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAUsagePanelAndCard",
+   "target": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAUsagePanelAndCard",
+   "target": "function:internal/ui/gha_views.go:ghaUsageChip",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAUsagePanelAndCard",
+   "target": "function:internal/ui/gha_detail.go:renderGHAProcOverview",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAKindCycle",
+   "target": "function:internal/ui/gha_tab.go:handleGHAKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAEnterOpensProcessDetail",
+   "target": "function:internal/ui/gha_tab.go:handleGHAKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAEnterOpensProcessDetail",
+   "target": "function:internal/ui/gha_detail.go:renderGHAProcessDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAProcessStatusFromRuns",
+   "target": "function:internal/ui/gha_detail.go:ghaStatusForProcess",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHATabCyclesPanels",
+   "target": "function:internal/ui/gha_tab.go:handleGHAKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAKindSwitchOnlyOnTable",
+   "target": "function:internal/ui/gha_tab.go:handleGHAKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHASetupModalWhenNoGH",
+   "target": "function:internal/ui/gha_views.go:renderGHASetupBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHASetupModalWhenNoGH",
+   "target": "function:internal/ui/gha_tab.go:handleGHAFormKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHASetupModalAuth",
+   "target": "function:internal/ui/gha_views.go:renderGHASetupBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesRemote",
+   "target": "function:internal/collectors/gha.go:GHAActionsURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAAskStopJobConfirm",
+   "target": "function:internal/ui/gha_tab.go:ghaAskStopJob",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAAskStopJobConfirm",
+   "target": "function:internal/ui/gha_views.go:ghaConfirmOpts",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAAskStopAllJobs",
+   "target": "function:internal/ui/gha_tab.go:ghaAskStopAllJobs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAOpenBrowserUsesSelectedRun",
+   "target": "function:internal/ui/gha_detail.go:ghaSyncSelectedProcRun",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHATickKeepsChainOnConfirm",
+   "target": "function:internal/ui/gha_tab.go:handleGHAMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHABeginTriggerSelectsBranch",
+   "target": "function:internal/ui/gha_tab.go:ghaBeginTrigger",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHABeginTriggerSelectsBranch",
+   "target": "function:internal/ui/gha_views.go:renderGHATriggerBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHABeginTriggerSelectsBranch",
+   "target": "function:internal/ui/gha_tab.go:ghaConfirmTrigger",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAFilteredRunsScopeAndProcess",
+   "target": "function:internal/ui/gha_tab.go:ghaFilteredRuns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAFilteredRunsScopeAndProcess",
+   "target": "function:internal/ui/gha_tab.go:ghaCycleRunScope",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_tab_test.go:TestGHAFilteredRunsScopeAndProcess",
+   "target": "function:internal/ui/gha_tab.go:ghaCycleRunProcFilter",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHALanding",
+   "target": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHATab",
+   "target": "function:internal/ui/gha_detail.go:renderGHAProcessDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:ghaConfirmOpts",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAHeader",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHATable",
+   "target": "function:internal/ui/gha_tab.go:ghaRowCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHATable",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHARow",
+   "target": "function:internal/ui/gha_detail.go:ghaStatusForProcess",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHARow",
+   "target": "function:internal/ui/gha_tab.go:ghaFilteredRuns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:ghaResultFor",
+   "target": "function:internal/ui/gha_detail.go:ghaStatusForProcess",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:ghaResultFor",
+   "target": "function:internal/ui/gha_tab.go:ghaFilteredRuns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "target": "function:internal/collectors/gha.go:GHAMinutesFromRuns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "target": "function:internal/collectors/gha.go:FormatGHAMinutes",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "target": "function:internal/collectors/gha.go:GHAFailHeatmap",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAUsagePanel",
+   "target": "function:internal/collectors/gha.go:GHABillingEstimate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHAActionsPanel",
+   "target": "function:internal/ui/gha_tab.go:ghaQuickActionItems",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHATriggerBox",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/gha_views.go:renderGHATriggerBox",
+   "target": "function:internal/collectors/git.go:GitCurrentBranchName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/gha_views.go",
+   "target": "file:internal/ui/gha_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,3376 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/app/app.go",
+   "type": "file",
+   "name": "app.go",
+   "filePath": "internal/app/app.go",
+   "summary": "Ponto de entrada do runtime: redireciona logs, carrega config, cria o StateStore, inicia os collectors e executa a TUI Bubble Tea com tratamento de sinais.",
+   "tags": [
+    "entry-point",
+    "bootstrap",
+    "orquestracao",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/app/app.go:redirectLogOutput",
+   "type": "function",
+   "name": "redirectLogOutput",
+   "filePath": "internal/app/app.go",
+   "lineRange": [
+    26,
+    35
+   ],
+   "summary": "Redireciona o logger padrão para um arquivo de log (ou descarta) para que escritas de collectors em segundo plano não corrompam a tela alternativa do Bubble Tea.",
+   "tags": [
+    "helper",
+    "entry-point",
+    "bootstrap"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/app/app.go:Run",
+   "type": "function",
+   "name": "Run",
+   "filePath": "internal/app/app.go",
+   "lineRange": [
+    37,
+    73
+   ],
+   "summary": "Ponto de entrada da aplicação: carrega a config, cria o StateStore, inicia o Manager de collectors, trata sinais SIGINT/SIGTERM e executa o programa TUI.",
+   "tags": [
+    "api",
+    "entry-point",
+    "bootstrap"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/core/models.go",
+   "type": "file",
+   "name": "models.go",
+   "filePath": "internal/core/models.go",
+   "summary": "Define os modelos de domínio compartilhados (Project, Container, GitInfo, Snapshot, HostMetrics etc.) e enums de status usados por collectors e UI.",
+   "tags": [
+    "data-model",
+    "type-definition",
+    "dominio",
+    "core"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/core/models.go:FrameworkInfo",
+   "type": "class",
+   "name": "FrameworkInfo",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    33,
+    37
+   ],
+   "summary": "Framework detectado em um projeto (nome, versão, linguagem).",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitFileStatus",
+   "type": "class",
+   "name": "GitFileStatus",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    39,
+    43
+   ],
+   "summary": "Status de um arquivo no working tree Git (caminho, código, staged).",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitCommit",
+   "type": "class",
+   "name": "GitCommit",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    45,
+    51
+   ],
+   "summary": "Commit Git com hash, autor, data e mensagem.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitCommitFileChange",
+   "type": "class",
+   "name": "GitCommitFileChange",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    53,
+    56
+   ],
+   "summary": "Arquivo alterado em um commit com contagem de adições e remoções.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitBranch",
+   "type": "class",
+   "name": "GitBranch",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    58,
+    62
+   ],
+   "summary": "Branch Git local ou remota com indicação de branch atual.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitStash",
+   "type": "class",
+   "name": "GitStash",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    64,
+    67
+   ],
+   "summary": "Entrada do stash Git.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitRemote",
+   "type": "class",
+   "name": "GitRemote",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    69,
+    72
+   ],
+   "summary": "Remote Git com nome e URL.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:GitInfo",
+   "type": "class",
+   "name": "GitInfo",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    74,
+    93
+   ],
+   "summary": "Informações Git agregadas de um projeto: branch, ahead/behind, arquivos, commits, branches, stashes e remotes.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/core/models.go:Service",
+   "type": "class",
+   "name": "Service",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    95,
+    104
+   ],
+   "summary": "Serviço detectado em um projeto (web, banco, cache, fila...) com porta e status.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Container",
+   "type": "class",
+   "name": "Container",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    106,
+    118
+   ],
+   "summary": "Container Docker com imagem, status, portas, saúde, métricas e política de restart.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Image",
+   "type": "class",
+   "name": "Image",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    120,
+    128
+   ],
+   "summary": "Imagem Docker local com repositório, tag, tamanho e data.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Worker",
+   "type": "class",
+   "name": "Worker",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    130,
+    136
+   ],
+   "summary": "Processo worker de um projeto (fila, cron) com status.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Domain",
+   "type": "class",
+   "name": "Domain",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    138,
+    143
+   ],
+   "summary": "Domínio associado a um projeto e seu status.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:SSLCert",
+   "type": "class",
+   "name": "SSLCert",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    145,
+    151
+   ],
+   "summary": "Certificado SSL de um domínio com emissor e data de expiração.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:ProjectModule",
+   "type": "class",
+   "name": "ProjectModule",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    153,
+    157
+   ],
+   "summary": "Módulo/sub-aplicação de um projeto monorepo.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:ProjectMetrics",
+   "type": "class",
+   "name": "ProjectMetrics",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    159,
+    162
+   ],
+   "summary": "Métricas agregadas de CPU e memória de um projeto.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:HealthCheckResult",
+   "type": "class",
+   "name": "HealthCheckResult",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    164,
+    170
+   ],
+   "summary": "Resultado de um health check HTTP com status, latência e erro.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Project",
+   "type": "class",
+   "name": "Project",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    172,
+    198
+   ],
+   "summary": "Modelo central de projeto: framework, status, Git, containers, serviços, portas, conflitos de porta e módulos.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/core/models.go:HostMetrics",
+   "type": "class",
+   "name": "HostMetrics",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    200,
+    215
+   ],
+   "summary": "Métricas do host: CPU, memória, disco, swap, load average, uptime e containers ativos.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/core/models.go:Snapshot",
+   "type": "class",
+   "name": "Snapshot",
+   "filePath": "internal/core/models.go",
+   "lineRange": [
+    217,
+    224
+   ],
+   "summary": "Estado global imutável exibido pela TUI: projetos, containers órfãos, métricas do host e dados da varredura.",
+   "tags": [
+    "data-model",
+    "struct",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/core/state.go",
+   "type": "file",
+   "name": "state.go",
+   "filePath": "internal/core/state.go",
+   "summary": "StateStore thread-safe que guarda o Snapshot global e oferece atualizações atômicas de projetos, Git, runtime e métricas do host.",
+   "tags": [
+    "state-management",
+    "concorrencia",
+    "core",
+    "singleton"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Usa sync.RWMutex e cópia profunda (Clone) para entregar Snapshots imutáveis às goroutines da UI."
+  },
+  {
+   "id": "class:internal/core/state.go:StateStore",
+   "type": "class",
+   "name": "StateStore",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    9,
+    12
+   ],
+   "summary": "Armazenamento de estado thread-safe que guarda o Snapshot global protegido por RWMutex.",
+   "tags": [
+    "service",
+    "struct",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:NewStateStore",
+   "type": "function",
+   "name": "NewStateStore",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    14,
+    22
+   ],
+   "summary": "Cria um StateStore inicializado com os caminhos de varredura configurados.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:Get",
+   "type": "function",
+   "name": "Get",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    24,
+    28
+   ],
+   "summary": "Retorna uma cópia profunda do Snapshot atual sob lock de leitura.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:Update",
+   "type": "function",
+   "name": "Update",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    30,
+    36
+   ],
+   "summary": "Aplica uma função de mutação ao Snapshot sob lock de escrita.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:Clone",
+   "type": "function",
+   "name": "Clone",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    38,
+    54
+   ],
+   "summary": "Faz cópia profunda do Snapshot, duplicando slices de projetos e containers para evitar data races.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:SetProjects",
+   "type": "function",
+   "name": "SetProjects",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    56,
+    95
+   ],
+   "summary": "Substitui a lista de projetos preservando dados Git detalhados e containers anteriores quando a nova varredura traz apenas um resumo.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/core/state.go:SetOrphanContainers",
+   "type": "function",
+   "name": "SetOrphanContainers",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    97,
+    101
+   ],
+   "summary": "Atualiza a lista de containers sem projeto associado.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:SetHostMetrics",
+   "type": "function",
+   "name": "SetHostMetrics",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    103,
+    107
+   ],
+   "summary": "Atualiza as métricas do host (CPU, memória, disco) no Snapshot.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:UpdateProjectGit",
+   "type": "function",
+   "name": "UpdateProjectGit",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    109,
+    120
+   ],
+   "summary": "Atualiza as informações Git de um projeto específico identificado pelo caminho.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state.go:UpdateProjectRuntime",
+   "type": "function",
+   "name": "UpdateProjectRuntime",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    122,
+    141
+   ],
+   "summary": "Mescla dados de runtime (containers, serviços, portas, status) de um projeto vindos de um collector.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/core/state.go:UpdateProjectStatus",
+   "type": "function",
+   "name": "UpdateProjectStatus",
+   "filePath": "internal/core/state.go",
+   "lineRange": [
+    143,
+    152
+   ],
+   "summary": "Atualiza o status de um projeto específico pelo caminho.",
+   "tags": [
+    "api",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/core/state_test.go",
+   "type": "file",
+   "name": "state_test.go",
+   "filePath": "internal/core/state_test.go",
+   "summary": "Testes do StateStore cobrindo concorrência, preservação de dados Git em SetProjects e cópia profunda do Snapshot.",
+   "tags": [
+    "test",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/core/state_test.go:TestStateStoreConcurrency",
+   "type": "function",
+   "name": "TestStateStoreConcurrency",
+   "filePath": "internal/core/state_test.go",
+   "lineRange": [
+    8,
+    33
+   ],
+   "summary": "Verifica que leituras e escritas concorrentes no StateStore não geram data races.",
+   "tags": [
+    "test",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/core/state_test.go:TestSetProjectsPreservesGit",
+   "type": "function",
+   "name": "TestSetProjectsPreservesGit",
+   "filePath": "internal/core/state_test.go",
+   "lineRange": [
+    35,
+    52
+   ],
+   "summary": "Garante que SetProjects preserva as informações Git já carregadas quando o novo projeto não as traz.",
+   "tags": [
+    "test",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state_test.go:TestSetProjectsDoesNotReplaceFullGitWithSummary",
+   "type": "function",
+   "name": "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+   "filePath": "internal/core/state_test.go",
+   "lineRange": [
+    54,
+    71
+   ],
+   "summary": "Garante que um resumo Git não sobrescreve dados Git completos já presentes.",
+   "tags": [
+    "test",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/core/state_test.go:TestSnapshotClone",
+   "type": "function",
+   "name": "TestSnapshotClone",
+   "filePath": "internal/core/state_test.go",
+   "lineRange": [
+    73,
+    84
+   ],
+   "summary": "Verifica que Clone produz cópia independente do Snapshot.",
+   "tags": [
+    "test",
+    "state-management",
+    "concorrencia"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/jenkinsutil/client.go",
+   "type": "file",
+   "name": "client.go",
+   "filePath": "internal/jenkinsutil/client.go",
+   "summary": "Cliente HTTP da API REST do Jenkins: ping, listagem de jobs, builds, console, disparo e parada de builds com crumb CSRF, além de formatadores de status.",
+   "tags": [
+    "api-client",
+    "jenkins",
+    "ci-cd",
+    "http"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/jenkinsutil/client.go:ServerInfo",
+   "type": "class",
+   "name": "ServerInfo",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    14,
+    25
+   ],
+   "summary": "Informações do servidor Jenkins obtidas no ping (versão, modo, executores, erro).",
+   "tags": [
+    "data-model",
+    "struct",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/jenkinsutil/client.go:Job",
+   "type": "class",
+   "name": "Job",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    27,
+    37
+   ],
+   "summary": "Representa um job/pipeline Jenkins com status, último build e saúde.",
+   "tags": [
+    "data-model",
+    "struct",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/jenkinsutil/client.go:Build",
+   "type": "class",
+   "name": "Build",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    39,
+    48
+   ],
+   "summary": "Representa um build Jenkins com número, resultado, duração e timestamp.",
+   "tags": [
+    "data-model",
+    "struct",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/jenkinsutil/client.go:Client",
+   "type": "class",
+   "name": "Client",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    50,
+    55
+   ],
+   "summary": "Cliente HTTP da API REST do Jenkins com autenticação por usuário/token e suporte a crumb CSRF.",
+   "tags": [
+    "service",
+    "struct",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "function",
+   "name": "NewClient",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    57,
+    64
+   ],
+   "summary": "Cria um Client Jenkins a partir da ProjectConfig com timeout HTTP padrão.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:Ping",
+   "type": "function",
+   "name": "Ping",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    66,
+    91
+   ],
+   "summary": "Consulta o servidor Jenkins e retorna versão e informações básicas ou erro de conexão.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:ListJobs",
+   "type": "function",
+   "name": "ListJobs",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    93,
+    146
+   ],
+   "summary": "Lista jobs Jenkins (inclusive dentro de pastas) com status e último build.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:GetJob",
+   "type": "function",
+   "name": "GetJob",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    148,
+    211
+   ],
+   "summary": "Obtém detalhes de um job e o histórico de builds recentes.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:GetBuild",
+   "type": "function",
+   "name": "GetBuild",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    213,
+    242
+   ],
+   "summary": "Obtém os dados de um build específico de um job.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:BuildConsole",
+   "type": "function",
+   "name": "BuildConsole",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    244,
+    251
+   ],
+   "summary": "Baixa o texto do console (log) de um build.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:TriggerBuild",
+   "type": "function",
+   "name": "TriggerBuild",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    253,
+    259
+   ],
+   "summary": "Dispara um novo build de um job via POST.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:StopBuild",
+   "type": "function",
+   "name": "StopBuild",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    261,
+    267
+   ],
+   "summary": "Interrompe um build em execução via POST.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:QueueDepth",
+   "type": "function",
+   "name": "QueueDepth",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    269,
+    283
+   ],
+   "summary": "Retorna quantos itens estão na fila de builds do Jenkins.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:ColorToStatus",
+   "type": "function",
+   "name": "ColorToStatus",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    285,
+    306
+   ],
+   "summary": "Converte a cor de status do Jenkins (blue, red, *_anime...) em status legível.",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "function",
+   "name": "BuildStatus",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    308,
+    324
+   ],
+   "summary": "Deriva o status textual de um Build (rodando, sucesso, falha, abortado).",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "function",
+   "name": "FormatDuration",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    326,
+    342
+   ],
+   "summary": "Formata duração em milissegundos em texto curto (s/m/h).",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:FormatAgo",
+   "type": "function",
+   "name": "FormatAgo",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    344,
+    360
+   ],
+   "summary": "Formata um timestamp em milissegundos como tempo relativo (\"há X\").",
+   "tags": [
+    "api",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "function",
+   "name": "jobAPIPath",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    362,
+    377
+   ],
+   "summary": "Converte o nome completo de um job (com pastas) no caminho /job/.../job/ da API.",
+   "tags": [
+    "helper",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:ensureCrumb",
+   "type": "function",
+   "name": "ensureCrumb",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    379,
+    401
+   ],
+   "summary": "Obtém e armazena o crumb CSRF do Jenkins antes de requisições POST.",
+   "tags": [
+    "helper",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:get",
+   "type": "function",
+   "name": "get",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    403,
+    422
+   ],
+   "summary": "Executa um GET autenticado na API Jenkins e retorna corpo e headers.",
+   "tags": [
+    "helper",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client.go:post",
+   "type": "function",
+   "name": "post",
+   "filePath": "internal/jenkinsutil/client.go",
+   "lineRange": [
+    424,
+    450
+   ],
+   "summary": "Executa um POST autenticado com crumb CSRF, repetindo após renovar o crumb quando necessário.",
+   "tags": [
+    "helper",
+    "api-client",
+    "jenkins"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/app/app.go",
+   "target": "function:internal/app/app.go:redirectLogOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "function:internal/app/app.go:Run",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "function:internal/app/app.go:Run",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/app/app.go:redirectLogOutput",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/anim.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/anim_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_auth_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_client.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_client_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_json_highlight.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_json_highlight_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_kv.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_screen.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_select_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/api_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/app.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/cf_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/cf_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/compose_messages.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/confirm_modal.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/confirm_modal_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_detail_code.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_detail_code_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_detail_layout.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_detail_views.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_messages.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/container_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/containers_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/containers_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/dashboard.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/dashboard_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/db_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/db_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/deploy.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/docker_add.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/docker_add_render.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/docker_add_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/editor.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/foundation.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/foundation_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/fuzzy.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/gha_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/gha_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/gha_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/gha_views.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_cache.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_cache_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_drawer.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_drawer_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_messages.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_prompt.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/graph_features_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/graph_layout.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/help_screen.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/help_screen_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/helpers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/jenkins_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/jenkins_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/json_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/json_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/jwt_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/jwt_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/k8s_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/k8s_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/keymap_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/landing_probe.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/logs_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_caps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_caps_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_landing.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_landing_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/module_shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/nginx_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/nginx_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/nginx_view.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/nginx_view_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ngrok_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ngrok_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/overview_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/overview_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/paths.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/project_cwd.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/project_cwd_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/project_load.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/project_messages.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/project_sidebar.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_aquarium.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_ast.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_blackhole.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_burst.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_cat.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_chess.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_city.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_clouds.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_coffee.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_cube.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_dragon.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_drop.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_engine.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_fall.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_fire.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_fireworks.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_fox.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_galaxy.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_hourglass.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_invaders.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_jackpot.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_moon.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_nebula.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_ridge.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_sea.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_sky.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_smoke.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_sword.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_tetris.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_tetris_draw.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_tree.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/relax_v4.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/responsive_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/routes_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/routes_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/shell_return.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/small_terminal_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/spark.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/spark_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ssh_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ssh_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/styles.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/swarm_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/swarm_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/swarm_views.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/theme.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/theme_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/tools_config_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/tunnel_modals.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/user_config_screen.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/views.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ws_compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ws_tab.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/app/app.go",
+   "target": "file:internal/ui/ws_tab_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:FrameworkInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:FrameworkInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitFileStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitFileStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitCommit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitCommit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitCommitFileChange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitCommitFileChange",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitBranch",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitStash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitStash",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitRemote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitRemote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:GitInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Service",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Service",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Container",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Container",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Image",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Image",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Worker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Worker",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Domain",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Domain",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:SSLCert",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:SSLCert",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:ProjectModule",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:ProjectModule",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:ProjectMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:ProjectMetrics",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:HealthCheckResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:HealthCheckResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Project",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Project",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:HostMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:HostMetrics",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "class:internal/core/models.go:Snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "class:internal/core/state.go:StateStore",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "class:internal/core/state.go:StateStore",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:NewStateStore",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:NewStateStore",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Get",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Get",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Update",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Update",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Clone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:Clone",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetOrphanContainers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetOrphanContainers",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetHostMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:SetHostMetrics",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectGit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectGit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectRuntime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectRuntime",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "function:internal/core/state.go:UpdateProjectStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state_test.go",
+   "target": "function:internal/core/state_test.go:TestStateStoreConcurrency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state_test.go",
+   "target": "function:internal/core/state_test.go:TestSetProjectsPreservesGit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state_test.go",
+   "target": "function:internal/core/state_test.go:TestSetProjectsDoesNotReplaceFullGitWithSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/core/state_test.go",
+   "target": "function:internal/core/state_test.go:TestSnapshotClone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:ServerInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:ServerInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Job",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Job",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Build",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Build",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Client",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "class:internal/jenkinsutil/client.go:Client",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:NewClient",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:Ping",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:Ping",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:ListJobs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:ListJobs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:GetJob",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:GetJob",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:GetBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:GetBuild",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:BuildConsole",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:BuildConsole",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:TriggerBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:TriggerBuild",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:StopBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:StopBuild",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:QueueDepth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:QueueDepth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:ColorToStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:ColorToStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:BuildStatus",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:FormatDuration",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:FormatAgo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:FormatAgo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:ensureCrumb",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:get",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "function:internal/jenkinsutil/client.go:post",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:ListJobs",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:ListJobs",
+   "target": "function:internal/jenkinsutil/client.go:ColorToStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:GetJob",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:GetJob",
+   "target": "function:internal/jenkinsutil/client.go:ColorToStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:GetBuild",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:BuildConsole",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:TriggerBuild",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jenkinsutil/client.go:StopBuild",
+   "target": "function:internal/jenkinsutil/client.go:jobAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/core/state.go:NewStateStore",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/collectors/manager.go:NewManager",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/collectors/manager.go:QuickScan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/collectors/manager.go:StartWithContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/ui/app.go:NewApp",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/app/app.go:Run",
+   "target": "function:internal/ui/app.go:Run",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/core/state.go:Get",
+   "target": "function:internal/core/state.go:Clone",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/core/models.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/jenkinsutil/client.go",
+   "target": "file:internal/jenkinsutil/client_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/core/state.go",
+   "target": "file:internal/core/models.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

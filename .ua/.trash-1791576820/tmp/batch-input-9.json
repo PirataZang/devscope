@@ -1,0 +1,1016 @@
+{
+ "batchIndex": 9,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": "internal/cfutil/agent.go",
+   "language": "go",
+   "sizeLines": 674,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/cfutil/agent_test.go",
+   "language": "go",
+   "sizeLines": 150,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/cfutil/config.go",
+   "language": "go",
+   "sizeLines": 196,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/cfutil/discover.go",
+   "language": "go",
+   "sizeLines": 431,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/cfutil/discover_test.go",
+   "language": "go",
+   "sizeLines": 57,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/dbutil/config.go",
+   "language": "go",
+   "sizeLines": 85,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/devscopeutil/dir.go",
+   "language": "go",
+   "sizeLines": 40,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/devscopeutil/dir_test.go",
+   "language": "go",
+   "sizeLines": 49,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jenkinsutil/config.go",
+   "language": "go",
+   "sizeLines": 77,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ngrokutil/config.go",
+   "language": "go",
+   "sizeLines": 188,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/discover.go",
+   "language": "go",
+   "sizeLines": 117,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/discover_test.go",
+   "language": "go",
+   "sizeLines": 179,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/openapi.go",
+   "language": "go",
+   "sizeLines": 161,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/route.go",
+   "language": "go",
+   "sizeLines": 41,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_django.go",
+   "language": "go",
+   "sizeLines": 78,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_express.go",
+   "language": "go",
+   "sizeLines": 59,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_fastapi.go",
+   "language": "go",
+   "sizeLines": 83,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_flask.go",
+   "language": "go",
+   "sizeLines": 54,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_go.go",
+   "language": "go",
+   "sizeLines": 90,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_laravel.go",
+   "language": "go",
+   "sizeLines": 141,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/routeutil/scan_laravel_test.go",
+   "language": "go",
+   "sizeLines": 58,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "internal/cfutil/agent.go": [],
+  "internal/cfutil/agent_test.go": [],
+  "internal/cfutil/config.go": [
+   "internal/devscopeutil/dir.go",
+   "internal/devscopeutil/dir_test.go"
+  ],
+  "internal/cfutil/discover.go": [],
+  "internal/cfutil/discover_test.go": [],
+  "internal/dbutil/config.go": [
+   "internal/devscopeutil/dir.go",
+   "internal/devscopeutil/dir_test.go"
+  ],
+  "internal/devscopeutil/dir.go": [],
+  "internal/devscopeutil/dir_test.go": [],
+  "internal/jenkinsutil/config.go": [
+   "internal/devscopeutil/dir.go",
+   "internal/devscopeutil/dir_test.go"
+  ],
+  "internal/ngrokutil/config.go": [
+   "internal/devscopeutil/dir.go",
+   "internal/devscopeutil/dir_test.go"
+  ],
+  "internal/routeutil/discover.go": [],
+  "internal/routeutil/discover_test.go": [],
+  "internal/routeutil/openapi.go": [],
+  "internal/routeutil/route.go": [],
+  "internal/routeutil/scan_django.go": [],
+  "internal/routeutil/scan_express.go": [],
+  "internal/routeutil/scan_fastapi.go": [],
+  "internal/routeutil/scan_flask.go": [],
+  "internal/routeutil/scan_go.go": [],
+  "internal/routeutil/scan_laravel.go": [],
+  "internal/routeutil/scan_laravel_test.go": []
+ },
+ "neighborMap": {
+  "internal/cfutil/agent.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/cf_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/cf_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesCFTunnel",
+     "TestCFLandingAndOpen",
+     "TestCFSidebarKey",
+     "TestCFWizardEditsURLAsText",
+     "TestCFConfigScreen",
+     "TestCFHintsIncludeInstallLogin",
+     "TestCFTunnelsViewLayout",
+     "TestCFWizardIsModal",
+     "TestCFDeleteConfirmModal"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/cfutil/agent_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/cf_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/cf_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesCFTunnel",
+     "TestCFLandingAndOpen",
+     "TestCFSidebarKey",
+     "TestCFWizardEditsURLAsText",
+     "TestCFConfigScreen",
+     "TestCFHintsIncludeInstallLogin",
+     "TestCFTunnelsViewLayout",
+     "TestCFWizardIsModal",
+     "TestCFDeleteConfirmModal"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/cfutil/config.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/cf_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/cf_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesCFTunnel",
+     "TestCFLandingAndOpen",
+     "TestCFSidebarKey",
+     "TestCFWizardEditsURLAsText",
+     "TestCFConfigScreen",
+     "TestCFHintsIncludeInstallLogin",
+     "TestCFTunnelsViewLayout",
+     "TestCFWizardIsModal",
+     "TestCFDeleteConfirmModal"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/cfutil/discover.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/cf_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/cf_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesCFTunnel",
+     "TestCFLandingAndOpen",
+     "TestCFSidebarKey",
+     "TestCFWizardEditsURLAsText",
+     "TestCFConfigScreen",
+     "TestCFHintsIncludeInstallLogin",
+     "TestCFTunnelsViewLayout",
+     "TestCFWizardIsModal",
+     "TestCFDeleteConfirmModal"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/cfutil/discover_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/cf_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/cf_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesCFTunnel",
+     "TestCFLandingAndOpen",
+     "TestCFSidebarKey",
+     "TestCFWizardEditsURLAsText",
+     "TestCFConfigScreen",
+     "TestCFHintsIncludeInstallLogin",
+     "TestCFTunnelsViewLayout",
+     "TestCFWizardIsModal",
+     "TestCFDeleteConfirmModal"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/dbutil/config.go": [
+   {
+    "path": "internal/collectors/database.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DBTarget",
+     "DBColumn",
+     "DBTableInfo",
+     "DetectProjectDatabasesLite",
+     "DetectProjectDatabases",
+     "DBListTables",
+     "DBDescribeTable",
+     "DBQuery"
+    ]
+   }
+  ],
+  "internal/devscopeutil/dir.go": [
+   {
+    "path": "internal/collectors/gha.go",
+    "batchIndex": 4,
+    "symbols": [
+     "GHACatalog",
+     "GHAProcess",
+     "GHAWorkflow",
+     "GHARun",
+     "GHAJob",
+     "GHAStep",
+     "GHAWorkflowInput",
+     "GHANote",
+     "GHANotesFile",
+     "GHAFailBucket",
+     "GHAMinuteBucket",
+     "GHAActionsBilling",
+     "GHAInfo",
+     "GHAAvailable",
+     "GHAInstallHint",
+     "GHAAuthLoginCmd",
+     "GHAAuthStatusOK",
+     "GHARepoInfo",
+     "GHAActionsURL",
+     "GHARunURL",
+     "GHACatalogPath",
+     "GHAWorkflowsDir",
+     "LoadGHACatalog",
+     "SaveGHACatalog",
+     "SyncGHACatalogFromDisk",
+     "GHAListLocalWorkflowFiles",
+     "GHAWorkflowTemplate",
+     "GHACreateProcess",
+     "GHADeleteProcess",
+     "GHAReadProcessFile",
+     "GHAListWorkflows",
+     "GHAListRuns",
+     "GHARunLogs",
+     "GHARunFailedLogs",
+     "GHAListRunJobs",
+     "FormatGHAJobsText",
+     "FormatGHATimelineText",
+     "BrailleBar",
+     "GHAFailHeatmap",
+     "GHABillingEstimate",
+     "FormatGHABilling",
+     "SumGHAMinutes",
+     "GHAMinutesFromRuns",
+     "FormatGHAMinutes",
+     "GHAFetchActionsBilling",
+     "GHATriggerWorkflow",
+     "GHATriggerWorkflowRef",
+     "GHATriggerWorkflowRefInputs",
+     "GHAParseWorkflowInputs",
+     "GitBranchAheadCount",
+     "GitPushBranch",
+     "GHANotesPath",
+     "LoadGHANotes",
+     "SaveGHANote",
+     "GHANoteForRun",
+     "DeleteGHANote",
+     "GHACancelRun",
+     "GHARerun",
+     "GHAOpenRunURL"
+    ]
+   },
+   {
+    "path": "internal/sshutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TunnelConfig",
+     "ProjectConfig",
+     "HistoryEntry",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject",
+     "UpsertTunnel",
+     "RemoveTunnel",
+     "NormalizeMode",
+     "MergeTunnels",
+     "CountForeignLive",
+     "MergeTunnelsAll"
+    ]
+   },
+   {
+    "path": "internal/wsutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "ProjectConfig",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject"
+    ]
+   }
+  ],
+  "internal/devscopeutil/dir_test.go": [
+   {
+    "path": "internal/collectors/gha.go",
+    "batchIndex": 4,
+    "symbols": [
+     "GHACatalog",
+     "GHAProcess",
+     "GHAWorkflow",
+     "GHARun",
+     "GHAJob",
+     "GHAStep",
+     "GHAWorkflowInput",
+     "GHANote",
+     "GHANotesFile",
+     "GHAFailBucket",
+     "GHAMinuteBucket",
+     "GHAActionsBilling",
+     "GHAInfo",
+     "GHAAvailable",
+     "GHAInstallHint",
+     "GHAAuthLoginCmd",
+     "GHAAuthStatusOK",
+     "GHARepoInfo",
+     "GHAActionsURL",
+     "GHARunURL",
+     "GHACatalogPath",
+     "GHAWorkflowsDir",
+     "LoadGHACatalog",
+     "SaveGHACatalog",
+     "SyncGHACatalogFromDisk",
+     "GHAListLocalWorkflowFiles",
+     "GHAWorkflowTemplate",
+     "GHACreateProcess",
+     "GHADeleteProcess",
+     "GHAReadProcessFile",
+     "GHAListWorkflows",
+     "GHAListRuns",
+     "GHARunLogs",
+     "GHARunFailedLogs",
+     "GHAListRunJobs",
+     "FormatGHAJobsText",
+     "FormatGHATimelineText",
+     "BrailleBar",
+     "GHAFailHeatmap",
+     "GHABillingEstimate",
+     "FormatGHABilling",
+     "SumGHAMinutes",
+     "GHAMinutesFromRuns",
+     "FormatGHAMinutes",
+     "GHAFetchActionsBilling",
+     "GHATriggerWorkflow",
+     "GHATriggerWorkflowRef",
+     "GHATriggerWorkflowRefInputs",
+     "GHAParseWorkflowInputs",
+     "GitBranchAheadCount",
+     "GitPushBranch",
+     "GHANotesPath",
+     "LoadGHANotes",
+     "SaveGHANote",
+     "GHANoteForRun",
+     "DeleteGHANote",
+     "GHACancelRun",
+     "GHARerun",
+     "GHAOpenRunURL"
+    ]
+   },
+   {
+    "path": "internal/sshutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TunnelConfig",
+     "ProjectConfig",
+     "HistoryEntry",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject",
+     "UpsertTunnel",
+     "RemoveTunnel",
+     "NormalizeMode",
+     "MergeTunnels",
+     "CountForeignLive",
+     "MergeTunnelsAll"
+    ]
+   },
+   {
+    "path": "internal/wsutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "ProjectConfig",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject"
+    ]
+   }
+  ],
+  "internal/jenkinsutil/config.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/jenkins_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/jenkins_tab_test.go",
+    "batchIndex": 2,
+    "symbols": [
+     "TestAllTabsIncludesJenkins",
+     "TestJenkinsSidebar",
+     "TestJenkinsLandingAndOpen",
+     "TestJenkinsSettingsNoPanic",
+     "TestJenkinsPipelinesRender",
+     "TestJenkinsActivityChart",
+     "TestJenkinsTokenMaskedInSettings"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/ngrokutil/config.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab.go",
+    "batchIndex": 3,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab_test.go",
+    "batchIndex": 3,
+    "symbols": [
+     "TestAllTabsIncludesNgrok",
+     "TestNgrokLandingAndOpen",
+     "TestNgrokSidebarKey",
+     "TestNgrokWizardEditsPortAsText",
+     "TestNgrokWizardCarriesDomainAndRegion",
+     "TestNgrokTunnelsRender",
+     "TestNgrokTunnelsViewLayout",
+     "TestNgrokWizardIsModal",
+     "TestNgrokDeleteConfirmModal"
+    ]
+   }
+  ],
+  "internal/routeutil/discover.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/discover_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/openapi.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/route.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_django.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_express.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_fastapi.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_flask.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_go.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_laravel.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ],
+  "internal/routeutil/scan_laravel_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/routes_tab.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/routes_tab_test.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TestAllTabsIncludesRoutes",
+     "TestRoutesLandingEnterAndEsc",
+     "TestOpenApiWithPreset",
+     "TestRoutesEnterOpensAPI",
+     "TestRoutesFilterByPath",
+     "TestRoutesFilterAuthAndRender",
+     "TestSidebarShowsUtilsRoutes"
+    ]
+   }
+  ]
+ }
+}

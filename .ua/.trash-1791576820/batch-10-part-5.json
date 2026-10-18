@@ -1,0 +1,92 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/wsutil/session_test.go",
+   "type": "file",
+   "name": "session_test.go",
+   "filePath": "internal/wsutil/session_test.go",
+   "summary": "Testes do cliente WebSocket: normalização de URL e um round-trip de Dial/envio/recebimento contra um servidor httptest.",
+   "tags": [
+    "test",
+    "websocket",
+    "integration-test",
+    "networking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/wsutil/session_test.go:TestNormalizeURL",
+   "type": "function",
+   "name": "TestNormalizeURL",
+   "filePath": "internal/wsutil/session_test.go",
+   "lineRange": [
+    13,
+    22
+   ],
+   "summary": "Testa a normalização de URLs WebSocket.",
+   "tags": [
+    "test",
+    "unit-test",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session_test.go:TestDialSendReceive",
+   "type": "function",
+   "name": "TestDialSendReceive",
+   "filePath": "internal/wsutil/session_test.go",
+   "lineRange": [
+    24,
+    54
+   ],
+   "summary": "Testa Dial, envio e recebimento contra servidor httptest.",
+   "tags": [
+    "test",
+    "unit-test",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/wsutil/session_test.go:waitKind",
+   "type": "function",
+   "name": "waitKind",
+   "filePath": "internal/wsutil/session_test.go",
+   "lineRange": [
+    56,
+    69
+   ],
+   "summary": "Helper de teste que espera um evento de tipo específico com timeout.",
+   "tags": [
+    "test",
+    "helper",
+    "websocket"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/wsutil/session_test.go",
+   "target": "function:internal/wsutil/session_test.go:TestNormalizeURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session_test.go",
+   "target": "function:internal/wsutil/session_test.go:TestDialSendReceive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/wsutil/session_test.go",
+   "target": "function:internal/wsutil/session_test.go:waitKind",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  }
+ ]
+}

@@ -1,0 +1,378 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/containers_tab_test.go",
+   "type": "file",
+   "name": "containers_tab_test.go",
+   "filePath": "internal/ui/containers_tab_test.go",
+   "summary": "Suíte extensa da aba de containers da TUI: cursor e seleção, atalhos Shift+U/D/R para compose e restart policy, portas, colunas, estados visuais, layout dividido e estabilidade do detalhe.",
+   "tags": [
+    "test",
+    "ui",
+    "tui",
+    "containers",
+    "bubble-tea"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/help_screen_test.go",
+   "type": "file",
+   "name": "help_screen_test.go",
+   "filePath": "internal/ui/help_screen_test.go",
+   "summary": "Testes da tela de ajuda: cores dos grupos alinhadas à sidebar, um bloco por tela, encaixe em qualquer tamanho de terminal, teclas de navegação e grafia de Shift.",
+   "tags": [
+    "test",
+    "ui",
+    "tui",
+    "help"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/project_cwd.go",
+   "type": "file",
+   "name": "project_cwd.go",
+   "filePath": "internal/ui/project_cwd.go",
+   "summary": "Abre direto o projeto correspondente ao diretório de trabalho atual, resolvendo a raiz via scanner e posicionando a App na aba Git desse projeto.",
+   "tags": [
+    "ui",
+    "navigation",
+    "tui",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/project_cwd.go:findProjectForCwd",
+   "type": "function",
+   "name": "findProjectForCwd",
+   "filePath": "internal/ui/project_cwd.go",
+   "lineRange": [
+    12,
+    38
+   ],
+   "summary": "Acha o projeto correspondente ao diretório atual, resolvendo a raiz via scanner.",
+   "tags": [
+    "cwd",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/project_cwd.go:projectByPath",
+   "type": "function",
+   "name": "projectByPath",
+   "filePath": "internal/ui/project_cwd.go",
+   "lineRange": [
+    40,
+    49
+   ],
+   "summary": "Busca um projeto pelo caminho limpo.",
+   "tags": [
+    "lookup",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/project_cwd.go:openProjectFromCwd",
+   "type": "function",
+   "name": "openProjectFromCwd",
+   "filePath": "internal/ui/project_cwd.go",
+   "lineRange": [
+    51,
+    66
+   ],
+   "summary": "Seleciona o projeto do cwd na App e abre a visão de projeto na aba Git.",
+   "tags": [
+    "navigation",
+    "ui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/theme_test.go",
+   "type": "file",
+   "name": "theme_test.go",
+   "filePath": "internal/ui/theme_test.go",
+   "summary": "Testes de temas da TUI: catálogo de temas, seletor que salva ou restaura com Esc, conversão hex→RGB e renderização do popup de temas.",
+   "tags": [
+    "test",
+    "ui",
+    "themes",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/tools_config_test.go",
+   "type": "file",
+   "name": "tools_config_test.go",
+   "filePath": "internal/ui/tools_config_test.go",
+   "summary": "Testes da integração de ferramentas configuráveis: agente de IA no dashboard, seletor de IA, atalhos de apps por dígito, painel de edição do user_config e atalho Ctrl+O.",
+   "tags": [
+    "test",
+    "ui",
+    "config",
+    "tui",
+    "shortcuts"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "function:internal/ui/project_cwd.go:findProjectForCwd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "function:internal/ui/project_cwd.go:projectByPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "function:internal/ui/project_cwd.go:openProjectFromCwd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/containers_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/help_screen_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/theme_test.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/theme_test.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/theme_test.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/tools_config_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/project_cwd.go:findProjectForCwd",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/project_cwd.go:findProjectForCwd",
+   "target": "function:internal/ui/project_cwd.go:projectByPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/project_cwd.go:openProjectFromCwd",
+   "target": "function:internal/ui/project_cwd.go:findProjectForCwd",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

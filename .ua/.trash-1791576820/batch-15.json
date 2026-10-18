@@ -1,0 +1,172 @@
+{
+ "nodes": [
+  {
+   "id": "config:docs/media/tapes/docker.json",
+   "type": "config",
+   "name": "docker.json",
+   "summary": "Lista de 5 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `docker.mp4` do README.",
+   "tags": [
+    "configuration",
+    "demo-media",
+    "zoom",
+    "vhs"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/docker.json"
+  },
+  {
+   "id": "config:docs/media/tapes/git.json",
+   "type": "config",
+   "name": "git.json",
+   "summary": "Lista de 8 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `git.mp4` do README.",
+   "tags": [
+    "configuration",
+    "demo-media",
+    "zoom",
+    "vhs"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/git.json"
+  },
+  {
+   "id": "config:docs/media/tapes/overview.json",
+   "type": "config",
+   "name": "overview.json",
+   "summary": "Lista de 2 segmentos de zoom `[início_s, fim_s, centro_x, centro_y, largura]` aplicados por `zoom.py` ao vídeo VHS `overview.mp4` do README.",
+   "tags": [
+    "configuration",
+    "demo-media",
+    "zoom",
+    "vhs"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/overview.json"
+  },
+  {
+   "id": "file:docs/media/tapes/record.sh",
+   "type": "file",
+   "name": "record.sh",
+   "summary": "Script Bash que regrava os GIFs/MP4 do README: compila o binário num container Go, monta uma imagem VHS com git e docker CLI, cria projetos fictícios (loja-api, painel-web, frete-service, blog) com histórico Git e containers, grava cada tape e aplica zoom com `zoom.py`.",
+   "tags": [
+    "script",
+    "demo-media",
+    "vhs",
+    "docker",
+    "automação"
+   ],
+   "complexity": "moderate",
+   "filePath": "docs/media/tapes/record.sh",
+   "languageNotes": "Usa heredocs para gerar Dockerfile e arquivos de projeto inline e `docker run` com o socket do host para que o VHS enxergue containers reais."
+  },
+  {
+   "id": "function:docs/media/tapes/record.sh:commit",
+   "type": "function",
+   "name": "commit",
+   "summary": "Cria um commit no repositório de demonstração com autor e data retroativa (N dias atrás) via variáveis GIT_AUTHOR_*/GIT_COMMITTER_*.",
+   "tags": [
+    "git",
+    "demo",
+    "helper"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/record.sh",
+   "lineRange": [
+    49,
+    53
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:docs/media/tapes/docker.json",
+   "target": "file:docs/media/tapes/zoom.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:docs/media/tapes/docker.json",
+   "target": "file:docs/media/tapes/docker.tape",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:docs/media/tapes/git.json",
+   "target": "file:docs/media/tapes/zoom.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:docs/media/tapes/git.json",
+   "target": "file:docs/media/tapes/git.tape",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:docs/media/tapes/overview.json",
+   "target": "file:docs/media/tapes/zoom.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:docs/media/tapes/overview.json",
+   "target": "file:docs/media/tapes/overview.tape",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "function:docs/media/tapes/record.sh:commit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:docs/media/tapes/zoom.py",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:cmd/devscope/main.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:docs/media/tapes/docker.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:docs/media/tapes/git.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:docs/media/tapes/overview.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/record.sh",
+   "target": "file:docs/media/tapes/head.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

@@ -1,0 +1,831 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/sshutil/agent_test.go",
+   "type": "file",
+   "name": "agent_test.go",
+   "filePath": "internal/sshutil/agent_test.go",
+   "summary": "Testes do pacote sshutil: modos, parsing de bind, argumentos ssh, mesclagem de túneis, config e sugestão de alvo.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestNormalizeMode",
+   "type": "function",
+   "name": "TestNormalizeMode",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    9,
+    19
+   ],
+   "summary": "Verifica a normalização dos modos de túnel ssh.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestParseBind",
+   "type": "function",
+   "name": "TestParseBind",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    30,
+    43
+   ],
+   "summary": "Verifica o parsing de endereços host:porta.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestTunnelArgs",
+   "type": "function",
+   "name": "TestTunnelArgs",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    45,
+    73
+   ],
+   "summary": "Verifica os argumentos ssh gerados para cada modo de túnel.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestMergeTunnels",
+   "type": "function",
+   "name": "TestMergeTunnels",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    75,
+    94
+   ],
+   "summary": "Verifica a mesclagem de túneis ssh ativos com a config do projeto.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestConfigRoundTrip",
+   "type": "function",
+   "name": "TestConfigRoundTrip",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    96,
+    115
+   ],
+   "summary": "Verifica gravação e leitura da config ssh do projeto.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestFormatForward",
+   "type": "function",
+   "name": "TestFormatForward",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    117,
+    127
+   ],
+   "summary": "Verifica a formatação legível de forwards.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/agent_test.go:TestSuggestSSHTargetAndDefaultRemote",
+   "type": "function",
+   "name": "TestSuggestSSHTargetAndDefaultRemote",
+   "filePath": "internal/sshutil/agent_test.go",
+   "lineRange": [
+    129,
+    143
+   ],
+   "summary": "Verifica a sugestão de alvo ssh a partir de remotes e o túnel remoto padrão.",
+   "tags": [
+    "test",
+    "ssh",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/anim.go",
+   "type": "file",
+   "name": "anim.go",
+   "filePath": "internal/ui/anim.go",
+   "summary": "Vocabulário de animação da TUI: spinners e pulsos Braille que codificam status pela altura, além do agendamento do tick de 10fps.",
+   "tags": [
+    "animation",
+    "tui",
+    "component",
+    "status-indicator"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/anim.go:pulseFrames",
+   "type": "function",
+   "name": "pulseFrames",
+   "filePath": "internal/ui/anim.go",
+   "lineRange": [
+    52,
+    63
+   ],
+   "summary": "Retorna os frames Braille do pulso conforme o nível de status (ok, degradado, parado).",
+   "tags": [
+    "helper",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim.go:pulseGlyph",
+   "type": "function",
+   "name": "pulseGlyph",
+   "filePath": "internal/ui/anim.go",
+   "lineRange": [
+    67,
+    76
+   ],
+   "summary": "Glifo de status único do app, animado em Braille, cuja altura codifica o estado.",
+   "tags": [
+    "helper",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim.go:needsAnim",
+   "type": "function",
+   "name": "needsAnim",
+   "filePath": "internal/ui/anim.go",
+   "lineRange": [
+    174,
+    192
+   ],
+   "summary": "Indica se algo na tela realmente anima, evitando tick de 10fps em telas ociosas.",
+   "tags": [
+    "helper",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim.go:wantsPulseAnim",
+   "type": "function",
+   "name": "wantsPulseAnim",
+   "filePath": "internal/ui/anim.go",
+   "lineRange": [
+    197,
+    208
+   ],
+   "summary": "Indica se há algum status visível que precise pulsar.",
+   "tags": [
+    "helper",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim.go:kickAnim",
+   "type": "function",
+   "name": "kickAnim",
+   "filePath": "internal/ui/anim.go",
+   "lineRange": [
+    212,
+    221
+   ],
+   "summary": "Inicia o loop de animação de 10fps garantindo uma única cadeia de ticks ativa.",
+   "tags": [
+    "helper",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/anim_test.go",
+   "type": "file",
+   "name": "anim_test.go",
+   "filePath": "internal/ui/anim_test.go",
+   "summary": "Testes de animação: ciclo do spinner, pulso/arco, badges de túnel e GitHub Actions e intervalo do tick.",
+   "tags": [
+    "test",
+    "animation",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/anim_test.go:TestAnimSpinnerCycles",
+   "type": "function",
+   "name": "TestAnimSpinnerCycles",
+   "filePath": "internal/ui/anim_test.go",
+   "lineRange": [
+    9,
+    23
+   ],
+   "summary": "Verifica que o spinner percorre os frames e repete o ciclo.",
+   "tags": [
+    "test",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim_test.go:TestTunnelStatusBadgeAnim",
+   "type": "function",
+   "name": "TestTunnelStatusBadgeAnim",
+   "filePath": "internal/ui/anim_test.go",
+   "lineRange": [
+    34,
+    48
+   ],
+   "summary": "Verifica que o badge de status de túnel anima entre frames.",
+   "tags": [
+    "test",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/anim_test.go:TestGHALiveBadgeAnim",
+   "type": "function",
+   "name": "TestGHALiveBadgeAnim",
+   "filePath": "internal/ui/anim_test.go",
+   "lineRange": [
+    50,
+    63
+   ],
+   "summary": "Verifica a animação do badge ao vivo do GitHub Actions.",
+   "tags": [
+    "test",
+    "animation",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/api_auth_test.go",
+   "type": "file",
+   "name": "api_auth_test.go",
+   "filePath": "internal/ui/api_auth_test.go",
+   "summary": "Testes da aba de autenticação do cliente de API: alternância de tipo, edição de token Bearer e campos Basic.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_auth_test.go:TestApiAuthCycleWithA",
+   "type": "function",
+   "name": "TestApiAuthCycleWithA",
+   "filePath": "internal/ui/api_auth_test.go",
+   "lineRange": [
+    11,
+    29
+   ],
+   "summary": "Verifica que a tecla 'a' alterna o tipo de auth (none→bearer→basic) sem entrar em edição.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_auth_test.go:TestApiAuthEditBearerToken",
+   "type": "function",
+   "name": "TestApiAuthEditBearerToken",
+   "filePath": "internal/ui/api_auth_test.go",
+   "lineRange": [
+    31,
+    51
+   ],
+   "summary": "Verifica a edição do token Bearer na aba de autenticação.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_auth_test.go:TestApiAuthTokenWindowFollowsCursor",
+   "type": "function",
+   "name": "TestApiAuthTokenWindowFollowsCursor",
+   "filePath": "internal/ui/api_auth_test.go",
+   "lineRange": [
+    53,
+    66
+   ],
+   "summary": "Verifica que a janela visível do token acompanha o cursor durante a edição.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_auth_test.go:TestApiAuthEditAcceptsKQ",
+   "type": "function",
+   "name": "TestApiAuthEditAcceptsKQ",
+   "filePath": "internal/ui/api_auth_test.go",
+   "lineRange": [
+    68,
+    96
+   ],
+   "summary": "Garante que as teclas k e q são digitadas como texto ao editar credenciais, não tratadas como atalhos.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_auth_test.go:TestApiAuthBasicTabSwitchesFields",
+   "type": "function",
+   "name": "TestApiAuthBasicTabSwitchesFields",
+   "filePath": "internal/ui/api_auth_test.go",
+   "lineRange": [
+    98,
+    116
+   ],
+   "summary": "Verifica que Tab alterna entre usuário e senha no modo Basic.",
+   "tags": [
+    "test",
+    "api-client",
+    "autenticacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/api_client.go",
+   "type": "file",
+   "name": "api_client.go",
+   "filePath": "internal/ui/api_client.go",
+   "summary": "Camada HTTP do cliente de API estilo Postman: parse de headers, auth, envio assíncrono via tea.Cmd e formatação de respostas e erros de rede.",
+   "tags": [
+    "api-client",
+    "http",
+    "tui",
+    "service"
+   ],
+   "complexity": "complex",
+   "languageNotes": "sendAPIRequest retorna um tea.Cmd: a requisição roda fora do loop de Update do Bubble Tea e volta como mensagem."
+  },
+  {
+   "id": "function:internal/ui/api_client.go:parseAPIHeaders",
+   "type": "function",
+   "name": "parseAPIHeaders",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    40,
+    59
+   ],
+   "summary": "Parseia o bloco de texto 'Chave: valor' em http.Header, ignorando linhas comentadas com #.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:applyAPIAuth",
+   "type": "function",
+   "name": "applyAPIAuth",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    61,
+    75
+   ],
+   "summary": "Aplica autenticação Bearer ou Basic aos headers da requisição.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:formatAPIResponseHeaders",
+   "type": "function",
+   "name": "formatAPIResponseHeaders",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    93,
+    118
+   ],
+   "summary": "Formata os headers da resposta em linhas ordenadas para exibição.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:newAPIHTTPClient",
+   "type": "function",
+   "name": "newAPIHTTPClient",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    120,
+    135
+   ],
+   "summary": "Cria o http.Client do cliente de API com timeouts e transporte configurados.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:sendAPIRequest",
+   "type": "function",
+   "name": "sendAPIRequest",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    137,
+    218
+   ],
+   "summary": "Comando Bubble Tea que envia a requisição HTTP, mede duração e tamanho e devolve um apiResponseMsg.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:explainAPINetError",
+   "type": "function",
+   "name": "explainAPINetError",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    220,
+    234
+   ],
+   "summary": "Traduz erros de rede (conexão recusada, timeout, DNS) em mensagens amigáveis.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:maybePrettyJSON",
+   "type": "function",
+   "name": "maybePrettyJSON",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    236,
+    250
+   ],
+   "summary": "Indenta o corpo da resposta quando ele é JSON válido.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client.go:wrapAPIErrorLines",
+   "type": "function",
+   "name": "wrapAPIErrorLines",
+   "filePath": "internal/ui/api_client.go",
+   "lineRange": [
+    252,
+    281
+   ],
+   "summary": "Quebra o texto de erro em linhas que cabem na largura do painel.",
+   "tags": [
+    "helper",
+    "api-client",
+    "http"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestNormalizeMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestParseBind",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestTunnelArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestMergeTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestConfigRoundTrip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestFormatForward",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/agent_test.go",
+   "target": "function:internal/sshutil/agent_test.go:TestSuggestSSHTargetAndDefaultRemote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "function:internal/ui/anim.go:pulseFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "function:internal/ui/anim.go:pulseGlyph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "function:internal/ui/anim.go:needsAnim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "function:internal/ui/anim.go:wantsPulseAnim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "function:internal/ui/anim.go:kickAnim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/anim.go:pulseGlyph",
+   "target": "function:internal/ui/anim.go:pulseFrames",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/anim_test.go",
+   "target": "function:internal/ui/anim_test.go:TestAnimSpinnerCycles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim_test.go",
+   "target": "function:internal/ui/anim_test.go:TestTunnelStatusBadgeAnim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/anim_test.go",
+   "target": "function:internal/ui/anim_test.go:TestGHALiveBadgeAnim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "function:internal/ui/api_auth_test.go:TestApiAuthCycleWithA",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "function:internal/ui/api_auth_test.go:TestApiAuthEditBearerToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "function:internal/ui/api_auth_test.go:TestApiAuthTokenWindowFollowsCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "function:internal/ui/api_auth_test.go:TestApiAuthEditAcceptsKQ",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "function:internal/ui/api_auth_test.go:TestApiAuthBasicTabSwitchesFields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_auth_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:parseAPIHeaders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:applyAPIAuth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:formatAPIResponseHeaders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:newAPIHTTPClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:sendAPIRequest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:explainAPINetError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:maybePrettyJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "function:internal/ui/api_client.go:wrapAPIErrorLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:parseAPIHeaders",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:applyAPIAuth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:newAPIHTTPClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:explainAPINetError",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:formatAPIResponseHeaders",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_client.go:sendAPIRequest",
+   "target": "function:internal/ui/api_client.go:maybePrettyJSON",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/anim.go",
+   "target": "file:internal/ui/anim_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/api_client.go",
+   "target": "file:internal/ui/api_client_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,1222 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/api_client_test.go",
+   "type": "file",
+   "name": "api_client_test.go",
+   "filePath": "internal/ui/api_client_test.go",
+   "summary": "Testes da camada HTTP do cliente de API: headers, auth, truncamento e envio GET via httptest.",
+   "tags": [
+    "test",
+    "api-client",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_client_test.go:TestParseAPIHeaders",
+   "type": "function",
+   "name": "TestParseAPIHeaders",
+   "filePath": "internal/ui/api_client_test.go",
+   "lineRange": [
+    11,
+    22
+   ],
+   "summary": "Verifica o parsing de headers e o ignorar de comentários.",
+   "tags": [
+    "test",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client_test.go:TestApplyAPIAuth",
+   "type": "function",
+   "name": "TestApplyAPIAuth",
+   "filePath": "internal/ui/api_client_test.go",
+   "lineRange": [
+    24,
+    42
+   ],
+   "summary": "Verifica a aplicação de auth Bearer e Basic.",
+   "tags": [
+    "test",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client_test.go:TestTruncateAPIBody",
+   "type": "function",
+   "name": "TestTruncateAPIBody",
+   "filePath": "internal/ui/api_client_test.go",
+   "lineRange": [
+    44,
+    55
+   ],
+   "summary": "Verifica o truncamento de corpos de resposta grandes.",
+   "tags": [
+    "test",
+    "api-client",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_client_test.go:TestSendAPIRequestGET",
+   "type": "function",
+   "name": "TestSendAPIRequestGET",
+   "filePath": "internal/ui/api_client_test.go",
+   "lineRange": [
+    66,
+    103
+   ],
+   "summary": "Testa sendAPIRequest com GET contra um servidor httptest.",
+   "tags": [
+    "test",
+    "api-client",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/api_json_highlight.go",
+   "type": "file",
+   "name": "api_json_highlight.go",
+   "filePath": "internal/ui/api_json_highlight.go",
+   "summary": "Lexer JSON mínimo e tolerante para colorir o corpo da requisição no editor da TUI.",
+   "tags": [
+    "syntax-highlight",
+    "json",
+    "tui",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight.go:jsonKindStyle",
+   "type": "function",
+   "name": "jsonKindStyle",
+   "filePath": "internal/ui/api_json_highlight.go",
+   "lineRange": [
+    22,
+    39
+   ],
+   "summary": "Mapeia cada tipo de token JSON para um estilo Lip Gloss.",
+   "tags": [
+    "helper",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight.go:jsonTokenKinds",
+   "type": "function",
+   "name": "jsonTokenKinds",
+   "filePath": "internal/ui/api_json_highlight.go",
+   "lineRange": [
+    49,
+    129
+   ],
+   "summary": "Lexer JSON mínimo que classifica cada byte (chave, string, número, keyword, pontuação), tolerante a JSON quebrado.",
+   "tags": [
+    "helper",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight.go:matchJSONKeyword",
+   "type": "function",
+   "name": "matchJSONKeyword",
+   "filePath": "internal/ui/api_json_highlight.go",
+   "lineRange": [
+    131,
+    145
+   ],
+   "summary": "Reconhece as keywords true, false e null em uma posição do texto.",
+   "tags": [
+    "helper",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight.go:jsonKindsForRunes",
+   "type": "function",
+   "name": "jsonKindsForRunes",
+   "filePath": "internal/ui/api_json_highlight.go",
+   "lineRange": [
+    148,
+    164
+   ],
+   "summary": "Converte classificações por byte em classificações por rune para o editor.",
+   "tags": [
+    "helper",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/api_json_highlight_test.go",
+   "type": "file",
+   "name": "api_json_highlight_test.go",
+   "filePath": "internal/ui/api_json_highlight_test.go",
+   "summary": "Testes do lexer de realce JSON: distinção chave/string e saída ANSI.",
+   "tags": [
+    "test",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight_test.go:TestJSONTokenKindsKeyVsString",
+   "type": "function",
+   "name": "TestJSONTokenKindsKeyVsString",
+   "filePath": "internal/ui/api_json_highlight_test.go",
+   "lineRange": [
+    8,
+    35
+   ],
+   "summary": "Verifica que o lexer diferencia chaves de valores string.",
+   "tags": [
+    "test",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_json_highlight_test.go:TestJSONHighlightRendersANSI",
+   "type": "function",
+   "name": "TestJSONHighlightRendersANSI",
+   "filePath": "internal/ui/api_json_highlight_test.go",
+   "lineRange": [
+    37,
+    47
+   ],
+   "summary": "Verifica que o realce JSON gera sequências ANSI de cor.",
+   "tags": [
+    "test",
+    "syntax-highlight",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/api_kv.go",
+   "type": "file",
+   "name": "api_kv.go",
+   "filePath": "internal/ui/api_kv.go",
+   "summary": "Tabela chave/valor de params e headers do cliente de API, como vista sincronizada da URL e do bloco de headers, mais geração de comando curl.",
+   "tags": [
+    "api-client",
+    "tui",
+    "data-binding",
+    "component"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiEscapeParam",
+   "type": "function",
+   "name": "apiEscapeParam",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    56,
+    77
+   ],
+   "summary": "Escapa apenas os caracteres que atrapalham numa query, preservando : e / como o usuário colou.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiParseQuery",
+   "type": "function",
+   "name": "apiParseQuery",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    81,
+    98
+   ],
+   "summary": "Parseia a query string em linhas chave/valor preservando a ordem original.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiBuildQuery",
+   "type": "function",
+   "name": "apiBuildQuery",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    100,
+    113
+   ],
+   "summary": "Serializa as linhas ativas de params de volta em query string.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiParseHeaderRows",
+   "type": "function",
+   "name": "apiParseHeaderRows",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    115,
+    136
+   ],
+   "summary": "Converte o bloco de texto de headers em linhas da tabela, tratando linhas comentadas como desligadas.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiBuildHeaderText",
+   "type": "function",
+   "name": "apiBuildHeaderText",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    140,
+    152
+   ],
+   "summary": "Serializa a tabela de headers de volta em texto, comentando linhas desligadas.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiSyncParamsFromURL",
+   "type": "function",
+   "name": "apiSyncParamsFromURL",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    160,
+    171
+   ],
+   "summary": "Reconstrói a tabela de params a partir da URL preservando linhas desligadas na posição.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiSetRows",
+   "type": "function",
+   "name": "apiSetRows",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    193,
+    202
+   ],
+   "summary": "Grava a tabela editada de volta na fonte da aba ativa (URL ou texto de headers).",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiClampRows",
+   "type": "function",
+   "name": "apiClampRows",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    204,
+    218
+   ],
+   "summary": "Mantém o cursor e a rolagem da tabela dentro dos limites.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiRowDelete",
+   "type": "function",
+   "name": "apiRowDelete",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    228,
+    238
+   ],
+   "summary": "Remove a linha selecionada da tabela de params/headers.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiRowText",
+   "type": "function",
+   "name": "apiRowText",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    253,
+    262
+   ],
+   "summary": "Retorna o texto da célula em foco para o editor de linha.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiRowSetText",
+   "type": "function",
+   "name": "apiRowSetText",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    264,
+    275
+   ],
+   "summary": "Grava o texto editado de volta na célula em foco.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_kv.go:apiCurlCommand",
+   "type": "function",
+   "name": "apiCurlCommand",
+   "filePath": "internal/ui/api_kv.go",
+   "lineRange": [
+    294,
+    322
+   ],
+   "summary": "Gera o comando curl equivalente à requisição atual com método, headers, auth e corpo.",
+   "tags": [
+    "helper",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/api_screen.go",
+   "type": "file",
+   "name": "api_screen.go",
+   "filePath": "internal/ui/api_screen.go",
+   "summary": "Renderização da tela do cliente de API no estilo Postman: cabeçalho, abas numeradas, painéis de requisição/resposta e barra de comandos.",
+   "tags": [
+    "component",
+    "tui",
+    "api-client",
+    "rendering"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiTab",
+   "type": "function",
+   "name": "renderApiTab",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    83,
+    98
+   ],
+   "summary": "Renderiza a tela completa do cliente de API: cabeçalho, abas numeradas, corpo e barra de comandos.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiHeader",
+   "type": "function",
+   "name": "renderApiHeader",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    104,
+    133
+   ],
+   "summary": "Renderiza o cabeçalho com projeto, método e resumo da última resposta (status, tempo, tamanho).",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiTabBar",
+   "type": "function",
+   "name": "renderApiTabBar",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    137,
+    171
+   ],
+   "summary": "Renderiza a régua de abas numerada com contadores de linhas ativas.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiSectionBadge",
+   "type": "function",
+   "name": "apiSectionBadge",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    174,
+    198
+   ],
+   "summary": "Calcula o contador exibido no rótulo de cada aba.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiFocusLabel",
+   "type": "function",
+   "name": "apiFocusLabel",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    200,
+    209
+   ],
+   "summary": "Retorna o rótulo da faixa em foco (requisição, painel ou resposta).",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiBody",
+   "type": "function",
+   "name": "renderApiBody",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    216,
+    248
+   ],
+   "summary": "Empilha linha da requisição, painel da aba e resposta, adaptando-se à altura do terminal.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiSectionHeight",
+   "type": "function",
+   "name": "apiSectionHeight",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    251,
+    268
+   ],
+   "summary": "Calcula a altura do painel da aba conforme o espaço disponível.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiRequestLine",
+   "type": "function",
+   "name": "renderApiRequestLine",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    272,
+    304
+   ],
+   "summary": "Renderiza a linha estilo Postman com método, URL e ação de enviar.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiRequestTitle",
+   "type": "function",
+   "name": "apiRequestTitle",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    306,
+    315
+   ],
+   "summary": "Monta o título da caixa de requisição.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiSection",
+   "type": "function",
+   "name": "renderApiSection",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    318,
+    341
+   ],
+   "summary": "Renderiza o painel da aba ativa (params, headers, auth ou body).",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiRowsSummary",
+   "type": "function",
+   "name": "apiRowsSummary",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    343,
+    353
+   ],
+   "summary": "Resume quantas linhas estão ativas de um total.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiRowTable",
+   "type": "function",
+   "name": "renderApiRowTable",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    375,
+    441
+   ],
+   "summary": "Renderiza a tabela chave/valor com caixinhas de ativação, cursor e rolagem.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiAuthLines",
+   "type": "function",
+   "name": "renderApiAuthLines",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    445,
+    501
+   ],
+   "summary": "Renderiza o painel de autenticação com tipo e campos de token ou usuário/senha.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiAuthSegments",
+   "type": "function",
+   "name": "renderApiAuthSegments",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    506,
+    524
+   ],
+   "summary": "Renderiza os segmentos seletores do tipo de autenticação.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiBodyLines",
+   "type": "function",
+   "name": "renderApiBodyLines",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    527,
+    550
+   ],
+   "summary": "Renderiza o editor de corpo com realce de sintaxe JSON.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiResponse",
+   "type": "function",
+   "name": "renderApiResponse",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    557,
+    599
+   ],
+   "summary": "Renderiza o painel de resposta com status, duração e alternância entre corpo e headers.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiResponseLines",
+   "type": "function",
+   "name": "renderApiResponseLines",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    601,
+    633
+   ],
+   "summary": "Gera as linhas numeradas da resposta com destaque de busca.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:renderApiCommandBar",
+   "type": "function",
+   "name": "renderApiCommandBar",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    640,
+    705
+   ],
+   "summary": "Renderiza a barra de comandos do rodapé conforme o foco e o modo de edição.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiHumanSize",
+   "type": "function",
+   "name": "apiHumanSize",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    718,
+    727
+   ],
+   "summary": "Formata tamanho em bytes como texto legível (B, kB, MB).",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_screen.go:apiAuthLabel",
+   "type": "function",
+   "name": "apiAuthLabel",
+   "filePath": "internal/ui/api_screen.go",
+   "lineRange": [
+    729,
+    738
+   ],
+   "summary": "Retorna o rótulo legível do tipo de autenticação.",
+   "tags": [
+    "helper",
+    "component",
+    "tui"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/api_client_test.go",
+   "target": "function:internal/ui/api_client_test.go:TestParseAPIHeaders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client_test.go",
+   "target": "function:internal/ui/api_client_test.go:TestApplyAPIAuth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client_test.go",
+   "target": "function:internal/ui/api_client_test.go:TestTruncateAPIBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_client_test.go",
+   "target": "function:internal/ui/api_client_test.go:TestSendAPIRequestGET",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight.go",
+   "target": "function:internal/ui/api_json_highlight.go:jsonKindStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight.go",
+   "target": "function:internal/ui/api_json_highlight.go:jsonTokenKinds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight.go",
+   "target": "function:internal/ui/api_json_highlight.go:matchJSONKeyword",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight.go",
+   "target": "function:internal/ui/api_json_highlight.go:jsonKindsForRunes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/api_json_highlight.go:jsonTokenKinds",
+   "target": "function:internal/ui/api_json_highlight.go:matchJSONKeyword",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_json_highlight.go:jsonKindsForRunes",
+   "target": "function:internal/ui/api_json_highlight.go:jsonTokenKinds",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight_test.go",
+   "target": "function:internal/ui/api_json_highlight_test.go:TestJSONTokenKindsKeyVsString",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight_test.go",
+   "target": "function:internal/ui/api_json_highlight_test.go:TestJSONHighlightRendersANSI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiEscapeParam",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiParseQuery",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiBuildQuery",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiParseHeaderRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiBuildHeaderText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiSyncParamsFromURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiSetRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiClampRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiRowDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiRowText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiRowSetText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "function:internal/ui/api_kv.go:apiCurlCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/api_kv.go:apiBuildQuery",
+   "target": "function:internal/ui/api_kv.go:apiEscapeParam",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_kv.go:apiSyncParamsFromURL",
+   "target": "function:internal/ui/api_kv.go:apiParseQuery",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_kv.go:apiSetRows",
+   "target": "function:internal/ui/api_kv.go:apiBuildHeaderText",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_kv.go:apiCurlCommand",
+   "target": "function:internal/ui/api_kv.go:apiParseHeaderRows",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiTabBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiSectionBadge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiFocusLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiSectionHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiRequestLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiRequestTitle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiSection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiRowsSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiRowTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiAuthLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiAuthSegments",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiBodyLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiResponse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiResponseLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:renderApiCommandBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiHumanSize",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "function:internal/ui/api_screen.go:apiAuthLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/api_screen.go:renderApiHeader",
+   "target": "function:internal/ui/api_screen.go:apiHumanSize",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_screen.go:renderApiSection",
+   "target": "function:internal/ui/api_screen.go:apiRowsSummary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_screen.go:renderApiSection",
+   "target": "function:internal/ui/api_screen.go:apiAuthLabel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/api_screen.go:renderApiResponse",
+   "target": "function:internal/ui/api_screen.go:apiHumanSize",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_json_highlight.go",
+   "target": "file:internal/ui/api_json_highlight_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "file:internal/ui/api_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/ui/api_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/ui/api_auth_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/ui/api_json_highlight.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/api_screen.go",
+   "target": "file:internal/ui/api_kv.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/api_kv.go",
+   "target": "file:internal/ui/api_client.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

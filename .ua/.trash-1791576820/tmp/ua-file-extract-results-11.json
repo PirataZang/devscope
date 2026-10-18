@@ -1,0 +1,91 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 2,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 2,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 2
+    }
+  },
+  "results": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "language": "yaml",
+      "fileCategory": "infra",
+      "totalLines": 45,
+      "nonEmptyLines": 35,
+      "sections": [
+        {
+          "heading": "name",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "on",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "permissions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "jobs",
+          "level": 1,
+          "line": 12
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "language": "yaml",
+      "fileCategory": "infra",
+      "totalLines": 29,
+      "nonEmptyLines": 24,
+      "sections": [
+        {
+          "heading": "name",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "on",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "permissions",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "jobs",
+          "level": 1,
+          "line": 11
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    }
+  ]
+}
