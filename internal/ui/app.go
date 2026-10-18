@@ -556,6 +556,14 @@ type App struct {
 	diskTargets                 []collectors.CleanTarget
 	diskLoading                 bool
 	diskStatus                  string
+	relPath                     string
+	relState                    collectors.ReleaseState
+	relRuns                     map[string]collectors.GHARun
+	relLoading                  bool
+	relBump                     int // 0 patch · 1 minor · 2 major
+	relBumpSet                  bool
+	relStatus                   string
+	relWatch                    string // tag cujo workflow está sendo acompanhado
 	taskList                    []collectors.ProjectTask
 	taskLoading                 bool
 	taskPath                    string
@@ -1103,6 +1111,19 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleProjectLogsLoaded(msg)
 		return a, nil
 
+	case relLoadedMsg:
+		a.handleReleaseLoaded(msg)
+		return a, nil
+
+	case relTaggedMsg:
+		return a, a.handleReleaseTagged(msg)
+
+	case relPollMsg:
+		return a, a.handleReleasePoll(msg)
+
+	case relRunsMsg:
+		return a, a.handleReleaseRuns(msg)
+
 	case diskLoadedMsg:
 		a.handleDiskLoaded(msg)
 		return a, nil
@@ -1452,6 +1473,11 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		cmds = append(cmds, a.loadWorktrees(p))
 	case TabTasks:
 		cmds = append(cmds, a.loadTasks(p))
+	case TabReleases:
+		cmds = append(cmds, a.loadRelease(p))
+		if a.relWatch != "" {
+			cmds = append(cmds, relPoll(a.relPath))
+		}
 	case TabContainers:
 		a.initContainersTab()
 		cmds = append(cmds, a.requestContainerPreview())
@@ -1659,6 +1685,11 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabTasks {
 		if cmd, ok := a.handleTaskKeys(msg, p); ok {
+			return a, cmd
+		}
+	}
+	if a.tab == TabReleases {
+		if cmd, ok := a.handleReleaseKeys(msg, p); ok {
 			return a, cmd
 		}
 	}
@@ -2351,7 +2382,7 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees || a.tab == TabTasks ||
+	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees || a.tab == TabTasks || a.tab == TabReleases ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
@@ -2482,6 +2513,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderWorktreesTab(p)
 	case TabTasks:
 		return a.renderTasksTab(p)
+	case TabReleases:
+		return a.renderReleasesTab(p)
 	case TabContainers:
 		return a.renderContainersTab(p)
 	case TabLogs:

@@ -258,7 +258,7 @@ type sidebarGroup struct {
 func sidebarGroups() []sidebarGroup {
 	return []sidebarGroup{
 		{"PROJETO", ColorAccent, []Tab{TabOverview}},
-		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabWorktrees, TabActions, TabJenkins}},
+		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins}},
 		{"EXECUÇÃO", ColorDocker, []Tab{TabTasks, TabContainers, TabSwarm, TabKubernetes}},
 		{"REDE", ColorPrimary, []Tab{TabNginx, TabNgrok, TabCFTunnel}},
 		{"DADOS", ColorPink, []Tab{TabAPI, TabDatabase}},
@@ -351,6 +351,8 @@ func tabGlyph(t Tab) string {
 		return "⇌"
 	case TabTasks:
 		return "»"
+	case TabReleases:
+		return "⇡"
 	case TabContainers:
 		return "▣"
 	case TabKubernetes:

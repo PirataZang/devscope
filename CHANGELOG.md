@@ -23,6 +23,11 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - Scripts de Node rodam com o gerenciador do lockfile (pnpm, yarn, bun ou npm); alvos internos ficam de fora (`.PHONY`, regras de padrão, receitas `_privadas`, tarefas `internal`)
   - Aparece quando o projeto tem algum desses arquivos
 - **Conflito de portas entre projetos** — porta do host reivindicada por mais de um projeto aparece com aviso no resumo do dashboard e na lista de portas da abertura dos módulos (só um processo consegue escutar cada porta)
+- **Módulo Releases (CÓDIGO)** — lançar uma versão sem esquecer passo
+  - Mostra a última tag, quantos commits entram e as três próximas versões (patch · minor · major); a sugerida é a que já tem seção no CHANGELOG
+  - VERIFICAÇÕES antes de lançar: alteração sem commit e commit não enviado bloqueiam; branch fora da padrão, remoto à frente e CHANGELOG sem a seção só avisam
+  - `enter` cria a tag anotada no HEAD com a seção do CHANGELOG como mensagem (sem seção, a lista de commits) e envia só a tag; se o push falha, a tag local é desfeita
+  - Depois do push acompanha ao vivo o workflow que a tag dispara (via `gh`) até publicar ou falhar; a lista de releases anteriores mostra o resultado de cada uma
 - **Pendências de git em todos os projetos** — o dashboard responde "onde eu deixei coisa pela metade?" sem abrir um por um
   - Na coluna BRANCH: `±3` alterações locais, `↑2` commits a enviar, `↓1` a receber; na barra, quantos projetos têm pendência
   - `p` mostra só os projetos com pendência; `esc` volta para todos

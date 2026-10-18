@@ -37,6 +37,7 @@ const (
 	TabNginx
 	TabWorktrees
 	TabTasks
+	TabReleases
 )
 
 func (t Tab) String() string {
@@ -49,6 +50,8 @@ func (t Tab) String() string {
 		return "Worktrees"
 	case TabTasks:
 		return "Tarefas"
+	case TabReleases:
+		return "Releases"
 	case TabContainers:
 		return "Containers"
 	case TabKubernetes:
@@ -89,7 +92,7 @@ func (t Tab) String() string {
 // por capacidade do projeto (module_caps.go).
 var AllTabs = []Tab{
 	TabOverview,
-	TabGit, TabWorktrees, TabActions, TabJenkins,
+	TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins,
 	TabTasks, TabContainers, TabSwarm, TabKubernetes,
 	TabNginx, TabNgrok, TabCFTunnel,
 	TabAPI, TabDatabase,

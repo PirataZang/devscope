@@ -105,6 +105,7 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 
 			TabGit:        isRepo,
 			TabWorktrees:  isRepo,
+			TabReleases:   isRepo,
 			TabTasks:      collectors.HasProjectTasks(path),
 			TabContainers: docker || hasTool("docker"),
 			TabActions:    dirExists(path, ".github", "workflows"),

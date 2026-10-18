@@ -52,6 +52,7 @@ var keysWithoutHelp = map[string]string{
 	"w":          "join-token de worker no formulário do Swarm, escrito no próprio formulário",
 	"m":          "join-token de manager no formulário do Swarm, idem",
 	"merge":      "nome de modo do prompt de git, não é tecla",
+	"release":    "nome de modo da confirmação de release, não é tecla",
 	"disk-clean": "nome de modo da confirmação de limpeza de disco, não é tecla",
 	"wt-remove":  "nome de modo da confirmação de worktree, não é tecla",
 	"!":          "aviso de setup do GitHub CLI — anunciado na barra da própria tela",

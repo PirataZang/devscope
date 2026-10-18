@@ -137,6 +137,12 @@ func helpGroups() []helpGroup {
 				{"shift+E · ctrl+O", "terminal / agente de IA na worktree"},
 				{"r · esc", "atualizar / voltar"},
 			}},
+			{"RELEASES", []helpEntry{
+				{"←→", "escolher a versão: patch / minor / major"},
+				{"enter", "lançar: cria a tag anotada e envia (confirma)"},
+				{"o", "abrir o workflow da release ou a página de releases"},
+				{"r · esc", "atualizar / voltar"},
+			}},
 			{"GITHUB ACTIONS", []helpEntry{
 				{"1-3", "processos / runs / workflows"},
 				{"enter", "abrir o centro de controle ou o detalhe"},
