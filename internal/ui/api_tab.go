@@ -74,38 +74,6 @@ func (a *App) openApiClient(p *core.Project) {
 	}
 }
 
-// openApiWithPreset opens the API client with method + path prefilled from Routes.
-func (a *App) openApiWithPreset(p *core.Project, method, path string) tea.Cmd {
-	a.routesOpen = false
-	a.tab = TabAPI
-	a.tabCursor = 0
-	a.apiOpen = true
-	a.apiEditing = false
-	if p != nil {
-		a.initApiTab(p)
-	}
-	method = strings.ToUpper(strings.TrimSpace(method))
-	if method == "" {
-		method = "GET"
-	}
-	a.apiMethod = method
-
-	path = strings.TrimSpace(path)
-	if path != "" && !strings.HasPrefix(path, "/") {
-		path = "/" + path
-	}
-	base := a.apiBaseURL(p)
-	a.apiURL = base + path
-	a.apiSyncParamsFromURL()
-	a.apiFocus = apiFocusURL
-	a.apiSection = apiSecParams
-	if a.apiHeaders == "" {
-		a.apiHeaders = "Accept: application/json\n"
-	}
-	a.statusMsg = "rota → " + method + " " + path
-	return nil
-}
-
 func (a *App) apiBaseURL(p *core.Project) string {
 	u := strings.TrimSpace(a.apiURL)
 	if u != "" {

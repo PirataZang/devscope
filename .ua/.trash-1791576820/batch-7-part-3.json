@@ -1,0 +1,1430 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/metrics/host.go",
+   "type": "file",
+   "name": "host.go",
+   "filePath": "internal/metrics/host.go",
+   "summary": "Coletor de métricas do host (CPU, memória, swap, disco, uptime, load average, processos, containers Docker, usuários logados e SO) lendo /proc no Linux e comandos no Windows.",
+   "tags": [
+    "metrics",
+    "system-monitoring",
+    "collector",
+    "cross-platform"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/metrics/host.go:NewHostCollector",
+   "type": "function",
+   "name": "NewHostCollector",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    25,
+    27
+   ],
+   "summary": "Cria um HostCollector.",
+   "tags": [
+    "constructor",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:Collect",
+   "type": "function",
+   "name": "Collect",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    29,
+    49
+   ],
+   "summary": "Coleta todas as métricas do host em core.HostMetrics, desviando para collectWindows no Windows.",
+   "tags": [
+    "metrics",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:cpuPercent",
+   "type": "function",
+   "name": "cpuPercent",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    51,
+    93
+   ],
+   "summary": "Calcula uso de CPU pela diferença entre duas leituras de /proc/stat.",
+   "tags": [
+    "cpu",
+    "proc"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/metrics/host.go:memoryUsedMB",
+   "type": "function",
+   "name": "memoryUsedMB",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    110,
+    122
+   ],
+   "summary": "Calcula memória usada em MB a partir de MemTotal e MemAvailable.",
+   "tags": [
+    "memory",
+    "proc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:readProcMeminfo",
+   "type": "function",
+   "name": "readProcMeminfo",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    134,
+    152
+   ],
+   "summary": "Lê /proc/meminfo para um mapa de chave para kB.",
+   "tags": [
+    "proc",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:readUptime",
+   "type": "function",
+   "name": "readUptime",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    183,
+    197
+   ],
+   "summary": "Lê o uptime do sistema em /proc/uptime.",
+   "tags": [
+    "proc",
+    "uptime"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:readLoadAvg",
+   "type": "function",
+   "name": "readLoadAvg",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    199,
+    209
+   ],
+   "summary": "Lê o load average de /proc/loadavg.",
+   "tags": [
+    "proc",
+    "load"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:countProcesses",
+   "type": "function",
+   "name": "countProcesses",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    211,
+    223
+   ],
+   "summary": "Conta processos pelos diretórios numéricos de /proc.",
+   "tags": [
+    "proc",
+    "processes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:countDockerRunning",
+   "type": "function",
+   "name": "countDockerRunning",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    225,
+    237
+   ],
+   "summary": "Conta containers Docker em execução via docker ps.",
+   "tags": [
+    "docker",
+    "exec"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:countLoggedInUsers",
+   "type": "function",
+   "name": "countLoggedInUsers",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    239,
+    249
+   ],
+   "summary": "Conta usuários logados executando o comando who.",
+   "tags": [
+    "users",
+    "exec"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:readOSInfo",
+   "type": "function",
+   "name": "readOSInfo",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    251,
+    263
+   ],
+   "summary": "Lê o nome do SO a partir de /etc/os-release.",
+   "tags": [
+    "os-info",
+    "parsing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/metrics/host.go:collectWindows",
+   "type": "function",
+   "name": "collectWindows",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    265,
+    345
+   ],
+   "summary": "Coleta métricas do host no Windows usando comandos do sistema (wmic/PowerShell).",
+   "tags": [
+    "windows",
+    "metrics",
+    "cross-platform"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/metrics/host.go:HostCollector",
+   "type": "class",
+   "name": "HostCollector",
+   "filePath": "internal/metrics/host.go",
+   "lineRange": [
+    15,
+    17
+   ],
+   "summary": "Coletor stateful de métricas do host que guarda a amostra anterior de CPU para calcular uso.",
+   "tags": [
+    "collector",
+    "metrics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/scanner/discover_test.go",
+   "type": "file",
+   "name": "discover_test.go",
+   "filePath": "internal/scanner/discover_test.go",
+   "summary": "Testes de descoberta: garante que MergeDiscovered preserva projetos existentes e que FastScan encontra projetos em diretório temporário.",
+   "tags": [
+    "test",
+    "scanner",
+    "discovery"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/scanner/markers.go",
+   "type": "file",
+   "name": "markers.go",
+   "filePath": "internal/scanner/markers.go",
+   "summary": "Leitura e classificação de marcadores de projeto em diretórios (.git, package.json, compose, go.mod etc.), detecção de módulos/subpastas de serviço e palpite de framework/linguagem.",
+   "tags": [
+    "scanner",
+    "heuristics",
+    "filesystem",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:readDirMarkers",
+   "type": "function",
+   "name": "readDirMarkers",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    37,
+    48
+   ],
+   "summary": "Lê o diretório e classifica todas as entradas em marcadores completos.",
+   "tags": [
+    "filesystem",
+    "markers"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:readFastMarkers",
+   "type": "function",
+   "name": "readFastMarkers",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    50,
+    61
+   ],
+   "summary": "Lê marcadores rápidos de um diretório para o FastScan.",
+   "tags": [
+    "filesystem",
+    "markers",
+    "fast-path"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:classifyEntry",
+   "type": "function",
+   "name": "classifyEntry",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    63,
+    98
+   ],
+   "summary": "Classifica uma entrada de diretório pelo nome, marcando o sinal correspondente em dirMarkers.",
+   "tags": [
+    "heuristics",
+    "classification"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:detectModules",
+   "type": "function",
+   "name": "detectModules",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    134,
+    155
+   ],
+   "summary": "Detecta módulos/subprojetos dentro de uma raiz (ex.: frontend/backend).",
+   "tags": [
+    "modules",
+    "filesystem"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:isServiceSubfolder",
+   "type": "function",
+   "name": "isServiceSubfolder",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    174,
+    187
+   ],
+   "summary": "Decide se um diretório é subpasta de serviço de um projeto pai em vez de raiz própria.",
+   "tags": [
+    "heuristics",
+    "classification"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/markers.go:guessFromMarkers",
+   "type": "function",
+   "name": "guessFromMarkers",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    189,
+    212
+   ],
+   "summary": "Infere framework e linguagem a partir dos marcadores encontrados.",
+   "tags": [
+    "heuristics",
+    "framework-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/scanner/markers.go:dirMarkers",
+   "type": "class",
+   "name": "dirMarkers",
+   "filePath": "internal/scanner/markers.go",
+   "lineRange": [
+    10,
+    26
+   ],
+   "summary": "Conjunto de sinais de projeto encontrados numa listagem de diretório (git, manifests, compose, código).",
+   "tags": [
+    "data-model",
+    "heuristics"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/scanner/runtime.go",
+   "type": "file",
+   "name": "runtime.go",
+   "filePath": "internal/scanner/runtime.go",
+   "summary": "Descobre raízes de projeto a partir de serviços em execução (labels do docker compose, caminhos de containers Docker e PM2) e resolve a raiz subindo diretórios até achar um marcador.",
+   "tags": [
+    "scanner",
+    "discovery",
+    "docker",
+    "pm2",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "type": "function",
+   "name": "DiscoverRunningRoots",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    13,
+    29
+   ],
+   "summary": "Encontra raízes de projetos com serviços em execução (Docker, PM2 e compose).",
+   "tags": [
+    "discovery",
+    "runtime",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:DiscoverComposeRoots",
+   "type": "function",
+   "name": "DiscoverComposeRoots",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    32,
+    71
+   ],
+   "summary": "Extrai raízes de projeto das labels de working_dir do docker compose em todos os containers.",
+   "tags": [
+    "docker",
+    "compose",
+    "discovery"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:discoverDockerPaths",
+   "type": "function",
+   "name": "discoverDockerPaths",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    73,
+    88
+   ],
+   "summary": "Lista caminhos montados/relacionados a containers Docker em execução.",
+   "tags": [
+    "docker",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:discoverPM2Paths",
+   "type": "function",
+   "name": "discoverPM2Paths",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    90,
+    113
+   ],
+   "summary": "Lista diretórios de trabalho dos processos PM2 via pm2 jlist.",
+   "tags": [
+    "pm2",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:existingPaths",
+   "type": "function",
+   "name": "existingPaths",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    115,
+    130
+   ],
+   "summary": "Filtra e deduplica caminhos que existem no disco.",
+   "tags": [
+    "filesystem",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:resolveExistingRoot",
+   "type": "function",
+   "name": "resolveExistingRoot",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    132,
+    146
+   ],
+   "summary": "Resolve a raiz de projeto de um caminho existente, com fallback aos marcadores locais.",
+   "tags": [
+    "filesystem",
+    "resolution"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "function",
+   "name": "ResolveProjectRoot",
+   "filePath": "internal/scanner/runtime.go",
+   "lineRange": [
+    149,
+    161
+   ],
+   "summary": "Sobe diretórios a partir de um caminho até achar um marcador de projeto.",
+   "tags": [
+    "filesystem",
+    "resolution",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/scanner/runtime_test.go",
+   "type": "file",
+   "name": "runtime_test.go",
+   "filePath": "internal/scanner/runtime_test.go",
+   "summary": "Testes de resolução de raiz de projeto: ResolveProjectRoot com e sem marcador e filtragem de caminhos existentes.",
+   "tags": [
+    "test",
+    "scanner",
+    "filesystem"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/scanner/scanner.go",
+   "type": "file",
+   "name": "scanner.go",
+   "filePath": "internal/scanner/scanner.go",
+   "summary": "Scanner de projetos: percorre os caminhos configurados com cache por fingerprint, faz scan rápido ou profundo com detecção de frameworks e módulos, mescla projetos descobertos em runtime e enriquece em paralelo.",
+   "tags": [
+    "scanner",
+    "service",
+    "filesystem",
+    "caching",
+    "concorrência"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:New",
+   "type": "function",
+   "name": "New",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    32,
+    38
+   ],
+   "summary": "Cria um Scanner com caminhos, profundidade máxima e padrões ignorados.",
+   "tags": [
+    "constructor",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:FastScan",
+   "type": "function",
+   "name": "FastScan",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    41,
+    43
+   ],
+   "summary": "Encontra raízes de projeto rapidamente via marcadores genéricos.",
+   "tags": [
+    "scanner",
+    "fast-path",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    46,
+    48
+   ],
+   "summary": "Scan profundo com detecção de frameworks e agrupamento de módulos.",
+   "tags": [
+    "scanner",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:discover",
+   "type": "function",
+   "name": "discover",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    50,
+    115
+   ],
+   "summary": "Percorre cada raiz com WalkDir, respeitando ignorados, profundidade e cache, montando stubs ou projetos completos.",
+   "tags": [
+    "filesystem",
+    "walk",
+    "core-algorithm"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "function",
+   "name": "MergeDiscovered",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    118,
+    138
+   ],
+   "summary": "Acrescenta projetos achados via Docker/PM2/compose que não vieram do scan de filesystem.",
+   "tags": [
+    "discovery",
+    "merge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:EnrichProjects",
+   "type": "function",
+   "name": "EnrichProjects",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    141,
+    175
+   ],
+   "summary": "Executa scan profundo em paralelo nos caminhos já conhecidos.",
+   "tags": [
+    "concorrência",
+    "enrichment"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:FocusedProjectPath",
+   "type": "function",
+   "name": "FocusedProjectPath",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    185,
+    191
+   ],
+   "summary": "Retorna a raiz de projeto do diretório de trabalho atual.",
+   "tags": [
+    "cwd",
+    "resolution"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:ProjectStubAt",
+   "type": "function",
+   "name": "ProjectStubAt",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    194,
+    203
+   ],
+   "summary": "Constrói um stub leve de projeto para um caminho conhecido.",
+   "tags": [
+    "stub",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:BuildProjectStub",
+   "type": "function",
+   "name": "BuildProjectStub",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    205,
+    225
+   ],
+   "summary": "Monta um core.Project leve a partir dos marcadores, com framework/linguagem estimados.",
+   "tags": [
+    "stub",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:depthRelative",
+   "type": "function",
+   "name": "depthRelative",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    227,
+    236
+   ],
+   "summary": "Calcula a profundidade de um caminho relativo à raiz do scan.",
+   "tags": [
+    "utility",
+    "filesystem"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:BuildProject",
+   "type": "function",
+   "name": "BuildProject",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    238,
+    284
+   ],
+   "summary": "Monta o projeto completo com detecção de frameworks, módulos e marcadores.",
+   "tags": [
+    "factory",
+    "framework-detection"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:cachedProjects",
+   "type": "function",
+   "name": "cachedProjects",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    299,
+    308
+   ],
+   "summary": "Retorna projetos em cache se o fingerprint da raiz não mudou.",
+   "tags": [
+    "caching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/scanner/scanner.go:storeCache",
+   "type": "function",
+   "name": "storeCache",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    310,
+    320
+   ],
+   "summary": "Grava projetos no cache com o fingerprint atual da raiz.",
+   "tags": [
+    "caching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/scanner/scanner.go:Scanner",
+   "type": "class",
+   "name": "Scanner",
+   "filePath": "internal/scanner/scanner.go",
+   "lineRange": [
+    26,
+    30
+   ],
+   "summary": "Scanner com caminhos, profundidade, ignorados e cache por raiz protegido por mutex.",
+   "tags": [
+    "scanner",
+    "service",
+    "caching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/scanner/scanner_test.go",
+   "type": "file",
+   "name": "scanner_test.go",
+   "filePath": "internal/scanner/scanner_test.go",
+   "summary": "Testes do scanner: marcadores rápidos, scan que ignora subpastas e acha múltiplas raízes, identificação de subpastas de serviço, FocusedProjectPath e ProjectStubAt.",
+   "tags": [
+    "test",
+    "scanner",
+    "filesystem"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:NewHostCollector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:NewHostCollector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:Collect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:Collect",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:cpuPercent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:memoryUsedMB",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:readProcMeminfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:readUptime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:readLoadAvg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:countProcesses",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:countDockerRunning",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:countLoggedInUsers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:readOSInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "function:internal/metrics/host.go:collectWindows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "class:internal/metrics/host.go:HostCollector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "class:internal/metrics/host.go:HostCollector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:readDirMarkers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:readFastMarkers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:classifyEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:detectModules",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:isServiceSubfolder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "function:internal/scanner/markers.go:guessFromMarkers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "class:internal/scanner/markers.go:dirMarkers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:DiscoverComposeRoots",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:DiscoverComposeRoots",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:discoverDockerPaths",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:discoverPM2Paths",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:existingPaths",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:resolveExistingRoot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:FastScan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:FastScan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:discover",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:EnrichProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:EnrichProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:FocusedProjectPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:FocusedProjectPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:ProjectStubAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:ProjectStubAt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:BuildProjectStub",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:BuildProjectStub",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:depthRelative",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:BuildProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:BuildProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:cachedProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "function:internal/scanner/scanner.go:storeCache",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "class:internal/scanner/scanner.go:Scanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "class:internal/scanner/scanner.go:Scanner",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/metrics/host.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/discover_test.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/detectors/frameworks.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/detectors/frameworks_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/detectors/registry.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "target": "function:internal/scanner/runtime.go:DiscoverComposeRoots",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "target": "function:internal/scanner/markers.go:readFastMarkers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "target": "function:internal/scanner/markers.go:isServiceSubfolder",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/runtime.go:resolveExistingRoot",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "target": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "target": "function:internal/scanner/markers.go:readFastMarkers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:FocusedProjectPath",
+   "target": "function:internal/scanner/runtime.go:ResolveProjectRoot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:ProjectStubAt",
+   "target": "function:internal/scanner/markers.go:readFastMarkers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:BuildProjectStub",
+   "target": "function:internal/scanner/markers.go:guessFromMarkers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:BuildProject",
+   "target": "function:internal/detectors/registry.go:DetectMatches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:BuildProject",
+   "target": "function:internal/scanner/markers.go:detectModules",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:BuildProject",
+   "target": "function:internal/scanner/markers.go:readDirMarkers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:FastScan",
+   "target": "function:internal/scanner/scanner.go:discover",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:Scan",
+   "target": "function:internal/scanner/scanner.go:discover",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:discover",
+   "target": "function:internal/scanner/scanner.go:cachedProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/scanner/scanner.go:discover",
+   "target": "function:internal/scanner/scanner.go:storeCache",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/scanner/scanner.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/scanner/markers.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/scanner/runtime.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,196 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/routeutil/scan_express.go",
+   "type": "file",
+   "name": "scan_express.go",
+   "filePath": "internal/routeutil/scan_express.go",
+   "summary": "Scanner de rotas Express que detecta chamadas app/router.METHOD em arquivos JS/TS.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "express",
+    "javascript",
+    "regex-parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_express.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_express.go",
+   "lineRange": [
+    23,
+    59
+   ],
+   "summary": "Percorre o projeto e extrai rotas de Express via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/routeutil/scan_fastapi.go",
+   "type": "file",
+   "name": "scan_fastapi.go",
+   "filePath": "internal/routeutil/scan_fastapi.go",
+   "summary": "Scanner de rotas FastAPI que identifica arquivos com instância FastAPI/APIRouter e extrai decorators @app.METHOD.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "fastapi",
+    "python",
+    "regex-parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_fastapi.go:fastapiMarker",
+   "type": "function",
+   "name": "fastapiMarker",
+   "filePath": "internal/routeutil/scan_fastapi.go",
+   "lineRange": [
+    21,
+    47
+   ],
+   "summary": "Detecta se um arquivo Python define instância FastAPI ou APIRouter.",
+   "tags": [
+    "detection",
+    "python",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_fastapi.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_fastapi.go",
+   "lineRange": [
+    51,
+    83
+   ],
+   "summary": "Percorre o projeto e extrai rotas de FastAPI via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/routeutil/scan_flask.go",
+   "type": "file",
+   "name": "scan_flask.go",
+   "filePath": "internal/routeutil/scan_flask.go",
+   "summary": "Scanner de rotas Flask que extrai decorators @app.route/@bp.route com seus métodos HTTP.",
+   "tags": [
+    "route-discovery",
+    "scanner",
+    "flask",
+    "python",
+    "regex-parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_flask.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_flask.go",
+   "lineRange": [
+    20,
+    54
+   ],
+   "summary": "Percorre o projeto e extrai rotas de Flask via expressões regulares.",
+   "tags": [
+    "scanner",
+    "route-discovery",
+    "golang"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/routeutil/scan_express.go",
+   "target": "function:internal/routeutil/scan_express.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_express.go",
+   "target": "function:internal/routeutil/scan_express.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_fastapi.go",
+   "target": "function:internal/routeutil/scan_fastapi.go:fastapiMarker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_fastapi.go",
+   "target": "function:internal/routeutil/scan_fastapi.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_fastapi.go",
+   "target": "function:internal/routeutil/scan_fastapi.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_flask.go",
+   "target": "function:internal/routeutil/scan_flask.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_flask.go",
+   "target": "function:internal/routeutil/scan_flask.go:Scan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/scan_fastapi.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/routeutil/scan_express.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_fastapi.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_flask.go",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  }
+ ]
+}

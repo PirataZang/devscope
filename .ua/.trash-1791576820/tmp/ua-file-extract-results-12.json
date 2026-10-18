@@ -1,0 +1,132 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 3,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 3
+    }
+  },
+  "results": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 31,
+      "nonEmptyLines": 21,
+      "sections": [
+        {
+          "heading": "Descrição",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Reprodução",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Esperado",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Ambiente",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "heading": "Logs / screenshots",
+          "level": 2,
+          "line": 29
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/detector_request.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 28,
+      "nonEmptyLines": 19,
+      "sections": [
+        {
+          "heading": "Framework / stack",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Marcadores",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Exemplo de projeto",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "heading": "Prioridade",
+          "level": 2,
+          "line": 26
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 22,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "Problema",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Solução proposta",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Alternativas",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "heading": "Contexto adicional",
+          "level": 2,
+          "line": 20
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    }
+  ]
+}

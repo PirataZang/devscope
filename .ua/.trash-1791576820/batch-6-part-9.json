@@ -1,0 +1,1192 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/k8s_tab_test.go",
+   "type": "file",
+   "name": "k8s_tab_test.go",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "summary": "Testes da aba Kubernetes cobrindo landing, sidebar, editor, layout da visão geral, contexto de produção e estilos.",
+   "tags": [
+    "test",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestAllTabsIncludesKubernetes",
+   "type": "function",
+   "name": "TestAllTabsIncludesKubernetes",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Testa que a lista de abas inclui o módulo Kubernetes.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestK8sLandingEnterAndEsc",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    28,
+    57
+   ],
+   "summary": "Testa que Enter entra na aba Kubernetes a partir da landing e Esc volta.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestSidebarShowsKubernetesInExecucao",
+   "type": "function",
+   "name": "TestSidebarShowsKubernetesInExecucao",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    59,
+    68
+   ],
+   "summary": "Testa que a sidebar mostra Kubernetes no grupo Execução.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestSanitizeK8sName",
+   "type": "function",
+   "name": "TestSanitizeK8sName",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    70,
+    74
+   ],
+   "summary": "Testa a normalização de nomes de recursos Kubernetes.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sApplyKeyAndEnterNewline",
+   "type": "function",
+   "name": "TestK8sApplyKeyAndEnterNewline",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    76,
+    95
+   ],
+   "summary": "Testa a tecla de apply e a inserção de nova linha no editor.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sCreateStartsEditing",
+   "type": "function",
+   "name": "TestK8sCreateStartsEditing",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    97,
+    103
+   ],
+   "summary": "Testa que criar um recurso abre o editor.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sOverviewLayout",
+   "type": "function",
+   "name": "TestK8sOverviewLayout",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    105,
+    136
+   ],
+   "summary": "Testa o layout da visão geral do cluster.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sKindStaysReachableWithoutExplorer",
+   "type": "function",
+   "name": "TestK8sKindStaysReachableWithoutExplorer",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    140,
+    176
+   ],
+   "summary": "Testa que os tipos de recurso continuam alcançáveis pelo teclado.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sProdContextIsFlagged",
+   "type": "function",
+   "name": "TestK8sProdContextIsFlagged",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    179,
+    194
+   ],
+   "summary": "Testa que contextos de produção são sinalizados.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sReadyAndRestartStyles",
+   "type": "function",
+   "name": "TestK8sReadyAndRestartStyles",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    197,
+    210
+   ],
+   "summary": "Testa os estilos de ready e restarts.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab_test.go:TestK8sFilterKey",
+   "type": "function",
+   "name": "TestK8sFilterKey",
+   "filePath": "internal/ui/k8s_tab_test.go",
+   "lineRange": [
+    212,
+    218
+   ],
+   "summary": "Testa a tecla de filtro da aba Kubernetes.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/logs_tab.go",
+   "type": "file",
+   "name": "logs_tab.go",
+   "filePath": "internal/ui/logs_tab.go",
+   "summary": "Aba Logs do projeto: carrega logs do compose/container e os exibe coloridos com modo follow.",
+   "tags": [
+    "component",
+    "logs",
+    "renderizacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/logs_tab.go:renderLogsTab",
+   "type": "function",
+   "name": "renderLogsTab",
+   "filePath": "internal/ui/logs_tab.go",
+   "lineRange": [
+    19,
+    61
+   ],
+   "summary": "Renderiza a aba Logs do projeto com contexto, fatos da origem e estado de follow.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "logs"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/logs_tab.go:renderLogsBodyBox",
+   "type": "function",
+   "name": "renderLogsBodyBox",
+   "filePath": "internal/ui/logs_tab.go",
+   "lineRange": [
+    80,
+    133
+   ],
+   "summary": "Renderiza a caixa rolável com as linhas de log coloridas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "logs"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/logs_tab.go:colorLogLine",
+   "type": "function",
+   "name": "colorLogLine",
+   "filePath": "internal/ui/logs_tab.go",
+   "lineRange": [
+    135,
+    145
+   ],
+   "summary": "Colore uma linha de log conforme o nível (erro, aviso, info).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "logs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/logs_tab.go:initLogsTab",
+   "type": "function",
+   "name": "initLogsTab",
+   "filePath": "internal/ui/logs_tab.go",
+   "lineRange": [
+    147,
+    162
+   ],
+   "summary": "Inicializa a aba Logs e dispara a carga dos logs do projeto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "logs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/logs_tab.go:loadProjectLogs",
+   "type": "function",
+   "name": "loadProjectLogs",
+   "filePath": "internal/ui/logs_tab.go",
+   "lineRange": [
+    164,
+    183
+   ],
+   "summary": "Carrega de forma assíncrona os logs do projeto a partir do compose ou do container.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "logs"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestAllTabsIncludesKubernetes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestSidebarShowsKubernetesInExecucao",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestSanitizeK8sName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sApplyKeyAndEnterNewline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sCreateStartsEditing",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sOverviewLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sKindStaysReachableWithoutExplorer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sProdContextIsFlagged",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sReadyAndRestartStyles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "function:internal/ui/k8s_tab_test.go:TestK8sFilterKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "function:internal/ui/logs_tab.go:renderLogsTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "function:internal/ui/logs_tab.go:renderLogsBodyBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "function:internal/ui/logs_tab.go:colorLogLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "function:internal/ui/logs_tab.go:initLogsTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "function:internal/ui/logs_tab.go:loadProjectLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/logs_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sLandingEnterAndEsc",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sLandingEnterAndEsc",
+   "target": "function:internal/ui/k8s_tab.go:handleK8sKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestSanitizeK8sName",
+   "target": "function:internal/ui/k8s_tab.go:sanitizeK8sName",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sApplyKeyAndEnterNewline",
+   "target": "function:internal/ui/k8s_tab.go:updateK8sEdit",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sCreateStartsEditing",
+   "target": "function:internal/ui/k8s_tab.go:k8sBeginCreate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sOverviewLayout",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sKindStaysReachableWithoutExplorer",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sKindStrip",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sProdContextIsFlagged",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sHeader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sReadyAndRestartStyles",
+   "target": "function:internal/ui/k8s_tab.go:k8sReadyStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sReadyAndRestartStyles",
+   "target": "function:internal/ui/k8s_tab.go:k8sRestartStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sReadyAndRestartStyles",
+   "target": "function:internal/ui/k8s_tab.go:k8sStatusDot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab_test.go:TestK8sFilterKey",
+   "target": "function:internal/ui/k8s_tab.go:handleK8sKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/logs_tab.go:renderLogsBodyBox",
+   "target": "function:internal/ui/helpers.go:wrapText",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/logs_tab.go:initLogsTab",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerRunning",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/logs_tab.go:loadProjectLogs",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/logs_tab.go:loadProjectLogs",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/logs_tab.go:loadProjectLogs",
+   "target": "function:internal/collectors/compose.go:ComposeLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

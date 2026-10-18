@@ -1,0 +1,820 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/compose_presets_test.go",
+   "type": "file",
+   "name": "compose_presets_test.go",
+   "filePath": "internal/collectors/compose_presets_test.go",
+   "summary": "Testes dos presets de compose: geração de YAML para Postgres, Redis e Node, imagens desconhecidas, nome base da imagem e conversão de portas/env a partir da config da imagem.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "presets"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets_test.go:TestComposeServiceYAMLFromPresetPostgres",
+   "type": "function",
+   "name": "TestComposeServiceYAMLFromPresetPostgres",
+   "filePath": "internal/collectors/compose_presets_test.go",
+   "lineRange": [
+    8,
+    31
+   ],
+   "summary": "Testa o YAML gerado pelo preset do Postgres (portas, env, volume, healthcheck).",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets_test.go:TestComposeServiceYAMLFromPresetNode",
+   "type": "function",
+   "name": "TestComposeServiceYAMLFromPresetNode",
+   "filePath": "internal/collectors/compose_presets_test.go",
+   "lineRange": [
+    43,
+    68
+   ],
+   "summary": "Testa o YAML gerado pelo preset do Node (bind mount, working_dir, command).",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets_test.go:TestComposeImageBaseName",
+   "type": "function",
+   "name": "TestComposeImageBaseName",
+   "filePath": "internal/collectors/compose_presets_test.go",
+   "lineRange": [
+    84,
+    96
+   ],
+   "summary": "Testa a normalização do nome base de imagens.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/compose_presets_test.go:TestPortsAndEnvFromConfig",
+   "type": "function",
+   "name": "TestPortsAndEnvFromConfig",
+   "filePath": "internal/collectors/compose_presets_test.go",
+   "lineRange": [
+    98,
+    107
+   ],
+   "summary": "Testa a conversão de portas expostas e env da imagem.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/compose_test.go",
+   "type": "file",
+   "name": "compose_test.go",
+   "filePath": "internal/collectors/compose_test.go",
+   "summary": "Testes da leitura de portas de host em arquivos compose (ignorando healthchecks) e da detecção do arquivo compose do projeto.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_test.go:TestParseComposePorts",
+   "type": "function",
+   "name": "TestParseComposePorts",
+   "filePath": "internal/collectors/compose_test.go",
+   "lineRange": [
+    9,
+    35
+   ],
+   "summary": "Testa a extração de portas de host do compose.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_test.go:TestParseComposePortsIgnoresHealthcheck",
+   "type": "function",
+   "name": "TestParseComposePortsIgnoresHealthcheck",
+   "filePath": "internal/collectors/compose_test.go",
+   "lineRange": [
+    37,
+    69
+   ],
+   "summary": "Testa que portas em healthchecks são ignoradas.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/compose_test.go:TestComposeFile",
+   "type": "function",
+   "name": "TestComposeFile",
+   "filePath": "internal/collectors/compose_test.go",
+   "lineRange": [
+    71,
+    83
+   ],
+   "summary": "Testa a detecção do arquivo compose do projeto.",
+   "tags": [
+    "test",
+    "docker-compose",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/database.go",
+   "type": "file",
+   "name": "database.go",
+   "filePath": "internal/collectors/database.go",
+   "summary": "Detecta bancos Postgres/MySQL ligados a um projeto (containers, .env, credenciais manuais em .devscope/database.json) e executa listagem de tabelas, descrição de schema e consultas SQL via `docker exec` ou cliente local psql/mysql.",
+   "tags": [
+    "database",
+    "collector",
+    "postgres",
+    "mysql",
+    "command-runner"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/collectors/database.go:DBTarget",
+   "type": "class",
+   "name": "DBTarget",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    28,
+    38
+   ],
+   "summary": "Banco executável alcançável via `docker exec` em container ou conexão TCP direta com credencial manual.",
+   "tags": [
+    "data-model",
+    "database",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/database.go:DBColumn",
+   "type": "class",
+   "name": "DBColumn",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    41,
+    46
+   ],
+   "summary": "Coluna de tabela obtida de DESCRIBE/information_schema.",
+   "tags": [
+    "data-model",
+    "database",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/database.go:DBTableInfo",
+   "type": "class",
+   "name": "DBTableInfo",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    49,
+    53
+   ],
+   "summary": "Schema de uma tabela com contagem aproximada de linhas.",
+   "tags": [
+    "data-model",
+    "database",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:DetectProjectDatabasesLite",
+   "type": "function",
+   "name": "DetectProjectDatabasesLite",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    65,
+    110
+   ],
+   "summary": "Lista bancos do projeto a partir do estado e do .env sem executar docker exec, seguro para render a cada frame.",
+   "tags": [
+    "database",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/database.go:dbTargetFromCredential",
+   "type": "function",
+   "name": "dbTargetFromCredential",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    112,
+    123
+   ],
+   "summary": "Converte uma credencial manual do dbutil em DBTarget de conexão direta.",
+   "tags": [
+    "database",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:DetectProjectDatabases",
+   "type": "function",
+   "name": "DetectProjectDatabases",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    127,
+    146
+   ],
+   "summary": "Enriquece a detecção Lite com variáveis de ambiente lidas via docker exec (POSTGRES_USER etc.).",
+   "tags": [
+    "database",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:detectContainerDBEngine",
+   "type": "function",
+   "name": "detectContainerDBEngine",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    148,
+    161
+   ],
+   "summary": "Identifica se um container é Postgres ou MySQL/MariaDB pela imagem.",
+   "tags": [
+    "database",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:readProjectDBEnv",
+   "type": "function",
+   "name": "readProjectDBEnv",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    163,
+    198
+   ],
+   "summary": "Lê usuário, banco e senha do .env do projeto (variáveis DB_* ou DATABASE_URL).",
+   "tags": [
+    "database",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/database.go:parseDatabaseURL",
+   "type": "function",
+   "name": "parseDatabaseURL",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    200,
+    223
+   ],
+   "summary": "Extrai usuário, banco e senha de uma DATABASE_URL.",
+   "tags": [
+    "database",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:readContainerDBEnv",
+   "type": "function",
+   "name": "readContainerDBEnv",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    225,
+    244
+   ],
+   "summary": "Lê usuário e banco das variáveis de ambiente do container via docker exec.",
+   "tags": [
+    "database",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:resolvePass",
+   "type": "function",
+   "name": "resolvePass",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    257,
+    285
+   ],
+   "summary": "Resolve a senha do alvo priorizando credencial manual, depois .env e por fim env do container.",
+   "tags": [
+    "database",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/database.go:DBListTables",
+   "type": "function",
+   "name": "DBListTables",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    288,
+    310
+   ],
+   "summary": "Retorna os nomes das tabelas do banco alvo.",
+   "tags": [
+    "database",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:DBDescribeTable",
+   "type": "function",
+   "name": "DBDescribeTable",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    313,
+    390
+   ],
+   "summary": "Retorna as colunas e a contagem aproximada de linhas de uma tabela, conforme o engine.",
+   "tags": [
+    "database",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/database.go:dbExecSQL",
+   "type": "function",
+   "name": "dbExecSQL",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    406,
+    434
+   ],
+   "summary": "Monta a invocação psql/mysql para executar SQL dentro do container ou diretamente no host.",
+   "tags": [
+    "database",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/database.go:dbClientCmd",
+   "type": "function",
+   "name": "dbClientCmd",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    438,
+    461
+   ],
+   "summary": "Executa os argumentos do cliente de banco via docker exec ou no host quando não há container.",
+   "tags": [
+    "database",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:DBQuery",
+   "type": "function",
+   "name": "DBQuery",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    471,
+    484
+   ],
+   "summary": "Executa SQL arbitrário e retorna a saída tabular truncada.",
+   "tags": [
+    "database",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database.go:runDBCmd",
+   "type": "function",
+   "name": "runDBCmd",
+   "filePath": "internal/collectors/database.go",
+   "lineRange": [
+    486,
+    508
+   ],
+   "summary": "Roda o comando de banco com timeout e normaliza a saída e os erros.",
+   "tags": [
+    "database",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/database_test.go",
+   "type": "file",
+   "name": "database_test.go",
+   "filePath": "internal/collectors/database_test.go",
+   "summary": "Testes de parsing de DATABASE_URL, detecção do engine de banco por imagem do container, descoberta de bancos do projeto e escape de literais SQL.",
+   "tags": [
+    "test",
+    "database",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database_test.go:TestDetectContainerDBEngine",
+   "type": "function",
+   "name": "TestDetectContainerDBEngine",
+   "filePath": "internal/collectors/database_test.go",
+   "lineRange": [
+    16,
+    26
+   ],
+   "summary": "Testa a detecção do engine de banco pela imagem.",
+   "tags": [
+    "test",
+    "database",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/database_test.go:TestDetectProjectDatabases",
+   "type": "function",
+   "name": "TestDetectProjectDatabases",
+   "filePath": "internal/collectors/database_test.go",
+   "lineRange": [
+    28,
+    39
+   ],
+   "summary": "Testa a descoberta de bancos ligados ao projeto.",
+   "tags": [
+    "test",
+    "database",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/compose_presets_test.go",
+   "target": "function:internal/collectors/compose_presets_test.go:TestComposeServiceYAMLFromPresetPostgres",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets_test.go",
+   "target": "function:internal/collectors/compose_presets_test.go:TestComposeServiceYAMLFromPresetNode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets_test.go",
+   "target": "function:internal/collectors/compose_presets_test.go:TestComposeImageBaseName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_presets_test.go",
+   "target": "function:internal/collectors/compose_presets_test.go:TestPortsAndEnvFromConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_test.go",
+   "target": "function:internal/collectors/compose_test.go:TestParseComposePorts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_test.go",
+   "target": "function:internal/collectors/compose_test.go:TestParseComposePortsIgnoresHealthcheck",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/compose_test.go",
+   "target": "function:internal/collectors/compose_test.go:TestComposeFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBTarget",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBColumn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBTableInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "class:internal/collectors/database.go:DBTableInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DetectProjectDatabasesLite",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DetectProjectDatabasesLite",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:dbTargetFromCredential",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DetectProjectDatabases",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DetectProjectDatabases",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:detectContainerDBEngine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:readProjectDBEnv",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:parseDatabaseURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:readContainerDBEnv",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:resolvePass",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBListTables",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBListTables",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBDescribeTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBDescribeTable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:dbExecSQL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:dbClientCmd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBQuery",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:DBQuery",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "function:internal/collectors/database.go:runDBCmd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/dbutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/dbutil/config_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database_test.go",
+   "target": "function:internal/collectors/database_test.go:TestDetectContainerDBEngine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database_test.go",
+   "target": "function:internal/collectors/database_test.go:TestDetectProjectDatabases",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/database_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/database_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/collectors/database.go:DetectProjectDatabasesLite",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/database.go:DetectProjectDatabasesLite",
+   "target": "function:internal/dbutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/database.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

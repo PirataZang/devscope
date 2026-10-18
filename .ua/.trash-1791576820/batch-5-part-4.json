@@ -1,0 +1,384 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/shell.go",
+   "type": "file",
+   "name": "shell.go",
+   "filePath": "internal/collectors/shell.go",
+   "summary": "Monta comandos para abrir o shell, agentes de IA de terminal e apps externos no diretório do projeto.",
+   "tags": [
+    "exec",
+    "shell",
+    "ai-tools",
+    "external-app"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/shell.go:ProjectShell",
+   "type": "function",
+   "name": "ProjectShell",
+   "filePath": "internal/collectors/shell.go",
+   "lineRange": [
+    10,
+    18
+   ],
+   "summary": "Monta o comando do shell do usuário com diretório de trabalho no projeto.",
+   "tags": [
+    "shell",
+    "exec",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell.go:DetectAITools",
+   "type": "function",
+   "name": "DetectAITools",
+   "filePath": "internal/collectors/shell.go",
+   "lineRange": [
+    25,
+    33
+   ],
+   "summary": "Devolve os agentes de IA de terminal instalados no PATH, na ordem de preferência.",
+   "tags": [
+    "detection",
+    "ai-tools",
+    "exec"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell.go:ProjectAI",
+   "type": "function",
+   "name": "ProjectAI",
+   "filePath": "internal/collectors/shell.go",
+   "lineRange": [
+    38,
+    54
+   ],
+   "summary": "Monta o comando do agente de IA (configurado ou primeiro do PATH) com cwd no projeto, aceitando argumentos.",
+   "tags": [
+    "exec",
+    "ai-tools",
+    "shell"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell.go:ExternalApp",
+   "type": "function",
+   "name": "ExternalApp",
+   "filePath": "internal/collectors/shell.go",
+   "lineRange": [
+    62,
+    75
+   ],
+   "summary": "Monta o comando de um atalho de app externo via shell; o \"&\" final define se roda solto ou assume o terminal.",
+   "tags": [
+    "exec",
+    "shell",
+    "external-app"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/shell_test.go",
+   "type": "file",
+   "name": "shell_test.go",
+   "filePath": "internal/collectors/shell_test.go",
+   "summary": "Testes dos construtores de comando de shell, agente de IA e apps externos (incluindo modo destacado com \"&\").",
+   "tags": [
+    "test",
+    "shell",
+    "exec"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/shell_test.go:TestProjectShellUsesProjectDir",
+   "type": "function",
+   "name": "TestProjectShellUsesProjectDir",
+   "filePath": "internal/collectors/shell_test.go",
+   "lineRange": [
+    8,
+    17
+   ],
+   "summary": "Garante que o comando de shell do projeto usa o diretório do projeto como cwd.",
+   "tags": [
+    "test",
+    "shell",
+    "exec"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell_test.go:TestProjectAIUsesProjectDirAndArgs",
+   "type": "function",
+   "name": "TestProjectAIUsesProjectDirAndArgs",
+   "filePath": "internal/collectors/shell_test.go",
+   "lineRange": [
+    19,
+    36
+   ],
+   "summary": "Testa que o agente de IA roda no diretório do projeto e repassa os argumentos configurados.",
+   "tags": [
+    "test",
+    "ai-tools",
+    "exec"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell_test.go:TestProjectAIReportsMissingBinary",
+   "type": "function",
+   "name": "TestProjectAIReportsMissingBinary",
+   "filePath": "internal/collectors/shell_test.go",
+   "lineRange": [
+    38,
+    42
+   ],
+   "summary": "Testa que ProjectAI retorna erro quando o binário configurado não existe.",
+   "tags": [
+    "test",
+    "ai-tools",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/shell_test.go:TestExternalAppDetachedByTrailingAmpersand",
+   "type": "function",
+   "name": "TestExternalAppDetachedByTrailingAmpersand",
+   "filePath": "internal/collectors/shell_test.go",
+   "lineRange": [
+    46,
+    60
+   ],
+   "summary": "Testa que o \"&\" no fim do comando marca o app externo como destacado (detached).",
+   "tags": [
+    "test",
+    "shell",
+    "external-app"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/ssl.go",
+   "type": "file",
+   "name": "ssl.go",
+   "filePath": "internal/collectors/ssl.go",
+   "summary": "Coletor de certificados Let's Encrypt locais, associando-os aos projetos pelos domínios.",
+   "tags": [
+    "collector",
+    "ssl",
+    "security"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/ssl.go:CollectSSLCerts",
+   "type": "function",
+   "name": "CollectSSLCerts",
+   "filePath": "internal/collectors/ssl.go",
+   "lineRange": [
+    15,
+    50
+   ],
+   "summary": "Lê certificados Let's Encrypt de /etc/letsencrypt/live e extrai domínio e validade.",
+   "tags": [
+    "collector",
+    "ssl",
+    "security"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/ssl.go:AssignSSLToProjects",
+   "type": "function",
+   "name": "AssignSSLToProjects",
+   "filePath": "internal/collectors/ssl.go",
+   "lineRange": [
+    53,
+    66
+   ],
+   "summary": "Associa certificados SSL aos projetos casando o host com os domínios do projeto.",
+   "tags": [
+    "collector",
+    "ssl",
+    "matching"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ProjectShell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ProjectShell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:DetectAITools",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:DetectAITools",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ProjectAI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ProjectAI",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ExternalApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "function:internal/collectors/shell.go:ExternalApp",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectShellUsesProjectDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectShellUsesProjectDir",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectAIUsesProjectDirAndArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectAIUsesProjectDirAndArgs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectAIReportsMissingBinary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestProjectAIReportsMissingBinary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestExternalAppDetachedByTrailingAmpersand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/shell_test.go",
+   "target": "function:internal/collectors/shell_test.go:TestExternalAppDetachedByTrailingAmpersand",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "function:internal/collectors/ssl.go:CollectSSLCerts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "function:internal/collectors/ssl.go:CollectSSLCerts",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "function:internal/collectors/ssl.go:AssignSSLToProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "function:internal/collectors/ssl.go:AssignSSLToProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/ssl.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/shell.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

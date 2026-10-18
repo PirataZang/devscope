@@ -1,0 +1,1720 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/jenkinsutil/client_test.go",
+   "type": "file",
+   "name": "client_test.go",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "summary": "Testes do pacote jenkinsutil cobrindo config do projeto, mascaramento de token, mapeamento de cores e o cliente contra um servidor httptest.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client_test.go:TestSaveLoadProject",
+   "type": "function",
+   "name": "TestSaveLoadProject",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "lineRange": [
+    11,
+    36
+   ],
+   "summary": "Verifica a gravação e leitura da config Jenkins do projeto em disco.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client_test.go:TestMaskToken",
+   "type": "function",
+   "name": "TestMaskToken",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "lineRange": [
+    45,
+    56
+   ],
+   "summary": "Verifica o mascaramento de tokens Jenkins para exibição.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client_test.go:TestColorToStatus",
+   "type": "function",
+   "name": "TestColorToStatus",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "lineRange": [
+    58,
+    73
+   ],
+   "summary": "Verifica o mapeamento de cores Jenkins para status.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client_test.go:TestClientListJobsAndConsole",
+   "type": "function",
+   "name": "TestClientListJobsAndConsole",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "lineRange": [
+    84,
+    153
+   ],
+   "summary": "Testa ListJobs, GetJob e BuildConsole contra um servidor httptest simulando o Jenkins.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/jenkinsutil/client_test.go:TestFormatHelpers",
+   "type": "function",
+   "name": "TestFormatHelpers",
+   "filePath": "internal/jenkinsutil/client_test.go",
+   "lineRange": [
+    162,
+    175
+   ],
+   "summary": "Verifica os formatadores de duração e tempo relativo.",
+   "tags": [
+    "test",
+    "jenkins",
+    "api-client"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/jsonutil/jsonutil.go",
+   "type": "file",
+   "name": "jsonutil.go",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "summary": "Utilitários de manipulação de JSON: validar, formatar, minificar, ordenar chaves, remover nulos, converter de/para YAML/TOML/XML, buscar chaves e gerar diff.",
+   "tags": [
+    "utility",
+    "json",
+    "serialization",
+    "conversao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "function",
+   "name": "Validate",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    18,
+    29
+   ],
+   "summary": "Valida JSON e retorna erro com linha/coluna quando possível.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:formatJSONError",
+   "type": "function",
+   "name": "formatJSONError",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    31,
+    47
+   ],
+   "summary": "Enriquece erros de sintaxe JSON com posição em linha e coluna.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:offsetLineCol",
+   "type": "function",
+   "name": "offsetLineCol",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    49,
+    66
+   ],
+   "summary": "Converte um offset de bytes em linha e coluna.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:Pretty",
+   "type": "function",
+   "name": "Pretty",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    79,
+    89
+   ],
+   "summary": "Retorna o JSON indentado.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:Minify",
+   "type": "function",
+   "name": "Minify",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    92,
+    102
+   ],
+   "summary": "Retorna o JSON compactado.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:SortKeys",
+   "type": "function",
+   "name": "SortKeys",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    105,
+    115
+   ],
+   "summary": "Retorna o JSON com chaves de objetos ordenadas recursivamente.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:sortValue",
+   "type": "function",
+   "name": "sortValue",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    117,
+    138
+   ],
+   "summary": "Ordena recursivamente as chaves de mapas em um valor genérico.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:StripNulls",
+   "type": "function",
+   "name": "StripNulls",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    141,
+    151
+   ],
+   "summary": "Remove campos nulos de objetos e elementos nulos de arrays.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:stripNulls",
+   "type": "function",
+   "name": "stripNulls",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    153,
+    176
+   ],
+   "summary": "Implementação recursiva da remoção de nulos em valores genéricos.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:ToYAML",
+   "type": "function",
+   "name": "ToYAML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    179,
+    189
+   ],
+   "summary": "Converte texto JSON para YAML.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:FromYAML",
+   "type": "function",
+   "name": "FromYAML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    192,
+    202
+   ],
+   "summary": "Converte texto YAML para JSON indentado.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:normalizeYAML",
+   "type": "function",
+   "name": "normalizeYAML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    204,
+    226
+   ],
+   "summary": "Normaliza mapas com chaves não-string do YAML para estruturas compatíveis com JSON.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:ToTOML",
+   "type": "function",
+   "name": "ToTOML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    229,
+    239
+   ],
+   "summary": "Converte um objeto JSON para TOML.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:plainNumbers",
+   "type": "function",
+   "name": "plainNumbers",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    241,
+    265
+   ],
+   "summary": "Converte números float inteiros em int para gerar TOML limpo.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:FromTOML",
+   "type": "function",
+   "name": "FromTOML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    268,
+    278
+   ],
+   "summary": "Converte TOML para JSON indentado.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:ToXML",
+   "type": "function",
+   "name": "ToXML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    281,
+    290
+   ],
+   "summary": "Converte JSON em um documento XML simples.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:FromXML",
+   "type": "function",
+   "name": "FromXML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    294,
+    313
+   ],
+   "summary": "Converte XML simples em JSON usando um parser recursivo de tags próprio.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:writeXML",
+   "type": "function",
+   "name": "writeXML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    315,
+    338
+   ],
+   "summary": "Serializa recursivamente um valor genérico como elementos XML indentados.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:sanitizeXMLTag",
+   "type": "function",
+   "name": "sanitizeXMLTag",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    340,
+    359
+   ],
+   "summary": "Sanitiza uma chave para ser um nome de tag XML válido.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:escapeXML",
+   "type": "function",
+   "name": "escapeXML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    361,
+    370
+   ],
+   "summary": "Escapa caracteres especiais de XML em texto.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:parseXMLElement",
+   "type": "function",
+   "name": "parseXMLElement",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    372,
+    466
+   ],
+   "summary": "Parser recursivo mínimo de elementos XML que produz mapas, listas e escalares.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:coerceScalar",
+   "type": "function",
+   "name": "coerceScalar",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    468,
+    482
+   ],
+   "summary": "Converte texto de nó XML em número, booleano, null ou string.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "type": "function",
+   "name": "DetectFormat",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    485,
+    511
+   ],
+   "summary": "Detecta heuristicamente se o conteúdo é JSON, YAML, TOML ou XML.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:looksLikeTOML",
+   "type": "function",
+   "name": "looksLikeTOML",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    513,
+    528
+   ],
+   "summary": "Heurística que identifica conteúdo com cara de TOML (tabelas e chave = valor).",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "type": "function",
+   "name": "ConvertToggle",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    531,
+    559
+   ],
+   "summary": "Alterna a conversão entre JSON e o formato indicado (yaml, toml ou xml) em ambas as direções.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:SearchKey",
+   "type": "function",
+   "name": "SearchKey",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    562,
+    577
+   ],
+   "summary": "Busca caminhos cujas chaves contenham o termo pesquisado (case-insensitive).",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:searchWalk",
+   "type": "function",
+   "name": "searchWalk",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    579,
+    603
+   ],
+   "summary": "Percorre recursivamente o valor acumulando caminhos de chaves que casam com a busca.",
+   "tags": [
+    "helper",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil.go:DiffText",
+   "type": "function",
+   "name": "DiffText",
+   "filePath": "internal/jsonutil/jsonutil.go",
+   "lineRange": [
+    606,
+    648
+   ],
+   "summary": "Gera um diff simples linha a linha entre dois textos no estilo unificado.",
+   "tags": [
+    "api",
+    "utility",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/jsonutil/jsonutil_test.go",
+   "type": "file",
+   "name": "jsonutil_test.go",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "summary": "Testes das funções de jsonutil: pretty/minify/validate, sort/strip, conversões YAML/TOML/XML, busca e diff.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil_test.go:TestPrettyMinifyValidate",
+   "type": "function",
+   "name": "TestPrettyMinifyValidate",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "lineRange": [
+    8,
+    32
+   ],
+   "summary": "Testa formatação, minificação e validação de JSON.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil_test.go:TestSortKeysAndStripNulls",
+   "type": "function",
+   "name": "TestSortKeysAndStripNulls",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "lineRange": [
+    34,
+    53
+   ],
+   "summary": "Testa ordenação de chaves e remoção de nulos.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil_test.go:TestYAMLRoundTrip",
+   "type": "function",
+   "name": "TestYAMLRoundTrip",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "lineRange": [
+    55,
+    67
+   ],
+   "summary": "Testa a conversão de ida e volta entre JSON e YAML.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil_test.go:TestTOMLAndXML",
+   "type": "function",
+   "name": "TestTOMLAndXML",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "lineRange": [
+    69,
+    95
+   ],
+   "summary": "Testa conversões JSON para TOML e XML e de volta.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jsonutil/jsonutil_test.go:TestSearchAndDiff",
+   "type": "function",
+   "name": "TestSearchAndDiff",
+   "filePath": "internal/jsonutil/jsonutil_test.go",
+   "lineRange": [
+    97,
+    106
+   ],
+   "summary": "Testa a busca de chaves e o diff textual.",
+   "tags": [
+    "test",
+    "json",
+    "serialization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/jwtutil/jwtutil.go",
+   "type": "file",
+   "name": "jwtutil.go",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "summary": "Utilitários de JWT: decodificar, exibir claims com dicas de tempo, verificar e assinar tokens HMAC e gerar claims iniciais.",
+   "tags": [
+    "utility",
+    "jwt",
+    "security",
+    "autenticacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "function",
+   "name": "Decode",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    16,
+    30
+   ],
+   "summary": "Separa e decodifica header e payload de um JWT sem verificar assinatura.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:decodePart",
+   "type": "function",
+   "name": "decodePart",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    32,
+    48
+   ],
+   "summary": "Decodifica um segmento base64url do JWT em mapa JSON.",
+   "tags": [
+    "helper",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "function",
+   "name": "DecodePretty",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    51,
+    66
+   ],
+   "summary": "Retorna decodificação legível do JWT com header, payload e dicas de tempo (exp, iat, nbf).",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:formatTimeHints",
+   "type": "function",
+   "name": "formatTimeHints",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    68,
+    94
+   ],
+   "summary": "Formata claims temporais (exp/iat/nbf) em datas legíveis indicando expiração.",
+   "tags": [
+    "helper",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:jsonNumberSeconds",
+   "type": "function",
+   "name": "jsonNumberSeconds",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    96,
+    110
+   ],
+   "summary": "Converte um valor numérico de claim JSON em segundos int64.",
+   "tags": [
+    "helper",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:ExportJSON",
+   "type": "function",
+   "name": "ExportJSON",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    121,
+    132
+   ],
+   "summary": "Exporta o JWT como JSON com header e payload.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:ClaimsJSON",
+   "type": "function",
+   "name": "ClaimsJSON",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    135,
+    141
+   ],
+   "summary": "Retorna apenas o payload do JWT como JSON indentado.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:Verify",
+   "type": "function",
+   "name": "Verify",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    144,
+    180
+   ],
+   "summary": "Verifica a assinatura HMAC do JWT e reporta o estado de expiração.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:Sign",
+   "type": "function",
+   "name": "Sign",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    183,
+    208
+   ],
+   "summary": "Cria um JWT assinado com HMAC a partir de claims em JSON.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:signHMAC",
+   "type": "function",
+   "name": "signHMAC",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    218,
+    236
+   ],
+   "summary": "Calcula a assinatura HMAC (HS256/HS384/HS512) do input de assinatura.",
+   "tags": [
+    "helper",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:GenerateClaims",
+   "type": "function",
+   "name": "GenerateClaims",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    239,
+    248
+   ],
+   "summary": "Gera um payload de claims inicial de exemplo com iat/exp.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil.go:Algs",
+   "type": "function",
+   "name": "Algs",
+   "filePath": "internal/jwtutil/jwtutil.go",
+   "lineRange": [
+    251,
+    253
+   ],
+   "summary": "Lista os algoritmos HMAC suportados.",
+   "tags": [
+    "api",
+    "utility",
+    "jwt"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/jwtutil/jwtutil_test.go",
+   "type": "file",
+   "name": "jwtutil_test.go",
+   "filePath": "internal/jwtutil/jwtutil_test.go",
+   "summary": "Testes do ciclo assinar/verificar/decodificar JWT e da geração de claims.",
+   "tags": [
+    "test",
+    "jwt",
+    "security"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil_test.go:TestSignVerifyDecode",
+   "type": "function",
+   "name": "TestSignVerifyDecode",
+   "filePath": "internal/jwtutil/jwtutil_test.go",
+   "lineRange": [
+    8,
+    37
+   ],
+   "summary": "Testa o ciclo completo de assinar, verificar e decodificar um JWT.",
+   "tags": [
+    "test",
+    "jwt",
+    "security"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/jwtutil/jwtutil_test.go:TestGenerateClaims",
+   "type": "function",
+   "name": "TestGenerateClaims",
+   "filePath": "internal/jwtutil/jwtutil_test.go",
+   "lineRange": [
+    39,
+    51
+   ],
+   "summary": "Verifica que GenerateClaims produz JSON válido com claims temporais.",
+   "tags": [
+    "test",
+    "jwt",
+    "security"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/jenkinsutil/client_test.go",
+   "target": "function:internal/jenkinsutil/client_test.go:TestSaveLoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client_test.go",
+   "target": "function:internal/jenkinsutil/client_test.go:TestMaskToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client_test.go",
+   "target": "function:internal/jenkinsutil/client_test.go:TestColorToStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client_test.go",
+   "target": "function:internal/jenkinsutil/client_test.go:TestClientListJobsAndConsole",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jenkinsutil/client_test.go",
+   "target": "function:internal/jenkinsutil/client_test.go:TestFormatHelpers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:formatJSONError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:offsetLineCol",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Pretty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Pretty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Minify",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:Minify",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:SortKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:SortKeys",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:sortValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:StripNulls",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:StripNulls",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:stripNulls",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromYAML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:normalizeYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToTOML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToTOML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:plainNumbers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromTOML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromTOML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToXML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ToXML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromXML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:FromXML",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:writeXML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:sanitizeXMLTag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:escapeXML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:parseXMLElement",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:coerceScalar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:looksLikeTOML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:SearchKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:SearchKey",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:searchWalk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:DiffText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "function:internal/jsonutil/jsonutil.go:DiffText",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:Validate",
+   "target": "function:internal/jsonutil/jsonutil.go:formatJSONError",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:formatJSONError",
+   "target": "function:internal/jsonutil/jsonutil.go:offsetLineCol",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:SortKeys",
+   "target": "function:internal/jsonutil/jsonutil.go:sortValue",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:StripNulls",
+   "target": "function:internal/jsonutil/jsonutil.go:stripNulls",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:FromYAML",
+   "target": "function:internal/jsonutil/jsonutil.go:normalizeYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ToTOML",
+   "target": "function:internal/jsonutil/jsonutil.go:plainNumbers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ToXML",
+   "target": "function:internal/jsonutil/jsonutil.go:writeXML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:FromXML",
+   "target": "function:internal/jsonutil/jsonutil.go:parseXMLElement",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:writeXML",
+   "target": "function:internal/jsonutil/jsonutil.go:sanitizeXMLTag",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:writeXML",
+   "target": "function:internal/jsonutil/jsonutil.go:escapeXML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:parseXMLElement",
+   "target": "function:internal/jsonutil/jsonutil.go:coerceScalar",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "target": "function:internal/jsonutil/jsonutil.go:Validate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "target": "function:internal/jsonutil/jsonutil.go:looksLikeTOML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:DetectFormat",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:FromYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:ToYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:FromTOML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:ToTOML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:FromXML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:ConvertToggle",
+   "target": "function:internal/jsonutil/jsonutil.go:ToXML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jsonutil/jsonutil.go:SearchKey",
+   "target": "function:internal/jsonutil/jsonutil.go:searchWalk",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil_test.go",
+   "target": "function:internal/jsonutil/jsonutil_test.go:TestPrettyMinifyValidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil_test.go",
+   "target": "function:internal/jsonutil/jsonutil_test.go:TestSortKeysAndStripNulls",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil_test.go",
+   "target": "function:internal/jsonutil/jsonutil_test.go:TestYAMLRoundTrip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil_test.go",
+   "target": "function:internal/jsonutil/jsonutil_test.go:TestTOMLAndXML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil_test.go",
+   "target": "function:internal/jsonutil/jsonutil_test.go:TestSearchAndDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:decodePart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:formatTimeHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:jsonNumberSeconds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:ExportJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:ExportJSON",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:ClaimsJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:ClaimsJSON",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Verify",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Verify",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Sign",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Sign",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:signHMAC",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:GenerateClaims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:GenerateClaims",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Algs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "function:internal/jwtutil/jwtutil.go:Algs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Decode",
+   "target": "function:internal/jwtutil/jwtutil.go:decodePart",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "target": "function:internal/jwtutil/jwtutil.go:formatTimeHints",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:formatTimeHints",
+   "target": "function:internal/jwtutil/jwtutil.go:jsonNumberSeconds",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:ExportJSON",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:ClaimsJSON",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Verify",
+   "target": "function:internal/jwtutil/jwtutil.go:Decode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Verify",
+   "target": "function:internal/jwtutil/jwtutil.go:signHMAC",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Verify",
+   "target": "function:internal/jwtutil/jwtutil.go:jsonNumberSeconds",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Verify",
+   "target": "function:internal/jwtutil/jwtutil.go:DecodePretty",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/jwtutil/jwtutil.go:Sign",
+   "target": "function:internal/jwtutil/jwtutil.go:signHMAC",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil_test.go",
+   "target": "function:internal/jwtutil/jwtutil_test.go:TestSignVerifyDecode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil_test.go",
+   "target": "function:internal/jwtutil/jwtutil_test.go:TestGenerateClaims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/jsonutil/jsonutil.go",
+   "target": "file:internal/jsonutil/jsonutil_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/jwtutil/jwtutil.go",
+   "target": "file:internal/jwtutil/jwtutil_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

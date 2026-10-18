@@ -1,0 +1,1839 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/jwt_tab_test.go",
+   "type": "file",
+   "name": "jwt_tab_test.go",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "summary": "Testes da ferramenta JWT: navegação, decodificação e assinatura, cache do token, rolagem e dashboard.",
+   "tags": [
+    "test",
+    "jwt",
+    "security"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJWTNotInNav",
+   "type": "function",
+   "name": "TestJWTNotInNav",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    11,
+    20
+   ],
+   "summary": "Garante que a ferramenta JWT não aparece na navegação principal.",
+   "tags": [
+    "test",
+    "jwt",
+    "navigation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestJwtLandingEnterAndEsc",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    22,
+    50
+   ],
+   "summary": "Testa entrar e sair da ferramenta JWT via landing.",
+   "tags": [
+    "test",
+    "jwt",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJwtDecodeAndSign",
+   "type": "function",
+   "name": "TestJwtDecodeAndSign",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    52,
+    70
+   ],
+   "summary": "Testa decodificação e assinatura de tokens JWT.",
+   "tags": [
+    "test",
+    "jwt",
+    "crypto"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJwtSourceTokenUsesCache",
+   "type": "function",
+   "name": "TestJwtSourceTokenUsesCache",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    72,
+    81
+   ],
+   "summary": "Verifica que o token de origem usa o cache.",
+   "tags": [
+    "test",
+    "jwt",
+    "cache"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "type": "function",
+   "name": "TestJwtHScrollAndEditorSelect",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    83,
+    102
+   ],
+   "summary": "Testa rolagem horizontal e seleção no editor JWT.",
+   "tags": [
+    "test",
+    "jwt",
+    "editor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "type": "function",
+   "name": "TestJwtClientDashboard",
+   "filePath": "internal/ui/jwt_tab_test.go",
+   "lineRange": [
+    112,
+    125
+   ],
+   "summary": "Testa o dashboard da ferramenta JWT.",
+   "tags": [
+    "test",
+    "jwt",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/keymap_test.go",
+   "type": "file",
+   "name": "keymap_test.go",
+   "filePath": "internal/ui/keymap_test.go",
+   "summary": "Testes de consistência do keymap: compara teclas tratadas no código com as prometidas na ajuda e verifica vocabulário uniforme entre módulos.",
+   "tags": [
+    "test",
+    "keybindings",
+    "consistency",
+    "help"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:canonKey",
+   "type": "function",
+   "name": "canonKey",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    62,
+    87
+   ],
+   "summary": "Normaliza a grafia de uma tecla para comparação entre handlers e ajuda.",
+   "tags": [
+    "test",
+    "keybindings",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:handledKeys",
+   "type": "function",
+   "name": "handledKeys",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    99,
+    146
+   ],
+   "summary": "Extrai do código-fonte as teclas efetivamente tratadas pelos handlers.",
+   "tags": [
+    "test",
+    "keybindings",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:helpKeys",
+   "type": "function",
+   "name": "helpKeys",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    150,
+    185
+   ],
+   "summary": "Coleta as teclas prometidas pela tela de ajuda.",
+   "tags": [
+    "test",
+    "keybindings",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestEveryActionIsDiscoverable",
+   "type": "function",
+   "name": "TestEveryActionIsDiscoverable",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    192,
+    214
+   ],
+   "summary": "Garante que toda ação tratada está documentada na ajuda.",
+   "tags": [
+    "test",
+    "keybindings",
+    "help"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestHelpNeverPromisesAKeyThatDoesNotExist",
+   "type": "function",
+   "name": "TestHelpNeverPromisesAKeyThatDoesNotExist",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    219,
+    240
+   ],
+   "summary": "Garante que a ajuda não promete teclas inexistentes.",
+   "tags": [
+    "test",
+    "keybindings",
+    "help"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestEveryModuleHasAHelpBlock",
+   "type": "function",
+   "name": "TestEveryModuleHasAHelpBlock",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    244,
+    280
+   ],
+   "summary": "Garante que todo módulo possui um bloco de ajuda.",
+   "tags": [
+    "test",
+    "help",
+    "modules"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:uniqueStrings",
+   "type": "function",
+   "name": "uniqueStrings",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    282,
+    292
+   ],
+   "summary": "Remove duplicatas de uma lista de strings preservando a ordem.",
+   "tags": [
+    "test",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestCommandBarSpeaksOneLanguage",
+   "type": "function",
+   "name": "TestCommandBarSpeaksOneLanguage",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    298,
+    327
+   ],
+   "summary": "Garante vocabulário consistente nas barras de comando.",
+   "tags": [
+    "test",
+    "keybindings",
+    "consistency"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestNavigationVocabularyIsUniform",
+   "type": "function",
+   "name": "TestNavigationVocabularyIsUniform",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    332,
+    367
+   ],
+   "summary": "Garante vocabulário de navegação uniforme entre módulos.",
+   "tags": [
+    "test",
+    "navigation",
+    "consistency"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestKeysAreSpelledTheSameEverywhere",
+   "type": "function",
+   "name": "TestKeysAreSpelledTheSameEverywhere",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    372,
+    394
+   ],
+   "summary": "Garante que as teclas são grafadas igual em toda a UI.",
+   "tags": [
+    "test",
+    "keybindings",
+    "consistency"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/keymap_test.go:TestStateHasOneWord",
+   "type": "function",
+   "name": "TestStateHasOneWord",
+   "filePath": "internal/ui/keymap_test.go",
+   "lineRange": [
+    398,
+    411
+   ],
+   "summary": "Garante que cada estado é nomeado com uma única palavra.",
+   "tags": [
+    "test",
+    "consistency",
+    "ux-copy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/module_caps.go",
+   "type": "file",
+   "name": "module_caps.go",
+   "filePath": "internal/ui/module_caps.go",
+   "summary": "Detecção de capacidades do projeto (Docker, Jenkins, K8s, nginx, ferramentas no PATH) para ocultar módulos irrelevantes da sidebar e da navegação por tab.",
+   "tags": [
+    "capabilities",
+    "discovery",
+    "sidebar",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_caps.go:hasTool",
+   "type": "function",
+   "name": "hasTool",
+   "filePath": "internal/ui/module_caps.go",
+   "lineRange": [
+    64,
+    73
+   ],
+   "summary": "Verifica (com cache) se um executável está disponível no PATH.",
+   "tags": [
+    "os-integration",
+    "cache",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps.go:probeModuleCaps",
+   "type": "function",
+   "name": "probeModuleCaps",
+   "filePath": "internal/ui/module_caps.go",
+   "lineRange": [
+    88,
+    121
+   ],
+   "summary": "Mede de forma assíncrona as capacidades do projeto (Docker, Jenkins, K8s, nginx...) para decidir quais módulos são relevantes.",
+   "tags": [
+    "capabilities",
+    "async",
+    "discovery"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_caps.go:visibleTabs",
+   "type": "function",
+   "name": "visibleTabs",
+   "filePath": "internal/ui/module_caps.go",
+   "lineRange": [
+    157,
+    168
+   ],
+   "summary": "Retorna a ordem de navegação de tab/shift+tab contendo só os módulos visíveis.",
+   "tags": [
+    "navigation",
+    "capabilities",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps.go:hiddenTabCount",
+   "type": "function",
+   "name": "hiddenTabCount",
+   "filePath": "internal/ui/module_caps.go",
+   "lineRange": [
+    171,
+    182
+   ],
+   "summary": "Conta os módulos ocultos anunciados na linha '⋯ N módulos' da sidebar.",
+   "tags": [
+    "capabilities",
+    "tabs",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/module_caps_test.go",
+   "type": "file",
+   "name": "module_caps_test.go",
+   "filePath": "internal/ui/module_caps_test.go",
+   "summary": "Testes das capacidades de módulo: ocultação de irrelevantes, grupos vazios, mostrar todos, ciclo de tabs, probe e preservação da aba ativa.",
+   "tags": [
+    "test",
+    "capabilities",
+    "sidebar"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "type": "function",
+   "name": "TestModuleCapsShowsEverythingUntilProbed",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    25,
+    39
+   ],
+   "summary": "Garante que todos os módulos aparecem antes do probe.",
+   "tags": [
+    "test",
+    "capabilities",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "type": "function",
+   "name": "TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    43,
+    65
+   ],
+   "summary": "Verifica que módulos irrelevantes são ocultos e anunciados.",
+   "tags": [
+    "test",
+    "capabilities",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestModuleCapsDropsEmptyGroups",
+   "type": "function",
+   "name": "TestModuleCapsDropsEmptyGroups",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    69,
+    80
+   ],
+   "summary": "Verifica que grupos vazios são removidos da sidebar.",
+   "tags": [
+    "test",
+    "capabilities",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "type": "function",
+   "name": "TestShowAllModulesToggle",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    83,
+    101
+   ],
+   "summary": "Testa o atalho que mostra todos os módulos.",
+   "tags": [
+    "test",
+    "capabilities",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestActiveTabStaysVisibleEvenWhenIrrelevant",
+   "type": "function",
+   "name": "TestActiveTabStaysVisibleEvenWhenIrrelevant",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    105,
+    115
+   ],
+   "summary": "Garante que a aba ativa continua visível mesmo irrelevante.",
+   "tags": [
+    "test",
+    "capabilities",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestTabCycleWalksOnlyVisibleModules",
+   "type": "function",
+   "name": "TestTabCycleWalksOnlyVisibleModules",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    119,
+    142
+   ],
+   "summary": "Garante que tab/shift+tab percorrem só módulos visíveis.",
+   "tags": [
+    "test",
+    "navigation",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestProbeModuleCapsReadsTheProject",
+   "type": "function",
+   "name": "TestProbeModuleCapsReadsTheProject",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    146,
+    174
+   ],
+   "summary": "Verifica que o probe lê os arquivos do projeto.",
+   "tags": [
+    "test",
+    "capabilities",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestAllTabsFollowsSidebarOrder",
+   "type": "function",
+   "name": "TestAllTabsFollowsSidebarOrder",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    187,
+    200
+   ],
+   "summary": "Garante que a lista de abas segue a ordem da sidebar.",
+   "tags": [
+    "test",
+    "tabs",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestCwdStartupProbesCapabilities",
+   "type": "function",
+   "name": "TestCwdStartupProbesCapabilities",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    208,
+    240
+   ],
+   "summary": "Verifica que iniciar no diretório atual dispara o probe de capacidades.",
+   "tags": [
+    "test",
+    "capabilities",
+    "startup"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:cmdBatchProbes",
+   "type": "function",
+   "name": "cmdBatchProbes",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    244,
+    259
+   ],
+   "summary": "Helper que inspeciona um tea.Batch em busca de comandos de probe.",
+   "tags": [
+    "test",
+    "helper",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestCapsAreRemeasuredWhenProjectDataLands",
+   "type": "function",
+   "name": "TestCapsAreRemeasuredWhenProjectDataLands",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    264,
+    279
+   ],
+   "summary": "Verifica que as capacidades são remedidas quando chegam dados do projeto.",
+   "tags": [
+    "test",
+    "capabilities",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_caps_test.go:TestActiveTabSurvivesFirstProbe",
+   "type": "function",
+   "name": "TestActiveTabSurvivesFirstProbe",
+   "filePath": "internal/ui/module_caps_test.go",
+   "lineRange": [
+    283,
+    292
+   ],
+   "summary": "Garante que a aba ativa sobrevive ao primeiro probe.",
+   "tags": [
+    "test",
+    "capabilities",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/module_landing_test.go",
+   "type": "file",
+   "name": "module_landing_test.go",
+   "filePath": "internal/ui/module_landing_test.go",
+   "summary": "Testes das landings de todos os módulos: sem caixas, respondem às três perguntas, cabem no terminal e comunicam estado honestamente.",
+   "tags": [
+    "test",
+    "landing",
+    "ux",
+    "design-system"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:landingRenderers",
+   "type": "function",
+   "name": "landingRenderers",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    14,
+    31
+   ],
+   "summary": "Helper que lista os renderizadores de landing de cada módulo.",
+   "tags": [
+    "test",
+    "landing",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:landingTestApp",
+   "type": "function",
+   "name": "landingTestApp",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    33,
+    44
+   ],
+   "summary": "Helper que cria um App de teste para as landings.",
+   "tags": [
+    "test",
+    "fixture",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingsHaveNoBoxes",
+   "type": "function",
+   "name": "TestLandingsHaveNoBoxes",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    49,
+    59
+   ],
+   "summary": "Garante que as landings não usam caixas.",
+   "tags": [
+    "test",
+    "landing",
+    "design-system"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingsAnswerTheThreeQuestions",
+   "type": "function",
+   "name": "TestLandingsAnswerTheThreeQuestions",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    62,
+    86
+   ],
+   "summary": "Garante que as landings respondem às três perguntas (o que é, estado, próxima ação).",
+   "tags": [
+    "test",
+    "landing",
+    "ux"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingsFitEveryTerminal",
+   "type": "function",
+   "name": "TestLandingsFitEveryTerminal",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    90,
+    113
+   ],
+   "summary": "Garante que as landings cabem em todos os terminais.",
+   "tags": [
+    "test",
+    "landing",
+    "responsive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingStateIsNotDuplicated",
+   "type": "function",
+   "name": "TestLandingStateIsNotDuplicated",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    117,
+    128
+   ],
+   "summary": "Garante que o estado não é duplicado na landing.",
+   "tags": [
+    "test",
+    "landing",
+    "ux"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingProbePendingIsHonest",
+   "type": "function",
+   "name": "TestLandingProbePendingIsHonest",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    131,
+    144
+   ],
+   "summary": "Verifica que a landing comunica honestamente probes pendentes.",
+   "tags": [
+    "test",
+    "landing",
+    "ux"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingPrimaryActionStandsOut",
+   "type": "function",
+   "name": "TestLandingPrimaryActionStandsOut",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    148,
+    162
+   ],
+   "summary": "Garante que a ação primária se destaca na landing.",
+   "tags": [
+    "test",
+    "landing",
+    "ux"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingBandIsClosed",
+   "type": "function",
+   "name": "TestLandingBandIsClosed",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    176,
+    204
+   ],
+   "summary": "Verifica que a faixa da landing é fechada corretamente.",
+   "tags": [
+    "test",
+    "landing",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingDropsFactsThatRepeatTheState",
+   "type": "function",
+   "name": "TestLandingDropsFactsThatRepeatTheState",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    208,
+    230
+   ],
+   "summary": "Garante que fatos redundantes com o estado são removidos.",
+   "tags": [
+    "test",
+    "landing",
+    "ux"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingFactColumnFollowsItsLabels",
+   "type": "function",
+   "name": "TestLandingFactColumnFollowsItsLabels",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    234,
+    261
+   ],
+   "summary": "Verifica que a coluna de fatos acompanha seus rótulos.",
+   "tags": [
+    "test",
+    "landing",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingShowsWhatTheProjectHas",
+   "type": "function",
+   "name": "TestLandingShowsWhatTheProjectHas",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    266,
+    302
+   ],
+   "summary": "Verifica que a landing mostra o que o projeto possui.",
+   "tags": [
+    "test",
+    "landing",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingPreviewEmptyStateSpeaks",
+   "type": "function",
+   "name": "TestLandingPreviewEmptyStateSpeaks",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    306,
+    318
+   ],
+   "summary": "Verifica a mensagem de estado vazio da prévia.",
+   "tags": [
+    "test",
+    "landing",
+    "empty-state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/module_landing_test.go:TestLandingPreviewTruncatesWithCount",
+   "type": "function",
+   "name": "TestLandingPreviewTruncatesWithCount",
+   "filePath": "internal/ui/module_landing_test.go",
+   "lineRange": [
+    321,
+    338
+   ],
+   "summary": "Verifica que a prévia trunca com contagem.",
+   "tags": [
+    "test",
+    "landing",
+    "rendering"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJWTNotInNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJWTNotInNav",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtDecodeAndSign",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtDecodeAndSign",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtSourceTokenUsesCache",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtSourceTokenUsesCache",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:canonKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:handledKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:helpKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestEveryActionIsDiscoverable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestEveryActionIsDiscoverable",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestHelpNeverPromisesAKeyThatDoesNotExist",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestHelpNeverPromisesAKeyThatDoesNotExist",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestEveryModuleHasAHelpBlock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestEveryModuleHasAHelpBlock",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:uniqueStrings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestCommandBarSpeaksOneLanguage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestCommandBarSpeaksOneLanguage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestNavigationVocabularyIsUniform",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestNavigationVocabularyIsUniform",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestKeysAreSpelledTheSameEverywhere",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestKeysAreSpelledTheSameEverywhere",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestStateHasOneWord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "function:internal/ui/keymap_test.go:TestStateHasOneWord",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "function:internal/ui/module_caps.go:hasTool",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "function:internal/ui/module_caps.go:probeModuleCaps",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "function:internal/ui/module_caps.go:visibleTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "function:internal/ui/module_caps.go:hiddenTabCount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsDropsEmptyGroups",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestModuleCapsDropsEmptyGroups",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestActiveTabStaysVisibleEvenWhenIrrelevant",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestActiveTabStaysVisibleEvenWhenIrrelevant",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestTabCycleWalksOnlyVisibleModules",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestTabCycleWalksOnlyVisibleModules",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestProbeModuleCapsReadsTheProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestProbeModuleCapsReadsTheProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestAllTabsFollowsSidebarOrder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestAllTabsFollowsSidebarOrder",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestCwdStartupProbesCapabilities",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestCwdStartupProbesCapabilities",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:cmdBatchProbes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestCapsAreRemeasuredWhenProjectDataLands",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestCapsAreRemeasuredWhenProjectDataLands",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestActiveTabSurvivesFirstProbe",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "function:internal/ui/module_caps_test.go:TestActiveTabSurvivesFirstProbe",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:landingRenderers",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:landingTestApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsHaveNoBoxes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsHaveNoBoxes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsAnswerTheThreeQuestions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsAnswerTheThreeQuestions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsFitEveryTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingsFitEveryTerminal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingStateIsNotDuplicated",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingStateIsNotDuplicated",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingProbePendingIsHonest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingProbePendingIsHonest",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPrimaryActionStandsOut",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPrimaryActionStandsOut",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingBandIsClosed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingBandIsClosed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingDropsFactsThatRepeatTheState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingDropsFactsThatRepeatTheState",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingFactColumnFollowsItsLabels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingFactColumnFollowsItsLabels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingShowsWhatTheProjectHas",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingShowsWhatTheProjectHas",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPreviewEmptyStateSpeaks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPreviewEmptyStateSpeaks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPreviewTruncatesWithCount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "function:internal/ui/module_landing_test.go:TestLandingPreviewTruncatesWithCount",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/jwt_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/keymap_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_caps_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/module_landing_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtLandingEnterAndEsc",
+   "target": "function:internal/ui/jwt_tab.go:handleJwtKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtDecodeAndSign",
+   "target": "function:internal/ui/jwt_tab.go:runJwtGenerate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtDecodeAndSign",
+   "target": "function:internal/ui/jwt_tab.go:runJwtSign",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "target": "function:internal/ui/jwt_tab.go:jwtHScrollDelta",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "target": "function:internal/ui/jwt_tab.go:updateJwtEdit",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtHScrollAndEditorSelect",
+   "target": "function:internal/ui/editor.go:selRange",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "target": "function:internal/ui/jwt_tab.go:openJwtClient",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/jwt_tab_test.go:TestJwtClientDashboard",
+   "target": "function:internal/ui/jwt_tab.go:renderJwtTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/keymap_test.go:helpKeys",
+   "target": "function:internal/ui/help_screen.go:helpGroups",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/keymap_test.go:TestEveryModuleHasAHelpBlock",
+   "target": "function:internal/ui/help_screen.go:helpGroups",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/keymap_test.go:TestStateHasOneWord",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "target": "function:internal/ui/module_caps.go:hiddenTabCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "target": "function:internal/ui/module_caps.go:visibleTabs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsShowsEverythingUntilProbed",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsHidesIrrelevantAndAnnouncesThem",
+   "target": "function:internal/ui/module_caps.go:hiddenTabCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestModuleCapsDropsEmptyGroups",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "target": "function:internal/ui/module_caps.go:hiddenTabCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestShowAllModulesToggle",
+   "target": "function:internal/ui/module_caps.go:visibleTabs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestActiveTabStaysVisibleEvenWhenIrrelevant",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestProbeModuleCapsReadsTheProject",
+   "target": "function:internal/ui/module_caps.go:probeModuleCaps",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_caps_test.go:TestActiveTabSurvivesFirstProbe",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingsHaveNoBoxes",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingsAnswerTheThreeQuestions",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingsFitEveryTerminal",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingsFitEveryTerminal",
+   "target": "function:internal/ui/module_shell.go:moduleSize",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingStateIsNotDuplicated",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingProbePendingIsHonest",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingPrimaryActionStandsOut",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingBandIsClosed",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingDropsFactsThatRepeatTheState",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingFactColumnFollowsItsLabels",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingShowsWhatTheProjectHas",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingPreviewEmptyStateSpeaks",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/module_landing_test.go:TestLandingPreviewTruncatesWithCount",
+   "target": "function:internal/ui/foundation.go:stripANSI",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/module_caps.go",
+   "target": "file:internal/ui/module_caps_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

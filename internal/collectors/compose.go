@@ -11,7 +11,12 @@ import (
 	"strings"
 )
 
-var composePortRe = regexp.MustCompile(`(?m)(?:^|\s)(?:-\s*)?(?:["']?(?:\d+\.){0,3}(\d+)\s*:\s*(\d+)["']?|["']?(\d+)["']?\s*$)`)
+// composeMapRe casa o formato host:container (específico, vale em qualquer
+// linha); composeBareRe casa a porta solta do formato curto `- 5173`, que só é
+// confiável dentro de um bloco `ports:` — fora dele, `retries: 5` ou
+// `interval: 5s` virariam portas falsas.
+var composeMapRe = regexp.MustCompile(`(?:^|\s)(?:-\s*)?["']?(?:\d+\.){0,3}(\d+)\s*:\s*(\d+)["']?`)
+var composeBareRe = regexp.MustCompile(`(?:^|\s)(?:-\s*)?["']?(\d+)["']?\s*$`)
 
 // ComposeFile returns the first compose file found in projectPath.
 func ComposeFile(projectPath string) string {
@@ -64,17 +69,44 @@ func ParseComposePorts(projectPath string) []int {
 	}
 	seen := make(map[int]bool)
 	var ports []int
-	for _, m := range composePortRe.FindAllStringSubmatch(string(data), -1) {
-		for _, g := range []string{m[1], m[3]} {
-			if g == "" {
-				continue
+	add := func(s string) {
+		if s == "" {
+			return
+		}
+		p, err := strconv.Atoi(s)
+		if err != nil || p <= 0 || p > 65535 || seen[p] {
+			return
+		}
+		seen[p] = true
+		ports = append(ports, p)
+	}
+
+	inPorts, portsIndent := false, 0
+	for _, line := range strings.Split(string(data), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		indent := len(line) - len(strings.TrimLeft(line, " \t"))
+		// saiu do bloco ports: quando a indentação volta ao nível da chave ou menos
+		if inPorts && indent <= portsIndent {
+			inPorts = false
+		}
+		if trimmed == "ports:" {
+			inPorts, portsIndent = true, indent
+			continue
+		}
+		// host:container vale em qualquer linha (específico o bastante)
+		matchedMap := false
+		for _, m := range composeMapRe.FindAllStringSubmatch(line, -1) {
+			add(m[1])
+			matchedMap = true
+		}
+		// porta solta (`- 5173`) só dentro de um bloco ports:
+		if !matchedMap && inPorts {
+			if m := composeBareRe.FindStringSubmatch(line); m != nil {
+				add(m[1])
 			}
-			p, err := strconv.Atoi(g)
-			if err != nil || p <= 0 || seen[p] {
-				continue
-			}
-			seen[p] = true
-			ports = append(ports, p)
 		}
 	}
 	return ports

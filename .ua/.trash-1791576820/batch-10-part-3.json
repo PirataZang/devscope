@@ -1,0 +1,3261 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/cf_tab.go",
+   "type": "file",
+   "name": "cf_tab.go",
+   "filePath": "internal/ui/cf_tab.go",
+   "summary": "Aba do módulo Cloudflare Tunnel: lista túneis quick/named do projeto e da conta, mostra detalhes e logs, e oferece wizard para criar, iniciar, parar, rotear DNS e excluir túneis via cloudflared.",
+   "tags": [
+    "tui",
+    "cloudflare",
+    "tunnel",
+    "component",
+    "wizard"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:openCFClient",
+   "type": "function",
+   "name": "openCFClient",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    67,
+    91
+   ],
+   "summary": "Abre o cliente do módulo Cloudflare e dispara a primeira atualização.",
+   "tags": [
+    "lifecycle",
+    "cloudflare",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:refreshCF",
+   "type": "function",
+   "name": "refreshCF",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    102,
+    133
+   ],
+   "summary": "Comando assíncrono que lê autenticação, túneis da conta, túneis vivos e configuração salva e funde tudo numa mensagem.",
+   "tags": [
+    "async",
+    "cloudflare",
+    "data-loading"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:handleCFMsg",
+   "type": "function",
+   "name": "handleCFMsg",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    135,
+    168
+   ],
+   "summary": "Aplica mensagens de carga e de ação do módulo Cloudflare ao estado do App.",
+   "tags": [
+    "event-handler",
+    "cloudflare",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFLanding",
+   "type": "function",
+   "name": "renderCFLanding",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    170,
+    203
+   ],
+   "summary": "Renderiza a landing do módulo Cloudflare com status de instalação e autenticação.",
+   "tags": [
+    "rendering",
+    "landing",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFTab",
+   "type": "function",
+   "name": "renderCFTab",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    205,
+    232
+   ],
+   "summary": "Renderiza a aba Cloudflare escolhendo entre visão de túneis, conta, configuração e wizard.",
+   "tags": [
+    "rendering",
+    "cloudflare",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfHints",
+   "type": "function",
+   "name": "cfHints",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    234,
+    256
+   ],
+   "summary": "Monta as dicas de teclas contextuais da aba Cloudflare.",
+   "tags": [
+    "hints",
+    "keybindings",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFHeader",
+   "type": "function",
+   "name": "renderCFHeader",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    260,
+    277
+   ],
+   "summary": "Header unificado com autenticação, versão e contagem de túneis.",
+   "tags": [
+    "rendering",
+    "header",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfAuthChip",
+   "type": "function",
+   "name": "cfAuthChip",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    279,
+    288
+   ],
+   "summary": "Chip visual com o estado de login do cloudflared.",
+   "tags": [
+    "rendering",
+    "status",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFNav",
+   "type": "function",
+   "name": "renderCFNav",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    290,
+    324
+   ],
+   "summary": "Renderiza a navegação entre as subvisões da aba Cloudflare.",
+   "tags": [
+    "rendering",
+    "navigation",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfCounts",
+   "type": "function",
+   "name": "cfCounts",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    326,
+    335
+   ],
+   "summary": "Conta túneis ativos e totais para o header.",
+   "tags": [
+    "utility",
+    "metrics",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFTunnelsView",
+   "type": "function",
+   "name": "renderCFTunnelsView",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    339,
+    357
+   ],
+   "summary": "Compõe a visão de túneis com tabela em largura total e painéis de detalhe/logs.",
+   "tags": [
+    "rendering",
+    "layout",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfColumns",
+   "type": "function",
+   "name": "cfColumns",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    361,
+    370
+   ],
+   "summary": "Calcula larguras das colunas da tabela de túneis.",
+   "tags": [
+    "layout",
+    "table",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFTunnelTable",
+   "type": "function",
+   "name": "renderCFTunnelTable",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    372,
+    409
+   ],
+   "summary": "Renderiza a tabela de túneis com status, nome, porta, modo e URL pública.",
+   "tags": [
+    "rendering",
+    "table",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFRow",
+   "type": "function",
+   "name": "renderCFRow",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    411,
+    447
+   ],
+   "summary": "Renderiza uma linha da tabela de túneis com destaque de seleção.",
+   "tags": [
+    "rendering",
+    "table",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfTunnelDot",
+   "type": "function",
+   "name": "cfTunnelDot",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    449,
+    458
+   ],
+   "summary": "Escolhe o indicador colorido de estado do túnel.",
+   "tags": [
+    "rendering",
+    "status",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFDetailsPane",
+   "type": "function",
+   "name": "renderCFDetailsPane",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    472,
+    512
+   ],
+   "summary": "Painel de detalhes do túnel selecionado com procedência do hostname e ID.",
+   "tags": [
+    "rendering",
+    "details",
+    "cloudflare"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFLogsPane",
+   "type": "function",
+   "name": "renderCFLogsPane",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    514,
+    555
+   ],
+   "summary": "Painel com os logs recentes do cloudflared do túnel selecionado.",
+   "tags": [
+    "rendering",
+    "logs",
+    "cloudflare"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFAccount",
+   "type": "function",
+   "name": "renderCFAccount",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    557,
+    587
+   ],
+   "summary": "Lista os túneis nomeados da conta Cloudflare.",
+   "tags": [
+    "rendering",
+    "account",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFConfig",
+   "type": "function",
+   "name": "renderCFConfig",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    591,
+    615
+   ],
+   "summary": "Tela de configuração que funde histórico, setup e ajustes.",
+   "tags": [
+    "rendering",
+    "configuration",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfSetupLines",
+   "type": "function",
+   "name": "cfSetupLines",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    617,
+    633
+   ],
+   "summary": "Linhas de instruções de setup do cloudflared.",
+   "tags": [
+    "rendering",
+    "setup",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfStepLines",
+   "type": "function",
+   "name": "cfStepLines",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    635,
+    651
+   ],
+   "summary": "Linhas com os passos de configuração e seu estado.",
+   "tags": [
+    "rendering",
+    "setup",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfHistoryLines",
+   "type": "function",
+   "name": "cfHistoryLines",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    653,
+    676
+   ],
+   "summary": "Linhas do histórico de túneis do projeto.",
+   "tags": [
+    "rendering",
+    "history",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:renderCFWizard",
+   "type": "function",
+   "name": "renderCFWizard",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    680,
+    705
+   ],
+   "summary": "Renderiza o formulário do wizard de túnel numa caixa só, com prévia do comando cloudflared.",
+   "tags": [
+    "rendering",
+    "wizard",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfWizardFields",
+   "type": "function",
+   "name": "cfWizardFields",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    707,
+    738
+   ],
+   "summary": "Define os campos do wizard conforme o modo (quick/named).",
+   "tags": [
+    "wizard",
+    "form",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfModeHint",
+   "type": "function",
+   "name": "cfModeHint",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    740,
+    749
+   ],
+   "summary": "Texto explicativo do modo de túnel selecionado.",
+   "tags": [
+    "hints",
+    "wizard",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfPortHint",
+   "type": "function",
+   "name": "cfPortHint",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    753,
+    766
+   ],
+   "summary": "Sugere as portas já detectadas pelo scanner para o destino.",
+   "tags": [
+    "hints",
+    "ports",
+    "wizard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfWizardValue",
+   "type": "function",
+   "name": "cfWizardValue",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    777,
+    795
+   ],
+   "summary": "Lê o valor de um campo do wizard.",
+   "tags": [
+    "wizard",
+    "form",
+    "accessor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfWizardCycle",
+   "type": "function",
+   "name": "cfWizardCycle",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    799,
+    817
+   ],
+   "summary": "Ação de espaço: alterna o modo ou percorre portas do projeto no campo destino.",
+   "tags": [
+    "wizard",
+    "event-handler",
+    "ports"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfDeleteConfirmLabels",
+   "type": "function",
+   "name": "cfDeleteConfirmLabels",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    828,
+    846
+   ],
+   "summary": "Rótulos do modal de confirmação de exclusão de túnel.",
+   "tags": [
+    "rendering",
+    "modal",
+    "confirmation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:beginCFWizard",
+   "type": "function",
+   "name": "beginCFWizard",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    848,
+    861
+   ],
+   "summary": "Inicia o wizard de criação com valores padrão.",
+   "tags": [
+    "wizard",
+    "lifecycle",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfWizardText",
+   "type": "function",
+   "name": "cfWizardText",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    863,
+    874
+   ],
+   "summary": "Retorna o texto editável do campo focado no wizard.",
+   "tags": [
+    "wizard",
+    "form",
+    "accessor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:setCFWizardText",
+   "type": "function",
+   "name": "setCFWizardText",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    876,
+    885
+   ],
+   "summary": "Grava o texto editado no campo focado do wizard.",
+   "tags": [
+    "wizard",
+    "form",
+    "mutation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfWizardFocusField",
+   "type": "function",
+   "name": "cfWizardFocusField",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    887,
+    896
+   ],
+   "summary": "Resolve qual campo do wizard está em foco.",
+   "tags": [
+    "wizard",
+    "focus",
+    "accessor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:handleCFKeys",
+   "type": "function",
+   "name": "handleCFKeys",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    952,
+    1053
+   ],
+   "summary": "Handler de teclas da aba Cloudflare: navegação, start/stop/restart, delete, login, instalação e cópia de URL.",
+   "tags": [
+    "event-handler",
+    "keybindings",
+    "cloudflare"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfMove",
+   "type": "function",
+   "name": "cfMove",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1055,
+    1090
+   ],
+   "summary": "Move o cursor na lista de túneis respeitando limites.",
+   "tags": [
+    "navigation",
+    "cursor",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:updateCFWizard",
+   "type": "function",
+   "name": "updateCFWizard",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1092,
+    1184
+   ],
+   "summary": "Trata teclas dentro do wizard modal, validando e submetendo o túnel.",
+   "tags": [
+    "event-handler",
+    "wizard",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "type": "function",
+   "name": "cfCreateAndStart",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1186,
+    1230
+   ],
+   "summary": "Cria (se named), roteia DNS, salva e inicia o túnel definido no wizard.",
+   "tags": [
+    "action",
+    "cloudflare",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfStartSelected",
+   "type": "function",
+   "name": "cfStartSelected",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1232,
+    1261
+   ],
+   "summary": "Inicia o túnel selecionado e atualiza a configuração salva.",
+   "tags": [
+    "action",
+    "cloudflare",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfStopSelected",
+   "type": "function",
+   "name": "cfStopSelected",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1263,
+    1276
+   ],
+   "summary": "Para o processo cloudflared do túnel selecionado.",
+   "tags": [
+    "action",
+    "cloudflare",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfKillForeign",
+   "type": "function",
+   "name": "cfKillForeign",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1281,
+    1292
+   ],
+   "summary": "Encerra processos cloudflared órfãos que ficaram ocupando portas.",
+   "tags": [
+    "action",
+    "cleanup",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfRestartSelected",
+   "type": "function",
+   "name": "cfRestartSelected",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1294,
+    1310
+   ],
+   "summary": "Reinicia o túnel selecionado (stop + start).",
+   "tags": [
+    "action",
+    "cloudflare",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfDeleteSelected",
+   "type": "function",
+   "name": "cfDeleteSelected",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1312,
+    1337
+   ],
+   "summary": "Remove o túnel da configuração e, se nomeado, da conta Cloudflare.",
+   "tags": [
+    "action",
+    "cloudflare",
+    "deletion"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfInstall",
+   "type": "function",
+   "name": "cfInstall",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1339,
+    1349
+   ],
+   "summary": "Executa a instalação do cloudflared.",
+   "tags": [
+    "action",
+    "install",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfLogin",
+   "type": "function",
+   "name": "cfLogin",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1351,
+    1361
+   ],
+   "summary": "Executa o login do cloudflared.",
+   "tags": [
+    "action",
+    "auth",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfCreateNamed",
+   "type": "function",
+   "name": "cfCreateNamed",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1363,
+    1398
+   ],
+   "summary": "Cria um túnel nomeado na conta e o registra no projeto.",
+   "tags": [
+    "action",
+    "cloudflare",
+    "tunnel"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfRouteSelected",
+   "type": "function",
+   "name": "cfRouteSelected",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1400,
+    1422
+   ],
+   "summary": "Associa um hostname DNS ao túnel nomeado selecionado.",
+   "tags": [
+    "action",
+    "dns",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfCopyURL",
+   "type": "function",
+   "name": "cfCopyURL",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1424,
+    1446
+   ],
+   "summary": "Copia a URL pública do túnel selecionado para o clipboard.",
+   "tags": [
+    "action",
+    "clipboard",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab.go:cfOpenBrowser",
+   "type": "function",
+   "name": "cfOpenBrowser",
+   "filePath": "internal/ui/cf_tab.go",
+   "lineRange": [
+    1448,
+    1468
+   ],
+   "summary": "Abre a URL pública do túnel selecionado no navegador.",
+   "tags": [
+    "action",
+    "browser",
+    "cloudflare"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/cf_tab_test.go",
+   "type": "file",
+   "name": "cf_tab_test.go",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "summary": "Testes da aba Cloudflare Tunnel cobrindo presença na lista de abas, landing, atalho da sidebar, wizard modal, tela de configuração e modal de exclusão.",
+   "tags": [
+    "test",
+    "tui",
+    "cloudflare",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestAllTabsIncludesCFTunnel",
+   "type": "function",
+   "name": "TestAllTabsIncludesCFTunnel",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    12,
+    26
+   ],
+   "summary": "Garante que a aba Cloudflare Tunnel está na lista de abas.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFLandingAndOpen",
+   "type": "function",
+   "name": "TestCFLandingAndOpen",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    28,
+    55
+   ],
+   "summary": "Valida a landing e a abertura do cliente Cloudflare.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFSidebarKey",
+   "type": "function",
+   "name": "TestCFSidebarKey",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    57,
+    63
+   ],
+   "summary": "Teste de CFSidebarKey.",
+   "tags": [
+    "test",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFWizardEditsURLAsText",
+   "type": "function",
+   "name": "TestCFWizardEditsURLAsText",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    65,
+    110
+   ],
+   "summary": "Verifica que o wizard edita a URL de destino como texto e gera os argumentos corretos.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFConfigScreen",
+   "type": "function",
+   "name": "TestCFConfigScreen",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    113,
+    124
+   ],
+   "summary": "Verifica o conteúdo da tela de configuração Cloudflare.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFHintsIncludeInstallLogin",
+   "type": "function",
+   "name": "TestCFHintsIncludeInstallLogin",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    126,
+    132
+   ],
+   "summary": "Teste de CFHintsIncludeInstallLogin.",
+   "tags": [
+    "test",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFTunnelsViewLayout",
+   "type": "function",
+   "name": "TestCFTunnelsViewLayout",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    134,
+    150
+   ],
+   "summary": "Verifica o layout da visão de túneis.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFWizardIsModal",
+   "type": "function",
+   "name": "TestCFWizardIsModal",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    152,
+    163
+   ],
+   "summary": "Garante que o wizard bloqueia outras teclas enquanto aberto.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/cf_tab_test.go:TestCFDeleteConfirmModal",
+   "type": "function",
+   "name": "TestCFDeleteConfirmModal",
+   "filePath": "internal/ui/cf_tab_test.go",
+   "lineRange": [
+    165,
+    179
+   ],
+   "summary": "Valida o modal de confirmação de exclusão.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/landing_probe.go",
+   "type": "file",
+   "name": "landing_probe.go",
+   "filePath": "internal/ui/landing_probe.go",
+   "summary": "Sondagem assíncrona das landings dos módulos: consulta CLIs e configs (cloudflared, ngrok, ssh, nginx, Jenkins, GHA, Kubernetes, Swarm) fora do View e entrega os resultados por mensagem.",
+   "tags": [
+    "tui",
+    "async",
+    "probe",
+    "bubbletea",
+    "integration"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Respeita a regra de que View nunca faz I/O: toda sondagem roda num tea.Cmd e retorna um toolLandingMsg."
+  },
+  {
+   "id": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "type": "function",
+   "name": "probeToolLanding",
+   "filePath": "internal/ui/landing_probe.go",
+   "lineRange": [
+    54,
+    114
+   ],
+   "summary": "Comando assíncrono que sonda CLIs/configs do módulo atual (cloudflared, ngrok, ssh, nginx, Jenkins, GHA, k8s, Swarm) e retorna um toolLandingMsg.",
+   "tags": [
+    "async",
+    "probe",
+    "integration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/landing_probe.go:handleToolLandingMsg",
+   "type": "function",
+   "name": "handleToolLandingMsg",
+   "filePath": "internal/ui/landing_probe.go",
+   "lineRange": [
+    116,
+    160
+   ],
+   "summary": "Aplica o resultado da sondagem nos campos em cache que as landings leem.",
+   "tags": [
+    "event-handler",
+    "state",
+    "cache"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/routes_tab.go",
+   "type": "file",
+   "name": "routes_tab.go",
+   "filePath": "internal/ui/routes_tab.go",
+   "summary": "Aba do módulo Rotas/API: dispara a descoberta de rotas do projeto via routeutil e renderiza cards, tabela filtrável por método/caminho/auth e um inspetor da rota selecionada.",
+   "tags": [
+    "tui",
+    "api-routes",
+    "component",
+    "filter"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:openRoutesClient",
+   "type": "function",
+   "name": "openRoutesClient",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    26,
+    35
+   ],
+   "summary": "Abre o cliente do módulo Rotas e dispara a descoberta.",
+   "tags": [
+    "lifecycle",
+    "api-routes",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:scanProjectRoutes",
+   "type": "function",
+   "name": "scanProjectRoutes",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    46,
+    66
+   ],
+   "summary": "Comando assíncrono que chama routeutil.Discover e devolve rotas e stacks detectadas.",
+   "tags": [
+    "async",
+    "api-routes",
+    "discovery"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:handleRoutesLoaded",
+   "type": "function",
+   "name": "handleRoutesLoaded",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    68,
+    98
+   ],
+   "summary": "Aplica o resultado da descoberta de rotas ao estado e reposiciona o cursor.",
+   "tags": [
+    "event-handler",
+    "api-routes",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:routesCountLabel",
+   "type": "function",
+   "name": "routesCountLabel",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    100,
+    119
+   ],
+   "summary": "Monta o rótulo de contagem de rotas por stack/origem.",
+   "tags": [
+    "rendering",
+    "metrics",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:filteredRoutes",
+   "type": "function",
+   "name": "filteredRoutes",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    121,
+    133
+   ],
+   "summary": "Retorna as rotas que passam pelo filtro de texto e de status.",
+   "tags": [
+    "filter",
+    "api-routes",
+    "query"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:routeMatchesFilter",
+   "type": "function",
+   "name": "routeMatchesFilter",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    135,
+    149
+   ],
+   "summary": "Testa uma rota contra o filtro (método, caminho, handler, auth).",
+   "tags": [
+    "filter",
+    "predicate",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:syncRoutesCursor",
+   "type": "function",
+   "name": "syncRoutesCursor",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    151,
+    164
+   ],
+   "summary": "Mantém o cursor e a rolagem válidos após mudanças no filtro.",
+   "tags": [
+    "cursor",
+    "state",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:updateRoutesFilter",
+   "type": "function",
+   "name": "updateRoutesFilter",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    166,
+    199
+   ],
+   "summary": "Trata a digitação no filtro da aba Rotas.",
+   "tags": [
+    "event-handler",
+    "filter",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:refreshRoutesStatusFilter",
+   "type": "function",
+   "name": "refreshRoutesStatusFilter",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    201,
+    211
+   ],
+   "summary": "Recalcula o filtro de status (auth/públicas) da lista de rotas.",
+   "tags": [
+    "filter",
+    "state",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesLanding",
+   "type": "function",
+   "name": "renderRoutesLanding",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    213,
+    235
+   ],
+   "summary": "Landing do módulo Rotas antes do cliente ser aberto.",
+   "tags": [
+    "rendering",
+    "landing",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesTab",
+   "type": "function",
+   "name": "renderRoutesTab",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    237,
+    271
+   ],
+   "summary": "Renderiza a aba Rotas com header, cards, filtro, tabela e inspetor.",
+   "tags": [
+    "rendering",
+    "layout",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesHeader",
+   "type": "function",
+   "name": "renderRoutesHeader",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    273,
+    290
+   ],
+   "summary": "Header com stacks detectadas e contagem de rotas.",
+   "tags": [
+    "rendering",
+    "header",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesCards",
+   "type": "function",
+   "name": "renderRoutesCards",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    292,
+    340
+   ],
+   "summary": "Cards de resumo com totais por método e por origem.",
+   "tags": [
+    "rendering",
+    "cards",
+    "metrics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesFilterLine",
+   "type": "function",
+   "name": "renderRoutesFilterLine",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    342,
+    352
+   ],
+   "summary": "Linha do filtro ativo da aba Rotas.",
+   "tags": [
+    "rendering",
+    "filter",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesTable",
+   "type": "function",
+   "name": "renderRoutesTable",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    354,
+    390
+   ],
+   "summary": "Tabela rolável de rotas filtradas.",
+   "tags": [
+    "rendering",
+    "table",
+    "api-routes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesTableLine",
+   "type": "function",
+   "name": "renderRoutesTableLine",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    392,
+    436
+   ],
+   "summary": "Renderiza uma linha da tabela de rotas com método colorido e indicador de auth.",
+   "tags": [
+    "rendering",
+    "table",
+    "api-routes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:renderRoutesInspector",
+   "type": "function",
+   "name": "renderRoutesInspector",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    438,
+    488
+   ],
+   "summary": "Inspetor da rota selecionada com arquivo, linha, handler e middlewares.",
+   "tags": [
+    "rendering",
+    "inspector",
+    "api-routes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:routesSourceStats",
+   "type": "function",
+   "name": "routesSourceStats",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    490,
+    533
+   ],
+   "summary": "Agrega estatísticas das rotas por origem/scanner.",
+   "tags": [
+    "metrics",
+    "aggregation",
+    "api-routes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:routeMethodStyle",
+   "type": "function",
+   "name": "routeMethodStyle",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    535,
+    548
+   ],
+   "summary": "Estilo Lip Gloss por método HTTP.",
+   "tags": [
+    "styling",
+    "lipgloss",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab.go:handleRoutesKeys",
+   "type": "function",
+   "name": "handleRoutesKeys",
+   "filePath": "internal/ui/routes_tab.go",
+   "lineRange": [
+    550,
+    593
+   ],
+   "summary": "Handler de teclas da aba Rotas: navegação, filtro, rescan e abertura da rota no cliente de API.",
+   "tags": [
+    "event-handler",
+    "keybindings",
+    "api-routes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/routes_tab_test.go",
+   "type": "file",
+   "name": "routes_tab_test.go",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "summary": "Testes da aba Rotas cobrindo navegação landing/esc, abertura do cliente de API com preset, filtros por caminho e auth e exibição na sidebar.",
+   "tags": [
+    "test",
+    "tui",
+    "api-routes",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestAllTabsIncludesRoutes",
+   "type": "function",
+   "name": "TestAllTabsIncludesRoutes",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    14,
+    28
+   ],
+   "summary": "Garante que a aba Rotas está na lista de abas.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestRoutesLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestRoutesLandingEnterAndEsc",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    30,
+    69
+   ],
+   "summary": "Valida entrada e saída do cliente Rotas pela landing.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestOpenApiWithPreset",
+   "type": "function",
+   "name": "TestOpenApiWithPreset",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    71,
+    90
+   ],
+   "summary": "Verifica a abertura do cliente de API com uma rota pré-preenchida.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestRoutesEnterOpensAPI",
+   "type": "function",
+   "name": "TestRoutesEnterOpensAPI",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    92,
+    110
+   ],
+   "summary": "Garante que enter numa rota abre o cliente de API.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestRoutesFilterByPath",
+   "type": "function",
+   "name": "TestRoutesFilterByPath",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    112,
+    141
+   ],
+   "summary": "Valida o filtro de rotas por caminho.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestRoutesFilterAuthAndRender",
+   "type": "function",
+   "name": "TestRoutesFilterAuthAndRender",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    143,
+    167
+   ],
+   "summary": "Valida o filtro por auth e a renderização resultante.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/routes_tab_test.go:TestSidebarShowsUtilsRoutes",
+   "type": "function",
+   "name": "TestSidebarShowsUtilsRoutes",
+   "filePath": "internal/ui/routes_tab_test.go",
+   "lineRange": [
+    169,
+    178
+   ],
+   "summary": "Garante que a sidebar exibe o módulo Rotas.",
+   "tags": [
+    "test",
+    "unit-test",
+    "tui"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:openCFClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:refreshCF",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:handleCFMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfAuthChip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFNav",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFTunnelsView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFTunnelTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfTunnelDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFDetailsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFLogsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFAccount",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfSetupLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfStepLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfHistoryLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:renderCFWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfWizardFields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfModeHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfPortHint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfWizardValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfWizardCycle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfDeleteConfirmLabels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:beginCFWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:setCFWizardText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfWizardFocusField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:handleCFKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:updateCFWizard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfStartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfStopSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfKillForeign",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfRestartSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfDeleteSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfInstall",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfLogin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfCreateNamed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfRouteSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfCopyURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "function:internal/ui/cf_tab.go:cfOpenBrowser",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/cfutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/cfutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/cfutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/cfutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestAllTabsIncludesCFTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFLandingAndOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFSidebarKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFWizardEditsURLAsText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFConfigScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFHintsIncludeInstallLogin",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFTunnelsViewLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFWizardIsModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/cf_tab_test.go",
+   "target": "function:internal/ui/cf_tab_test.go:TestCFDeleteConfirmModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/cfutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/cfutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/cfutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/cfutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/jenkinsutil/client.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/jenkinsutil/client_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/jenkinsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/nginxutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/ngrokutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/ngrokutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/ngrokutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/sshutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/sshutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "file:internal/sshutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/landing_probe.go",
+   "target": "function:internal/ui/landing_probe.go:handleToolLandingMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/openapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/route.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_django.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_express.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_fastapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_flask.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_go.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_laravel.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_laravel_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_nestjs.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_next_nuxt.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_node_extra.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_rails.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_rust.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/scan_spring.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/stacks.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/routeutil/walk.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:openRoutesClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:scanProjectRoutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:handleRoutesLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:routesCountLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:filteredRoutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:routeMatchesFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:syncRoutesCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:updateRoutesFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:refreshRoutesStatusFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesCards",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesFilterLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesTableLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:renderRoutesInspector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:routesSourceStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:routeMethodStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "function:internal/ui/routes_tab.go:handleRoutesKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/openapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/route.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_django.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_express.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_fastapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_flask.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_go.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_laravel.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_laravel_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_nestjs.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_next_nuxt.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_node_extra.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_rails.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_rust.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/scan_spring.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/stacks.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "file:internal/routeutil/walk.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestAllTabsIncludesRoutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestRoutesLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestOpenApiWithPreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestRoutesEnterOpensAPI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestRoutesFilterByPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestRoutesFilterAuthAndRender",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/routes_tab_test.go",
+   "target": "function:internal/ui/routes_tab_test.go:TestSidebarShowsUtilsRoutes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/routes_tab.go:scanProjectRoutes",
+   "target": "function:internal/routeutil/discover.go:Discover",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/routes_tab.go:filteredRoutes",
+   "target": "function:internal/ui/routes_tab.go:routeMatchesFilter",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/agent.go:Auth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/agent.go:ListAccountTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/discover.go:ListLiveTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/config.go:LoadProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/config.go:MergeTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/config.go:MergeTunnelsAll",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:refreshCF",
+   "target": "function:internal/cfutil/config.go:CountForeignLive",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "target": "function:internal/cfutil/agent.go:CreateTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "target": "function:internal/cfutil/agent.go:RouteDNS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "target": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCreateAndStart",
+   "target": "function:internal/cfutil/config.go:SaveProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfStartSelected",
+   "target": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfStopSelected",
+   "target": "function:internal/cfutil/agent.go:StopTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfKillForeign",
+   "target": "function:internal/cfutil/discover.go:StopForeignTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfRestartSelected",
+   "target": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfDeleteSelected",
+   "target": "function:internal/cfutil/agent.go:DeleteAccountTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfInstall",
+   "target": "function:internal/cfutil/agent.go:Install",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfLogin",
+   "target": "function:internal/cfutil/agent.go:Login",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCreateNamed",
+   "target": "function:internal/cfutil/agent.go:CreateTunnel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfRouteSelected",
+   "target": "function:internal/cfutil/agent.go:RouteDNS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfCopyURL",
+   "target": "function:internal/cfutil/agent.go:PublicURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:cfOpenBrowser",
+   "target": "function:internal/cfutil/agent.go:PublicURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:renderCFLogsPane",
+   "target": "function:internal/cfutil/agent.go:RecentLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:renderCFWizard",
+   "target": "function:internal/cfutil/agent.go:TunnelArgs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/cf_tab.go:updateCFWizard",
+   "target": "function:internal/cfutil/agent.go:NormalizeURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/cfutil/agent.go:Auth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/gha.go:GHARepoInfo",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/gha.go:GHAListLocalWorkflowFiles",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/k8s.go:K8sAvailable",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/k8s.go:K8sCurrentContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/swarm.go:SwarmAvailable",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "target": "function:internal/collectors/swarm.go:SwarmClusterInfo",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/ui/cf_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/routes_tab.go",
+   "target": "file:internal/ui/routes_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

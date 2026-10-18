@@ -1,0 +1,1383 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/project_cwd_test.go",
+   "type": "file",
+   "name": "project_cwd_test.go",
+   "filePath": "internal/ui/project_cwd_test.go",
+   "summary": "Teste que valida a detecção do projeto correspondente ao diretório de trabalho atual (findProjectForCwd).",
+   "tags": [
+    "test",
+    "cwd",
+    "project-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/project_cwd_test.go:TestFindProjectForCwd",
+   "type": "function",
+   "name": "TestFindProjectForCwd",
+   "filePath": "internal/ui/project_cwd_test.go",
+   "lineRange": [
+    11,
+    31
+   ],
+   "summary": "Verifica que o projeto cujo caminho contém o diretório atual é encontrado corretamente.",
+   "tags": [
+    "test",
+    "tui",
+    "project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax.go",
+   "type": "file",
+   "name": "relax.go",
+   "filePath": "internal/ui/relax.go",
+   "summary": "Tela Relax: registro tabular de todas as cenas animadas (nome, glifo, passo e render), troca de cena com crossfade, barra lateral com seleção, banner RELAX! em arco-íris e utilidades de cor HSL, centralização e hash determinístico.",
+   "tags": [
+    "entry-point",
+    "relax",
+    "animacao",
+    "tui",
+    "registry"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax.go:String",
+   "type": "function",
+   "name": "String",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    260,
+    260
+   ],
+   "summary": "Implementa fmt.Stringer para relaxGame devolvendo o nome da cena.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:closeRelax",
+   "type": "function",
+   "name": "closeRelax",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    275,
+    285
+   ],
+   "summary": "Sai da tela Relax e zera o motor de animação e o estado das cenas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:resetRelaxScenes",
+   "type": "function",
+   "name": "resetRelaxScenes",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    289,
+    313
+   ],
+   "summary": "Zera o estado de todas as cenas num único lugar.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax.go:applyRelaxPending",
+   "type": "function",
+   "name": "applyRelaxPending",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    338,
+    347
+   ],
+   "summary": "Aplica a cena pendente quando o crossfade chega ao meio.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:updateRelax",
+   "type": "function",
+   "name": "updateRelax",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    363,
+    378
+   ],
+   "summary": "Trata as teclas da tela Relax: navegação entre cenas e saída.",
+   "tags": [
+    "relax",
+    "event-handler",
+    "keyboard"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:renderRelax",
+   "type": "function",
+   "name": "renderRelax",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    380,
+    396
+   ],
+   "summary": "Renderiza a tela Relax com barra lateral de cenas e palco animado.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:renderRelaxSidebar",
+   "type": "function",
+   "name": "renderRelaxSidebar",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    402,
+    451
+   ],
+   "summary": "Renderiza a barra lateral com banner, lista de cenas e destaque da selecionada.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax.go:renderRelaxSidebarRow",
+   "type": "function",
+   "name": "renderRelaxSidebarRow",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    453,
+    466
+   ],
+   "summary": "Renderiza uma linha da barra lateral com glifo, nome e subtítulo da cena.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:relaxBanner",
+   "type": "function",
+   "name": "relaxBanner",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    470,
+    486
+   ],
+   "summary": "Escreve RELAX! em texto simples com uma cor por letra em fluxo arco-íris.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:relaxRainbowColor",
+   "type": "function",
+   "name": "relaxRainbowColor",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    498,
+    513
+   ],
+   "summary": "Calcula a cor arco-íris da letra i no instante dado.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:relaxHSL",
+   "type": "function",
+   "name": "relaxHSL",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    525,
+    546
+   ],
+   "summary": "Converte uma cor HSL em lipgloss.Color hexadecimal.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:renderRelaxStage",
+   "type": "function",
+   "name": "renderRelaxStage",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    548,
+    565
+   ],
+   "summary": "Renderiza o palco chamando o render da cena ativa com o fade global.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:relaxCenterBlock",
+   "type": "function",
+   "name": "relaxCenterBlock",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    577,
+    598
+   ],
+   "summary": "Centraliza o desenho como bloco, com padding igual em todas as linhas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax.go:relaxHash",
+   "type": "function",
+   "name": "relaxHash",
+   "filePath": "internal/ui/relax.go",
+   "lineRange": [
+    601,
+    610
+   ],
+   "summary": "Gera pseudo-aleatório determinístico e sem estado a partir de inteiros.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_aquarium.go",
+   "type": "file",
+   "name": "relax_aquarium.go",
+   "filePath": "internal/ui/relax_aquarium.go",
+   "summary": "Cena Relax de aquário: peixes desenhados por partes com cauda animada por ângulo, algas balançando, bolhas subindo e feixes de luz na água, renderizados em Braille.",
+   "tags": [
+    "relax",
+    "animacao",
+    "braille",
+    "cena"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_aquarium.go:relaxAqInit",
+   "type": "function",
+   "name": "relaxAqInit",
+   "filePath": "internal/ui/relax_aquarium.go",
+   "lineRange": [
+    70,
+    95
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena aquário para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_aquarium.go:stepRelaxAquarium",
+   "type": "function",
+   "name": "stepRelaxAquarium",
+   "filePath": "internal/ui/relax_aquarium.go",
+   "lineRange": [
+    97,
+    133
+   ],
+   "summary": "Avança um passo da simulação da cena aquário, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_aquarium.go:relaxAquariumFrames",
+   "type": "function",
+   "name": "relaxAquariumFrames",
+   "filePath": "internal/ui/relax_aquarium.go",
+   "lineRange": [
+    135,
+    255
+   ],
+   "summary": "Renderiza um quadro da cena aquário no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_ast.go",
+   "type": "file",
+   "name": "relax_ast.go",
+   "filePath": "internal/ui/relax_ast.go",
+   "summary": "Cena Relax 'Asteroids Idle': nave em piloto automático com inércia que vagueia, mira e atira em asteroides que se partem, em ciclos de ~30s com física por frame e correção de aspecto da célula.",
+   "tags": [
+    "relax",
+    "animacao",
+    "simulacao",
+    "fisica",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstNewScene",
+   "type": "function",
+   "name": "relaxAstNewScene",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    85,
+    124
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena Asteroids Idle para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstRock",
+   "type": "function",
+   "name": "relaxAstRock",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    126,
+    159
+   ],
+   "summary": "Cria um asteroide do tamanho indicado com posição, velocidade, rotação e forma sorteadas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstDiscreteTick",
+   "type": "function",
+   "name": "relaxAstDiscreteTick",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    196,
+    235
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena Asteroids Idle: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstAdvance",
+   "type": "function",
+   "name": "relaxAstAdvance",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    243,
+    277
+   ],
+   "summary": "Avança a simulação da cena Asteroids Idle por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstPilot",
+   "type": "function",
+   "name": "relaxAstPilot",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    302,
+    391
+   ],
+   "summary": "Piloto automático da nave: cruza, eventualmente escolhe uma rocha, gira até ela, espera uma janela e atira.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstNearest",
+   "type": "function",
+   "name": "relaxAstNearest",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    398,
+    409
+   ],
+   "summary": "Devolve a rocha detectada mais próxima dentro de um raio.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstCollide",
+   "type": "function",
+   "name": "relaxAstCollide",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    411,
+    428
+   ],
+   "summary": "Detecta colisões entre tiros e rochas e dispara a quebra.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstBreak",
+   "type": "function",
+   "name": "relaxAstBreak",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    432,
+    467
+   ],
+   "summary": "Quebra uma rocha: grande vira dois médios, médio vira dois pequenos, pequeno vira partículas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAstPoly",
+   "type": "function",
+   "name": "relaxAstPoly",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    504,
+    513
+   ],
+   "summary": "Gera o contorno poligonal estável de uma rocha a partir de raios determinísticos.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:relaxAsteroidFrames",
+   "type": "function",
+   "name": "relaxAsteroidFrames",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    517,
+    602
+   ],
+   "summary": "Renderiza um quadro da cena Asteroids Idle no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_ast.go:status",
+   "type": "function",
+   "name": "status",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    604,
+    616
+   ],
+   "summary": "Texto de status da fase do piloto automático para a barra da cena.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_ast.go:relaxAsteroidState",
+   "type": "class",
+   "name": "relaxAsteroidState",
+   "filePath": "internal/ui/relax_ast.go",
+   "lineRange": [
+    57,
+    83
+   ],
+   "summary": "Estado mutável da cena Asteroids Idle: entidades, contadores e parâmetros sorteados do ciclo atual.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/relax_blackhole.go",
+   "type": "file",
+   "name": "relax_blackhole.go",
+   "filePath": "internal/ui/relax_blackhole.go",
+   "summary": "Cena Relax de buraco negro: horizonte de eventos, anel de fóton, disco de acreção com lente gravitacional e efeito Doppler, fluxos de gás com rastro e estrelas de fundo deslocadas pela lente.",
+   "tags": [
+    "relax",
+    "animacao",
+    "braille",
+    "astronomia",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_blackhole.go:relaxBhInit",
+   "type": "function",
+   "name": "relaxBhInit",
+   "filePath": "internal/ui/relax_blackhole.go",
+   "lineRange": [
+    68,
+    86
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena buraco negro para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_blackhole.go:relaxBhDiscreteTick",
+   "type": "function",
+   "name": "relaxBhDiscreteTick",
+   "filePath": "internal/ui/relax_blackhole.go",
+   "lineRange": [
+    92,
+    109
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena buraco negro: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_blackhole.go:relaxBhAdvance",
+   "type": "function",
+   "name": "relaxBhAdvance",
+   "filePath": "internal/ui/relax_blackhole.go",
+   "lineRange": [
+    115,
+    141
+   ],
+   "summary": "Avança a simulação da cena buraco negro por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_blackhole.go:relaxBlackHoleFrames",
+   "type": "function",
+   "name": "relaxBlackHoleFrames",
+   "filePath": "internal/ui/relax_blackhole.go",
+   "lineRange": [
+    151,
+    343
+   ],
+   "summary": "Renderiza um quadro da cena buraco negro no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_braille.go",
+   "type": "file",
+   "name": "relax_braille.go",
+   "filePath": "internal/ui/relax_braille.go",
+   "summary": "Camada de desenho Braille compartilhada pelas cenas Relax: converte cada célula em 2×4 subpixels, mantém nível de cor por ponto com média por célula e oferece primitivas (disco, elipse, triângulo, quadrilátero) e rampas de cor.",
+   "tags": [
+    "utility",
+    "braille",
+    "rendering",
+    "graphics",
+    "relax"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:relaxArtDots",
+   "type": "function",
+   "name": "relaxArtDots",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    35,
+    60
+   ],
+   "summary": "Lê uma arte Braille pronta e devolve o bitmap de subpontos com largura e altura em pontos.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:lock",
+   "type": "function",
+   "name": "lock",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    127,
+    140
+   ],
+   "summary": "Congela a célula na cor atualmente votada pelos pontos, preservando traços finos.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:set",
+   "type": "function",
+   "name": "set",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    144,
+    167
+   ],
+   "summary": "Acende um subpixel com um nível de cor, sem contar duas vezes um ponto já aceso.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:lines",
+   "type": "function",
+   "name": "lines",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    183,
+    238
+   ],
+   "summary": "Monta as linhas de saída agrupando células vizinhas de mesmo nível num único trecho estilizado.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:disc",
+   "type": "function",
+   "name": "disc",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    266,
+    284
+   ],
+   "summary": "Desenha um disco com volume, iluminado de cima à esquerda.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:ellipse",
+   "type": "function",
+   "name": "ellipse",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    286,
+    298
+   ],
+   "summary": "Preenche uma elipse com o tom indicado.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:quadFill",
+   "type": "function",
+   "name": "quadFill",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    327,
+    358
+   ],
+   "summary": "Preenche um quadrilátero rotacionado por varredura de linhas.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:tri",
+   "type": "function",
+   "name": "tri",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    364,
+    381
+   ],
+   "summary": "Preenche um triângulo por teste baricêntrico; base para quads e faces 3D.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_braille.go:relaxRamp",
+   "type": "function",
+   "name": "relaxRamp",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    437,
+    451
+   ],
+   "summary": "Interpola uma lista de paradas hex em n degraus de cor.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_braille.go:relaxBraille",
+   "type": "class",
+   "name": "relaxBraille",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    62,
+    76
+   ],
+   "summary": "Buffer de desenho Braille com subpixels 2×4 por célula, nível de cor por ponto e geração das linhas estilizadas.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/relax_braille.go:relaxPen",
+   "type": "class",
+   "name": "relaxPen",
+   "filePath": "internal/ui/relax_braille.go",
+   "lineRange": [
+    249,
+    252
+   ],
+   "summary": "Caneta de desenho sobre relaxBraille com primitivas geométricas (disco, elipse, quadrilátero) e transformação de coordenadas.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/project_cwd_test.go",
+   "target": "function:internal/ui/project_cwd_test.go:TestFindProjectForCwd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/project_cwd_test.go",
+   "target": "function:internal/ui/project_cwd_test.go:TestFindProjectForCwd",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/project_cwd_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/project_cwd_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:String",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:String",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:closeRelax",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:resetRelaxScenes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:applyRelaxPending",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:updateRelax",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:renderRelax",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:renderRelaxSidebar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:renderRelaxSidebarRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:relaxBanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:relaxRainbowColor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:relaxHSL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:renderRelaxStage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:relaxCenterBlock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "function:internal/ui/relax.go:relaxHash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_aquarium.go",
+   "target": "function:internal/ui/relax_aquarium.go:relaxAqInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_aquarium.go",
+   "target": "function:internal/ui/relax_aquarium.go:stepRelaxAquarium",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_aquarium.go",
+   "target": "function:internal/ui/relax_aquarium.go:relaxAquariumFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstNewScene",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstRock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstPilot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstNearest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstCollide",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstBreak",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAstPoly",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:relaxAsteroidFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "function:internal/ui/relax_ast.go:status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ast.go",
+   "target": "class:internal/ui/relax_ast.go:relaxAsteroidState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_blackhole.go",
+   "target": "function:internal/ui/relax_blackhole.go:relaxBhInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_blackhole.go",
+   "target": "function:internal/ui/relax_blackhole.go:relaxBhDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_blackhole.go",
+   "target": "function:internal/ui/relax_blackhole.go:relaxBhAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_blackhole.go",
+   "target": "function:internal/ui/relax_blackhole.go:relaxBlackHoleFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:relaxArtDots",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:lock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:lines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:disc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:ellipse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:quadFill",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:tri",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "function:internal/ui/relax_braille.go:relaxRamp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "class:internal/ui/relax_braille.go:relaxBraille",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "class:internal/ui/relax_braille.go:relaxPen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_aquarium.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_ast.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_blackhole.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_burst.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_cat.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_chess.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_city.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_clouds.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_coffee.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_cube.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_dragon.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_drop.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_fall.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_fire.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_fireworks.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_fox.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_galaxy.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_hourglass.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_invaders.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_engine.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_aquarium.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_blackhole.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_braille.go",
+   "target": "file:internal/ui/relax_engine.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "function:internal/ui/relax.go:renderRelaxStage",
+   "target": "function:internal/ui/relax_engine.go:fade",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

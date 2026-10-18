@@ -1,0 +1,58 @@
+{
+ "batchIndex": 13,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": ".goreleaser.yaml",
+   "language": "yaml",
+   "sizeLines": 46,
+   "fileCategory": "config"
+  },
+  {
+   "path": "Animation.md",
+   "language": "markdown",
+   "sizeLines": 2822,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "CHANGELOG.md",
+   "language": "markdown",
+   "sizeLines": 336,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "CODE_OF_CONDUCT.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "Makefile",
+   "language": "makefile",
+   "sizeLines": 58,
+   "fileCategory": "infra"
+  },
+  {
+   "path": "README.md",
+   "language": "markdown",
+   "sizeLines": 532,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "go.mod",
+   "language": "mod",
+   "sizeLines": 53,
+   "fileCategory": "config"
+  }
+ ],
+ "batchImportData": {
+  ".goreleaser.yaml": [],
+  "Animation.md": [],
+  "CHANGELOG.md": [],
+  "CODE_OF_CONDUCT.md": [],
+  "Makefile": [],
+  "README.md": [],
+  "go.mod": []
+ },
+ "neighborMap": {}
+}

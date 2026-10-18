@@ -1,0 +1,597 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/routeutil/scan_nestjs.go",
+   "type": "file",
+   "name": "scan_nestjs.go",
+   "filePath": "internal/routeutil/scan_nestjs.go",
+   "summary": "Scanner de rotas para NestJS: detecta o framework pelas dependências e extrai rotas por regex dos decorators @Controller e @Get/@Post/etc., marcando handlers protegidos por @UseGuards.",
+   "tags": [
+    "route-scanner",
+    "nestjs",
+    "regex",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_nestjs.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_nestjs.go",
+   "lineRange": [
+    27,
+    78
+   ],
+   "summary": "Percorre arquivos .ts, localiza controllers Nest e emite rotas combinando prefixo do @Controller com o caminho do decorator de método.",
+   "tags": [
+    "route-scanner",
+    "nestjs",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_nestjs.go:nestPath",
+   "type": "function",
+   "name": "nestPath",
+   "filePath": "internal/routeutil/scan_nestjs.go",
+   "lineRange": [
+    89,
+    99
+   ],
+   "summary": "Converte parâmetros de rota no estilo :id do Nest para o formato {id}.",
+   "tags": [
+    "utility",
+    "path",
+    "normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_nestjs.go:depsContain",
+   "type": "function",
+   "name": "depsContain",
+   "filePath": "internal/routeutil/scan_nestjs.go",
+   "lineRange": [
+    101,
+    112
+   ],
+   "summary": "Verifica se o package.json do projeto menciona um pacote específico.",
+   "tags": [
+    "utility",
+    "dependency-detection",
+    "nodejs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/scan_nestjs.go:nestjsScanner",
+   "type": "class",
+   "name": "nestjsScanner",
+   "filePath": "internal/routeutil/scan_nestjs.go",
+   "lineRange": [
+    10,
+    10
+   ],
+   "summary": "Implementação de Scanner para projetos NestJS.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_next_nuxt.go",
+   "type": "file",
+   "name": "scan_next_nuxt.go",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "summary": "Scanners de rotas para Next.js (App Router e pages/api) e Nuxt (server/api), derivando caminhos HTTP a partir da estrutura de arquivos do projeto.",
+   "tags": [
+    "route-scanner",
+    "nextjs",
+    "nuxt",
+    "file-based-routing"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Dois tipos vazios (nextjsScanner, nuxtScanner) satisfazem a mesma interface Scanner via métodos com receptor por valor."
+  },
+  {
+   "id": "function:internal/routeutil/scan_next_nuxt.go:nextjsScanner.Scan",
+   "type": "function",
+   "name": "nextjsScanner.Scan",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    44,
+    80
+   ],
+   "summary": "Varre app/ e pages/api do Next.js e gera rotas a partir dos handlers exportados (GET/POST/...) e dos arquivos de API.",
+   "tags": [
+    "route-scanner",
+    "nextjs",
+    "file-based-routing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_next_nuxt.go:nextAppRoutePath",
+   "type": "function",
+   "name": "nextAppRoutePath",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    82,
+    116
+   ],
+   "summary": "Traduz o caminho de um route.ts do App Router em rota HTTP, tratando segmentos dinâmicos, catch-all e grupos.",
+   "tags": [
+    "utility",
+    "nextjs",
+    "path"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_next_nuxt.go:pagesAPIPath",
+   "type": "function",
+   "name": "pagesAPIPath",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    118,
+    137
+   ],
+   "summary": "Traduz um arquivo de pages/api do Next.js no caminho HTTP correspondente.",
+   "tags": [
+    "utility",
+    "nextjs",
+    "path"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_next_nuxt.go:nuxtScanner.Scan",
+   "type": "function",
+   "name": "nuxtScanner.Scan",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    139,
+    155
+   ],
+   "summary": "Varre server/api do Nuxt e gera rotas a partir do nome dos arquivos, incluindo sufixos de método.",
+   "tags": [
+    "route-scanner",
+    "nuxt",
+    "file-based-routing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_next_nuxt.go:nuxtAPIRoute",
+   "type": "function",
+   "name": "nuxtAPIRoute",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    157,
+    185
+   ],
+   "summary": "Deriva método e caminho HTTP de um arquivo em server/api do Nuxt.",
+   "tags": [
+    "utility",
+    "nuxt",
+    "path"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/scan_next_nuxt.go:nextjsScanner",
+   "type": "class",
+   "name": "nextjsScanner",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    10,
+    10
+   ],
+   "summary": "Implementação de Scanner para rotas file-based do Next.js.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/scan_next_nuxt.go:nuxtScanner",
+   "type": "class",
+   "name": "nuxtScanner",
+   "filePath": "internal/routeutil/scan_next_nuxt.go",
+   "lineRange": [
+    26,
+    26
+   ],
+   "summary": "Implementação de Scanner para rotas server/api do Nuxt.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_node_extra.go",
+   "type": "file",
+   "name": "scan_node_extra.go",
+   "filePath": "internal/routeutil/scan_node_extra.go",
+   "summary": "Scanner de rotas para Fastify, Hono e Koa, que reutiliza uma regex no estilo Express para capturar chamadas de verbo HTTP.",
+   "tags": [
+    "route-scanner",
+    "nodejs",
+    "fastify",
+    "regex"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_node_extra.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_node_extra.go",
+   "lineRange": [
+    24,
+    72
+   ],
+   "summary": "Varre arquivos JS/TS e extrai rotas de chamadas de verbo HTTP, rotulando a origem como fastify, hono ou koa.",
+   "tags": [
+    "route-scanner",
+    "nodejs",
+    "regex"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/routeutil/scan_node_extra.go:nodeExtraScanner",
+   "type": "class",
+   "name": "nodeExtraScanner",
+   "filePath": "internal/routeutil/scan_node_extra.go",
+   "lineRange": [
+    11,
+    11
+   ],
+   "summary": "Implementação de Scanner para Fastify, Hono e Koa.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_rails.go",
+   "type": "file",
+   "name": "scan_rails.go",
+   "filePath": "internal/routeutil/scan_rails.go",
+   "summary": "Scanner de rotas para Ruby on Rails que lê config/routes.rb e extrai verbos explícitos e declarações resources/resource.",
+   "tags": [
+    "route-scanner",
+    "rails",
+    "regex",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_rails.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_rails.go",
+   "lineRange": [
+    23,
+    71
+   ],
+   "summary": "Lê config/routes.rb e emite rotas de verbos explícitos e expande resources em rotas REST padrão.",
+   "tags": [
+    "route-scanner",
+    "rails",
+    "rest"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/routeutil/scan_rails.go:railsScanner",
+   "type": "class",
+   "name": "railsScanner",
+   "filePath": "internal/routeutil/scan_rails.go",
+   "lineRange": [
+    10,
+    10
+   ],
+   "summary": "Implementação de Scanner para rotas Rails.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/scan_rust.go",
+   "type": "file",
+   "name": "scan_rust.go",
+   "filePath": "internal/routeutil/scan_rust.go",
+   "summary": "Scanner de rotas para projetos Rust (Axum e Actix), extraindo rotas de chamadas .route() e de atributos #[get(...)].",
+   "tags": [
+    "route-scanner",
+    "rust",
+    "axum",
+    "actix"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_rust.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_rust.go",
+   "lineRange": [
+    27,
+    62
+   ],
+   "summary": "Varre arquivos .rs e extrai rotas Axum (.route) e Actix (atributos de método).",
+   "tags": [
+    "route-scanner",
+    "rust",
+    "regex"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/routeutil/scan_rust.go:rustScanner",
+   "type": "class",
+   "name": "rustScanner",
+   "filePath": "internal/routeutil/scan_rust.go",
+   "lineRange": [
+    10,
+    10
+   ],
+   "summary": "Implementação de Scanner para Axum e Actix.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/routeutil/scan_nestjs.go",
+   "target": "function:internal/routeutil/scan_nestjs.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_nestjs.go",
+   "target": "function:internal/routeutil/scan_nestjs.go:nestPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_nestjs.go",
+   "target": "function:internal/routeutil/scan_nestjs.go:depsContain",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_nestjs.go",
+   "target": "class:internal/routeutil/scan_nestjs.go:nestjsScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_nestjs.go:nestjsScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nextjsScanner.Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nextAppRoutePath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:pagesAPIPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nuxtScanner.Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nuxtAPIRoute",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "class:internal/routeutil/scan_next_nuxt.go:nextjsScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_next_nuxt.go:nextjsScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_next_nuxt.go",
+   "target": "class:internal/routeutil/scan_next_nuxt.go:nuxtScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_next_nuxt.go:nuxtScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_node_extra.go",
+   "target": "function:internal/routeutil/scan_node_extra.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_node_extra.go",
+   "target": "class:internal/routeutil/scan_node_extra.go:nodeExtraScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_node_extra.go:nodeExtraScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_rails.go",
+   "target": "function:internal/routeutil/scan_rails.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_rails.go",
+   "target": "class:internal/routeutil/scan_rails.go:railsScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_rails.go:railsScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/scan_rust.go",
+   "target": "function:internal/routeutil/scan_rust.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_rust.go",
+   "target": "class:internal/routeutil/scan_rust.go:rustScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_rust.go:rustScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "function:internal/routeutil/scan_nestjs.go:Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_next_nuxt.go:nextjsScanner.Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_next_nuxt.go:nuxtScanner.Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_node_extra.go:Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_rust.go:Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_nestjs.go:Scan",
+   "target": "function:internal/routeutil/walk.go:joinRoute",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_nestjs.go:Scan",
+   "target": "function:internal/routeutil/scan_nestjs.go:nestPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_next_nuxt.go:nextjsScanner.Scan",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nextAppRoutePath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_next_nuxt.go:nextjsScanner.Scan",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:pagesAPIPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_next_nuxt.go:nuxtScanner.Scan",
+   "target": "function:internal/routeutil/scan_next_nuxt.go:nuxtAPIRoute",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

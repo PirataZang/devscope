@@ -1,0 +1,785 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/user_config_screen.go",
+   "type": "file",
+   "name": "user_config_screen.go",
+   "filePath": "internal/ui/user_config_screen.go",
+   "summary": "Tela de preferências do usuário para tema, atalhos de aplicativos e agente de IA, com salvar e reset com backup.",
+   "tags": [
+    "component",
+    "configuracao-usuario",
+    "formulario"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "type": "function",
+   "name": "openUserConfig",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    32,
+    57
+   ],
+   "summary": "Abre a tela de configuração do usuário carregando os valores atuais.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:updateUserConfig",
+   "type": "function",
+   "name": "updateUserConfig",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    59,
+    99
+   ],
+   "summary": "Trata as teclas da tela de configuração do usuário (navegação, edição, tema, salvar, reset).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "configuracao-usuario"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:userCfgFieldValue",
+   "type": "function",
+   "name": "userCfgFieldValue",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    117,
+    129
+   ],
+   "summary": "Retorna o valor do campo de configuração selecionado.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:setUserCfgFieldValue",
+   "type": "function",
+   "name": "setUserCfgFieldValue",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    131,
+    148
+   ],
+   "summary": "Define o valor do campo de configuração selecionado.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:editUserCfgText",
+   "type": "function",
+   "name": "editUserCfgText",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    152,
+    165
+   ],
+   "summary": "Edita o texto do campo selecionado reaproveitando o editor dos formulários.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:saveUserConfig",
+   "type": "function",
+   "name": "saveUserConfig",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    167,
+    181
+   ],
+   "summary": "Salva a configuração do usuário em disco.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:updateUserConfigReset",
+   "type": "function",
+   "name": "updateUserConfigReset",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    185,
+    208
+   ],
+   "summary": "Trata a confirmação de reset da configuração, guardando backup .bak.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:renderUserConfigScreen",
+   "type": "function",
+   "name": "renderUserConfigScreen",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    212,
+    241
+   ],
+   "summary": "Renderiza a tela de configuração do usuário sobre o fundo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "configuracao-usuario"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:userCfgFooter",
+   "type": "function",
+   "name": "userCfgFooter",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    243,
+    256
+   ],
+   "summary": "Gera o rodapé com dicas de teclas da tela de configuração.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:renderUserCfgFields",
+   "type": "function",
+   "name": "renderUserCfgFields",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    262,
+    316
+   ],
+   "summary": "Renderiza os campos de configuração com scroll que mantém a caixa do cursor visível.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "configuracao-usuario"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:joinCells",
+   "type": "function",
+   "name": "joinCells",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    318,
+    327
+   ],
+   "summary": "Junta células com separador em linhas.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:renderUserCfgSlot",
+   "type": "function",
+   "name": "renderUserCfgSlot",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    339,
+    354
+   ],
+   "summary": "Renderiza um slot de atalho de aplicativo (nome e comando).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:userCfgValueCell",
+   "type": "function",
+   "name": "userCfgValueCell",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    358,
+    369
+   ],
+   "summary": "Renderiza a célula de valor, mostrando placeholder apagado quando vazia.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/user_config_screen.go:renderUserCfgAI",
+   "type": "function",
+   "name": "renderUserCfgAI",
+   "filePath": "internal/ui/user_config_screen.go",
+   "lineRange": [
+    371,
+    381
+   ],
+   "summary": "Renderiza o campo de configuração do agente de IA.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "configuracao-usuario"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:pkg/version/version.go",
+   "type": "file",
+   "name": "version.go",
+   "filePath": "pkg/version/version.go",
+   "summary": "Variáveis de versão, commit e data de build injetadas via ldflags e função que as formata.",
+   "tags": [
+    "versao",
+    "build-system",
+    "utility"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Variáveis de pacote sobrescritas em build com -ldflags \"-X\"."
+  },
+  {
+   "id": "function:pkg/version/version.go:String",
+   "type": "function",
+   "name": "String",
+   "filePath": "pkg/version/version.go",
+   "lineRange": [
+    9,
+    11
+   ],
+   "summary": "Retorna a string de versão formatada com commit e data de build.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "versao"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:updateUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:userCfgFieldValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:setUserCfgFieldValue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:editUserCfgText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:saveUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:updateUserConfigReset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:renderUserConfigScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:userCfgFooter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:renderUserCfgFields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:joinCells",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:renderUserCfgSlot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:userCfgValueCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "function:internal/ui/user_config_screen.go:renderUserCfgAI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/user_config_screen.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:pkg/version/version.go",
+   "target": "function:pkg/version/version.go:String",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:pkg/version/version.go",
+   "target": "function:pkg/version/version.go:String",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "target": "function:internal/collectors/shell.go:DetectAITools",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "target": "function:internal/config/userconfig.go:WriteDefaultUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "target": "function:internal/config/userconfig.go:EnsureUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:openUserConfig",
+   "target": "function:internal/config/userconfig.go:ParseUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:saveUserConfig",
+   "target": "function:internal/config/userconfig.go:RenderUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:saveUserConfig",
+   "target": "function:internal/config/userconfig.go:SaveUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:updateUserConfigReset",
+   "target": "function:internal/config/userconfig.go:ResetUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/user_config_screen.go:updateUserConfigReset",
+   "target": "function:internal/config/userconfig.go:ParseUserConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

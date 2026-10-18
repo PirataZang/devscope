@@ -1,0 +1,2469 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/helpers.go",
+   "type": "file",
+   "name": "helpers.go",
+   "filePath": "internal/ui/helpers.go",
+   "summary": "Utilitários compartilhados da UI: cálculo de alturas, janela horizontal ANSI, quebra de texto, ordenação de projetos, rótulos e estilos de status Git.",
+   "tags": [
+    "utility",
+    "helpers",
+    "renderizacao",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:contentPanelHeight",
+   "type": "function",
+   "name": "contentPanelHeight",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    22,
+    34
+   ],
+   "summary": "Calcula a altura disponível para o painel de conteúdo em terminais pequenos e grandes.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:sliceColumns",
+   "type": "function",
+   "name": "sliceColumns",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    77,
+    118
+   ],
+   "summary": "Retorna uma janela horizontal da string a partir de uma coluna, ciente de ANSI e largura de runa.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "function",
+   "name": "ensureVisible",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    141,
+    158
+   ],
+   "summary": "Ajusta o scroll para manter o cursor visível no viewport.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:wrapText",
+   "type": "function",
+   "name": "wrapText",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    160,
+    194
+   ],
+   "summary": "Quebra texto em linhas na largura informada.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:clampCursor",
+   "type": "function",
+   "name": "clampCursor",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    196,
+    207
+   ],
+   "summary": "Limita o cursor ao intervalo válido da lista.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:sortProjects",
+   "type": "function",
+   "name": "sortProjects",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    209,
+    220
+   ],
+   "summary": "Ordena projetos por status e nome.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:statusRank",
+   "type": "function",
+   "name": "statusRank",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    222,
+    233
+   ],
+   "summary": "Atribui um peso de ordenação ao status do projeto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:gitStatusLabel",
+   "type": "function",
+   "name": "gitStatusLabel",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    235,
+    246
+   ],
+   "summary": "Traduz os códigos de staging/worktree do Git para rótulo legível.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "function",
+   "name": "gitFileStaged",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    252,
+    264
+   ],
+   "summary": "Indica se um arquivo do Git está staged.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:gitStatusStyle",
+   "type": "function",
+   "name": "gitStatusStyle",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    266,
+    281
+   ],
+   "summary": "Escolhe o estilo de cor para um código de status Git.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:shortenPath",
+   "type": "function",
+   "name": "shortenPath",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    283,
+    295
+   ],
+   "summary": "Abrevia caminhos substituindo o home por ~.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:formatUptime",
+   "type": "function",
+   "name": "formatUptime",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    297,
+    311
+   ],
+   "summary": "Formata uma duração como uptime compacto.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "bubbletea"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:metricUsageStyle",
+   "type": "function",
+   "name": "metricUsageStyle",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    322,
+    331
+   ],
+   "summary": "Escolhe a cor da métrica de uso: verde até 30%, laranja até 70% e vermelho acima.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/helpers.go:tunnelTableCols",
+   "type": "function",
+   "name": "tunnelTableCols",
+   "filePath": "internal/ui/helpers.go",
+   "lineRange": [
+    341,
+    366
+   ],
+   "summary": "Calcula as larguras das colunas da tabela de túneis.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/k8s_tab.go",
+   "type": "file",
+   "name": "k8s_tab.go",
+   "filePath": "internal/ui/k8s_tab.go",
+   "summary": "Aba Kubernetes completa: landing, visão geral, tabela de recursos, logs, YAML, describe, eventos, editor de manifests e ações de apply, scale e delete.",
+   "tags": [
+    "component",
+    "kubernetes",
+    "event-handler",
+    "renderizacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:openK8sClient",
+   "type": "function",
+   "name": "openK8sClient",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    104,
+    132
+   ],
+   "summary": "Inicializa a aba Kubernetes para o projeto, verificando o kubectl e carregando contexto e namespaces.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sLanding",
+   "type": "function",
+   "name": "renderK8sLanding",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    144,
+    168
+   ],
+   "summary": "Renderiza a landing do módulo Kubernetes com estado do kubectl e prévia de manifests.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "type": "function",
+   "name": "refreshK8s",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    177,
+    206
+   ],
+   "summary": "Dispara a coleta assíncrona de recursos Kubernetes do namespace atual.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:handleK8sMsg",
+   "type": "function",
+   "name": "handleK8sMsg",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    208,
+    302
+   ],
+   "summary": "Processa as mensagens assíncronas da aba Kubernetes (carga, ações, detalhe, namespaces, edição, inspeção).",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "kubernetes"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sFilteredResources",
+   "type": "function",
+   "name": "k8sFilteredResources",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    304,
+    316
+   ],
+   "summary": "Filtra os recursos Kubernetes pelo texto do filtro.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sFilteredManifests",
+   "type": "function",
+   "name": "k8sFilteredManifests",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    318,
+    330
+   ],
+   "summary": "Filtra os manifests locais pelo texto do filtro.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sTab",
+   "type": "function",
+   "name": "renderK8sTab",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    355,
+    389
+   ],
+   "summary": "Renderiza a aba Kubernetes escolhendo entre landing, visão geral, tabela, painéis e editor.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sDeleteConfirmLabels",
+   "type": "function",
+   "name": "k8sDeleteConfirmLabels",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    391,
+    401
+   ],
+   "summary": "Monta os rótulos do modal de confirmação de exclusão de recurso.",
+   "tags": [
+    "confirmacao",
+    "acao-destrutiva",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sHints",
+   "type": "function",
+   "name": "k8sHints",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    403,
+    421
+   ],
+   "summary": "Monta a linha de dicas de teclas da aba Kubernetes.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sHeader",
+   "type": "function",
+   "name": "renderK8sHeader",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    425,
+    457
+   ],
+   "summary": "Renderiza o cabeçalho com contexto e namespace, sinalizando contexto de produção em vermelho.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sSubTabs",
+   "type": "function",
+   "name": "renderK8sSubTabs",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    474,
+    487
+   ],
+   "summary": "Renderiza as sub-abas da aba Kubernetes.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sKindStrip",
+   "type": "function",
+   "name": "renderK8sKindStrip",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    493,
+    533
+   ],
+   "summary": "Renderiza a faixa de tipos de recurso com o atual destacado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sPodHealth",
+   "type": "function",
+   "name": "k8sPodHealth",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    535,
+    550
+   ],
+   "summary": "Conta pods em execução, pendentes e com falha.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sOverview",
+   "type": "function",
+   "name": "renderK8sOverview",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    555,
+    587
+   ],
+   "summary": "Renderiza a visão geral do cluster com saúde dos pods e recursos.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sTable",
+   "type": "function",
+   "name": "renderK8sTable",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    589,
+    614
+   ],
+   "summary": "Renderiza a tabela de recursos Kubernetes com scroll.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sColumns",
+   "type": "function",
+   "name": "k8sColumns",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    618,
+    665
+   ],
+   "summary": "Calcula as larguras das colunas da tabela conforme o tipo de recurso.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sTableHeader",
+   "type": "function",
+   "name": "k8sTableHeader",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    667,
+    696
+   ],
+   "summary": "Renderiza o cabeçalho da tabela de recursos.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sRow",
+   "type": "function",
+   "name": "renderK8sRow",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    698,
+    748
+   ],
+   "summary": "Renderiza uma linha de recurso com status, ready, restarts e idade.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sStatusDot",
+   "type": "function",
+   "name": "k8sStatusDot",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    762,
+    773
+   ],
+   "summary": "Gera o indicador colorido de status de um recurso.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sReadyStyle",
+   "type": "function",
+   "name": "k8sReadyStyle",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    776,
+    793
+   ],
+   "summary": "Escolhe o estilo do campo ready, sinalizando pods parcialmente prontos.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sRestartStyle",
+   "type": "function",
+   "name": "k8sRestartStyle",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    796,
+    809
+   ],
+   "summary": "Escolhe o estilo da contagem de restarts como sinal de instabilidade.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sTableTitle",
+   "type": "function",
+   "name": "k8sTableTitle",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    811,
+    822
+   ],
+   "summary": "Monta o título da tabela com tipo e contagem.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sStatusLabel",
+   "type": "function",
+   "name": "k8sStatusLabel",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    824,
+    840
+   ],
+   "summary": "Gera o rótulo de status do recurso com animação.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sLogsPane",
+   "type": "function",
+   "name": "renderK8sLogsPane",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    842,
+    861
+   ],
+   "summary": "Renderiza o painel de logs do pod selecionado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sColorLogLine",
+   "type": "function",
+   "name": "k8sColorLogLine",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    863,
+    875
+   ],
+   "summary": "Colore uma linha de log conforme o nível detectado.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sYAMLPane",
+   "type": "function",
+   "name": "renderK8sYAMLPane",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    877,
+    900
+   ],
+   "summary": "Renderiza o painel com o YAML do recurso.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sDetailPane",
+   "type": "function",
+   "name": "renderK8sDetailPane",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    902,
+    938
+   ],
+   "summary": "Renderiza o painel de detalhe (describe) do recurso.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sResourceSummary",
+   "type": "function",
+   "name": "k8sResourceSummary",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    940,
+    963
+   ],
+   "summary": "Gera um resumo textual de um recurso Kubernetes.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sEventsView",
+   "type": "function",
+   "name": "renderK8sEventsView",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    965,
+    979
+   ],
+   "summary": "Renderiza a lista de eventos do namespace.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sRelation",
+   "type": "function",
+   "name": "renderK8sRelation",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    981,
+    993
+   ],
+   "summary": "Renderiza as relações do recurso selecionado (dono e dependentes).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:renderK8sEditor",
+   "type": "function",
+   "name": "renderK8sEditor",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    995,
+    1019
+   ],
+   "summary": "Renderiza o editor de YAML para criar ou editar recursos.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:handleK8sKeys",
+   "type": "function",
+   "name": "handleK8sKeys",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1021,
+    1119
+   ],
+   "summary": "Trata as teclas da aba Kubernetes: navegação, sub-abas, namespace, logs, YAML, scale, apply e delete.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "kubernetes"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:updateK8sFilter",
+   "type": "function",
+   "name": "updateK8sFilter",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1121,
+    1145
+   ],
+   "summary": "Trata as teclas do filtro inline de recursos.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sSetSubTab",
+   "type": "function",
+   "name": "k8sSetSubTab",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1147,
+    1172
+   ],
+   "summary": "Troca a sub-aba ativa e dispara a carga correspondente.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:syncK8sSubTabFromKind",
+   "type": "function",
+   "name": "syncK8sSubTabFromKind",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1174,
+    1185
+   ],
+   "summary": "Sincroniza a sub-aba com o tipo de recurso selecionado.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sMove",
+   "type": "function",
+   "name": "k8sMove",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1196,
+    1225
+   ],
+   "summary": "Move o cursor da tabela e atualiza os painéis dependentes.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sScrollPane",
+   "type": "function",
+   "name": "k8sScrollPane",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1227,
+    1245
+   ],
+   "summary": "Rola o painel lateral ativo (logs, YAML ou detalhe).",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sCycleNamespace",
+   "type": "function",
+   "name": "k8sCycleNamespace",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1247,
+    1265
+   ],
+   "summary": "Cicla entre os namespaces disponíveis e recarrega os recursos.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "type": "function",
+   "name": "k8sInspectSelected",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1267,
+    1302
+   ],
+   "summary": "Abre a inspeção do recurso selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sLoadEvents",
+   "type": "function",
+   "name": "k8sLoadEvents",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1304,
+    1314
+   ],
+   "summary": "Carrega os eventos do namespace.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sLoadYAML",
+   "type": "function",
+   "name": "k8sLoadYAML",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1316,
+    1346
+   ],
+   "summary": "Carrega o YAML do recurso selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sShowDetail",
+   "type": "function",
+   "name": "k8sShowDetail",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1348,
+    1379
+   ],
+   "summary": "Carrega o describe do recurso selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sShowLogs",
+   "type": "function",
+   "name": "k8sShowLogs",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1381,
+    1400
+   ],
+   "summary": "Carrega os logs do pod selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sApplyCurrent",
+   "type": "function",
+   "name": "k8sApplyCurrent",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1402,
+    1419
+   ],
+   "summary": "Aplica (kubectl apply) o manifest local selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sBeginCreate",
+   "type": "function",
+   "name": "k8sBeginCreate",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1421,
+    1437
+   ],
+   "summary": "Abre o editor com template para criar um novo recurso.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sBeginEdit",
+   "type": "function",
+   "name": "k8sBeginEdit",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1439,
+    1468
+   ],
+   "summary": "Abre o editor com o YAML atual do recurso para edição.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sDoDelete",
+   "type": "function",
+   "name": "k8sDoDelete",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1470,
+    1486
+   ],
+   "summary": "Exclui o recurso selecionado após confirmação.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sScale",
+   "type": "function",
+   "name": "k8sScale",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1488,
+    1516
+   ],
+   "summary": "Altera o número de réplicas do deployment selecionado.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:k8sApplyEditedYAML",
+   "type": "function",
+   "name": "k8sApplyEditedYAML",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1526,
+    1541
+   ],
+   "summary": "Aplica o YAML editado no cluster.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:updateK8sEdit",
+   "type": "function",
+   "name": "updateK8sEdit",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1543,
+    1609
+   ],
+   "summary": "Trata as teclas do editor de YAML (edição, nova linha, aplicar e cancelar).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "kubernetes"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/k8s_tab.go:sanitizeK8sName",
+   "type": "function",
+   "name": "sanitizeK8sName",
+   "filePath": "internal/ui/k8s_tab.go",
+   "lineRange": [
+    1611,
+    1629
+   ],
+   "summary": "Normaliza um texto para nome válido de recurso Kubernetes (DNS-1123).",
+   "tags": [
+    "validation",
+    "normalizacao",
+    "kubernetes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:contentPanelHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:sliceColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:wrapText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:sortProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:statusRank",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:gitStatusLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:gitStatusStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:shortenPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:formatUptime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:metricUsageStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "function:internal/ui/helpers.go:tunnelTableCols",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/helpers.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:openK8sClient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sLanding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:handleK8sMsg",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sFilteredResources",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sFilteredManifests",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sDeleteConfirmLabels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sSubTabs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sKindStrip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sPodHealth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sOverview",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sTableHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sStatusDot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sReadyStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sRestartStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sTableTitle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sStatusLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sLogsPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sColorLogLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sYAMLPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sDetailPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sResourceSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sEventsView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sRelation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:renderK8sEditor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:handleK8sKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:updateK8sFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sSetSubTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:syncK8sSubTabFromKind",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sMove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sScrollPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sCycleNamespace",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sLoadEvents",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sLoadYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sShowDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sShowLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sApplyCurrent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sBeginCreate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sBeginEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sDoDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sScale",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:k8sApplyEditedYAML",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:updateK8sEdit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "function:internal/ui/k8s_tab.go:sanitizeK8sName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/helpers.go:gitStatusLabel",
+   "target": "function:internal/collectors/git.go:GitFileUnmerged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:openK8sClient",
+   "target": "function:internal/collectors/k8s.go:K8sCurrentContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:openK8sClient",
+   "target": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sLanding",
+   "target": "function:internal/ui/module_landing.go:landingToolState",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sLanding",
+   "target": "function:internal/ui/module_landing.go:renderModuleLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "target": "function:internal/collectors/k8s.go:K8sListPods",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "target": "function:internal/collectors/k8s.go:K8sListDeployments",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "target": "function:internal/collectors/k8s.go:K8sListServices",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:refreshK8s",
+   "target": "function:internal/collectors/k8s.go:DiscoverProjectManifests",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sTab",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sHeader",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sKindStrip",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sTable",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:renderK8sEditor",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sCycleNamespace",
+   "target": "function:internal/collectors/k8s.go:K8sNamespaces",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "target": "function:internal/collectors/k8s.go:K8sDescribe",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "target": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "target": "function:internal/collectors/k8s.go:K8sPodLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sInspectSelected",
+   "target": "function:internal/collectors/k8s.go:K8sListEvents",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sLoadEvents",
+   "target": "function:internal/collectors/k8s.go:K8sListEvents",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sLoadYAML",
+   "target": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sShowDetail",
+   "target": "function:internal/collectors/k8s.go:K8sDescribe",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sShowLogs",
+   "target": "function:internal/collectors/k8s.go:K8sPodLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sApplyCurrent",
+   "target": "function:internal/collectors/k8s.go:K8sApplyFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sBeginCreate",
+   "target": "function:internal/collectors/k8s.go:K8sDeploymentTemplate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sBeginCreate",
+   "target": "function:internal/collectors/k8s.go:K8sServiceTemplate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sBeginEdit",
+   "target": "function:internal/collectors/k8s.go:K8sGetYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sDoDelete",
+   "target": "function:internal/collectors/k8s.go:K8sDelete",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sScale",
+   "target": "function:internal/collectors/k8s.go:K8sScale",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/k8s_tab.go:k8sApplyEditedYAML",
+   "target": "function:internal/collectors/k8s.go:K8sApplyYAML",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/k8s_tab.go",
+   "target": "file:internal/ui/k8s_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,713 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_tree.go",
+   "type": "file",
+   "name": "relax_tree.go",
+   "filePath": "internal/ui/relax_tree.go",
+   "summary": "Cena 'Copa ao vento' do modo Relax: árvore em Braille com meio-tom por densidade de luz; a estrutura é pré-calculada e por frame só vento e sombra deformam a amostragem (domain warp).",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "procedural-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_tree.go:relaxTreeBuild",
+   "type": "function",
+   "name": "relaxTreeBuild",
+   "filePath": "internal/ui/relax_tree.go",
+   "lineRange": [
+    62,
+    220
+   ],
+   "summary": "Pré-calcula as grades de subpixel da árvore: silhueta, cachos de folhas, luz base, rigidez e ruído de meio-tom.",
+   "tags": [
+    "precomputation",
+    "procedural-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_tree.go:relaxTreePlane",
+   "type": "function",
+   "name": "relaxTreePlane",
+   "filePath": "internal/ui/relax_tree.go",
+   "lineRange": [
+    226,
+    235
+   ],
+   "summary": "Amostra uma grade pré-calculada com bounds checking.",
+   "tags": [
+    "utility",
+    "sampling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_tree.go:relaxTreeFrames",
+   "type": "function",
+   "name": "relaxTreeFrames",
+   "filePath": "internal/ui/relax_tree.go",
+   "lineRange": [
+    237,
+    312
+   ],
+   "summary": "Renderiza a copa por frame deformando a amostragem com vento e sombra (domain warp).",
+   "tags": [
+    "rendering",
+    "animation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/relax_v4.go",
+   "type": "file",
+   "name": "relax_v4.go",
+   "filePath": "internal/ui/relax_v4.go",
+   "summary": "Cena 'Motor V4' do modo Relax: corte animado de um motor de quatro cilindros com pistões, bielas, virabrequim, válvulas e comando, simulando partida, marcha lenta e aceleradas em ciclo de quatro tempos.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "simulation",
+    "mechanical"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Init",
+   "type": "function",
+   "name": "relaxV4Init",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    121,
+    142
+   ],
+   "summary": "Inicializa o motor V4 com os quatro cilindros, fases de ignição e estado de partida.",
+   "tags": [
+    "initialization",
+    "simulation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Stage",
+   "type": "function",
+   "name": "relaxV4Stage",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    179,
+    214
+   ],
+   "summary": "Determina o tempo do ciclo de quatro tempos (admissão, compressão, combustão, escape) de um cilindro pelo ângulo do virabrequim.",
+   "tags": [
+    "simulation",
+    "mechanical"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Advance",
+   "type": "function",
+   "name": "relaxV4Advance",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    223,
+    266
+   ],
+   "summary": "Avança o motor: partida, marcha lenta e aceleradas, integrando a rotação do virabrequim.",
+   "tags": [
+    "simulation",
+    "physics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Puffs",
+   "type": "function",
+   "name": "relaxV4Puffs",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    277,
+    294
+   ],
+   "summary": "Emite e move os puffs de escape dos cilindros.",
+   "tags": [
+    "particle-system",
+    "simulation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Frames",
+   "type": "function",
+   "name": "relaxV4Frames",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    298,
+    321
+   ],
+   "summary": "Ponto de entrada de render do motor V4, avançando pelo tempo real.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Draw",
+   "type": "function",
+   "name": "relaxV4Draw",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    323,
+    367
+   ],
+   "summary": "Compõe o quadro do motor: cilindros, virabrequim e fumaça.",
+   "tags": [
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Cylinder",
+   "type": "function",
+   "name": "relaxV4Cylinder",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    372,
+    498
+   ],
+   "summary": "Desenha um cilindro em corte com pistão, biela, válvulas, comando e frente de chama.",
+   "tags": [
+    "rendering",
+    "mechanical"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Bottom",
+   "type": "function",
+   "name": "relaxV4Bottom",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    502,
+    538
+   ],
+   "summary": "Desenha o virabrequim com contrapesos, mancais e cárter.",
+   "tags": [
+    "rendering",
+    "mechanical"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_v4.go:relaxV4Smoke",
+   "type": "function",
+   "name": "relaxV4Smoke",
+   "filePath": "internal/ui/relax_v4.go",
+   "lineRange": [
+    540,
+    553
+   ],
+   "summary": "Desenha a fumaça de escape do motor.",
+   "tags": [
+    "rendering",
+    "effect"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/responsive_test.go",
+   "type": "file",
+   "name": "responsive_test.go",
+   "filePath": "internal/ui/responsive_test.go",
+   "summary": "Testes de responsividade da UI: renderiza dezenas de cenas (dashboard, módulos, containers, git, ajuda, tema, relax) em vários tamanhos e verifica ausência de overflow, degradação ordenada de colunas e dicas de teclas.",
+   "tags": [
+    "test",
+    "responsive-layout",
+    "regression",
+    "fixtures"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveBranches",
+   "type": "function",
+   "name": "responsiveBranches",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    28,
+    37
+   ],
+   "summary": "Fixture que gera n branches Git falsas.",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveCommits",
+   "type": "function",
+   "name": "responsiveCommits",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    39,
+    53
+   ],
+   "summary": "Fixture que gera n commits Git falsos.",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveProject",
+   "type": "function",
+   "name": "responsiveProject",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    55,
+    91
+   ],
+   "summary": "Fixture de um projeto completo com containers, git e métricas para testes de layout.",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveApp",
+   "type": "function",
+   "name": "responsiveApp",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    95,
+    120
+   ],
+   "summary": "Cria um App com tamanho de terminal fixo e dados de fixture.",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveProjects",
+   "type": "function",
+   "name": "responsiveProjects",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    124,
+    141
+   ],
+   "summary": "Gera n cópias de um projeto base para listas longas.",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:responsiveScenes",
+   "type": "function",
+   "name": "responsiveScenes",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    153,
+    211
+   ],
+   "summary": "Lista as cenas a testar (dashboard, ajuda, tema, relax, cada aba e subtelas de containers/git).",
+   "tags": [
+    "test-helper",
+    "fixtures",
+    "test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveNoOverflow",
+   "type": "function",
+   "name": "TestResponsiveNoOverflow",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    217,
+    238
+   ],
+   "summary": "Garante que nenhuma cena estoura largura ou altura do terminal em vários tamanhos.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:contentStats",
+   "type": "function",
+   "name": "contentStats",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    242,
+    252
+   ],
+   "summary": "Mede linhas e largura úteis de um quadro renderizado.",
+   "tags": [
+    "test-helper",
+    "measurement",
+    "test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveScrollableGrowsWithHeight",
+   "type": "function",
+   "name": "TestResponsiveScrollableGrowsWithHeight",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    295,
+    317
+   ],
+   "summary": "Verifica que áreas roláveis crescem com a altura do terminal.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveBoundedScenesStayHonest",
+   "type": "function",
+   "name": "TestResponsiveBoundedScenesStayHonest",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    322,
+    355
+   ],
+   "summary": "Verifica que cenas de tamanho limitado não esticam artificialmente.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveVoidStaysAtTheEnd",
+   "type": "function",
+   "name": "TestResponsiveVoidStaysAtTheEnd",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    374,
+    413
+   ],
+   "summary": "Garante que o espaço vazio fica no fim da tela, não no meio.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveColumnsDegradeInOrder",
+   "type": "function",
+   "name": "TestResponsiveColumnsDegradeInOrder",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    422,
+    447
+   ],
+   "summary": "Verifica que colunas de tabela somem na ordem de prioridade ao estreitar.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/responsive_test.go:TestResponsiveKeyHintsDegradeByDropping",
+   "type": "function",
+   "name": "TestResponsiveKeyHintsDegradeByDropping",
+   "filePath": "internal/ui/responsive_test.go",
+   "lineRange": [
+    452,
+    480
+   ],
+   "summary": "Verifica que dicas de teclas são descartadas, não truncadas, ao faltar espaço.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_tree.go",
+   "target": "function:internal/ui/relax_tree.go:relaxTreeBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_tree.go",
+   "target": "function:internal/ui/relax_tree.go:relaxTreePlane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_tree.go",
+   "target": "function:internal/ui/relax_tree.go:relaxTreeFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Init",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Stage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Advance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Puffs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Frames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Draw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Cylinder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Bottom",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "function:internal/ui/relax_v4.go:relaxV4Smoke",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveCommits",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:responsiveScenes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveNoOverflow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveNoOverflow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:contentStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveScrollableGrowsWithHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveScrollableGrowsWithHeight",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveBoundedScenesStayHonest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveBoundedScenesStayHonest",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveVoidStaysAtTheEnd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveVoidStaysAtTheEnd",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveColumnsDegradeInOrder",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveColumnsDegradeInOrder",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveKeyHintsDegradeByDropping",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "function:internal/ui/responsive_test.go:TestResponsiveKeyHintsDegradeByDropping",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/responsive_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_tree.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_v4.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

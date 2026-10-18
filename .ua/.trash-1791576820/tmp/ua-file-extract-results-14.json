@@ -1,0 +1,647 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 3,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 3
+    }
+  },
+  "results": [
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 691,
+      "nonEmptyLines": 531,
+      "sections": [
+        {
+          "heading": "DevScope — Arquitetura",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1. Visão Geral",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1.1 Problema",
+          "level": 3,
+          "line": 9
+        },
+        {
+          "heading": "1.2 Solução",
+          "level": 3,
+          "line": 13
+        },
+        {
+          "heading": "1.3 Princípios de Design",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "2. Decisões Arquiteturais",
+          "level": 2,
+          "line": 30
+        },
+        {
+          "heading": "2.1 Por que Go + Bubble Tea?",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "2.2 Modelo de Dados Imutável (Snapshot)",
+          "level": 3,
+          "line": 38
+        },
+        {
+          "heading": "2.3 Pipeline de Descoberta",
+          "level": 3,
+          "line": 50
+        },
+        {
+          "heading": "2.4 Agrupamento de Projetos",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "heading": "2.5 Detecção de Framework (Plugin System)",
+          "level": 3,
+          "line": 78
+        },
+        {
+          "heading": "2.6 Detecção de Serviços",
+          "level": 3,
+          "line": 94
+        },
+        {
+          "heading": "2.7 Health Checks",
+          "level": 3,
+          "line": 107
+        },
+        {
+          "heading": "2.8 Logs Unificados",
+          "level": 3,
+          "line": 119
+        },
+        {
+          "heading": "3. Estrutura de Pastas",
+          "level": 2,
+          "line": 135
+        },
+        {
+          "heading": "4. Descrição dos Pacotes",
+          "level": 2,
+          "line": 231
+        },
+        {
+          "heading": "4.1 `cmd/devscope`",
+          "level": 3,
+          "line": 233
+        },
+        {
+          "heading": "4.2 `internal/app`",
+          "level": 3,
+          "line": 237
+        },
+        {
+          "heading": "4.3 `internal/config`",
+          "level": 3,
+          "line": 247
+        },
+        {
+          "heading": "4.4 `internal/core`",
+          "level": 3,
+          "line": 279
+        },
+        {
+          "heading": "4.5 `internal/scanner`",
+          "level": 3,
+          "line": 343
+        },
+        {
+          "heading": "4.6 `internal/detectors`",
+          "level": 3,
+          "line": 360
+        },
+        {
+          "heading": "4.7 `internal/collectors`",
+          "level": 3,
+          "line": 388
+        },
+        {
+          "heading": "4.8 `internal/health`",
+          "level": 3,
+          "line": 422
+        },
+        {
+          "heading": "4.9 `internal/metrics`",
+          "level": 3,
+          "line": 428
+        },
+        {
+          "heading": "4.10 `internal/logs`",
+          "level": 3,
+          "line": 436
+        },
+        {
+          "heading": "4.11 `internal/ui`",
+          "level": 3,
+          "line": 442
+        },
+        {
+          "heading": "4.12 `internal/commands`",
+          "level": 3,
+          "line": 482
+        },
+        {
+          "heading": "5. Fluxo de Execução",
+          "level": 2,
+          "line": 488
+        },
+        {
+          "heading": "6. Arquitetura Concorrente",
+          "level": 2,
+          "line": 515
+        },
+        {
+          "heading": "6.1 Diagrama",
+          "level": 3,
+          "line": 517
+        },
+        {
+          "heading": "6.2 Evitando Race Conditions",
+          "level": 3,
+          "line": 532
+        },
+        {
+          "heading": "6.3 Worker Pool",
+          "level": 3,
+          "line": 540
+        },
+        {
+          "heading": "6.4 Context e Cancelamento",
+          "level": 3,
+          "line": 550
+        },
+        {
+          "heading": "7. Gerenciamento de Memória",
+          "level": 2,
+          "line": 556
+        },
+        {
+          "heading": "8. Estratégia de Testes",
+          "level": 2,
+          "line": 567
+        },
+        {
+          "heading": "8.1 Unitários",
+          "level": 3,
+          "line": 569
+        },
+        {
+          "heading": "8.2 Integração",
+          "level": 3,
+          "line": 576
+        },
+        {
+          "heading": "8.3 UI",
+          "level": 3,
+          "line": 582
+        },
+        {
+          "heading": "8.4 Benchmarks",
+          "level": 3,
+          "line": 587
+        },
+        {
+          "heading": "9. CI/CD",
+          "level": 2,
+          "line": 594
+        },
+        {
+          "heading": "9.1 CI (`.github/workflows/ci.yml`)",
+          "level": 3,
+          "line": 596
+        },
+        {
+          "heading": "9.2 Release (`.github/workflows/release.yml`)",
+          "level": 3,
+          "line": 618
+        },
+        {
+          "heading": "9.3 Makefile targets",
+          "level": 3,
+          "line": 626
+        },
+        {
+          "heading": "10. Distribuição e Versionamento",
+          "level": 2,
+          "line": 638
+        },
+        {
+          "heading": "10.1 Versionamento",
+          "level": 3,
+          "line": 640
+        },
+        {
+          "heading": "10.2 Distribuição",
+          "level": 3,
+          "line": 647
+        },
+        {
+          "heading": "10.3 Binário",
+          "level": 3,
+          "line": 655
+        },
+        {
+          "heading": "11. Segurança",
+          "level": 2,
+          "line": 665
+        },
+        {
+          "heading": "12. Limitações Conhecidas (MVP)",
+          "level": 2,
+          "line": 675
+        },
+        {
+          "heading": "13. Referências",
+          "level": 2,
+          "line": 685
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 51
+      }
+    },
+    {
+      "path": "docs/DESIGN.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 877,
+      "nonEmptyLines": 664,
+      "sections": [
+        {
+          "heading": "DevScope — Padrão de Telas (TUI)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1. Princípios",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "1.1 A fundação (`internal/ui/foundation.go`)",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "1.2 Navegação: módulos contextuais",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "Duas descobertas, dois custos",
+          "level": 3,
+          "line": 92
+        },
+        {
+          "heading": "As duas regras que valem mais que a precisão",
+          "level": 3,
+          "line": 103
+        },
+        {
+          "heading": "Largura: a sidebar corta, não quebra",
+          "level": 3,
+          "line": 130
+        },
+        {
+          "heading": "1.3 Tela de lista + detalhe (Containers)",
+          "level": 2,
+          "line": 140
+        },
+        {
+          "heading": "1.4 Gaveta: o que não é ambiente",
+          "level": 2,
+          "line": 188
+        },
+        {
+          "heading": "1.5 Faixa de abertura do módulo",
+          "level": 2,
+          "line": 221
+        },
+        {
+          "heading": "Por que faixa, e não cartão",
+          "level": 3,
+          "line": 244
+        },
+        {
+          "heading": "A lista é o que faz a tela valer",
+          "level": 3,
+          "line": 259
+        },
+        {
+          "heading": "Regras",
+          "level": 3,
+          "line": 285
+        },
+        {
+          "heading": "1.6 Responsividade: regras de degradação",
+          "level": 2,
+          "line": 318
+        },
+        {
+          "heading": "As três classes de tela",
+          "level": 3,
+          "line": 333
+        },
+        {
+          "heading": "Onde o vazio pode ficar",
+          "level": 3,
+          "line": 348
+        },
+        {
+          "heading": "Escada de expansão (Dashboard)",
+          "level": 3,
+          "line": 360
+        },
+        {
+          "heading": "Ordem de sacrifício das colunas",
+          "level": 3,
+          "line": 374
+        },
+        {
+          "heading": "As dicas encurtam, não mudam de palavra",
+          "level": 3,
+          "line": 386
+        },
+        {
+          "heading": "2. Anatomia da tela padrão",
+          "level": 2,
+          "line": 398
+        },
+        {
+          "heading": "2.1 Cabeçalho",
+          "level": 3,
+          "line": 441
+        },
+        {
+          "heading": "2.2 Régua de abas",
+          "level": 3,
+          "line": 456
+        },
+        {
+          "heading": "2.3 Barra de comandos",
+          "level": 3,
+          "line": 471
+        },
+        {
+          "heading": "3. Teclado",
+          "level": 2,
+          "line": 490
+        },
+        {
+          "heading": "As três camadas",
+          "level": 3,
+          "line": 492
+        },
+        {
+          "heading": "O que `keymap_test.go` cobra",
+          "level": 3,
+          "line": 509
+        },
+        {
+          "heading": "4. Corpo da tela",
+          "level": 2,
+          "line": 552
+        },
+        {
+          "heading": "4.1 Painel único, largura cheia",
+          "level": 3,
+          "line": 554
+        },
+        {
+          "heading": "4.2 Organizar antes de realçar",
+          "level": 3,
+          "line": 576
+        },
+        {
+          "heading": "4.3 Título do painel",
+          "level": 3,
+          "line": 599
+        },
+        {
+          "heading": "4.4 Truncamento lateral",
+          "level": 3,
+          "line": 604
+        },
+        {
+          "heading": "5. Números: régua, não cards",
+          "level": 2,
+          "line": 611
+        },
+        {
+          "heading": "5.1 Gráficos",
+          "level": 3,
+          "line": 626
+        },
+        {
+          "heading": "6. Vocabulário visual: Braille",
+          "level": 2,
+          "line": 639
+        },
+        {
+          "heading": "6.1 Ondas de status (`internal/ui/spark.go`)",
+          "level": 3,
+          "line": 644
+        },
+        {
+          "heading": "6.2 Pulso inline (`internal/ui/anim.go`)",
+          "level": 3,
+          "line": 667
+        },
+        {
+          "heading": "6.3 Histórico",
+          "level": 3,
+          "line": 673
+        },
+        {
+          "heading": "6.4 Carregamento",
+          "level": 3,
+          "line": 680
+        },
+        {
+          "heading": "6.5 Animação",
+          "level": 3,
+          "line": 685
+        },
+        {
+          "heading": "7. Cores e tema",
+          "level": 2,
+          "line": 692
+        },
+        {
+          "heading": "8. Largura, altura e glifos",
+          "level": 2,
+          "line": 706
+        },
+        {
+          "heading": "9. Estados",
+          "level": 2,
+          "line": 732
+        },
+        {
+          "heading": "10. Microcópia",
+          "level": 2,
+          "line": 744
+        },
+        {
+          "heading": "10.1 Um nome, uma grafia",
+          "level": 2,
+          "line": 754
+        },
+        {
+          "heading": "11. Anti-padrões",
+          "level": 2,
+          "line": 773
+        },
+        {
+          "heading": "12. Testes obrigatórios",
+          "level": 2,
+          "line": 799
+        },
+        {
+          "heading": "13. Fluxo de trabalho",
+          "level": 2,
+          "line": 828
+        },
+        {
+          "heading": "14. Checklist antes de entregar uma tela",
+          "level": 2,
+          "line": 847
+        },
+        {
+          "heading": "15. Fora do padrão",
+          "level": 2,
+          "line": 863
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 49
+      }
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 153,
+      "nonEmptyLines": 114,
+      "sections": [
+        {
+          "heading": "DevScope — Roadmap",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "MVP (v0.0.1) — Fundação ✅",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "v0.1 — Serviços ✅",
+          "level": 2,
+          "line": 29
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 33
+        },
+        {
+          "heading": "v0.2 — Observabilidade ✅",
+          "level": 2,
+          "line": 51
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 55
+        },
+        {
+          "heading": "v0.3 — Polimento ✅",
+          "level": 2,
+          "line": 67
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 71
+        },
+        {
+          "heading": "Pendente v0.3",
+          "level": 3,
+          "line": 84
+        },
+        {
+          "heading": "v1.0 — Produção (em progresso)",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 95
+        },
+        {
+          "heading": "v2.0 — Plataforma (planejado)",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Entregas",
+          "level": 3,
+          "line": 117
+        },
+        {
+          "heading": "Timeline Estimada",
+          "level": 2,
+          "line": 134
+        },
+        {
+          "heading": "Critérios de Release",
+          "level": 2,
+          "line": 147
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    }
+  ]
+}

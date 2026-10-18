@@ -1,0 +1,462 @@
+{
+ "nodes": [
+  {
+   "id": "config:configs/devscope.example.yaml",
+   "type": "config",
+   "name": "devscope.example.yaml",
+   "summary": "Exemplo de configuração do DevScope: caminhos e profundidade do scan, diretórios ignorados, intervalos de refresh (scan, métricas, health, git), tema da UI, timeouts de health e projetos fixados.",
+   "tags": [
+    "configuration",
+    "exemplo",
+    "scan",
+    "yaml"
+   ],
+   "complexity": "simple",
+   "filePath": "configs/devscope.example.yaml"
+  },
+  {
+   "id": "file:docs/media/tapes/head.tape",
+   "type": "file",
+   "name": "head.tape",
+   "summary": "Cabeçalho VHS compartilhado que define shell, fonte, dimensões 1400x800, tema TokyoNight e velocidade de digitação, limpando o terminal sem gravar.",
+   "tags": [
+    "vhs",
+    "demo-media",
+    "configuration",
+    "tape"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/head.tape"
+  },
+  {
+   "id": "file:docs/media/tapes/docker.tape",
+   "type": "file",
+   "name": "docker.tape",
+   "summary": "Roteiro VHS da demo de Docker: abre o DevScope, entra nos containers, navega pelo detalhe, menus e ações de start/restart, gerando `docker.mp4`.",
+   "tags": [
+    "vhs",
+    "demo-media",
+    "docker",
+    "tape"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/docker.tape"
+  },
+  {
+   "id": "file:docs/media/tapes/git.tape",
+   "type": "file",
+   "name": "git.tape",
+   "summary": "Roteiro VHS da demo de Git: navega pela aba Git, grafo de commits (Ctrl+G), branches, staging e cria um commit com mensagem, gerando `git.mp4`.",
+   "tags": [
+    "vhs",
+    "demo-media",
+    "git",
+    "tape"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/git.tape"
+  },
+  {
+   "id": "file:docs/media/tapes/overview.tape",
+   "type": "file",
+   "name": "overview.tape",
+   "summary": "Roteiro VHS da visão geral: lista de projetos, filtro `/`, paleta Ctrl+P, abas do projeto, ajuda `?` e seletor de tema, gerando `overview.mp4` e uma captura.",
+   "tags": [
+    "vhs",
+    "demo-media",
+    "overview",
+    "tape"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/overview.tape"
+  },
+  {
+   "id": "file:docs/media/tapes/zoom.py",
+   "type": "file",
+   "name": "zoom.py",
+   "summary": "Script Python que aplica zoom suave (smoothstep) por segmentos de tempo a um vídeo do VHS usando Pillow e ffmpeg, gerando o MP4 final e um GIF otimizado abaixo de 10 MB, com modo `--preview`.",
+   "tags": [
+    "script",
+    "demo-media",
+    "video-processing",
+    "ffmpeg",
+    "pillow"
+   ],
+   "complexity": "moderate",
+   "filePath": "docs/media/tapes/zoom.py"
+  },
+  {
+   "id": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "type": "document",
+   "name": "2026-08-12-git-pull-conflict.md",
+   "summary": "Plano de implementação em 3 tarefas para tratar pull divergente (Merge/Rebase) e resolução de conflitos (Ours/Theirs/editor/Continue/Abort) na aba Git, com novas funções do collector e mudanças na UI.",
+   "tags": [
+    "documentation",
+    "plano",
+    "git",
+    "conflitos"
+   ],
+   "complexity": "moderate",
+   "filePath": "docs/superpowers/plans/2026-08-12-git-pull-conflict.md"
+  },
+  {
+   "id": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "type": "document",
+   "name": "2026-08-12-git-pull-conflict-design.md",
+   "summary": "Especificação de design para pull com divergência e modo de conflito na aba Git: fluxo, atalhos o/t/e/a/c/x, API nova do collector, pontos de toque na UI e critérios de sucesso.",
+   "tags": [
+    "documentation",
+    "spec",
+    "git",
+    "conflitos",
+    "design"
+   ],
+   "complexity": "moderate",
+   "filePath": "docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md"
+  },
+  {
+   "id": "file:scripts/install.ps1",
+   "type": "file",
+   "name": "install.ps1",
+   "summary": "Instalador PowerShell para Windows: obtém a última release do GitHub, detecta a arquitetura, baixa o zip, valida o checksum SHA-256, extrai `devscope.exe` para `%USERPROFILE%\\.devscope\\bin` e adiciona ao PATH do usuário.",
+   "tags": [
+    "script",
+    "instalação",
+    "windows",
+    "powershell",
+    "release"
+   ],
+   "complexity": "moderate",
+   "filePath": "scripts/install.ps1"
+  },
+  {
+   "id": "file:scripts/install.sh",
+   "type": "file",
+   "name": "install.sh",
+   "summary": "Instalador Bash para Linux/macOS/Windows (MSYS): detecta OS e arquitetura, baixa o asset da release, verifica SHA-256, instala o binário (com sudo se preciso) e adiciona o diretório ao PATH no profile do shell.",
+   "tags": [
+    "script",
+    "instalação",
+    "bash",
+    "release",
+    "cross-platform"
+   ],
+   "complexity": "moderate",
+   "filePath": "scripts/install.sh"
+  },
+  {
+   "id": "function:docs/media/tapes/zoom.py:state",
+   "type": "function",
+   "name": "state",
+   "summary": "Interpola com smoothstep entre os keyframes de zoom e retorna (centro_x, centro_y, largura) para o instante t.",
+   "tags": [
+    "video-processing",
+    "zoom",
+    "utility"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/zoom.py",
+   "lineRange": [
+    33,
+    41
+   ]
+  },
+  {
+   "id": "function:docs/media/tapes/zoom.py:box",
+   "type": "function",
+   "name": "box",
+   "summary": "Converte o estado de zoom no instante t numa caixa de recorte que mantém a proporção 1400x800 e fica dentro do quadro.",
+   "tags": [
+    "video-processing",
+    "zoom",
+    "utility"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/zoom.py",
+   "lineRange": [
+    44,
+    49
+   ]
+  },
+  {
+   "id": "function:docs/media/tapes/zoom.py:ff",
+   "type": "function",
+   "name": "ff",
+   "summary": "Wrapper que executa o ffmpeg em modo silencioso com check=True.",
+   "tags": [
+    "video-processing",
+    "zoom",
+    "utility"
+   ],
+   "complexity": "simple",
+   "filePath": "docs/media/tapes/zoom.py",
+   "lineRange": [
+    52,
+    53
+   ]
+  },
+  {
+   "id": "function:scripts/install.ps1:Show-Banner",
+   "type": "function",
+   "name": "Show-Banner",
+   "summary": "Imprime o banner ASCII do DevScope em ciano no início da instalação.",
+   "tags": [
+    "banner",
+    "cli-output",
+    "instalação"
+   ],
+   "complexity": "simple",
+   "filePath": "scripts/install.ps1",
+   "lineRange": [
+    3,
+    18
+   ]
+  },
+  {
+   "id": "function:scripts/install.sh:print_banner",
+   "type": "function",
+   "name": "print_banner",
+   "summary": "Imprime o banner ASCII do DevScope no início da instalação.",
+   "tags": [
+    "banner",
+    "cli-output",
+    "instalação"
+   ],
+   "complexity": "simple",
+   "filePath": "scripts/install.sh",
+   "lineRange": [
+    21,
+    36
+   ]
+  },
+  {
+   "id": "function:scripts/install.sh:add_to_path",
+   "type": "function",
+   "name": "add_to_path",
+   "summary": "Anexa um `export PATH` com o diretório de instalação ao arquivo de profile do shell, se ainda não estiver presente.",
+   "tags": [
+    "path",
+    "shell-profile",
+    "instalação"
+   ],
+   "complexity": "simple",
+   "filePath": "scripts/install.sh",
+   "lineRange": [
+    170,
+    182
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:configs/devscope.example.yaml",
+   "target": "file:internal/config/config.go",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/docker.tape",
+   "target": "file:docs/media/tapes/head.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/git.tape",
+   "target": "file:docs/media/tapes/head.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/overview.tape",
+   "target": "file:docs/media/tapes/head.tape",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:state",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:state",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:box",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:box",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:ff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:docs/media/tapes/zoom.py",
+   "target": "function:docs/media/tapes/zoom.py:ff",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:docs/media/tapes/zoom.py:box",
+   "target": "function:docs/media/tapes/zoom.py:state",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:scripts/install.ps1",
+   "target": "function:scripts/install.ps1:Show-Banner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:scripts/install.sh",
+   "target": "function:scripts/install.sh:print_banner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:scripts/install.sh",
+   "target": "function:scripts/install.sh:add_to_path",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:scripts/install.ps1",
+   "target": "config:.goreleaser.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:scripts/install.sh",
+   "target": "config:.goreleaser.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/collectors/git.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/ui/git_messages.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/ui/git_prompt.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/ui/app.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/ui/helpers.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/ui/git_tab.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+   "target": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/collectors/git.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/ui/git_messages.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/ui/git_prompt.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/ui/app.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/ui/helpers.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+   "target": "file:internal/ui/git_tab.go",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

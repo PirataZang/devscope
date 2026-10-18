@@ -84,10 +84,10 @@ func TestJsonShiftSelectAndCtrlWord(t *testing.T) {
 }
 
 func TestSidebarHidesJSON(t *testing.T) {
-	a := &App{width: 120, height: 40, tab: TabRoutes}
+	a := &App{width: 120, height: 40, tab: TabNginx}
 	got := stripANSI(a.renderProjectSidebar())
-	if !strings.Contains(got, "REDE") || !strings.Contains(got, "Rotas") {
-		t.Fatalf("sidebar missing REDE/Rotas: %q", got)
+	if !strings.Contains(got, "REDE") || !strings.Contains(got, "Nginx") {
+		t.Fatalf("sidebar missing REDE/Nginx: %q", got)
 	}
 	if strings.Contains(got, "JSON") || strings.Contains(got, "JWT") {
 		t.Fatalf("sidebar should not list JSON/JWT: %q", got)

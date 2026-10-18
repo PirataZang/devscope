@@ -16,8 +16,6 @@ import (
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/nginxutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
-	"github.com/devscope/devscope/internal/routeutil"
-	"github.com/devscope/devscope/internal/sshutil"
 	"github.com/devscope/devscope/internal/wsutil"
 	"github.com/mattn/go-runewidth"
 )
@@ -455,16 +453,6 @@ type App struct {
 	jwtHScrollIn                int
 	jwtHScrollOut               int
 	jwtHScrollSecret            int
-	routesOpen                  bool
-	routesLoading               bool
-	routes                      []routeutil.Route
-	routesCursor                int
-	routesScroll                int
-	routesErr                   string
-	routesStatus                string
-	routesFilterOn              bool
-	routesFilterInput           string
-	routesFilter                string
 	wsOpen                      bool
 	wsComposeOn                 bool
 	wsComposeFocus              wsComposeFocus
@@ -561,32 +549,6 @@ type App struct {
 	cfAccount                   []cfutil.AccountTunnel
 	cfCfg                       cfutil.ProjectConfig
 	cfAuth                      cfutil.AuthInfo
-	sshOpen                     bool
-	sshLoading                  bool
-	sshWizard                   bool
-	sshSeedWizard               bool
-	sshConfirmDelete            bool
-	sshSubTab                   sshSubTab
-	sshFocus                    sshFocus
-	sshCursor                   int
-	sshScroll                   int
-	sshLogScroll                int
-	sshDetailsScroll            int
-	sshNewLocalPort             int
-	sshNewLocalPortStr          string
-	sshNewName                  string
-	sshNewMode                  string
-	sshNewBind                  string
-	sshNewTarget                string
-	sshNewIdentity              string
-	sshWizardField              int
-	sshWizardCursor             int
-	sshStatus                   string
-	sshErr                      string
-	sshForeign                  int
-	sshShowAll                  bool
-	sshTunnels                  []sshutil.Tunnel
-	sshCfg                      sshutil.ProjectConfig
 	jenkinsOpen                 bool
 	jenkinsLoading              bool
 	jenkinsEditing              bool
@@ -618,6 +580,13 @@ type App struct {
 	jenkinsCfg                  jenkinsutil.ProjectConfig
 	jenkinsInfo                 jenkinsutil.ServerInfo
 	nginxOpen                   bool
+	wtList                      []collectors.GitWorktree
+	wtLoading                   bool
+	wtErr                       string
+	wtStatus                    string
+	wtCursor                    int
+	wtScroll                    int
+	wtFollow                    string
 	nginxLoading                bool
 	nginxView                   nginxView
 	nginxCursor                 int
@@ -743,10 +712,6 @@ type App struct {
 	landingGHAProcs     int
 	landingCFOK         bool
 	landingCF           cfutil.AuthInfo
-	landingSSHOK        bool
-	landingSSHAvail     bool
-	landingSSHVer       string
-	landingSSHLive      int
 	landingSwarmOK      bool
 	landingSwarmAvail   bool
 	landingSwarm        collectors.SwarmInfo
@@ -880,9 +845,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.gitBranchFilterOn {
 			return a.updateGitBranchFilter(msg)
 		}
-		if a.routesFilterOn {
-			return a.updateRoutesFilter(msg)
-		}
 		if a.dbFilterOn {
 			return a.updateDbFilter(msg, a.currentProject())
 		}
@@ -983,6 +945,13 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return a, tea.Batch(cmds...)
 
+	case wtLoadedMsg:
+		a.handleWorktreesLoaded(msg)
+		return a, nil
+
+	case wtActionMsg:
+		return a, a.handleWorktreeAction(msg)
+
 	case gitWTRefreshedMsg:
 		a.handleGitWTRefreshed(msg)
 		return a, nil
@@ -1049,10 +1018,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case swarmLoadedMsg, swarmActionMsg, swarmDetailMsg, swarmTickMsg:
 		return a.handleSwarmMsg(msg)
 
-	case routesLoadedMsg:
-		a.handleRoutesLoaded(msg)
-		return a, nil
-
 	case wsConnectedMsg, wsEventMsg:
 		return a.handleWsMsg(msg)
 	case ngrokLoadedMsg, ngrokActionMsg:
@@ -1060,9 +1025,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case cfLoadedMsg, cfActionMsg:
 		return a.handleCFMsg(msg)
-
-	case sshLoadedMsg, sshActionMsg:
-		return a.handleSSHMsg(msg)
 
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
@@ -1436,9 +1398,6 @@ func (a *App) closeToolClients() {
 	a.swarmGen++
 	a.jsonOpen = false
 	a.jwtOpen = false
-	a.routesOpen = false
-	a.routesLoading = false
-	a.routesFilterOn = false
 	if a.wsOpen || a.wsConnected {
 		a.wsCloseSession()
 	}
@@ -1452,9 +1411,6 @@ func (a *App) closeToolClients() {
 	a.cfOpen = false
 	a.cfWizard = false
 	a.cfConfirmDelete = false
-	a.sshOpen = false
-	a.sshWizard = false
-	a.sshConfirmDelete = false
 	a.jenkinsOpen = false
 	a.jenkinsEditing = false
 	a.jenkinsBuildDetail = false
@@ -1500,6 +1456,9 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		if p != nil {
 			a.initGitTab(p)
 		}
+	case TabWorktrees:
+		a.wtStatus = ""
+		cmds = append(cmds, a.loadWorktrees(p))
 	case TabContainers:
 		a.initContainersTab()
 		cmds = append(cmds, a.requestContainerPreview())
@@ -1525,8 +1484,6 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterJsonTab(p)
 	case TabJWT:
 		a.enterJwtTab(p)
-	case TabRoutes:
-		a.enterRoutesTab(p)
 	case TabWebSocket:
 		a.enterWsTab(p)
 	case TabNgrok:
@@ -1538,11 +1495,6 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		a.enterCFTab(p)
 		if !a.landingCFOK {
 			cmds = append(cmds, a.probeToolLanding(TabCFTunnel, p))
-		}
-	case TabSSH:
-		a.enterSSHTab(p)
-		if !a.landingSSHOK {
-			cmds = append(cmds, a.probeToolLanding(TabSSH, p))
 		}
 	case TabJenkins:
 		a.enterJenkinsTab(p)
@@ -1605,9 +1557,6 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	if tab == TabJWT {
 		a.jwtOpen = false
 	}
-	if tab == TabRoutes {
-		a.routesOpen = false
-	}
 	if tab == TabWebSocket {
 		a.wsOpen = false
 	}
@@ -1616,9 +1565,6 @@ func (a *App) openProject(p core.Project, tab Tab) tea.Cmd {
 	}
 	if tab == TabCFTunnel {
 		a.cfOpen = false
-	}
-	if tab == TabSSH {
-		a.sshOpen = false
 	}
 	if tab == TabJenkins {
 		a.jenkinsOpen = false
@@ -1703,9 +1649,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabJWT && a.jwtOpen {
 		return a.handleJwtKeys(msg, p)
 	}
-	if a.tab == TabRoutes && a.routesOpen {
-		return a.handleRoutesKeys(msg, p)
-	}
 	if a.tab == TabWebSocket && a.wsOpen {
 		return a.handleWsKeys(msg, p)
 	}
@@ -1715,14 +1658,16 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if a.tab == TabCFTunnel && a.cfOpen {
 		return a.handleCFKeys(msg, p)
 	}
-	if a.tab == TabSSH && a.sshOpen {
-		return a.handleSSHKeys(msg, p)
-	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.handleJenkinsKeys(msg, p)
 	}
 	if a.tab == TabNginx && a.nginxOpen {
 		return a.handleNginxKeys(msg, p)
+	}
+	if a.tab == TabWorktrees {
+		if cmd, ok := a.handleWorktreeKeys(msg, p); ok {
+			return a, cmd
+		}
 	}
 
 	switch msg.String() {
@@ -2158,9 +2103,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if a.tab == TabJWT && !a.jwtOpen {
 			return a, a.openJwtClient(p)
 		}
-		if a.tab == TabRoutes && !a.routesOpen {
-			return a, a.openRoutesClient(p)
-		}
 		if a.tab == TabWebSocket && !a.wsOpen {
 			return a, a.openWsClient(p)
 		}
@@ -2169,9 +2111,6 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		if a.tab == TabCFTunnel && !a.cfOpen {
 			return a, a.openCFClient(p)
-		}
-		if a.tab == TabSSH && !a.sshOpen {
-			return a, a.openSSHClient(p)
 		}
 		if a.tab == TabJenkins && !a.jenkinsOpen {
 			return a, a.openJenkinsClient(p)
@@ -2364,9 +2303,6 @@ func (a *App) renderProject() string {
 	if a.tab == TabJWT && a.jwtOpen {
 		return a.renderJwtTab(p)
 	}
-	if a.tab == TabRoutes && a.routesOpen {
-		return a.renderRoutesTab(p)
-	}
 	if a.tab == TabWebSocket && a.wsOpen {
 		return a.renderWsTab(p)
 	}
@@ -2375,9 +2311,6 @@ func (a *App) renderProject() string {
 	}
 	if a.tab == TabCFTunnel && a.cfOpen {
 		return a.renderCFTab(p)
-	}
-	if a.tab == TabSSH && a.sshOpen {
-		return a.renderSSHTab(p)
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.renderJenkinsTab(p)
@@ -2409,14 +2342,13 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	moduleDash := a.tab == TabOverview || a.tab == TabLogs ||
+	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
 		(a.tab == TabKubernetes && !a.k8sOpen) || (a.tab == TabSwarm && !a.swarmOpen) ||
 		(a.tab == TabJSON && !a.jsonOpen) || (a.tab == TabJWT && !a.jwtOpen) ||
-		(a.tab == TabRoutes && !a.routesOpen) || (a.tab == TabNgrok && !a.ngrokOpen) ||
-		(a.tab == TabCFTunnel && !a.cfOpen) || (a.tab == TabSSH && !a.sshOpen) ||
+		(a.tab == TabNgrok && !a.ngrokOpen) || (a.tab == TabCFTunnel && !a.cfOpen) ||
 		(a.tab == TabJenkins && !a.jenkinsOpen) || (a.tab == TabActions && !a.ghaOpen) ||
 		(a.tab == TabNginx && !a.nginxOpen)
 	switch {
@@ -2537,6 +2469,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 	switch a.tab {
 	case TabGit:
 		return a.renderGitTab(p)
+	case TabWorktrees:
+		return a.renderWorktreesTab(p)
 	case TabContainers:
 		return a.renderContainersTab(p)
 	case TabLogs:
@@ -2553,16 +2487,12 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderJsonLanding(p)
 	case TabJWT:
 		return a.renderJwtLanding(p)
-	case TabRoutes:
-		return a.renderRoutesLanding(p)
 	case TabWebSocket:
 		return a.renderWsLanding(p)
 	case TabNgrok:
 		return a.renderNgrokLanding(p)
 	case TabCFTunnel:
 		return a.renderCFLanding(p)
-	case TabSSH:
-		return a.renderSSHLanding(p)
 	case TabJenkins:
 		return a.renderJenkinsLanding(p)
 	case TabNginx:
@@ -2724,16 +2654,12 @@ func (a *App) moduleClientOpen(t Tab) bool {
 		return a.jsonOpen
 	case TabJWT:
 		return a.jwtOpen
-	case TabRoutes:
-		return a.routesOpen
 	case TabWebSocket:
 		return a.wsOpen
 	case TabNgrok:
 		return a.ngrokOpen
 	case TabCFTunnel:
 		return a.cfOpen
-	case TabSSH:
-		return a.sshOpen
 	case TabJenkins:
 		return a.jenkinsOpen
 	case TabNginx:

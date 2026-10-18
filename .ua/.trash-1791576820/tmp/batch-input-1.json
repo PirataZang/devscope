@@ -1,0 +1,2745 @@
+{
+ "batchIndex": 1,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": "internal/app/app.go",
+   "language": "go",
+   "sizeLines": 73,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/core/models.go",
+   "language": "go",
+   "sizeLines": 224,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/core/state.go",
+   "language": "go",
+   "sizeLines": 152,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/core/state_test.go",
+   "language": "go",
+   "sizeLines": 84,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jenkinsutil/client.go",
+   "language": "go",
+   "sizeLines": 471,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jenkinsutil/client_test.go",
+   "language": "go",
+   "sizeLines": 175,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jsonutil/jsonutil.go",
+   "language": "go",
+   "sizeLines": 664,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jsonutil/jsonutil_test.go",
+   "language": "go",
+   "sizeLines": 106,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jwtutil/jwtutil.go",
+   "language": "go",
+   "sizeLines": 253,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/jwtutil/jwtutil_test.go",
+   "language": "go",
+   "sizeLines": 51,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/nginxutil/agent.go",
+   "language": "go",
+   "sizeLines": 671,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/nginxutil/agent_test.go",
+   "language": "go",
+   "sizeLines": 337,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ngrokutil/agent.go",
+   "language": "go",
+   "sizeLines": 407,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ngrokutil/agent_test.go",
+   "language": "go",
+   "sizeLines": 76,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/sshutil/agent.go",
+   "language": "go",
+   "sizeLines": 456,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/sshutil/agent_test.go",
+   "language": "go",
+   "sizeLines": 152,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/anim.go",
+   "language": "go",
+   "sizeLines": 221,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/anim_test.go",
+   "language": "go",
+   "sizeLines": 70,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_auth_test.go",
+   "language": "go",
+   "sizeLines": 116,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_client.go",
+   "language": "go",
+   "sizeLines": 281,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_client_test.go",
+   "language": "go",
+   "sizeLines": 103,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_json_highlight.go",
+   "language": "go",
+   "sizeLines": 164,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_json_highlight_test.go",
+   "language": "go",
+   "sizeLines": 47,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_kv.go",
+   "language": "go",
+   "sizeLines": 322,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_screen.go",
+   "language": "go",
+   "sizeLines": 738,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_select_test.go",
+   "language": "go",
+   "sizeLines": 93,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/api_tab_test.go",
+   "language": "go",
+   "sizeLines": 439,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/confirm_modal.go",
+   "language": "go",
+   "sizeLines": 66,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/confirm_modal_test.go",
+   "language": "go",
+   "sizeLines": 80,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "internal/app/app.go": [
+   "internal/collectors/compose.go",
+   "internal/collectors/compose_edit.go",
+   "internal/collectors/compose_edit_test.go",
+   "internal/collectors/compose_presets.go",
+   "internal/collectors/compose_presets_test.go",
+   "internal/collectors/compose_test.go",
+   "internal/collectors/database.go",
+   "internal/collectors/database_test.go",
+   "internal/collectors/docker.go",
+   "internal/collectors/docker_actions.go",
+   "internal/collectors/docker_close_port.go",
+   "internal/collectors/docker_deps.go",
+   "internal/collectors/docker_detail.go",
+   "internal/collectors/docker_detail_test.go",
+   "internal/collectors/docker_hub.go",
+   "internal/collectors/docker_hub_test.go",
+   "internal/collectors/docker_images.go",
+   "internal/collectors/docker_stats.go",
+   "internal/collectors/docker_stats_test.go",
+   "internal/collectors/docker_test.go",
+   "internal/collectors/gha.go",
+   "internal/collectors/gha_test.go",
+   "internal/collectors/git.go",
+   "internal/collectors/git_graph.go",
+   "internal/collectors/git_test.go",
+   "internal/collectors/health.go",
+   "internal/collectors/integration_test.go",
+   "internal/collectors/k8s.go",
+   "internal/collectors/k8s_test.go",
+   "internal/collectors/manager.go",
+   "internal/collectors/nginx.go",
+   "internal/collectors/pm2.go",
+   "internal/collectors/ports.go",
+   "internal/collectors/ports_test.go",
+   "internal/collectors/project_enrich.go",
+   "internal/collectors/project_status.go",
+   "internal/collectors/projects_filter.go",
+   "internal/collectors/registry_inspect.go",
+   "internal/collectors/registry_inspect_test.go",
+   "internal/collectors/shell.go",
+   "internal/collectors/shell_test.go",
+   "internal/collectors/ssl.go",
+   "internal/collectors/swarm.go",
+   "internal/collectors/swarm_test.go",
+   "internal/config/config.go",
+   "internal/config/userconfig.go",
+   "internal/config/userconfig_test.go",
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go",
+   "internal/ui/anim.go",
+   "internal/ui/anim_test.go",
+   "internal/ui/api_auth_test.go",
+   "internal/ui/api_client.go",
+   "internal/ui/api_client_test.go",
+   "internal/ui/api_json_highlight.go",
+   "internal/ui/api_json_highlight_test.go",
+   "internal/ui/api_kv.go",
+   "internal/ui/api_screen.go",
+   "internal/ui/api_select_test.go",
+   "internal/ui/api_tab.go",
+   "internal/ui/api_tab_test.go",
+   "internal/ui/app.go",
+   "internal/ui/cf_tab.go",
+   "internal/ui/cf_tab_test.go",
+   "internal/ui/compose_messages.go",
+   "internal/ui/confirm_modal.go",
+   "internal/ui/confirm_modal_test.go",
+   "internal/ui/container_deps.go",
+   "internal/ui/container_detail.go",
+   "internal/ui/container_detail_code.go",
+   "internal/ui/container_detail_code_test.go",
+   "internal/ui/container_detail_layout.go",
+   "internal/ui/container_detail_views.go",
+   "internal/ui/container_images.go",
+   "internal/ui/container_messages.go",
+   "internal/ui/container_ports.go",
+   "internal/ui/container_stats.go",
+   "internal/ui/containers_tab.go",
+   "internal/ui/containers_tab_test.go",
+   "internal/ui/dashboard.go",
+   "internal/ui/dashboard_test.go",
+   "internal/ui/db_tab.go",
+   "internal/ui/db_tab_test.go",
+   "internal/ui/deploy.go",
+   "internal/ui/docker_add.go",
+   "internal/ui/docker_add_render.go",
+   "internal/ui/docker_add_test.go",
+   "internal/ui/editor.go",
+   "internal/ui/foundation.go",
+   "internal/ui/foundation_test.go",
+   "internal/ui/fuzzy.go",
+   "internal/ui/gha_detail.go",
+   "internal/ui/gha_tab.go",
+   "internal/ui/gha_tab_test.go",
+   "internal/ui/gha_views.go",
+   "internal/ui/git_cache.go",
+   "internal/ui/git_cache_test.go",
+   "internal/ui/git_compose.go",
+   "internal/ui/git_drawer.go",
+   "internal/ui/git_drawer_test.go",
+   "internal/ui/git_graph.go",
+   "internal/ui/git_messages.go",
+   "internal/ui/git_prompt.go",
+   "internal/ui/git_tab.go",
+   "internal/ui/git_tab_test.go",
+   "internal/ui/graph_features_test.go",
+   "internal/ui/graph_layout.go",
+   "internal/ui/help_screen.go",
+   "internal/ui/help_screen_test.go",
+   "internal/ui/helpers.go",
+   "internal/ui/jenkins_tab.go",
+   "internal/ui/jenkins_tab_test.go",
+   "internal/ui/json_tab.go",
+   "internal/ui/json_tab_test.go",
+   "internal/ui/jwt_tab.go",
+   "internal/ui/jwt_tab_test.go",
+   "internal/ui/k8s_tab.go",
+   "internal/ui/k8s_tab_test.go",
+   "internal/ui/keymap_test.go",
+   "internal/ui/landing_probe.go",
+   "internal/ui/logs_tab.go",
+   "internal/ui/module_caps.go",
+   "internal/ui/module_caps_test.go",
+   "internal/ui/module_landing.go",
+   "internal/ui/module_landing_test.go",
+   "internal/ui/module_shell.go",
+   "internal/ui/module_shell_test.go",
+   "internal/ui/nginx_tab.go",
+   "internal/ui/nginx_tab_test.go",
+   "internal/ui/nginx_view.go",
+   "internal/ui/nginx_view_test.go",
+   "internal/ui/ngrok_tab.go",
+   "internal/ui/ngrok_tab_test.go",
+   "internal/ui/overview_tab.go",
+   "internal/ui/overview_tab_test.go",
+   "internal/ui/paths.go",
+   "internal/ui/project_cwd.go",
+   "internal/ui/project_cwd_test.go",
+   "internal/ui/project_load.go",
+   "internal/ui/project_messages.go",
+   "internal/ui/project_sidebar.go",
+   "internal/ui/relax.go",
+   "internal/ui/relax_aquarium.go",
+   "internal/ui/relax_ast.go",
+   "internal/ui/relax_blackhole.go",
+   "internal/ui/relax_braille.go",
+   "internal/ui/relax_burst.go",
+   "internal/ui/relax_cat.go",
+   "internal/ui/relax_chess.go",
+   "internal/ui/relax_city.go",
+   "internal/ui/relax_clouds.go",
+   "internal/ui/relax_coffee.go",
+   "internal/ui/relax_cube.go",
+   "internal/ui/relax_dragon.go",
+   "internal/ui/relax_drop.go",
+   "internal/ui/relax_engine.go",
+   "internal/ui/relax_fall.go",
+   "internal/ui/relax_fire.go",
+   "internal/ui/relax_fireworks.go",
+   "internal/ui/relax_fox.go",
+   "internal/ui/relax_galaxy.go",
+   "internal/ui/relax_hourglass.go",
+   "internal/ui/relax_invaders.go",
+   "internal/ui/relax_jackpot.go",
+   "internal/ui/relax_moon.go",
+   "internal/ui/relax_motion.go",
+   "internal/ui/relax_nebula.go",
+   "internal/ui/relax_ridge.go",
+   "internal/ui/relax_sea.go",
+   "internal/ui/relax_sky.go",
+   "internal/ui/relax_smoke.go",
+   "internal/ui/relax_sword.go",
+   "internal/ui/relax_test.go",
+   "internal/ui/relax_tetris.go",
+   "internal/ui/relax_tetris_draw.go",
+   "internal/ui/relax_tree.go",
+   "internal/ui/relax_v4.go",
+   "internal/ui/responsive_test.go",
+   "internal/ui/routes_tab.go",
+   "internal/ui/routes_tab_test.go",
+   "internal/ui/shell_return.go",
+   "internal/ui/small_terminal_test.go",
+   "internal/ui/spark.go",
+   "internal/ui/spark_test.go",
+   "internal/ui/ssh_tab.go",
+   "internal/ui/ssh_tab_test.go",
+   "internal/ui/styles.go",
+   "internal/ui/swarm_tab.go",
+   "internal/ui/swarm_tab_test.go",
+   "internal/ui/swarm_views.go",
+   "internal/ui/theme.go",
+   "internal/ui/theme_test.go",
+   "internal/ui/tools_config_test.go",
+   "internal/ui/tunnel_modals.go",
+   "internal/ui/user_config_screen.go",
+   "internal/ui/views.go",
+   "internal/ui/ws_compose.go",
+   "internal/ui/ws_tab.go",
+   "internal/ui/ws_tab_test.go"
+  ],
+  "internal/core/models.go": [],
+  "internal/core/state.go": [],
+  "internal/core/state_test.go": [],
+  "internal/jenkinsutil/client.go": [],
+  "internal/jenkinsutil/client_test.go": [],
+  "internal/jsonutil/jsonutil.go": [],
+  "internal/jsonutil/jsonutil_test.go": [],
+  "internal/jwtutil/jwtutil.go": [],
+  "internal/jwtutil/jwtutil_test.go": [],
+  "internal/nginxutil/agent.go": [],
+  "internal/nginxutil/agent_test.go": [],
+  "internal/ngrokutil/agent.go": [],
+  "internal/ngrokutil/agent_test.go": [],
+  "internal/sshutil/agent.go": [],
+  "internal/sshutil/agent_test.go": [],
+  "internal/ui/anim.go": [],
+  "internal/ui/anim_test.go": [],
+  "internal/ui/api_auth_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/api_client.go": [],
+  "internal/ui/api_client_test.go": [],
+  "internal/ui/api_json_highlight.go": [],
+  "internal/ui/api_json_highlight_test.go": [],
+  "internal/ui/api_kv.go": [],
+  "internal/ui/api_screen.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/api_select_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/api_tab_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/confirm_modal.go": [],
+  "internal/ui/confirm_modal_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ]
+ },
+ "neighborMap": {
+  "internal/app/app.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/manager.go",
+    "batchIndex": 7,
+    "symbols": [
+     "Manager",
+     "NewManager",
+     "QuickScan",
+     "Start",
+     "StartWithContext",
+     "EnrichSnapshot"
+    ]
+   },
+   {
+    "path": "internal/collectors/project_enrich.go",
+    "batchIndex": 7,
+    "symbols": [
+     "EnrichProjectDockerDetail",
+     "RefreshProjectDocker"
+    ]
+   },
+   {
+    "path": "internal/ui/project_load.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/docker_actions.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DockerPause",
+     "DockerUnpause",
+     "DockerStart",
+     "DockerStop",
+     "DockerRestart",
+     "DockerSetRestartPolicy",
+     "DockerRemove",
+     "DockerLogs",
+     "DockerLogsSince",
+     "DockerExecTarget",
+     "DockerExecShell",
+     "DockerExecShellBash",
+     "DockerExecShellFallback",
+     "RefreshProjectsDocker",
+     "IsContainerRunning",
+     "IsContainerStopped"
+    ]
+   },
+   {
+    "path": "internal/collectors/health.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectHealth"
+    ]
+   },
+   {
+    "path": "internal/collectors/database.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DBTarget",
+     "DBColumn",
+     "DBTableInfo",
+     "DetectProjectDatabasesLite",
+     "DetectProjectDatabases",
+     "DBListTables",
+     "DBDescribeTable",
+     "DBQuery"
+    ]
+   },
+   {
+    "path": "internal/ui/dashboard.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/project_sidebar.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/api_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_deps.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_detail.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_images.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_messages.go",
+    "batchIndex": 5,
+    "symbols": [
+     "Error"
+    ]
+   },
+   {
+    "path": "internal/ui/container_ports.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_stats.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/containers_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab_test.go",
+    "batchIndex": 5,
+    "symbols": [
+     "TestAllTabsIncludesDatabase",
+     "TestDbLandingEnterAndEsc",
+     "TestSidebarShowsDatabaseTool",
+     "TestDbClientRenderAndFilter"
+    ]
+   },
+   {
+    "path": "internal/ui/docker_add.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/docker_add_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestDockerAddRefuseOpensEditor",
+     "TestDockerAddSelectImageOpensEditor",
+     "TestDockerAddUnknownImageUsesAsyncCompose",
+     "TestDockerAddLoadMoreAppends",
+     "TestDockerHubDetailsDoneCaches"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_detail.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/gha_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String",
+     "String",
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesActions",
+     "TestSidebarShowsActionsInCodigo",
+     "TestGHALandingEnterAndEsc",
+     "TestGHAControlCenterRenders",
+     "TestGHAUsagePanelAndCard",
+     "TestGHAKindCycle",
+     "TestGHAEnterOpensProcessDetail",
+     "TestGHAProcessStatusFromRuns",
+     "TestGHATabCyclesPanels",
+     "TestGHAKindSwitchOnlyOnTable",
+     "TestGHASetupModalWhenNoGH",
+     "TestGHASetupModalAuth",
+     "TestGHAOpenBrowserUsesRemote",
+     "TestGHAAskStopJobConfirm",
+     "TestGHAAskStopAllJobs",
+     "TestGHARunIsActive",
+     "TestGHAOpenBrowserUsesSelectedRun",
+     "TestGHATickIntervalFasterWhenActive",
+     "TestGHATickKeepsChainOnConfirm",
+     "TestGHABeginTriggerSelectsBranch",
+     "TestGHAFilteredRunsScopeAndProcess"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_compose.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_graph.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_messages.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_prompt.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderGitMainShowsBottomBoxes",
+     "TestExtractGitURL",
+     "TestRenderGitCommandLogShowsOutput",
+     "TestGitFileLinesShowsStagedBadge",
+     "TestMoveWTFileTreeCursorSkipsFolders",
+     "TestGitFileLinesShowsTree",
+     "TestGitConflictFileLinesOnlyUnmerged",
+     "TestGitConflictDiffScreen",
+     "TestGitAddFileTogglesUnstage",
+     "TestOpenGitFileDiffAllowsScroll",
+     "TestFilteredGitBranches",
+     "TestGitBranchFilterLiveInline",
+     "TestGitDiffSearchInlineLive",
+     "TestGitPromptEditsAtCursor",
+     "TestSyncGitBranchCursor",
+     "TestGitSelectCommitRange",
+     "TestFitGitPanelLines",
+     "TestIsGitCommitInCherryBufferMarked",
+     "TestOpenGitBranchHistoryDoesNotOpenCommit",
+     "TestRenderGitDiffLineColors",
+     "TestGitDiffHorizontalScrollRevealsTail",
+     "TestBuildCommitFileTreeCompactsFolders",
+     "TestGitCommitTreeKeysOpenCollapse",
+     "TestGitCommitDetailShowsSidebarAndDiff",
+     "TestCommitFileChangeCounts",
+     "TestGitCommitDetailShowsFileStats",
+     "TestGitCommitMessageExpandToggle",
+     "TestGitCommitDetailKeepsFileColumnClean",
+     "TestGitDiffSearchJumpsToMatch",
+     "TestSwitchGitCommitFileUsesCache",
+     "TestGitCommitDiffScrollReachesEnd",
+     "TestGitComposeModalMultiline",
+     "TestGitNewBranchPromptIsModal",
+     "TestGitGraphRowFitsBox",
+     "TestGraphCommitIconsAreSingleWidth",
+     "TestGitHeaderFindsRemoteInEitherField",
+     "TestGitHeaderShowsSyncState",
+     "TestGitStashSubjectStripsWipPrefix",
+     "TestGitColumnWidthsFollowPanelNotTerminal",
+     "TestGitCommandBarWrapsInsteadOfHiding"
+    ]
+   },
+   {
+    "path": "internal/ui/graph_features_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderContainerImagesDoesNotPanic",
+     "TestHandleContainerImagesKeysNavigatesAndCycles",
+     "TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+     "TestBuildGraphLayoutRowsShareAUniformWidth",
+     "TestRenderGitGraphDoesNotPanic",
+     "TestHandleGitGraphKeysSkipsConnectorRows",
+     "TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+     "TestGitGraphTabCyclesPanesAndScrollsThem",
+     "TestGitGraphBranchPickerFiltersTheGraph",
+     "TestGitGraphBranchPickerTypingNarrowsTheList",
+     "TestDockerImageRowColorsProjectMembership"
+    ]
+   },
+   {
+    "path": "internal/ui/helpers.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesKubernetes",
+     "TestK8sLandingEnterAndEsc",
+     "TestSidebarShowsKubernetesInExecucao",
+     "TestSanitizeK8sName",
+     "TestK8sApplyKeyAndEnterNewline",
+     "TestK8sCreateStartsEditing",
+     "TestK8sOverviewLayout",
+     "TestK8sKindStaysReachableWithoutExplorer",
+     "TestK8sProdContextIsFlagged",
+     "TestK8sReadyAndRestartStyles",
+     "TestK8sFilterKey"
+    ]
+   },
+   {
+    "path": "internal/ui/logs_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/module_landing.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/overview_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/project_messages.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/swarm_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesSwarm",
+     "TestSidebarShowsSwarmInExecucao",
+     "TestSwarmLandingEnterAndEsc",
+     "TestSanitizeSwarmStackName",
+     "TestSwarmKindCycle",
+     "TestSwarmControlCenterRenders",
+     "TestSwarmReplicaStyleFlagsIncomplete",
+     "TestSwarmKindTabsShowAll",
+     "TestSwarmNavPushPop",
+     "TestSwarmScaleForm"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/user_config_screen.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/database_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseDatabaseURL",
+     "TestDetectContainerDBEngine",
+     "TestDetectProjectDatabases",
+     "TestDetectContainerDBEngineExtras",
+     "TestEscapeSQLLiteral"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDocker",
+     "CollectDockerPS",
+     "AssignContainersToProjects",
+     "EnrichProjectsWithMissingComposeServices",
+     "ProjectRunning"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_images.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerImages",
+     "RemoveDockerImages"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerStats",
+     "CollectDockerStatsForIDs",
+     "ApplyDockerStats"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseCPUPerc",
+     "TestParseMemUsageBytes",
+     "TestApplyDockerStats",
+     "TestParseContainerPorts",
+     "TestParseContainerPortMappings",
+     "TestFormatPortsShort",
+     "TestApplyProjectStatusDegraded",
+     "TestSortPinnedFirst"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestMatchScoreComposeRoot",
+     "TestMatchScoreComposeRootInsideProject",
+     "TestMatchScoreMountInsideProject",
+     "TestMatchScoreParentMountRejected",
+     "TestParseHealthFromStatus",
+     "TestParseDockerPSLine",
+     "TestApplyRestartPolicies",
+     "TestAssignContainersUnique",
+     "TestAssignContainersProjectPathFallback",
+     "TestAssignStoppedContainerFromNestedCompose",
+     "TestReclaimOrphanByComposeName",
+     "TestMissingComposeServiceListed"
+    ]
+   }
+  ],
+  "internal/core/models.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/commands/scan.go",
+    "batchIndex": 7,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/manager.go",
+    "batchIndex": 7,
+    "symbols": [
+     "Manager",
+     "NewManager",
+     "QuickScan",
+     "Start",
+     "StartWithContext",
+     "EnrichSnapshot"
+    ]
+   },
+   {
+    "path": "internal/collectors/project_enrich.go",
+    "batchIndex": 7,
+    "symbols": [
+     "EnrichProjectDockerDetail",
+     "RefreshProjectDocker"
+    ]
+   },
+   {
+    "path": "internal/ui/project_load.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/docker_actions.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DockerPause",
+     "DockerUnpause",
+     "DockerStart",
+     "DockerStop",
+     "DockerRestart",
+     "DockerSetRestartPolicy",
+     "DockerRemove",
+     "DockerLogs",
+     "DockerLogsSince",
+     "DockerExecTarget",
+     "DockerExecShell",
+     "DockerExecShellBash",
+     "DockerExecShellFallback",
+     "RefreshProjectsDocker",
+     "IsContainerRunning",
+     "IsContainerStopped"
+    ]
+   },
+   {
+    "path": "internal/collectors/health.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectHealth"
+    ]
+   },
+   {
+    "path": "internal/collectors/database.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DBTarget",
+     "DBColumn",
+     "DBTableInfo",
+     "DetectProjectDatabasesLite",
+     "DetectProjectDatabases",
+     "DBListTables",
+     "DBDescribeTable",
+     "DBQuery"
+    ]
+   },
+   {
+    "path": "internal/ui/dashboard.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/project_sidebar.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/api_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_deps.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_detail.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_images.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_messages.go",
+    "batchIndex": 5,
+    "symbols": [
+     "Error"
+    ]
+   },
+   {
+    "path": "internal/ui/container_ports.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_stats.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/containers_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab_test.go",
+    "batchIndex": 5,
+    "symbols": [
+     "TestAllTabsIncludesDatabase",
+     "TestDbLandingEnterAndEsc",
+     "TestSidebarShowsDatabaseTool",
+     "TestDbClientRenderAndFilter"
+    ]
+   },
+   {
+    "path": "internal/ui/docker_add.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/docker_add_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestDockerAddRefuseOpensEditor",
+     "TestDockerAddSelectImageOpensEditor",
+     "TestDockerAddUnknownImageUsesAsyncCompose",
+     "TestDockerAddLoadMoreAppends",
+     "TestDockerHubDetailsDoneCaches"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_detail.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/gha_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String",
+     "String",
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesActions",
+     "TestSidebarShowsActionsInCodigo",
+     "TestGHALandingEnterAndEsc",
+     "TestGHAControlCenterRenders",
+     "TestGHAUsagePanelAndCard",
+     "TestGHAKindCycle",
+     "TestGHAEnterOpensProcessDetail",
+     "TestGHAProcessStatusFromRuns",
+     "TestGHATabCyclesPanels",
+     "TestGHAKindSwitchOnlyOnTable",
+     "TestGHASetupModalWhenNoGH",
+     "TestGHASetupModalAuth",
+     "TestGHAOpenBrowserUsesRemote",
+     "TestGHAAskStopJobConfirm",
+     "TestGHAAskStopAllJobs",
+     "TestGHARunIsActive",
+     "TestGHAOpenBrowserUsesSelectedRun",
+     "TestGHATickIntervalFasterWhenActive",
+     "TestGHATickKeepsChainOnConfirm",
+     "TestGHABeginTriggerSelectsBranch",
+     "TestGHAFilteredRunsScopeAndProcess"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_compose.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_graph.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_messages.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_prompt.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderGitMainShowsBottomBoxes",
+     "TestExtractGitURL",
+     "TestRenderGitCommandLogShowsOutput",
+     "TestGitFileLinesShowsStagedBadge",
+     "TestMoveWTFileTreeCursorSkipsFolders",
+     "TestGitFileLinesShowsTree",
+     "TestGitConflictFileLinesOnlyUnmerged",
+     "TestGitConflictDiffScreen",
+     "TestGitAddFileTogglesUnstage",
+     "TestOpenGitFileDiffAllowsScroll",
+     "TestFilteredGitBranches",
+     "TestGitBranchFilterLiveInline",
+     "TestGitDiffSearchInlineLive",
+     "TestGitPromptEditsAtCursor",
+     "TestSyncGitBranchCursor",
+     "TestGitSelectCommitRange",
+     "TestFitGitPanelLines",
+     "TestIsGitCommitInCherryBufferMarked",
+     "TestOpenGitBranchHistoryDoesNotOpenCommit",
+     "TestRenderGitDiffLineColors",
+     "TestGitDiffHorizontalScrollRevealsTail",
+     "TestBuildCommitFileTreeCompactsFolders",
+     "TestGitCommitTreeKeysOpenCollapse",
+     "TestGitCommitDetailShowsSidebarAndDiff",
+     "TestCommitFileChangeCounts",
+     "TestGitCommitDetailShowsFileStats",
+     "TestGitCommitMessageExpandToggle",
+     "TestGitCommitDetailKeepsFileColumnClean",
+     "TestGitDiffSearchJumpsToMatch",
+     "TestSwitchGitCommitFileUsesCache",
+     "TestGitCommitDiffScrollReachesEnd",
+     "TestGitComposeModalMultiline",
+     "TestGitNewBranchPromptIsModal",
+     "TestGitGraphRowFitsBox",
+     "TestGraphCommitIconsAreSingleWidth",
+     "TestGitHeaderFindsRemoteInEitherField",
+     "TestGitHeaderShowsSyncState",
+     "TestGitStashSubjectStripsWipPrefix",
+     "TestGitColumnWidthsFollowPanelNotTerminal",
+     "TestGitCommandBarWrapsInsteadOfHiding"
+    ]
+   },
+   {
+    "path": "internal/ui/graph_features_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderContainerImagesDoesNotPanic",
+     "TestHandleContainerImagesKeysNavigatesAndCycles",
+     "TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+     "TestBuildGraphLayoutRowsShareAUniformWidth",
+     "TestRenderGitGraphDoesNotPanic",
+     "TestHandleGitGraphKeysSkipsConnectorRows",
+     "TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+     "TestGitGraphTabCyclesPanesAndScrollsThem",
+     "TestGitGraphBranchPickerFiltersTheGraph",
+     "TestGitGraphBranchPickerTypingNarrowsTheList",
+     "TestDockerImageRowColorsProjectMembership"
+    ]
+   },
+   {
+    "path": "internal/ui/helpers.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesKubernetes",
+     "TestK8sLandingEnterAndEsc",
+     "TestSidebarShowsKubernetesInExecucao",
+     "TestSanitizeK8sName",
+     "TestK8sApplyKeyAndEnterNewline",
+     "TestK8sCreateStartsEditing",
+     "TestK8sOverviewLayout",
+     "TestK8sKindStaysReachableWithoutExplorer",
+     "TestK8sProdContextIsFlagged",
+     "TestK8sReadyAndRestartStyles",
+     "TestK8sFilterKey"
+    ]
+   },
+   {
+    "path": "internal/ui/logs_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/module_landing.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/overview_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/swarm_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesSwarm",
+     "TestSidebarShowsSwarmInExecucao",
+     "TestSwarmLandingEnterAndEsc",
+     "TestSanitizeSwarmStackName",
+     "TestSwarmKindCycle",
+     "TestSwarmControlCenterRenders",
+     "TestSwarmReplicaStyleFlagsIncomplete",
+     "TestSwarmKindTabsShowAll",
+     "TestSwarmNavPushPop",
+     "TestSwarmScaleForm"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/database_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseDatabaseURL",
+     "TestDetectContainerDBEngine",
+     "TestDetectProjectDatabases",
+     "TestDetectContainerDBEngineExtras",
+     "TestEscapeSQLLiteral"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDocker",
+     "CollectDockerPS",
+     "AssignContainersToProjects",
+     "EnrichProjectsWithMissingComposeServices",
+     "ProjectRunning"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_images.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerImages",
+     "RemoveDockerImages"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerStats",
+     "CollectDockerStatsForIDs",
+     "ApplyDockerStats"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseCPUPerc",
+     "TestParseMemUsageBytes",
+     "TestApplyDockerStats",
+     "TestParseContainerPorts",
+     "TestParseContainerPortMappings",
+     "TestFormatPortsShort",
+     "TestApplyProjectStatusDegraded",
+     "TestSortPinnedFirst"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestMatchScoreComposeRoot",
+     "TestMatchScoreComposeRootInsideProject",
+     "TestMatchScoreMountInsideProject",
+     "TestMatchScoreParentMountRejected",
+     "TestParseHealthFromStatus",
+     "TestParseDockerPSLine",
+     "TestApplyRestartPolicies",
+     "TestAssignContainersUnique",
+     "TestAssignContainersProjectPathFallback",
+     "TestAssignStoppedContainerFromNestedCompose",
+     "TestReclaimOrphanByComposeName",
+     "TestMissingComposeServiceListed"
+    ]
+   },
+   {
+    "path": "internal/collectors/git.go",
+    "batchIndex": 4,
+    "symbols": [
+     "Collect",
+     "CollectGitSummary",
+     "CollectAt",
+     "CollectConflictDiff",
+     "GitResolveBoth",
+     "CollectWorkingTreeDiff",
+     "CollectCommitsAt",
+     "CollectCommitFiles",
+     "CollectCommitFullMessage",
+     "CollectCommitFileDiff",
+     "GitRemoteBranchNames",
+     "GitCurrentBranchName",
+     "GitExec",
+     "GitCheckout",
+     "GitAdd",
+     "GitUnstage",
+     "GitCherryPick",
+     "GitResolveHash",
+     "GitCurrentBranch",
+     "GitBranchCreate",
+     "GitCommit",
+     "GitBranchDelete",
+     "GitBranchRename",
+     "GitPull",
+     "GitBranchOrigin",
+     "GitPullOrigin",
+     "GitPullOriginMerge",
+     "GitPullOriginRebase",
+     "GitIsFFImpossible",
+     "GitIsConflictError",
+     "GitFileUnmerged",
+     "GitOpInProgress",
+     "GitCheckoutOurs",
+     "GitCheckoutTheirs",
+     "GitContinue",
+     "GitAbort",
+     "GitConflictSides",
+     "GitUnmergedCount",
+     "GitPush",
+     "GitMerge",
+     "GitRemoteOrigin",
+     "ParseGitHubRepo",
+     "GitDefaultPRBase",
+     "GitHubCompareURL",
+     "GitWorkTreeRoot",
+     "RefreshGitBranches",
+     "RefreshProjectGit",
+     "RefreshProjectGitFiles"
+    ]
+   }
+  ],
+  "internal/core/state.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/commands/scan.go",
+    "batchIndex": 7,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/manager.go",
+    "batchIndex": 7,
+    "symbols": [
+     "Manager",
+     "NewManager",
+     "QuickScan",
+     "Start",
+     "StartWithContext",
+     "EnrichSnapshot"
+    ]
+   },
+   {
+    "path": "internal/collectors/project_enrich.go",
+    "batchIndex": 7,
+    "symbols": [
+     "EnrichProjectDockerDetail",
+     "RefreshProjectDocker"
+    ]
+   },
+   {
+    "path": "internal/ui/project_load.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/docker_actions.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DockerPause",
+     "DockerUnpause",
+     "DockerStart",
+     "DockerStop",
+     "DockerRestart",
+     "DockerSetRestartPolicy",
+     "DockerRemove",
+     "DockerLogs",
+     "DockerLogsSince",
+     "DockerExecTarget",
+     "DockerExecShell",
+     "DockerExecShellBash",
+     "DockerExecShellFallback",
+     "RefreshProjectsDocker",
+     "IsContainerRunning",
+     "IsContainerStopped"
+    ]
+   },
+   {
+    "path": "internal/collectors/health.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectHealth"
+    ]
+   },
+   {
+    "path": "internal/collectors/database.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DBTarget",
+     "DBColumn",
+     "DBTableInfo",
+     "DetectProjectDatabasesLite",
+     "DetectProjectDatabases",
+     "DBListTables",
+     "DBDescribeTable",
+     "DBQuery"
+    ]
+   },
+   {
+    "path": "internal/ui/dashboard.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/project_sidebar.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/api_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_deps.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_detail.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_images.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_messages.go",
+    "batchIndex": 5,
+    "symbols": [
+     "Error"
+    ]
+   },
+   {
+    "path": "internal/ui/container_ports.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_stats.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/containers_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab_test.go",
+    "batchIndex": 5,
+    "symbols": [
+     "TestAllTabsIncludesDatabase",
+     "TestDbLandingEnterAndEsc",
+     "TestSidebarShowsDatabaseTool",
+     "TestDbClientRenderAndFilter"
+    ]
+   },
+   {
+    "path": "internal/ui/docker_add.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/docker_add_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestDockerAddRefuseOpensEditor",
+     "TestDockerAddSelectImageOpensEditor",
+     "TestDockerAddUnknownImageUsesAsyncCompose",
+     "TestDockerAddLoadMoreAppends",
+     "TestDockerHubDetailsDoneCaches"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_detail.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/gha_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String",
+     "String",
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesActions",
+     "TestSidebarShowsActionsInCodigo",
+     "TestGHALandingEnterAndEsc",
+     "TestGHAControlCenterRenders",
+     "TestGHAUsagePanelAndCard",
+     "TestGHAKindCycle",
+     "TestGHAEnterOpensProcessDetail",
+     "TestGHAProcessStatusFromRuns",
+     "TestGHATabCyclesPanels",
+     "TestGHAKindSwitchOnlyOnTable",
+     "TestGHASetupModalWhenNoGH",
+     "TestGHASetupModalAuth",
+     "TestGHAOpenBrowserUsesRemote",
+     "TestGHAAskStopJobConfirm",
+     "TestGHAAskStopAllJobs",
+     "TestGHARunIsActive",
+     "TestGHAOpenBrowserUsesSelectedRun",
+     "TestGHATickIntervalFasterWhenActive",
+     "TestGHATickKeepsChainOnConfirm",
+     "TestGHABeginTriggerSelectsBranch",
+     "TestGHAFilteredRunsScopeAndProcess"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_compose.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_graph.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_messages.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_prompt.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderGitMainShowsBottomBoxes",
+     "TestExtractGitURL",
+     "TestRenderGitCommandLogShowsOutput",
+     "TestGitFileLinesShowsStagedBadge",
+     "TestMoveWTFileTreeCursorSkipsFolders",
+     "TestGitFileLinesShowsTree",
+     "TestGitConflictFileLinesOnlyUnmerged",
+     "TestGitConflictDiffScreen",
+     "TestGitAddFileTogglesUnstage",
+     "TestOpenGitFileDiffAllowsScroll",
+     "TestFilteredGitBranches",
+     "TestGitBranchFilterLiveInline",
+     "TestGitDiffSearchInlineLive",
+     "TestGitPromptEditsAtCursor",
+     "TestSyncGitBranchCursor",
+     "TestGitSelectCommitRange",
+     "TestFitGitPanelLines",
+     "TestIsGitCommitInCherryBufferMarked",
+     "TestOpenGitBranchHistoryDoesNotOpenCommit",
+     "TestRenderGitDiffLineColors",
+     "TestGitDiffHorizontalScrollRevealsTail",
+     "TestBuildCommitFileTreeCompactsFolders",
+     "TestGitCommitTreeKeysOpenCollapse",
+     "TestGitCommitDetailShowsSidebarAndDiff",
+     "TestCommitFileChangeCounts",
+     "TestGitCommitDetailShowsFileStats",
+     "TestGitCommitMessageExpandToggle",
+     "TestGitCommitDetailKeepsFileColumnClean",
+     "TestGitDiffSearchJumpsToMatch",
+     "TestSwitchGitCommitFileUsesCache",
+     "TestGitCommitDiffScrollReachesEnd",
+     "TestGitComposeModalMultiline",
+     "TestGitNewBranchPromptIsModal",
+     "TestGitGraphRowFitsBox",
+     "TestGraphCommitIconsAreSingleWidth",
+     "TestGitHeaderFindsRemoteInEitherField",
+     "TestGitHeaderShowsSyncState",
+     "TestGitStashSubjectStripsWipPrefix",
+     "TestGitColumnWidthsFollowPanelNotTerminal",
+     "TestGitCommandBarWrapsInsteadOfHiding"
+    ]
+   },
+   {
+    "path": "internal/ui/graph_features_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderContainerImagesDoesNotPanic",
+     "TestHandleContainerImagesKeysNavigatesAndCycles",
+     "TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+     "TestBuildGraphLayoutRowsShareAUniformWidth",
+     "TestRenderGitGraphDoesNotPanic",
+     "TestHandleGitGraphKeysSkipsConnectorRows",
+     "TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+     "TestGitGraphTabCyclesPanesAndScrollsThem",
+     "TestGitGraphBranchPickerFiltersTheGraph",
+     "TestGitGraphBranchPickerTypingNarrowsTheList",
+     "TestDockerImageRowColorsProjectMembership"
+    ]
+   },
+   {
+    "path": "internal/ui/helpers.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesKubernetes",
+     "TestK8sLandingEnterAndEsc",
+     "TestSidebarShowsKubernetesInExecucao",
+     "TestSanitizeK8sName",
+     "TestK8sApplyKeyAndEnterNewline",
+     "TestK8sCreateStartsEditing",
+     "TestK8sOverviewLayout",
+     "TestK8sKindStaysReachableWithoutExplorer",
+     "TestK8sProdContextIsFlagged",
+     "TestK8sReadyAndRestartStyles",
+     "TestK8sFilterKey"
+    ]
+   },
+   {
+    "path": "internal/ui/logs_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/module_landing.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/overview_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/swarm_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesSwarm",
+     "TestSidebarShowsSwarmInExecucao",
+     "TestSwarmLandingEnterAndEsc",
+     "TestSanitizeSwarmStackName",
+     "TestSwarmKindCycle",
+     "TestSwarmControlCenterRenders",
+     "TestSwarmReplicaStyleFlagsIncomplete",
+     "TestSwarmKindTabsShowAll",
+     "TestSwarmNavPushPop",
+     "TestSwarmScaleForm"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/database_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseDatabaseURL",
+     "TestDetectContainerDBEngine",
+     "TestDetectProjectDatabases",
+     "TestDetectContainerDBEngineExtras",
+     "TestEscapeSQLLiteral"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDocker",
+     "CollectDockerPS",
+     "AssignContainersToProjects",
+     "EnrichProjectsWithMissingComposeServices",
+     "ProjectRunning"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_images.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerImages",
+     "RemoveDockerImages"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerStats",
+     "CollectDockerStatsForIDs",
+     "ApplyDockerStats"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseCPUPerc",
+     "TestParseMemUsageBytes",
+     "TestApplyDockerStats",
+     "TestParseContainerPorts",
+     "TestParseContainerPortMappings",
+     "TestFormatPortsShort",
+     "TestApplyProjectStatusDegraded",
+     "TestSortPinnedFirst"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestMatchScoreComposeRoot",
+     "TestMatchScoreComposeRootInsideProject",
+     "TestMatchScoreMountInsideProject",
+     "TestMatchScoreParentMountRejected",
+     "TestParseHealthFromStatus",
+     "TestParseDockerPSLine",
+     "TestApplyRestartPolicies",
+     "TestAssignContainersUnique",
+     "TestAssignContainersProjectPathFallback",
+     "TestAssignStoppedContainerFromNestedCompose",
+     "TestReclaimOrphanByComposeName",
+     "TestMissingComposeServiceListed"
+    ]
+   },
+   {
+    "path": "internal/collectors/git.go",
+    "batchIndex": 4,
+    "symbols": [
+     "Collect",
+     "CollectGitSummary",
+     "CollectAt",
+     "CollectConflictDiff",
+     "GitResolveBoth",
+     "CollectWorkingTreeDiff",
+     "CollectCommitsAt",
+     "CollectCommitFiles",
+     "CollectCommitFullMessage",
+     "CollectCommitFileDiff",
+     "GitRemoteBranchNames",
+     "GitCurrentBranchName",
+     "GitExec",
+     "GitCheckout",
+     "GitAdd",
+     "GitUnstage",
+     "GitCherryPick",
+     "GitResolveHash",
+     "GitCurrentBranch",
+     "GitBranchCreate",
+     "GitCommit",
+     "GitBranchDelete",
+     "GitBranchRename",
+     "GitPull",
+     "GitBranchOrigin",
+     "GitPullOrigin",
+     "GitPullOriginMerge",
+     "GitPullOriginRebase",
+     "GitIsFFImpossible",
+     "GitIsConflictError",
+     "GitFileUnmerged",
+     "GitOpInProgress",
+     "GitCheckoutOurs",
+     "GitCheckoutTheirs",
+     "GitContinue",
+     "GitAbort",
+     "GitConflictSides",
+     "GitUnmergedCount",
+     "GitPush",
+     "GitMerge",
+     "GitRemoteOrigin",
+     "ParseGitHubRepo",
+     "GitDefaultPRBase",
+     "GitHubCompareURL",
+     "GitWorkTreeRoot",
+     "RefreshGitBranches",
+     "RefreshProjectGit",
+     "RefreshProjectGitFiles"
+    ]
+   }
+  ],
+  "internal/core/state_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/commands/scan.go",
+    "batchIndex": 7,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/manager.go",
+    "batchIndex": 7,
+    "symbols": [
+     "Manager",
+     "NewManager",
+     "QuickScan",
+     "Start",
+     "StartWithContext",
+     "EnrichSnapshot"
+    ]
+   },
+   {
+    "path": "internal/collectors/project_enrich.go",
+    "batchIndex": 7,
+    "symbols": [
+     "EnrichProjectDockerDetail",
+     "RefreshProjectDocker"
+    ]
+   },
+   {
+    "path": "internal/ui/project_load.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/docker_actions.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DockerPause",
+     "DockerUnpause",
+     "DockerStart",
+     "DockerStop",
+     "DockerRestart",
+     "DockerSetRestartPolicy",
+     "DockerRemove",
+     "DockerLogs",
+     "DockerLogsSince",
+     "DockerExecTarget",
+     "DockerExecShell",
+     "DockerExecShellBash",
+     "DockerExecShellFallback",
+     "RefreshProjectsDocker",
+     "IsContainerRunning",
+     "IsContainerStopped"
+    ]
+   },
+   {
+    "path": "internal/collectors/health.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectHealth"
+    ]
+   },
+   {
+    "path": "internal/collectors/database.go",
+    "batchIndex": 4,
+    "symbols": [
+     "DBTarget",
+     "DBColumn",
+     "DBTableInfo",
+     "DetectProjectDatabasesLite",
+     "DetectProjectDatabases",
+     "DBListTables",
+     "DBDescribeTable",
+     "DBQuery"
+    ]
+   },
+   {
+    "path": "internal/ui/dashboard.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/project_sidebar.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/api_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_deps.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_detail.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_images.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_messages.go",
+    "batchIndex": 5,
+    "symbols": [
+     "Error"
+    ]
+   },
+   {
+    "path": "internal/ui/container_ports.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/container_stats.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/containers_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/db_tab_test.go",
+    "batchIndex": 5,
+    "symbols": [
+     "TestAllTabsIncludesDatabase",
+     "TestDbLandingEnterAndEsc",
+     "TestSidebarShowsDatabaseTool",
+     "TestDbClientRenderAndFilter"
+    ]
+   },
+   {
+    "path": "internal/ui/docker_add.go",
+    "batchIndex": 5,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/docker_add_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestDockerAddRefuseOpensEditor",
+     "TestDockerAddSelectImageOpensEditor",
+     "TestDockerAddUnknownImageUsesAsyncCompose",
+     "TestDockerAddLoadMoreAppends",
+     "TestDockerHubDetailsDoneCaches"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_detail.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/gha_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String",
+     "String",
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesActions",
+     "TestSidebarShowsActionsInCodigo",
+     "TestGHALandingEnterAndEsc",
+     "TestGHAControlCenterRenders",
+     "TestGHAUsagePanelAndCard",
+     "TestGHAKindCycle",
+     "TestGHAEnterOpensProcessDetail",
+     "TestGHAProcessStatusFromRuns",
+     "TestGHATabCyclesPanels",
+     "TestGHAKindSwitchOnlyOnTable",
+     "TestGHASetupModalWhenNoGH",
+     "TestGHASetupModalAuth",
+     "TestGHAOpenBrowserUsesRemote",
+     "TestGHAAskStopJobConfirm",
+     "TestGHAAskStopAllJobs",
+     "TestGHARunIsActive",
+     "TestGHAOpenBrowserUsesSelectedRun",
+     "TestGHATickIntervalFasterWhenActive",
+     "TestGHATickKeepsChainOnConfirm",
+     "TestGHABeginTriggerSelectsBranch",
+     "TestGHAFilteredRunsScopeAndProcess"
+    ]
+   },
+   {
+    "path": "internal/ui/gha_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_compose.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_graph.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_messages.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_prompt.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/git_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderGitMainShowsBottomBoxes",
+     "TestExtractGitURL",
+     "TestRenderGitCommandLogShowsOutput",
+     "TestGitFileLinesShowsStagedBadge",
+     "TestMoveWTFileTreeCursorSkipsFolders",
+     "TestGitFileLinesShowsTree",
+     "TestGitConflictFileLinesOnlyUnmerged",
+     "TestGitConflictDiffScreen",
+     "TestGitAddFileTogglesUnstage",
+     "TestOpenGitFileDiffAllowsScroll",
+     "TestFilteredGitBranches",
+     "TestGitBranchFilterLiveInline",
+     "TestGitDiffSearchInlineLive",
+     "TestGitPromptEditsAtCursor",
+     "TestSyncGitBranchCursor",
+     "TestGitSelectCommitRange",
+     "TestFitGitPanelLines",
+     "TestIsGitCommitInCherryBufferMarked",
+     "TestOpenGitBranchHistoryDoesNotOpenCommit",
+     "TestRenderGitDiffLineColors",
+     "TestGitDiffHorizontalScrollRevealsTail",
+     "TestBuildCommitFileTreeCompactsFolders",
+     "TestGitCommitTreeKeysOpenCollapse",
+     "TestGitCommitDetailShowsSidebarAndDiff",
+     "TestCommitFileChangeCounts",
+     "TestGitCommitDetailShowsFileStats",
+     "TestGitCommitMessageExpandToggle",
+     "TestGitCommitDetailKeepsFileColumnClean",
+     "TestGitDiffSearchJumpsToMatch",
+     "TestSwitchGitCommitFileUsesCache",
+     "TestGitCommitDiffScrollReachesEnd",
+     "TestGitComposeModalMultiline",
+     "TestGitNewBranchPromptIsModal",
+     "TestGitGraphRowFitsBox",
+     "TestGraphCommitIconsAreSingleWidth",
+     "TestGitHeaderFindsRemoteInEitherField",
+     "TestGitHeaderShowsSyncState",
+     "TestGitStashSubjectStripsWipPrefix",
+     "TestGitColumnWidthsFollowPanelNotTerminal",
+     "TestGitCommandBarWrapsInsteadOfHiding"
+    ]
+   },
+   {
+    "path": "internal/ui/graph_features_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestRenderContainerImagesDoesNotPanic",
+     "TestHandleContainerImagesKeysNavigatesAndCycles",
+     "TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+     "TestBuildGraphLayoutRowsShareAUniformWidth",
+     "TestRenderGitGraphDoesNotPanic",
+     "TestHandleGitGraphKeysSkipsConnectorRows",
+     "TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+     "TestGitGraphTabCyclesPanesAndScrollsThem",
+     "TestGitGraphBranchPickerFiltersTheGraph",
+     "TestGitGraphBranchPickerTypingNarrowsTheList",
+     "TestDockerImageRowColorsProjectMembership"
+    ]
+   },
+   {
+    "path": "internal/ui/helpers.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/k8s_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesKubernetes",
+     "TestK8sLandingEnterAndEsc",
+     "TestSidebarShowsKubernetesInExecucao",
+     "TestSanitizeK8sName",
+     "TestK8sApplyKeyAndEnterNewline",
+     "TestK8sCreateStartsEditing",
+     "TestK8sOverviewLayout",
+     "TestK8sKindStaysReachableWithoutExplorer",
+     "TestK8sProdContextIsFlagged",
+     "TestK8sReadyAndRestartStyles",
+     "TestK8sFilterKey"
+    ]
+   },
+   {
+    "path": "internal/ui/logs_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/module_landing.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/overview_tab.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/swarm_tab.go",
+    "batchIndex": 6,
+    "symbols": [
+     "String"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_tab_test.go",
+    "batchIndex": 6,
+    "symbols": [
+     "TestAllTabsIncludesSwarm",
+     "TestSidebarShowsSwarmInExecucao",
+     "TestSwarmLandingEnterAndEsc",
+     "TestSanitizeSwarmStackName",
+     "TestSwarmKindCycle",
+     "TestSwarmControlCenterRenders",
+     "TestSwarmReplicaStyleFlagsIncomplete",
+     "TestSwarmKindTabsShowAll",
+     "TestSwarmNavPushPop",
+     "TestSwarmScaleForm"
+    ]
+   },
+   {
+    "path": "internal/ui/swarm_views.go",
+    "batchIndex": 6,
+    "symbols": []
+   },
+   {
+    "path": "internal/collectors/database_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseDatabaseURL",
+     "TestDetectContainerDBEngine",
+     "TestDetectProjectDatabases",
+     "TestDetectContainerDBEngineExtras",
+     "TestEscapeSQLLiteral"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDocker",
+     "CollectDockerPS",
+     "AssignContainersToProjects",
+     "EnrichProjectsWithMissingComposeServices",
+     "ProjectRunning"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_images.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerImages",
+     "RemoveDockerImages"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats.go",
+    "batchIndex": 4,
+    "symbols": [
+     "CollectDockerStats",
+     "CollectDockerStatsForIDs",
+     "ApplyDockerStats"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_stats_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestParseCPUPerc",
+     "TestParseMemUsageBytes",
+     "TestApplyDockerStats",
+     "TestParseContainerPorts",
+     "TestParseContainerPortMappings",
+     "TestFormatPortsShort",
+     "TestApplyProjectStatusDegraded",
+     "TestSortPinnedFirst"
+    ]
+   },
+   {
+    "path": "internal/collectors/docker_test.go",
+    "batchIndex": 4,
+    "symbols": [
+     "TestMatchScoreComposeRoot",
+     "TestMatchScoreComposeRootInsideProject",
+     "TestMatchScoreMountInsideProject",
+     "TestMatchScoreParentMountRejected",
+     "TestParseHealthFromStatus",
+     "TestParseDockerPSLine",
+     "TestApplyRestartPolicies",
+     "TestAssignContainersUnique",
+     "TestAssignContainersProjectPathFallback",
+     "TestAssignStoppedContainerFromNestedCompose",
+     "TestReclaimOrphanByComposeName",
+     "TestMissingComposeServiceListed"
+    ]
+   },
+   {
+    "path": "internal/collectors/git.go",
+    "batchIndex": 4,
+    "symbols": [
+     "Collect",
+     "CollectGitSummary",
+     "CollectAt",
+     "CollectConflictDiff",
+     "GitResolveBoth",
+     "CollectWorkingTreeDiff",
+     "CollectCommitsAt",
+     "CollectCommitFiles",
+     "CollectCommitFullMessage",
+     "CollectCommitFileDiff",
+     "GitRemoteBranchNames",
+     "GitCurrentBranchName",
+     "GitExec",
+     "GitCheckout",
+     "GitAdd",
+     "GitUnstage",
+     "GitCherryPick",
+     "GitResolveHash",
+     "GitCurrentBranch",
+     "GitBranchCreate",
+     "GitCommit",
+     "GitBranchDelete",
+     "GitBranchRename",
+     "GitPull",
+     "GitBranchOrigin",
+     "GitPullOrigin",
+     "GitPullOriginMerge",
+     "GitPullOriginRebase",
+     "GitIsFFImpossible",
+     "GitIsConflictError",
+     "GitFileUnmerged",
+     "GitOpInProgress",
+     "GitCheckoutOurs",
+     "GitCheckoutTheirs",
+     "GitContinue",
+     "GitAbort",
+     "GitConflictSides",
+     "GitUnmergedCount",
+     "GitPush",
+     "GitMerge",
+     "GitRemoteOrigin",
+     "ParseGitHubRepo",
+     "GitDefaultPRBase",
+     "GitHubCompareURL",
+     "GitWorkTreeRoot",
+     "RefreshGitBranches",
+     "RefreshProjectGit",
+     "RefreshProjectGitFiles"
+    ]
+   }
+  ],
+  "internal/jenkinsutil/client.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/jenkins_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/jenkins_tab_test.go",
+    "batchIndex": 2,
+    "symbols": [
+     "TestAllTabsIncludesJenkins",
+     "TestJenkinsSidebar",
+     "TestJenkinsLandingAndOpen",
+     "TestJenkinsSettingsNoPanic",
+     "TestJenkinsPipelinesRender",
+     "TestJenkinsActivityChart",
+     "TestJenkinsTokenMaskedInSettings"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/jenkinsutil/client_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/jenkins_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/jenkins_tab_test.go",
+    "batchIndex": 2,
+    "symbols": [
+     "TestAllTabsIncludesJenkins",
+     "TestJenkinsSidebar",
+     "TestJenkinsLandingAndOpen",
+     "TestJenkinsSettingsNoPanic",
+     "TestJenkinsPipelinesRender",
+     "TestJenkinsActivityChart",
+     "TestJenkinsTokenMaskedInSettings"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   }
+  ],
+  "internal/jsonutil/jsonutil.go": [
+   {
+    "path": "internal/ui/json_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   }
+  ],
+  "internal/jsonutil/jsonutil_test.go": [
+   {
+    "path": "internal/ui/json_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   }
+  ],
+  "internal/jwtutil/jwtutil.go": [
+   {
+    "path": "internal/ui/jwt_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   }
+  ],
+  "internal/jwtutil/jwtutil_test.go": [
+   {
+    "path": "internal/ui/jwt_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   }
+  ],
+  "internal/nginxutil/agent.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_view.go",
+    "batchIndex": 3,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_view_test.go",
+    "batchIndex": 3,
+    "symbols": [
+     "TestNginxConsoleFitsAnyTerminal",
+     "TestNginxColumnsNeverExceedPanel",
+     "TestNginxNavigationKeys",
+     "TestNginxHighlightOnlyPaints",
+     "TestNginxForeignRouteIsMarked"
+    ]
+   }
+  ],
+  "internal/nginxutil/agent_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_tab.go",
+    "batchIndex": 2,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_view.go",
+    "batchIndex": 3,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/nginx_view_test.go",
+    "batchIndex": 3,
+    "symbols": [
+     "TestNginxConsoleFitsAnyTerminal",
+     "TestNginxColumnsNeverExceedPanel",
+     "TestNginxNavigationKeys",
+     "TestNginxHighlightOnlyPaints",
+     "TestNginxForeignRouteIsMarked"
+    ]
+   }
+  ],
+  "internal/ngrokutil/agent.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab.go",
+    "batchIndex": 3,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab_test.go",
+    "batchIndex": 3,
+    "symbols": [
+     "TestAllTabsIncludesNgrok",
+     "TestNgrokLandingAndOpen",
+     "TestNgrokSidebarKey",
+     "TestNgrokWizardEditsPortAsText",
+     "TestNgrokWizardCarriesDomainAndRegion",
+     "TestNgrokTunnelsRender",
+     "TestNgrokTunnelsViewLayout",
+     "TestNgrokWizardIsModal",
+     "TestNgrokDeleteConfirmModal"
+    ]
+   }
+  ],
+  "internal/ngrokutil/agent_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab.go",
+    "batchIndex": 3,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ngrok_tab_test.go",
+    "batchIndex": 3,
+    "symbols": [
+     "TestAllTabsIncludesNgrok",
+     "TestNgrokLandingAndOpen",
+     "TestNgrokSidebarKey",
+     "TestNgrokWizardEditsPortAsText",
+     "TestNgrokWizardCarriesDomainAndRegion",
+     "TestNgrokTunnelsRender",
+     "TestNgrokTunnelsViewLayout",
+     "TestNgrokWizardIsModal",
+     "TestNgrokDeleteConfirmModal"
+    ]
+   }
+  ],
+  "internal/sshutil/agent.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ssh_tab.go",
+    "batchIndex": 8,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ssh_tab_test.go",
+    "batchIndex": 8,
+    "symbols": [
+     "TestAllTabsIncludesSSH",
+     "TestSSHLandingAndOpen",
+     "TestSSHSidebarKey",
+     "TestSSHWizardCyclesMode",
+     "TestSSHTunnelsRender",
+     "TestSSHTunnelFromWizard"
+    ]
+   }
+  ],
+  "internal/sshutil/agent_test.go": [
+   {
+    "path": "internal/ui/app.go",
+    "batchIndex": 10,
+    "symbols": [
+     "App",
+     "NewApp",
+     "Init",
+     "Update",
+     "Run",
+     "Update",
+     "View"
+    ]
+   },
+   {
+    "path": "internal/ui/landing_probe.go",
+    "batchIndex": 10,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ssh_tab.go",
+    "batchIndex": 8,
+    "symbols": []
+   },
+   {
+    "path": "internal/ui/ssh_tab_test.go",
+    "batchIndex": 8,
+    "symbols": [
+     "TestAllTabsIncludesSSH",
+     "TestSSHLandingAndOpen",
+     "TestSSHSidebarKey",
+     "TestSSHWizardCyclesMode",
+     "TestSSHTunnelsRender",
+     "TestSSHTunnelFromWizard"
+    ]
+   }
+  ]
+ }
+}

@@ -3,7 +3,7 @@
 > Como uma tela do DevScope deve ser desenhada. Vale para **todo módulo novo** e
 > para toda tela reformulada. O que está aqui foi extraído das telas já
 > convertidas — Início, Git, Docker, detalhe de container, GH Actions, ngrok,
-> Cloudflared, SSH, Swarm, Kubernetes e Nginx.
+> Cloudflared, Swarm, Kubernetes, Nginx e Worktrees.
 
 O DevScope é uma TUI em Go com Bubble Tea. Especificação que chega em termos de
 web (card, modal, hover, breakpoint) precisa ser traduzida antes de virar
@@ -72,17 +72,17 @@ pequena esticada — cada faixa decide **o que cabe**, não só o quanto estica.
 ## 1.2 Navegação: módulos contextuais
 
 A barra lateral lista **os módulos que fazem sentido para o projeto aberto**, não
-os quinze que o DevScope sabe fazer. Num projeto Go sem Docker, sem Jenkins e
-sem túnel, quinze linhas são treze coisas que não existem.
+os catorze que o DevScope sabe fazer. Num projeto Go sem Docker, sem Jenkins e
+sem túnel, catorze linhas são doze coisas que não existem.
 
 Cinco grupos, e cada rótulo responde a uma pergunta:
 
 | grupo | pergunta | módulos |
 |-------|----------|---------|
 | `PROJETO` | o que é isto aqui? | Visão Geral |
-| `CÓDIGO` | o que mudou, e o que roda em cima disso? | Git · GH Actions · Jenkins |
+| `CÓDIGO` | o que mudou, e o que roda em cima disso? | Git · Worktrees · GH Actions · Jenkins |
 | `EXECUÇÃO` | o que está no ar? | Containers · Swarm · Kubernetes |
-| `REDE` | por onde se chega? | Nginx · Rotas · Ngrok · SSH · CF Tunnel |
+| `REDE` | por onde se chega? | Nginx · Ngrok · CF Tunnel |
 | `DADOS` | com o que eu falo? | API · Database · WebSocket |
 
 A cor do grupo é a cor de destaque do módulo no app inteiro (`tabAccentColor`):
@@ -109,7 +109,7 @@ tocada, e ela roda fora do `View` (§13).
    **Toda porta de entrada tem de medir.** `openProject` sonda; `Init()` sonda
    quando o `devscope` abre dentro de um projeto (`openProjectFromCwd`), que
    entra direto no módulo sem passar por `openProject`. Esse caminho ficou sem
-   sondagem e o "na dúvida, mostre" virou o modo permanente: os quinze módulos,
+   sondagem e o "na dúvida, mostre" virou o modo permanente: os catorze módulos,
    em todo projeto, sempre.
 
    **E medir de novo quando o dado chega.** A sondagem lê `p.Git` e
@@ -220,7 +220,7 @@ Regras da gaveta (`internal/ui/git_drawer.go`):
 
 ## 1.5 Faixa de abertura do módulo
 
-Treze dos quinze módulos abrem numa tela de antes-de-entrar. Ela responde a
+Onze dos catorze módulos abrem numa tela de antes-de-entrar. Ela responde a
 **três perguntas**: o que é isto, dá para usar aqui, como eu entro.
 
 ```
@@ -271,7 +271,7 @@ Toda abertura mostra **o que ESTE projeto tem para o módulo operar** —
 | Kubernetes | os manifests achados em `k8s/`, `manifests/`, `deploy/` |
 | GH Actions | os workflows de `.github/workflows` |
 | Nginx | as rotas já cadastradas |
-| Ngrok · CF · SSH · Rotas | as portas e domínios que o projeto publica |
+| Ngrok · CF | as portas e domínios que o projeto publica |
 | Database · API | os alvos detectados / o histórico |
 
 Ela responde à única pergunta que existe antes do `enter`: **"o que eu vou
@@ -310,7 +310,7 @@ mostrar.
     o mesmo glifo de "parado", e em screenshot parado os dois viravam a mesma
     coisa (§6).
 
-Módulo com conteúdo real na abertura (Logs) **não tem faixa**: segue o padrão de
+Módulo com conteúdo real na abertura (Logs, Worktrees) **não tem faixa**: segue o padrão de
 lista+detalhe (§1.3).
 
 ---

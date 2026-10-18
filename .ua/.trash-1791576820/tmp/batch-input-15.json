@@ -1,0 +1,37 @@
+{
+ "batchIndex": 15,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": "docs/media/tapes/docker.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "docs/media/tapes/git.json",
+   "language": "json",
+   "sizeLines": 8,
+   "fileCategory": "config"
+  },
+  {
+   "path": "docs/media/tapes/overview.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "docs/media/tapes/record.sh",
+   "language": "shell",
+   "sizeLines": 138,
+   "fileCategory": "script"
+  }
+ ],
+ "batchImportData": {
+  "docs/media/tapes/docker.json": [],
+  "docs/media/tapes/git.json": [],
+  "docs/media/tapes/overview.json": [],
+  "docs/media/tapes/record.sh": []
+ },
+ "neighborMap": {}
+}

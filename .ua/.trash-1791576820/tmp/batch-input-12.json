@@ -1,0 +1,30 @@
+{
+ "batchIndex": 12,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+   "language": "markdown",
+   "sizeLines": 31,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".github/ISSUE_TEMPLATE/detector_request.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+   "language": "markdown",
+   "sizeLines": 22,
+   "fileCategory": "docs"
+  }
+ ],
+ "batchImportData": {
+  ".github/ISSUE_TEMPLATE/bug_report.md": [],
+  ".github/ISSUE_TEMPLATE/detector_request.md": [],
+  ".github/ISSUE_TEMPLATE/feature_request.md": []
+ },
+ "neighborMap": {}
+}

@@ -1,0 +1,326 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/shell_return.go",
+   "type": "file",
+   "name": "shell_return.go",
+   "filePath": "internal/ui/shell_return.go",
+   "summary": "Renderiza a mensagem exibida ao voltar de um shell externo, pedindo Enter para retornar ao DevScope e mostrando o erro quando houver.",
+   "tags": [
+    "component",
+    "rendering",
+    "tui",
+    "shell"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/shell_return.go:renderShellReturnMessage",
+   "type": "function",
+   "name": "renderShellReturnMessage",
+   "filePath": "internal/ui/shell_return.go",
+   "lineRange": [
+    7,
+    17
+   ],
+   "summary": "Monta a mensagem centralizada pedindo Enter para voltar ao DevScope, prefixada pelo erro se houver.",
+   "tags": [
+    "rendering",
+    "formatting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/small_terminal_test.go",
+   "type": "file",
+   "name": "small_terminal_test.go",
+   "filePath": "internal/ui/small_terminal_test.go",
+   "summary": "Testes que garantem que a view cabe em terminais pequenos e que a sidebar mantém a aba ativa visível.",
+   "tags": [
+    "test",
+    "responsive-layout",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/small_terminal_test.go:TestViewFitsSmallTerminal",
+   "type": "function",
+   "name": "TestViewFitsSmallTerminal",
+   "filePath": "internal/ui/small_terminal_test.go",
+   "lineRange": [
+    12,
+    41
+   ],
+   "summary": "Verifica que a view cabe em um terminal pequeno sem overflow.",
+   "tags": [
+    "test",
+    "responsive-layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/small_terminal_test.go:TestSidebarKeepsActiveTabVisible",
+   "type": "function",
+   "name": "TestSidebarKeepsActiveTabVisible",
+   "filePath": "internal/ui/small_terminal_test.go",
+   "lineRange": [
+    44,
+    56
+   ],
+   "summary": "Verifica que a sidebar rola para manter a aba ativa visível.",
+   "tags": [
+    "test",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/spark.go",
+   "type": "file",
+   "name": "spark.go",
+   "filePath": "internal/ui/spark.go",
+   "summary": "Sparklines e ondas em Braille: sparkHistory guarda janelas de métricas 0–100, brailleSpark empacota duas amostras por célula e statusWave desenha ondas animadas por status de container.",
+   "tags": [
+    "utility",
+    "braille-rendering",
+    "metrics",
+    "visualization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/spark.go:push",
+   "type": "function",
+   "name": "push",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    25,
+    34
+   ],
+   "summary": "Adiciona uma amostra ao histórico mantendo a janela máxima.",
+   "tags": [
+    "data-structure",
+    "ring-buffer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark.go:brailleSpark",
+   "type": "function",
+   "name": "brailleSpark",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    48,
+    73
+   ],
+   "summary": "Desenha sparkline Braille com duas amostras por célula, preenchendo à esquerda quando falta histórico.",
+   "tags": [
+    "rendering",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark.go:sparkColumn",
+   "type": "function",
+   "name": "sparkColumn",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    78,
+    94
+   ],
+   "summary": "Converte um percentual na altura preenchida de uma coluna Braille.",
+   "tags": [
+    "math",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark.go:brailleWave",
+   "type": "function",
+   "name": "brailleWave",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    119,
+    138
+   ],
+   "summary": "Desenha uma onda Braille a partir de uma função de amplitude.",
+   "tags": [
+    "rendering",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/spark.go:statusWave",
+   "type": "function",
+   "name": "statusWave",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    153,
+    208
+   ],
+   "summary": "Desenha a onda animada de um status de container (running, starting, stopping, exited) com formas distintas.",
+   "tags": [
+    "rendering",
+    "animation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/spark.go:waveColumn",
+   "type": "function",
+   "name": "waveColumn",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    220,
+    232
+   ],
+   "summary": "Calcula o padrão de pontos de uma coluna da onda.",
+   "tags": [
+    "math",
+    "braille-rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/spark.go:sparkHistory",
+   "type": "class",
+   "name": "sparkHistory",
+   "filePath": "internal/ui/spark.go",
+   "lineRange": [
+    20,
+    23
+   ],
+   "summary": "Histórico deslizante de amostras de uma métrica (0–100) com push e média recente (last).",
+   "tags": [
+    "data-model",
+    "metrics"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/shell_return.go",
+   "target": "function:internal/ui/shell_return.go:renderShellReturnMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "function:internal/ui/small_terminal_test.go:TestViewFitsSmallTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "function:internal/ui/small_terminal_test.go:TestViewFitsSmallTerminal",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "function:internal/ui/small_terminal_test.go:TestSidebarKeepsActiveTabVisible",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "function:internal/ui/small_terminal_test.go:TestSidebarKeepsActiveTabVisible",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/small_terminal_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:push",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:brailleSpark",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:sparkColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:brailleWave",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:statusWave",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "function:internal/ui/spark.go:waveColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "class:internal/ui/spark.go:sparkHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/spark.go",
+   "target": "file:internal/ui/spark_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/shell_return.go",
+   "target": "file:internal/ui/styles.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

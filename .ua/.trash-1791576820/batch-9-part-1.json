@@ -1,0 +1,1528 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/cfutil/agent.go",
+   "type": "file",
+   "name": "agent.go",
+   "filePath": "internal/cfutil/agent.go",
+   "summary": "Gerencia o ciclo de vida de túneis Cloudflare via CLI cloudflared: instalação, login, criação/remoção de túneis nomeados, rota DNS, início/parada de processos e captura da URL pública a partir dos logs.",
+   "tags": [
+    "service",
+    "cloudflare",
+    "tunnel",
+    "process-management",
+    "cli-wrapper"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/cfutil/agent.go:Tunnel",
+   "type": "class",
+   "name": "Tunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    21,
+    33
+   ],
+   "summary": "Visão mesclada de um túnel Cloudflare combinando processo em execução e configuração do projeto (status, URLs, modo, PID).",
+   "tags": [
+    "data-model",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/cfutil/agent.go:AccountTunnel",
+   "type": "class",
+   "name": "AccountTunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    36,
+    42
+   ],
+   "summary": "Representa um túnel nomeado registrado na conta Cloudflare, com conexões e datas.",
+   "tags": [
+    "data-model",
+    "cloudflare",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/cfutil/agent.go:AuthInfo",
+   "type": "class",
+   "name": "AuthInfo",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    44,
+    49
+   ],
+   "summary": "Estado de autenticação do cloudflared: login, caminho do certificado, versão e presença do CLI.",
+   "tags": [
+    "data-model",
+    "auth",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:Available",
+   "type": "function",
+   "name": "Available",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    68,
+    71
+   ],
+   "summary": "Verifica se o binário cloudflared está disponível no PATH.",
+   "tags": [
+    "utility",
+    "cli-wrapper",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:Version",
+   "type": "function",
+   "name": "Version",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    73,
+    86
+   ],
+   "summary": "Obtém a versão instalada do cloudflared executando o CLI.",
+   "tags": [
+    "utility",
+    "cli-wrapper",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:CertPath",
+   "type": "function",
+   "name": "CertPath",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    88,
+    105
+   ],
+   "summary": "Localiza o arquivo cert.pem do cloudflared nos diretórios padrão.",
+   "tags": [
+    "utility",
+    "auth",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:LoggedIn",
+   "type": "function",
+   "name": "LoggedIn",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    107,
+    111
+   ],
+   "summary": "Indica se há certificado de login do cloudflared presente.",
+   "tags": [
+    "auth",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:HasToken",
+   "type": "function",
+   "name": "HasToken",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    113,
+    124
+   ],
+   "summary": "Verifica se existe token/credencial para um túnel nomeado.",
+   "tags": [
+    "auth",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:Auth",
+   "type": "function",
+   "name": "Auth",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    126,
+    133
+   ],
+   "summary": "Agrega informações de autenticação e versão em um AuthInfo.",
+   "tags": [
+    "auth",
+    "service",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:Login",
+   "type": "function",
+   "name": "Login",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    136,
+    153
+   ],
+   "summary": "Dispara o fluxo de login interativo do cloudflared no navegador.",
+   "tags": [
+    "auth",
+    "cli-wrapper",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:Install",
+   "type": "function",
+   "name": "Install",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    156,
+    189
+   ],
+   "summary": "Instala o cloudflared baixando o binário da release oficial para o SO/arquitetura atual.",
+   "tags": [
+    "installer",
+    "download",
+    "cli-wrapper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:releaseURL",
+   "type": "function",
+   "name": "releaseURL",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    191,
+    206
+   ],
+   "summary": "Monta a URL de download da release do cloudflared conforme GOOS/GOARCH.",
+   "tags": [
+    "utility",
+    "download",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:downloadFile",
+   "type": "function",
+   "name": "downloadFile",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    208,
+    225
+   ],
+   "summary": "Baixa um arquivo HTTP para disco com permissão de execução.",
+   "tags": [
+    "utility",
+    "download",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:ListAccountTunnels",
+   "type": "function",
+   "name": "ListAccountTunnels",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    227,
+    262
+   ],
+   "summary": "Lista túneis nomeados da conta Cloudflare via 'cloudflared tunnel list' em JSON.",
+   "tags": [
+    "cloudflare",
+    "cli-wrapper",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:CreateTunnel",
+   "type": "function",
+   "name": "CreateTunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    265,
+    303
+   ],
+   "summary": "Cria um túnel nomeado na conta Cloudflare e retorna seu ID.",
+   "tags": [
+    "cloudflare",
+    "cli-wrapper",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:DeleteAccountTunnel",
+   "type": "function",
+   "name": "DeleteAccountTunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    305,
+    315
+   ],
+   "summary": "Remove um túnel nomeado da conta Cloudflare.",
+   "tags": [
+    "cloudflare",
+    "cli-wrapper",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:RouteDNS",
+   "type": "function",
+   "name": "RouteDNS",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    317,
+    328
+   ],
+   "summary": "Associa um hostname DNS a um túnel nomeado via cloudflared.",
+   "tags": [
+    "cloudflare",
+    "dns",
+    "cli-wrapper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:NormalizeMode",
+   "type": "function",
+   "name": "NormalizeMode",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    337,
+    351
+   ],
+   "summary": "Normaliza o modo do túnel (quick/named/http2) considerando o hostname informado.",
+   "tags": [
+    "validation",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "function",
+   "name": "StartTunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    355,
+    439
+   ],
+   "summary": "Inicia um processo cloudflared para o destino local, registra o estado em memória, consome a saída e aguarda a URL pública.",
+   "tags": [
+    "process-management",
+    "tunnel",
+    "concurrency"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:PublicURL",
+   "type": "function",
+   "name": "PublicURL",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    442,
+    449
+   ],
+   "summary": "Retorna a URL pública capturada de um túnel em execução.",
+   "tags": [
+    "tunnel",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:StopTunnel",
+   "type": "function",
+   "name": "StopTunnel",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    451,
+    482
+   ],
+   "summary": "Encerra um túnel gerenciado ou, se não estiver em memória, o processo vivo correspondente.",
+   "tags": [
+    "process-management",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:RecentLogs",
+   "type": "function",
+   "name": "RecentLogs",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    484,
+    503
+   ],
+   "summary": "Retorna as últimas linhas de log de um túnel ou o erro da última saída.",
+   "tags": [
+    "logging",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:consumeOutput",
+   "type": "function",
+   "name": "consumeOutput",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    512,
+    534
+   ],
+   "summary": "Lê stdout/stderr do cloudflared, guarda linhas recentes e extrai a URL pública.",
+   "tags": [
+    "logging",
+    "concurrency",
+    "parser"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:extractPublicURL",
+   "type": "function",
+   "name": "extractPublicURL",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    537,
+    548
+   ],
+   "summary": "Extrai a URL pública (trycloudflare ou hostname) de uma linha de log.",
+   "tags": [
+    "parser",
+    "regex",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:TunnelArgs",
+   "type": "function",
+   "name": "TunnelArgs",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    556,
+    563
+   ],
+   "summary": "Monta os argumentos de linha de comando do cloudflared para uma configuração de túnel.",
+   "tags": [
+    "cli-wrapper",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:NormalizeURL",
+   "type": "function",
+   "name": "NormalizeURL",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    579,
+    605
+   ],
+   "summary": "Normaliza o destino local aceitando porta, host:porta ou URL completa em http://host:porta.",
+   "tags": [
+    "validation",
+    "url",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:sanitizeName",
+   "type": "function",
+   "name": "sanitizeName",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    607,
+    622
+   ],
+   "summary": "Sanitiza o nome do túnel para caracteres seguros.",
+   "tags": [
+    "validation",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:parseAddrPort",
+   "type": "function",
+   "name": "parseAddrPort",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    640,
+    652
+   ],
+   "summary": "Extrai host e porta de um endereço textual.",
+   "tags": [
+    "parser",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent.go:formatUptime",
+   "type": "function",
+   "name": "formatUptime",
+   "filePath": "internal/cfutil/agent.go",
+   "lineRange": [
+    664,
+    674
+   ],
+   "summary": "Formata uma duração em texto compacto de uptime.",
+   "tags": [
+    "formatting",
+    "utility",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/cfutil/agent_test.go",
+   "type": "file",
+   "name": "agent_test.go",
+   "filePath": "internal/cfutil/agent_test.go",
+   "summary": "Testes unitários do pacote cfutil cobrindo merge de túneis, persistência de configuração, normalização de URL/modo, montagem de argumentos e extração da URL pública.",
+   "tags": [
+    "test",
+    "cloudflare",
+    "tunnel",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestMergeTunnels",
+   "type": "function",
+   "name": "TestMergeTunnels",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    10,
+    42
+   ],
+   "summary": "Valida a mescla de túneis configurados com processos vivos.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestSaveLoadProject",
+   "type": "function",
+   "name": "TestSaveLoadProject",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    44,
+    57
+   ],
+   "summary": "Testa o ciclo salvar/carregar da configuração do projeto.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestLegacyPortOnlyConfigGetsURL",
+   "type": "function",
+   "name": "TestLegacyPortOnlyConfigGetsURL",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    59,
+    72
+   ],
+   "summary": "Garante que configs antigas só com porta ganhem URL derivada.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestNormalizeURL",
+   "type": "function",
+   "name": "TestNormalizeURL",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    74,
+    91
+   ],
+   "summary": "Casos de tabela para normalização de URL local.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestTunnelArgs",
+   "type": "function",
+   "name": "TestTunnelArgs",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    93,
+    106
+   ],
+   "summary": "Verifica os argumentos gerados para o cloudflared.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestNormalizeMode",
+   "type": "function",
+   "name": "TestNormalizeMode",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    108,
+    133
+   ],
+   "summary": "Casos de normalização do modo do túnel.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/agent_test.go:TestExtractPublicURL",
+   "type": "function",
+   "name": "TestExtractPublicURL",
+   "filePath": "internal/cfutil/agent_test.go",
+   "lineRange": [
+    141,
+    150
+   ],
+   "summary": "Valida a extração da URL pública a partir de logs.",
+   "tags": [
+    "test",
+    "unit-test",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/cfutil/config.go",
+   "type": "file",
+   "name": "config.go",
+   "filePath": "internal/cfutil/config.go",
+   "summary": "Persiste a configuração de túneis Cloudflare por projeto em .devscope/cloudflare.json e mescla túneis configurados com processos vivos, incluindo histórico e contagem de túneis de outros projetos.",
+   "tags": [
+    "config",
+    "persistence",
+    "cloudflare",
+    "tunnel",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/cfutil/config.go:TunnelConfig",
+   "type": "class",
+   "name": "TunnelConfig",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    12,
+    21
+   ],
+   "summary": "Configuração persistida de um túnel Cloudflare (URL local, hostname, modo, ID, autostart).",
+   "tags": [
+    "data-model",
+    "serialization",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/cfutil/config.go:ProjectConfig",
+   "type": "class",
+   "name": "ProjectConfig",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    33,
+    38
+   ],
+   "summary": "Configuração Cloudflare do projeto com lista de túneis, histórico e métodos de upsert/remoção.",
+   "tags": [
+    "data-model",
+    "config",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/cfutil/config.go:HistoryEntry",
+   "type": "class",
+   "name": "HistoryEntry",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    40,
+    48
+   ],
+   "summary": "Entrada do histórico de uso de túneis do projeto.",
+   "tags": [
+    "data-model",
+    "history",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:ConfigPath",
+   "type": "function",
+   "name": "ConfigPath",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    50,
+    52
+   ],
+   "summary": "Retorna o caminho de cloudflare.json dentro de .devscope.",
+   "tags": [
+    "utility",
+    "config",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:LoadProject",
+   "type": "function",
+   "name": "LoadProject",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    54,
+    68
+   ],
+   "summary": "Carrega e normaliza a configuração Cloudflare do projeto.",
+   "tags": [
+    "persistence",
+    "config",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:SaveProject",
+   "type": "function",
+   "name": "SaveProject",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    70,
+    80
+   ],
+   "summary": "Grava a configuração do projeto garantindo o diretório .devscope.",
+   "tags": [
+    "persistence",
+    "config",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:UpsertTunnel",
+   "type": "function",
+   "name": "UpsertTunnel",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    82,
+    95
+   ],
+   "summary": "Insere ou atualiza um túnel na configuração, normalizando modo e URL.",
+   "tags": [
+    "persistence",
+    "data-model",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:RemoveTunnel",
+   "type": "function",
+   "name": "RemoveTunnel",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    97,
+    105
+   ],
+   "summary": "Remove um túnel da configuração pelo nome.",
+   "tags": [
+    "persistence",
+    "data-model",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:MergeTunnels",
+   "type": "function",
+   "name": "MergeTunnels",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    107,
+    161
+   ],
+   "summary": "Mescla túneis configurados com processos vivos do projeto, definindo status e URLs.",
+   "tags": [
+    "aggregation",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:CountForeignLive",
+   "type": "function",
+   "name": "CountForeignLive",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    164,
+    166
+   ],
+   "summary": "Conta túneis vivos que não pertencem ao projeto.",
+   "tags": [
+    "utility",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/cfutil/config.go:MergeTunnelsAll",
+   "type": "function",
+   "name": "MergeTunnelsAll",
+   "filePath": "internal/cfutil/config.go",
+   "lineRange": [
+    169,
+    196
+   ],
+   "summary": "Mescla configurados e todos os túneis vivos, incluindo os estrangeiros.",
+   "tags": [
+    "aggregation",
+    "tunnel",
+    "golang"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:Tunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:Tunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:AccountTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:AccountTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:AuthInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "class:internal/cfutil/agent.go:AuthInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Available",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Available",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:CertPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:CertPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:LoggedIn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:LoggedIn",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:HasToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:HasToken",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Auth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Auth",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Login",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Login",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Install",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:Install",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:releaseURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:downloadFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:ListAccountTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:ListAccountTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:CreateTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:CreateTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:DeleteAccountTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:DeleteAccountTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:RouteDNS",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:RouteDNS",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:NormalizeMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:NormalizeMode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:StartTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:PublicURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:PublicURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:StopTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:StopTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:RecentLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:RecentLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:consumeOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:extractPublicURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:TunnelArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:TunnelArgs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:NormalizeURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:NormalizeURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:sanitizeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:parseAddrPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "function:internal/cfutil/agent.go:formatUptime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestMergeTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestMergeTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestSaveLoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestSaveLoadProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestLegacyPortOnlyConfigGetsURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestLegacyPortOnlyConfigGetsURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestNormalizeURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestNormalizeURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestTunnelArgs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestTunnelArgs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestNormalizeMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestNormalizeMode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestExtractPublicURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/agent_test.go",
+   "target": "function:internal/cfutil/agent_test.go:TestExtractPublicURL",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:TunnelConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:TunnelConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:ProjectConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:ProjectConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:HistoryEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "class:internal/cfutil/config.go:HistoryEntry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:ConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:ConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:LoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:LoadProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:SaveProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:SaveProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:UpsertTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:UpsertTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:RemoveTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:RemoveTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:MergeTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:MergeTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:CountForeignLive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:CountForeignLive",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:MergeTunnelsAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "function:internal/cfutil/config.go:MergeTunnelsAll",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "file:internal/devscopeutil/dir.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "file:internal/devscopeutil/dir_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/cfutil/agent.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/cfutil/config.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "function:internal/cfutil/config.go:SaveProject",
+   "target": "function:internal/devscopeutil/dir.go:EnsureDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/cfutil/config.go:UpsertTunnel",
+   "target": "function:internal/cfutil/agent.go:NormalizeMode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/cfutil/config.go:CountForeignLive",
+   "target": "function:internal/cfutil/discover.go:ForeignTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/cfutil/agent.go:StopTunnel",
+   "target": "function:internal/cfutil/discover.go:ListLiveTunnels",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/agent.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/cf_tab.go",
+   "target": "file:internal/cfutil/config.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

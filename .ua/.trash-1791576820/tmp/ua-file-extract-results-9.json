@@ -1,0 +1,6478 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 21,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 21,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 21,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "internal/cfutil/agent.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 674,
+      "nonEmptyLines": 632,
+      "functions": [
+        {
+          "name": "Available",
+          "startLine": 68,
+          "endLine": 71,
+          "params": []
+        },
+        {
+          "name": "Version",
+          "startLine": 73,
+          "endLine": 86,
+          "params": []
+        },
+        {
+          "name": "CertPath",
+          "startLine": 88,
+          "endLine": 105,
+          "params": []
+        },
+        {
+          "name": "LoggedIn",
+          "startLine": 107,
+          "endLine": 111,
+          "params": []
+        },
+        {
+          "name": "HasToken",
+          "startLine": 113,
+          "endLine": 124,
+          "params": []
+        },
+        {
+          "name": "Auth",
+          "startLine": 126,
+          "endLine": 133,
+          "params": []
+        },
+        {
+          "name": "Login",
+          "startLine": 136,
+          "endLine": 153,
+          "params": []
+        },
+        {
+          "name": "Install",
+          "startLine": 156,
+          "endLine": 189,
+          "params": []
+        },
+        {
+          "name": "releaseURL",
+          "startLine": 191,
+          "endLine": 206,
+          "params": []
+        },
+        {
+          "name": "downloadFile",
+          "startLine": 208,
+          "endLine": 225,
+          "params": [
+            "url",
+            "dest"
+          ]
+        },
+        {
+          "name": "ListAccountTunnels",
+          "startLine": 227,
+          "endLine": 262,
+          "params": []
+        },
+        {
+          "name": "CreateTunnel",
+          "startLine": 265,
+          "endLine": 303,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "name": "DeleteAccountTunnel",
+          "startLine": 305,
+          "endLine": 315,
+          "params": [
+            "nameOrID"
+          ]
+        },
+        {
+          "name": "RouteDNS",
+          "startLine": 317,
+          "endLine": 328,
+          "params": [
+            "tunnel",
+            "hostname"
+          ]
+        },
+        {
+          "name": "NormalizeMode",
+          "startLine": 337,
+          "endLine": 351,
+          "params": [
+            "mode",
+            "hostname"
+          ]
+        },
+        {
+          "name": "StartTunnel",
+          "startLine": 355,
+          "endLine": 439,
+          "params": [
+            "name",
+            "target",
+            "mode",
+            "hostname"
+          ]
+        },
+        {
+          "name": "PublicURL",
+          "startLine": 442,
+          "endLine": 449,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "name": "StopTunnel",
+          "startLine": 451,
+          "endLine": 482,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "name": "RecentLogs",
+          "startLine": 484,
+          "endLine": 503,
+          "params": [
+            "name",
+            "limit"
+          ]
+        },
+        {
+          "name": "tail",
+          "startLine": 505,
+          "endLine": 510,
+          "params": [
+            "lines",
+            "n"
+          ]
+        },
+        {
+          "name": "consumeOutput",
+          "startLine": 512,
+          "endLine": 534,
+          "params": [
+            "name",
+            "r"
+          ]
+        },
+        {
+          "name": "extractPublicURL",
+          "startLine": 537,
+          "endLine": 548,
+          "params": [
+            "line"
+          ]
+        },
+        {
+          "name": "TunnelArgs",
+          "startLine": 556,
+          "endLine": 563,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "tunnelArgs",
+          "startLine": 565,
+          "endLine": 573,
+          "params": [
+            "name",
+            "url",
+            "mode"
+          ]
+        },
+        {
+          "name": "NormalizeURL",
+          "startLine": 579,
+          "endLine": 605,
+          "params": [
+            "s"
+          ]
+        },
+        {
+          "name": "sanitizeName",
+          "startLine": 607,
+          "endLine": 622,
+          "params": [
+            "s"
+          ]
+        },
+        {
+          "name": "localURL",
+          "startLine": 624,
+          "endLine": 629,
+          "params": [
+            "port"
+          ]
+        },
+        {
+          "name": "publicHost",
+          "startLine": 631,
+          "endLine": 638,
+          "params": [
+            "u"
+          ]
+        },
+        {
+          "name": "parseAddrPort",
+          "startLine": 640,
+          "endLine": 652,
+          "params": [
+            "addr"
+          ]
+        },
+        {
+          "name": "normalizeLocal",
+          "startLine": 654,
+          "endLine": 662,
+          "params": [
+            "addr"
+          ]
+        },
+        {
+          "name": "formatUptime",
+          "startLine": 664,
+          "endLine": 674,
+          "params": [
+            "d"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Tunnel",
+          "startLine": 21,
+          "endLine": 33,
+          "methods": [],
+          "properties": [
+            "Name",
+            "Project",
+            "Port",
+            "Hostname",
+            "PublicURL",
+            "LocalURL",
+            "Status",
+            "Mode",
+            "TunnelID",
+            "Uptime",
+            "PID"
+          ]
+        },
+        {
+          "name": "AccountTunnel",
+          "startLine": 36,
+          "endLine": 42,
+          "methods": [],
+          "properties": [
+            "ID",
+            "Name",
+            "CreatedAt",
+            "Connections",
+            "DeletedAt"
+          ]
+        },
+        {
+          "name": "AuthInfo",
+          "startLine": 44,
+          "endLine": 49,
+          "methods": [],
+          "properties": [
+            "LoggedIn",
+            "CertPath",
+            "Version",
+            "CLI"
+          ]
+        },
+        {
+          "name": "runState",
+          "startLine": 51,
+          "endLine": 60,
+          "methods": [],
+          "properties": [
+            "cmd",
+            "name",
+            "url",
+            "mode",
+            "hostname",
+            "publicURL",
+            "started",
+            "logLines"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Tunnel",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "AccountTunnel",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "AuthInfo",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "Available",
+          "line": 68,
+          "isDefault": false
+        },
+        {
+          "name": "Version",
+          "line": 73,
+          "isDefault": false
+        },
+        {
+          "name": "CertPath",
+          "line": 88,
+          "isDefault": false
+        },
+        {
+          "name": "LoggedIn",
+          "line": 107,
+          "isDefault": false
+        },
+        {
+          "name": "HasToken",
+          "line": 113,
+          "isDefault": false
+        },
+        {
+          "name": "Auth",
+          "line": 126,
+          "isDefault": false
+        },
+        {
+          "name": "Login",
+          "line": 136,
+          "isDefault": false
+        },
+        {
+          "name": "Install",
+          "line": 156,
+          "isDefault": false
+        },
+        {
+          "name": "ListAccountTunnels",
+          "line": 227,
+          "isDefault": false
+        },
+        {
+          "name": "CreateTunnel",
+          "line": 265,
+          "isDefault": false
+        },
+        {
+          "name": "DeleteAccountTunnel",
+          "line": 305,
+          "isDefault": false
+        },
+        {
+          "name": "RouteDNS",
+          "line": 317,
+          "isDefault": false
+        },
+        {
+          "name": "NormalizeMode",
+          "line": 337,
+          "isDefault": false
+        },
+        {
+          "name": "StartTunnel",
+          "line": 355,
+          "isDefault": false
+        },
+        {
+          "name": "PublicURL",
+          "line": 442,
+          "isDefault": false
+        },
+        {
+          "name": "StopTunnel",
+          "line": 451,
+          "isDefault": false
+        },
+        {
+          "name": "RecentLogs",
+          "line": 484,
+          "isDefault": false
+        },
+        {
+          "name": "TunnelArgs",
+          "line": 556,
+          "isDefault": false
+        },
+        {
+          "name": "NormalizeURL",
+          "line": 579,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Available",
+          "callee": "exec.LookPath",
+          "lineNumber": 69
+        },
+        {
+          "caller": "Version",
+          "callee": "exec.Command(\"cloudflared\", \"--version\").CombinedOutput",
+          "lineNumber": 74
+        },
+        {
+          "caller": "Version",
+          "callee": "exec.Command",
+          "lineNumber": 74
+        },
+        {
+          "caller": "Version",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 79
+        },
+        {
+          "caller": "Version",
+          "callee": "string",
+          "lineNumber": 79
+        },
+        {
+          "caller": "Version",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 80
+        },
+        {
+          "caller": "Version",
+          "callee": "strings.Fields",
+          "lineNumber": 81
+        },
+        {
+          "caller": "Version",
+          "callee": "len",
+          "lineNumber": 82
+        },
+        {
+          "caller": "CertPath",
+          "callee": "os.Getenv",
+          "lineNumber": 89
+        },
+        {
+          "caller": "CertPath",
+          "callee": "os.UserHomeDir",
+          "lineNumber": 92
+        },
+        {
+          "caller": "CertPath",
+          "callee": "filepath.Join",
+          "lineNumber": 94
+        },
+        {
+          "caller": "CertPath",
+          "callee": "filepath.Join",
+          "lineNumber": 95
+        },
+        {
+          "caller": "CertPath",
+          "callee": "os.Stat",
+          "lineNumber": 100
+        },
+        {
+          "caller": "CertPath",
+          "callee": "st.IsDir",
+          "lineNumber": 100
+        },
+        {
+          "caller": "CertPath",
+          "callee": "filepath.Join",
+          "lineNumber": 104
+        },
+        {
+          "caller": "LoggedIn",
+          "callee": "CertPath",
+          "lineNumber": 108
+        },
+        {
+          "caller": "LoggedIn",
+          "callee": "os.Stat",
+          "lineNumber": 109
+        },
+        {
+          "caller": "LoggedIn",
+          "callee": "st.IsDir",
+          "lineNumber": 110
+        },
+        {
+          "caller": "HasToken",
+          "callee": "os.UserHomeDir",
+          "lineNumber": 114
+        },
+        {
+          "caller": "HasToken",
+          "callee": "filepath.Join",
+          "lineNumber": 117
+        },
+        {
+          "caller": "HasToken",
+          "callee": "os.Stat",
+          "lineNumber": 119
+        },
+        {
+          "caller": "HasToken",
+          "callee": "st.IsDir",
+          "lineNumber": 119
+        },
+        {
+          "caller": "Auth",
+          "callee": "LoggedIn",
+          "lineNumber": 128
+        },
+        {
+          "caller": "Auth",
+          "callee": "HasToken",
+          "lineNumber": 128
+        },
+        {
+          "caller": "Auth",
+          "callee": "CertPath",
+          "lineNumber": 129
+        },
+        {
+          "caller": "Auth",
+          "callee": "Version",
+          "lineNumber": 130
+        },
+        {
+          "caller": "Auth",
+          "callee": "Available",
+          "lineNumber": 131
+        },
+        {
+          "caller": "Login",
+          "callee": "Available",
+          "lineNumber": 137
+        },
+        {
+          "caller": "Login",
+          "callee": "fmt.Errorf",
+          "lineNumber": 138
+        },
+        {
+          "caller": "Login",
+          "callee": "exec.Command",
+          "lineNumber": 140
+        },
+        {
+          "caller": "Login",
+          "callee": "cmd.CombinedOutput",
+          "lineNumber": 141
+        },
+        {
+          "caller": "Login",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 143
+        },
+        {
+          "caller": "Login",
+          "callee": "string",
+          "lineNumber": 143
+        },
+        {
+          "caller": "Login",
+          "callee": "err.Error",
+          "lineNumber": 145
+        },
+        {
+          "caller": "Login",
+          "callee": "fmt.Errorf",
+          "lineNumber": 147
+        },
+        {
+          "caller": "Login",
+          "callee": "LoggedIn",
+          "lineNumber": 149
+        },
+        {
+          "caller": "Login",
+          "callee": "fmt.Errorf",
+          "lineNumber": 150
+        },
+        {
+          "caller": "Login",
+          "callee": "CertPath",
+          "lineNumber": 150
+        },
+        {
+          "caller": "Install",
+          "callee": "Available",
+          "lineNumber": 157
+        },
+        {
+          "caller": "Install",
+          "callee": "Version",
+          "lineNumber": 158
+        },
+        {
+          "caller": "Install",
+          "callee": "os.UserHomeDir",
+          "lineNumber": 160
+        },
+        {
+          "caller": "Install",
+          "callee": "filepath.Join",
+          "lineNumber": 164
+        },
+        {
+          "caller": "Install",
+          "callee": "os.MkdirAll",
+          "lineNumber": 165
+        },
+        {
+          "caller": "Install",
+          "callee": "filepath.Join",
+          "lineNumber": 168
+        },
+        {
+          "caller": "Install",
+          "callee": "releaseURL",
+          "lineNumber": 169
+        },
+        {
+          "caller": "Install",
+          "callee": "downloadFile",
+          "lineNumber": 174
+        },
+        {
+          "caller": "Install",
+          "callee": "os.Chmod",
+          "lineNumber": 177
+        },
+        {
+          "caller": "Install",
+          "callee": "os.Remove",
+          "lineNumber": 178
+        },
+        {
+          "caller": "Install",
+          "callee": "os.Rename",
+          "lineNumber": 181
+        },
+        {
+          "caller": "Install",
+          "callee": "os.Remove",
+          "lineNumber": 182
+        },
+        {
+          "caller": "Install",
+          "callee": "Available",
+          "lineNumber": 185
+        },
+        {
+          "caller": "Install",
+          "callee": "Version",
+          "lineNumber": 188
+        },
+        {
+          "caller": "releaseURL",
+          "callee": "fmt.Errorf",
+          "lineNumber": 196
+        },
+        {
+          "caller": "releaseURL",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 200
+        },
+        {
+          "caller": "releaseURL",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 202
+        },
+        {
+          "caller": "releaseURL",
+          "callee": "fmt.Errorf",
+          "lineNumber": 204
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "client.Get",
+          "lineNumber": 210
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "resp.Body.Close",
+          "lineNumber": 214
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "fmt.Errorf",
+          "lineNumber": 216
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "os.Create",
+          "lineNumber": 218
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "f.Close",
+          "lineNumber": 222
+        },
+        {
+          "caller": "downloadFile",
+          "callee": "io.Copy",
+          "lineNumber": 223
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "Available",
+          "lineNumber": 228
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "fmt.Errorf",
+          "lineNumber": 229
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "LoggedIn",
+          "lineNumber": 231
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "fmt.Errorf",
+          "lineNumber": 232
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "exec.Command(\"cloudflared\", \"tunnel\", \"list\", \"--output\", \"json\").CombinedOutput",
+          "lineNumber": 234
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "exec.Command",
+          "lineNumber": 234
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "fmt.Errorf",
+          "lineNumber": 236
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 236
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "string",
+          "lineNumber": 236
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "json.Unmarshal",
+          "lineNumber": 245
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "fmt.Errorf",
+          "lineNumber": 246
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "make",
+          "lineNumber": 248
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "len",
+          "lineNumber": 248
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "t.DeletedAt.IsZero",
+          "lineNumber": 250
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "append",
+          "lineNumber": 253
+        },
+        {
+          "caller": "ListAccountTunnels",
+          "callee": "len",
+          "lineNumber": 257
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "sanitizeName",
+          "lineNumber": 266
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 268
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "LoggedIn",
+          "lineNumber": 270
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 271
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "exec.Command(\"cloudflared\", \"tunnel\", \"create\", \"--output\", \"json\", name).CombinedOutput",
+          "lineNumber": 273
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "exec.Command",
+          "lineNumber": 273
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "exec.Command(\"cloudflared\", \"tunnel\", \"create\", name).CombinedOutput",
+          "lineNumber": 276
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "exec.Command",
+          "lineNumber": 276
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 278
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "string",
+          "lineNumber": 278
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 280
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "string",
+          "lineNumber": 280
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 282
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "ListAccountTunnels",
+          "lineNumber": 284
+        },
+        {
+          "caller": "CreateTunnel",
+          "callee": "json.Unmarshal",
+          "lineNumber": 299
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 306
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 308
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "exec.Command(\"cloudflared\", \"tunnel\", \"delete\", \"-f\", nameOrID).CombinedOutput",
+          "lineNumber": 310
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "exec.Command",
+          "lineNumber": 310
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 312
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 312
+        },
+        {
+          "caller": "DeleteAccountTunnel",
+          "callee": "string",
+          "lineNumber": 312
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "sanitizeName",
+          "lineNumber": 318
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 319
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "strings.ToLower",
+          "lineNumber": 319
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "fmt.Errorf",
+          "lineNumber": 321
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "exec.Command(\"cloudflared\", \"tunnel\", \"route\", \"dns\", tunnel, hostname).CombinedOutput",
+          "lineNumber": 323
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "exec.Command",
+          "lineNumber": 323
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "fmt.Errorf",
+          "lineNumber": 325
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 325
+        },
+        {
+          "caller": "RouteDNS",
+          "callee": "string",
+          "lineNumber": 325
+        },
+        {
+          "caller": "NormalizeMode",
+          "callee": "strings.ToLower",
+          "lineNumber": 338
+        },
+        {
+          "caller": "NormalizeMode",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 338
+        },
+        {
+          "caller": "NormalizeMode",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 340
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "NormalizeURL",
+          "lineNumber": 356
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 358
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "sanitizeName",
+          "lineNumber": 360
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "NormalizeMode",
+          "lineNumber": 364
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 365
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 367
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 368
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 370
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "LoggedIn",
+          "lineNumber": 372
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 373
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "exec.Command",
+          "lineNumber": 375
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "tunnelArgs",
+          "lineNumber": 375
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "cmd.StdoutPipe",
+          "lineNumber": 377
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "cmd.StderrPipe",
+          "lineNumber": 381
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "cmd.Start",
+          "lineNumber": 385
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Now",
+          "lineNumber": 394
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 399
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "delete",
+          "lineNumber": 401
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 402
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "consumeOutput",
+          "lineNumber": 406
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "consumeOutput",
+          "lineNumber": 407
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "func() {\n\t\t_ = cmd.Wait()\n\t\trunMu.Lock()\n\t\tif cur, ok := running[name]; ok && cur.cmd == cmd {\n\t\t\tlastExit[name] = tail(cur.logLines, 3)\n\t\t\tdelete(running, name)\n\t\t}\n\t\trunMu.Unlock()\n\t}",
+          "lineNumber": 408
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "cmd.Wait",
+          "lineNumber": 409
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 410
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "tail",
+          "lineNumber": 412
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "delete",
+          "lineNumber": 413
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 415
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Now().Add",
+          "lineNumber": 418
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Now",
+          "lineNumber": 418
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Now().Before",
+          "lineNumber": 419
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Now",
+          "lineNumber": 419
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 420
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 426
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 434
+        },
+        {
+          "caller": "StartTunnel",
+          "callee": "time.Sleep",
+          "lineNumber": 436
+        },
+        {
+          "caller": "PublicURL",
+          "callee": "runMu.Lock",
+          "lineNumber": 443
+        },
+        {
+          "caller": "PublicURL",
+          "callee": "runMu.Unlock",
+          "lineNumber": 444
+        },
+        {
+          "caller": "PublicURL",
+          "callee": "sanitizeName",
+          "lineNumber": 445
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "sanitizeName",
+          "lineNumber": 452
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 453
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 455
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "st.cmd.Process.Signal",
+          "lineNumber": 457
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "st.cmd.Process.Kill",
+          "lineNumber": 458
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "make",
+          "lineNumber": 460
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "func() {\n\t\t\t_ = st.cmd.Wait()\n\t\t\tclose(done)\n\t\t}",
+          "lineNumber": 461
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "st.cmd.Wait",
+          "lineNumber": 462
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "close",
+          "lineNumber": 463
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "time.After",
+          "lineNumber": 467
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "st.cmd.Process.Kill",
+          "lineNumber": 468
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "runMu.Lock",
+          "lineNumber": 470
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "delete",
+          "lineNumber": 471
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "runMu.Unlock",
+          "lineNumber": 472
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "ListLiveTunnels",
+          "lineNumber": 476
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "sanitizeName",
+          "lineNumber": 477
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "StopPID",
+          "lineNumber": 478
+        },
+        {
+          "caller": "StopTunnel",
+          "callee": "fmt.Errorf",
+          "lineNumber": 481
+        },
+        {
+          "caller": "RecentLogs",
+          "callee": "runMu.Lock",
+          "lineNumber": 488
+        },
+        {
+          "caller": "RecentLogs",
+          "callee": "runMu.Unlock",
+          "lineNumber": 489
+        },
+        {
+          "caller": "RecentLogs",
+          "callee": "sanitizeName",
+          "lineNumber": 490
+        },
+        {
+          "caller": "RecentLogs",
+          "callee": "len",
+          "lineNumber": 494
+        },
+        {
+          "caller": "RecentLogs",
+          "callee": "append",
+          "lineNumber": 502
+        },
+        {
+          "caller": "tail",
+          "callee": "len",
+          "lineNumber": 506
+        },
+        {
+          "caller": "tail",
+          "callee": "len",
+          "lineNumber": 507
+        },
+        {
+          "caller": "tail",
+          "callee": "strings.Join",
+          "lineNumber": 509
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "bufio.NewScanner",
+          "lineNumber": 513
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "sc.Buffer",
+          "lineNumber": 514
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "make",
+          "lineNumber": 514
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "sc.Scan",
+          "lineNumber": 515
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "sc.Text",
+          "lineNumber": 516
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "runMu.Lock",
+          "lineNumber": 517
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "runMu.Unlock",
+          "lineNumber": 520
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "append",
+          "lineNumber": 523
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "len",
+          "lineNumber": 524
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "len",
+          "lineNumber": 525
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "extractPublicURL",
+          "lineNumber": 528
+        },
+        {
+          "caller": "consumeOutput",
+          "callee": "runMu.Unlock",
+          "lineNumber": 532
+        },
+        {
+          "caller": "extractPublicURL",
+          "callee": "strings.Fields",
+          "lineNumber": 538
+        },
+        {
+          "caller": "extractPublicURL",
+          "callee": "strings.Trim",
+          "lineNumber": 539
+        },
+        {
+          "caller": "extractPublicURL",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 540
+        },
+        {
+          "caller": "extractPublicURL",
+          "callee": "strings.Contains",
+          "lineNumber": 543
+        },
+        {
+          "caller": "extractPublicURL",
+          "callee": "strings.Contains",
+          "lineNumber": 543
+        },
+        {
+          "caller": "TunnelArgs",
+          "callee": "t.normalize",
+          "lineNumber": 557
+        },
+        {
+          "caller": "TunnelArgs",
+          "callee": "sanitizeName",
+          "lineNumber": 558
+        },
+        {
+          "caller": "TunnelArgs",
+          "callee": "tunnelArgs",
+          "lineNumber": 562
+        },
+        {
+          "caller": "TunnelArgs",
+          "callee": "NormalizeMode",
+          "lineNumber": 562
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 580
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "strconv.Atoi",
+          "lineNumber": 584
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "localURL",
+          "lineNumber": 588
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "strings.Contains",
+          "lineNumber": 590
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "url.Parse",
+          "lineNumber": 593
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "strings.TrimSuffix",
+          "lineNumber": 593
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "u.Hostname",
+          "lineNumber": 597
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "u.Port",
+          "lineNumber": 599
+        },
+        {
+          "caller": "NormalizeURL",
+          "callee": "u.String",
+          "lineNumber": 604
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 608
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "strings.ToLower",
+          "lineNumber": 608
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "b.WriteRune",
+          "lineNumber": 612
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "b.WriteByte",
+          "lineNumber": 614
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "strings.Trim",
+          "lineNumber": 617
+        },
+        {
+          "caller": "sanitizeName",
+          "callee": "b.String",
+          "lineNumber": 617
+        },
+        {
+          "caller": "localURL",
+          "callee": "strconv.Itoa",
+          "lineNumber": 628
+        },
+        {
+          "caller": "publicHost",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 632
+        },
+        {
+          "caller": "publicHost",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 633
+        },
+        {
+          "caller": "publicHost",
+          "callee": "strings.Index",
+          "lineNumber": 634
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 641
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 642
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strings.Index",
+          "lineNumber": 643
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strings.LastIndex",
+          "lineNumber": 646
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strconv.Atoi",
+          "lineNumber": 647
+        },
+        {
+          "caller": "parseAddrPort",
+          "callee": "strconv.Atoi",
+          "lineNumber": 650
+        },
+        {
+          "caller": "normalizeLocal",
+          "callee": "strings.Contains",
+          "lineNumber": 658
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 666
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "int",
+          "lineNumber": 666
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "d.Seconds",
+          "lineNumber": 666
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 669
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "int",
+          "lineNumber": 669
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "d.Minutes",
+          "lineNumber": 669
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "int",
+          "lineNumber": 671
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "d.Hours",
+          "lineNumber": 671
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "int",
+          "lineNumber": 672
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "d.Minutes",
+          "lineNumber": 672
+        },
+        {
+          "caller": "formatUptime",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 673
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 22,
+        "functionCount": 31,
+        "classCount": 4
+      }
+    },
+    {
+      "path": "internal/cfutil/agent_test.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 150,
+      "nonEmptyLines": 141,
+      "functions": [
+        {
+          "name": "TestMergeTunnels",
+          "startLine": 10,
+          "endLine": 42,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestSaveLoadProject",
+          "startLine": 44,
+          "endLine": 57,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestLegacyPortOnlyConfigGetsURL",
+          "startLine": 59,
+          "endLine": 72,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestNormalizeURL",
+          "startLine": 74,
+          "endLine": 91,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestTunnelArgs",
+          "startLine": 93,
+          "endLine": 106,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestNormalizeMode",
+          "startLine": 108,
+          "endLine": 133,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestSanitizeName",
+          "startLine": 135,
+          "endLine": 139,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestExtractPublicURL",
+          "startLine": 141,
+          "endLine": 150,
+          "params": [
+            "t"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TestMergeTunnels",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "TestSaveLoadProject",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "TestLegacyPortOnlyConfigGetsURL",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "TestNormalizeURL",
+          "line": 74,
+          "isDefault": false
+        },
+        {
+          "name": "TestTunnelArgs",
+          "line": 93,
+          "isDefault": false
+        },
+        {
+          "name": "TestNormalizeMode",
+          "line": 108,
+          "isDefault": false
+        },
+        {
+          "name": "TestSanitizeName",
+          "line": 135,
+          "isDefault": false
+        },
+        {
+          "name": "TestExtractPublicURL",
+          "line": 141,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "MergeTunnels",
+          "lineNumber": 22
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "len",
+          "lineNumber": 23
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 24
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "len",
+          "lineNumber": 24
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 27
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 30
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "CountForeignLive",
+          "lineNumber": 32
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 33
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "MergeTunnelsAll",
+          "lineNumber": 35
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "len",
+          "lineNumber": 36
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 37
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "len",
+          "lineNumber": 37
+        },
+        {
+          "caller": "TestMergeTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 40
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "t.TempDir",
+          "lineNumber": 45
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "SaveProject",
+          "lineNumber": 47
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "t.Fatal",
+          "lineNumber": 48
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "os.Stat",
+          "lineNumber": 50
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "filepath.Join",
+          "lineNumber": 50
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "t.Fatal",
+          "lineNumber": 51
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "LoadProject",
+          "lineNumber": 53
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "len",
+          "lineNumber": 54
+        },
+        {
+          "caller": "TestSaveLoadProject",
+          "callee": "t.Fatalf",
+          "lineNumber": 55
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "t.TempDir",
+          "lineNumber": 60
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "os.MkdirAll",
+          "lineNumber": 61
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "filepath.Join",
+          "lineNumber": 61
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "t.Fatal",
+          "lineNumber": 62
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "os.WriteFile",
+          "lineNumber": 65
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "filepath.Join",
+          "lineNumber": 65
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "t.Fatal",
+          "lineNumber": 66
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "LoadProject",
+          "lineNumber": 68
+        },
+        {
+          "caller": "TestLegacyPortOnlyConfigGetsURL",
+          "callee": "t.Fatalf",
+          "lineNumber": 70
+        },
+        {
+          "caller": "TestNormalizeURL",
+          "callee": "NormalizeURL",
+          "lineNumber": 87
+        },
+        {
+          "caller": "TestNormalizeURL",
+          "callee": "t.Fatalf",
+          "lineNumber": 88
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "strings.Join",
+          "lineNumber": 94
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "tunnelArgs",
+          "lineNumber": 94
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "t.Fatalf",
+          "lineNumber": 96
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "strings.Join",
+          "lineNumber": 98
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "tunnelArgs",
+          "lineNumber": 98
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "t.Fatalf",
+          "lineNumber": 100
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "strings.Join",
+          "lineNumber": 102
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "tunnelArgs",
+          "lineNumber": 102
+        },
+        {
+          "caller": "TestTunnelArgs",
+          "callee": "t.Fatalf",
+          "lineNumber": 104
+        },
+        {
+          "caller": "TestNormalizeMode",
+          "callee": "NormalizeMode",
+          "lineNumber": 122
+        },
+        {
+          "caller": "TestNormalizeMode",
+          "callee": "t.Fatalf",
+          "lineNumber": 123
+        },
+        {
+          "caller": "TestNormalizeMode",
+          "callee": "NormalizeMode",
+          "lineNumber": 129
+        },
+        {
+          "caller": "TestNormalizeMode",
+          "callee": "t.Fatalf",
+          "lineNumber": 130
+        },
+        {
+          "caller": "TestSanitizeName",
+          "callee": "sanitizeName",
+          "lineNumber": 136
+        },
+        {
+          "caller": "TestSanitizeName",
+          "callee": "t.Fatalf",
+          "lineNumber": 137
+        },
+        {
+          "caller": "TestSanitizeName",
+          "callee": "sanitizeName",
+          "lineNumber": 137
+        },
+        {
+          "caller": "TestExtractPublicURL",
+          "callee": "extractPublicURL",
+          "lineNumber": 143
+        },
+        {
+          "caller": "TestExtractPublicURL",
+          "callee": "t.Fatalf",
+          "lineNumber": 145
+        },
+        {
+          "caller": "TestExtractPublicURL",
+          "callee": "extractPublicURL",
+          "lineNumber": 147
+        },
+        {
+          "caller": "TestExtractPublicURL",
+          "callee": "t.Fatal",
+          "lineNumber": 148
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 8,
+        "functionCount": 8,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/cfutil/config.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 196,
+      "nonEmptyLines": 182,
+      "functions": [
+        {
+          "name": "normalize",
+          "startLine": 25,
+          "endLine": 31,
+          "params": []
+        },
+        {
+          "name": "ConfigPath",
+          "startLine": 50,
+          "endLine": 52,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "LoadProject",
+          "startLine": 54,
+          "endLine": 68,
+          "params": [
+            "projectPath",
+            "projectName"
+          ]
+        },
+        {
+          "name": "SaveProject",
+          "startLine": 70,
+          "endLine": 80,
+          "params": [
+            "projectPath",
+            "cfg"
+          ]
+        },
+        {
+          "name": "UpsertTunnel",
+          "startLine": 82,
+          "endLine": 95,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "RemoveTunnel",
+          "startLine": 97,
+          "endLine": 105,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "name": "MergeTunnels",
+          "startLine": 107,
+          "endLine": 161,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        },
+        {
+          "name": "CountForeignLive",
+          "startLine": 164,
+          "endLine": 166,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        },
+        {
+          "name": "MergeTunnelsAll",
+          "startLine": 169,
+          "endLine": 196,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "TunnelConfig",
+          "startLine": 12,
+          "endLine": 21,
+          "methods": [
+            "normalize"
+          ],
+          "properties": [
+            "Name",
+            "URL",
+            "Port",
+            "Hostname",
+            "Mode",
+            "TunnelID",
+            "AutoStart",
+            "CreatedAt"
+          ]
+        },
+        {
+          "name": "ProjectConfig",
+          "startLine": 33,
+          "endLine": 38,
+          "methods": [
+            "UpsertTunnel",
+            "RemoveTunnel"
+          ],
+          "properties": [
+            "Project",
+            "Tunnels",
+            "History",
+            "UpdatedAt"
+          ]
+        },
+        {
+          "name": "HistoryEntry",
+          "startLine": 40,
+          "endLine": 48,
+          "methods": [],
+          "properties": [
+            "Name",
+            "Target",
+            "Hostname",
+            "Mode",
+            "Started",
+            "Stopped",
+            "URL"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TunnelConfig",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "ProjectConfig",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "HistoryEntry",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "ConfigPath",
+          "line": 50,
+          "isDefault": false
+        },
+        {
+          "name": "LoadProject",
+          "line": 54,
+          "isDefault": false
+        },
+        {
+          "name": "SaveProject",
+          "line": 70,
+          "isDefault": false
+        },
+        {
+          "name": "UpsertTunnel",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "RemoveTunnel",
+          "line": 97,
+          "isDefault": false
+        },
+        {
+          "name": "MergeTunnels",
+          "line": 107,
+          "isDefault": false
+        },
+        {
+          "name": "CountForeignLive",
+          "line": 164,
+          "isDefault": false
+        },
+        {
+          "name": "MergeTunnelsAll",
+          "line": 169,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "normalize",
+          "callee": "NormalizeURL",
+          "lineNumber": 26
+        },
+        {
+          "caller": "normalize",
+          "callee": "localURL",
+          "lineNumber": 28
+        },
+        {
+          "caller": "normalize",
+          "callee": "parseAddrPort",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ConfigPath",
+          "callee": "filepath.Join",
+          "lineNumber": 51
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "os.ReadFile",
+          "lineNumber": 56
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "ConfigPath",
+          "lineNumber": 56
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "json.Unmarshal",
+          "lineNumber": 60
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "cfg.Tunnels[i].normalize",
+          "lineNumber": 65
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "time.Now",
+          "lineNumber": 71
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "devscopeutil.EnsureDir",
+          "lineNumber": 72
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "json.MarshalIndent",
+          "lineNumber": 75
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "os.WriteFile",
+          "lineNumber": 79
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "ConfigPath",
+          "lineNumber": 79
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "t.normalize",
+          "lineNumber": 83
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "NormalizeMode",
+          "lineNumber": 84
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "t.CreatedAt.IsZero",
+          "lineNumber": 85
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "time.Now",
+          "lineNumber": 86
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "append",
+          "lineNumber": 94
+        },
+        {
+          "caller": "RemoveTunnel",
+          "callee": "append",
+          "lineNumber": 101
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 113
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "len",
+          "lineNumber": 120
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 142
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 149
+        },
+        {
+          "caller": "CountForeignLive",
+          "callee": "len",
+          "lineNumber": 165
+        },
+        {
+          "caller": "CountForeignLive",
+          "callee": "ForeignTunnels",
+          "lineNumber": 165
+        },
+        {
+          "caller": "MergeTunnelsAll",
+          "callee": "MergeTunnels",
+          "lineNumber": 170
+        },
+        {
+          "caller": "MergeTunnelsAll",
+          "callee": "append",
+          "lineNumber": 193
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 11,
+        "functionCount": 9,
+        "classCount": 3
+      }
+    },
+    {
+      "path": "internal/cfutil/discover.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 431,
+      "nonEmptyLines": 416,
+      "functions": [
+        {
+          "name": "ListLiveTunnels",
+          "startLine": 16,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "listManagedTunnels",
+          "startLine": 39,
+          "endLine": 65,
+          "params": []
+        },
+        {
+          "name": "discoverSystemTunnels",
+          "startLine": 67,
+          "endLine": 99,
+          "params": [
+            "metrics"
+          ]
+        },
+        {
+          "name": "isCloudflaredCmd",
+          "startLine": 101,
+          "endLine": 113,
+          "params": [
+            "args"
+          ]
+        },
+        {
+          "name": "readProcCmdline",
+          "startLine": 115,
+          "endLine": 128,
+          "params": [
+            "pid"
+          ]
+        },
+        {
+          "name": "tunnelFromCmdline",
+          "startLine": 130,
+          "endLine": 201,
+          "params": [
+            "pid",
+            "args"
+          ]
+        },
+        {
+          "name": "probeMetricsPorts",
+          "startLine": 209,
+          "endLine": 254,
+          "params": []
+        },
+        {
+          "name": "httpGet",
+          "startLine": 256,
+          "endLine": 280,
+          "params": [
+            "client",
+            "url"
+          ]
+        },
+        {
+          "name": "enrichFromMetrics",
+          "startLine": 282,
+          "endLine": 335,
+          "params": [
+            "t",
+            "snaps"
+          ]
+        },
+        {
+          "name": "procUptime",
+          "startLine": 337,
+          "endLine": 375,
+          "params": [
+            "pid"
+          ]
+        },
+        {
+          "name": "ForeignTunnels",
+          "startLine": 381,
+          "endLine": 398,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        },
+        {
+          "name": "StopForeignTunnels",
+          "startLine": 402,
+          "endLine": 416,
+          "params": [
+            "cfg"
+          ]
+        },
+        {
+          "name": "StopPID",
+          "startLine": 419,
+          "endLine": 431,
+          "params": [
+            "pid"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "metricsSnap",
+          "startLine": 203,
+          "endLine": 207,
+          "methods": [],
+          "properties": [
+            "localURL",
+            "quickHost",
+            "ha"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ListLiveTunnels",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "ForeignTunnels",
+          "line": 381,
+          "isDefault": false
+        },
+        {
+          "name": "StopForeignTunnels",
+          "line": 402,
+          "isDefault": false
+        },
+        {
+          "name": "StopPID",
+          "line": 419,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "probeMetricsPorts",
+          "lineNumber": 17
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "listManagedTunnels",
+          "lineNumber": 18
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "make",
+          "lineNumber": 20
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "len",
+          "lineNumber": 20
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "enrichFromMetrics",
+          "lineNumber": 23
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "append",
+          "lineNumber": 28
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "discoverSystemTunnels",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ListLiveTunnels",
+          "callee": "append",
+          "lineNumber": 34
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "runMu.Lock",
+          "lineNumber": 40
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "runMu.Unlock",
+          "lineNumber": 41
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "make",
+          "lineNumber": 42
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "len",
+          "lineNumber": 42
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "publicHost",
+          "lineNumber": 50
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "append",
+          "lineNumber": 52
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "parseAddrPort",
+          "lineNumber": 54
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "formatUptime",
+          "lineNumber": 60
+        },
+        {
+          "caller": "listManagedTunnels",
+          "callee": "time.Since",
+          "lineNumber": 60
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "os.ReadDir",
+          "lineNumber": 68
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "e.IsDir",
+          "lineNumber": 74
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "strconv.Atoi",
+          "lineNumber": 77
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "e.Name",
+          "lineNumber": 77
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "readProcCmdline",
+          "lineNumber": 81
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "len",
+          "lineNumber": 82
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "isCloudflaredCmd",
+          "lineNumber": 82
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 85
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "enrichFromMetrics",
+          "lineNumber": 86
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "strconv.Itoa",
+          "lineNumber": 88
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "procUptime",
+          "lineNumber": 94
+        },
+        {
+          "caller": "discoverSystemTunnels",
+          "callee": "append",
+          "lineNumber": 96
+        },
+        {
+          "caller": "isCloudflaredCmd",
+          "callee": "len",
+          "lineNumber": 102
+        },
+        {
+          "caller": "isCloudflaredCmd",
+          "callee": "filepath.Base",
+          "lineNumber": 105
+        },
+        {
+          "caller": "isCloudflaredCmd",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 108
+        },
+        {
+          "caller": "isCloudflaredCmd",
+          "callee": "strings.Join",
+          "lineNumber": 111
+        },
+        {
+          "caller": "isCloudflaredCmd",
+          "callee": "strings.Contains",
+          "lineNumber": 112
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "os.ReadFile",
+          "lineNumber": 116
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "strconv.Itoa",
+          "lineNumber": 116
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "len",
+          "lineNumber": 117
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "strings.Split",
+          "lineNumber": 120
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "string",
+          "lineNumber": 120
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "make",
+          "lineNumber": 121
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "len",
+          "lineNumber": 121
+        },
+        {
+          "caller": "readProcCmdline",
+          "callee": "append",
+          "lineNumber": 124
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 136
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 139
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "parseAddrPort",
+          "lineNumber": 141
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 143
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 144
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "parseAddrPort",
+          "lineNumber": 146
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 147
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 147
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.Contains",
+          "lineNumber": 149
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 149
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 152
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 152
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.Contains",
+          "lineNumber": 153
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 153
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 156
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 159
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 160
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 163
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 165
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 165
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.Contains",
+          "lineNumber": 165
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 168
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "filepath.Base",
+          "lineNumber": 171
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "append",
+          "lineNumber": 174
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 183
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "sanitizeName",
+          "lineNumber": 184
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "len",
+          "lineNumber": 184
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strconv.Itoa",
+          "lineNumber": 195
+        },
+        {
+          "caller": "tunnelFromCmdline",
+          "callee": "strconv.Itoa",
+          "lineNumber": 198
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "strconv.Itoa",
+          "lineNumber": 213
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "httpGet",
+          "lineNumber": 215
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "json.Unmarshal",
+          "lineNumber": 219
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 220
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "httpGet",
+          "lineNumber": 223
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "json.Unmarshal",
+          "lineNumber": 231
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 233
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "httpGet",
+          "lineNumber": 240
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "json.Unmarshal",
+          "lineNumber": 244
+        },
+        {
+          "caller": "probeMetricsPorts",
+          "callee": "append",
+          "lineNumber": 251
+        },
+        {
+          "caller": "httpGet",
+          "callee": "client.Get",
+          "lineNumber": 257
+        },
+        {
+          "caller": "httpGet",
+          "callee": "resp.Body.Close",
+          "lineNumber": 261
+        },
+        {
+          "caller": "httpGet",
+          "callee": "fmt.Errorf",
+          "lineNumber": 263
+        },
+        {
+          "caller": "httpGet",
+          "callee": "make",
+          "lineNumber": 265
+        },
+        {
+          "caller": "httpGet",
+          "callee": "make",
+          "lineNumber": 266
+        },
+        {
+          "caller": "httpGet",
+          "callee": "resp.Body.Read",
+          "lineNumber": 268
+        },
+        {
+          "caller": "httpGet",
+          "callee": "append",
+          "lineNumber": 270
+        },
+        {
+          "caller": "httpGet",
+          "callee": "len",
+          "lineNumber": 271
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "normalizeLocal",
+          "lineNumber": 285
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "normalizeLocal",
+          "lineNumber": 285
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "parseAddrPort",
+          "lineNumber": 288
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "parseAddrPort",
+          "lineNumber": 299
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "append",
+          "lineNumber": 315
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "len",
+          "lineNumber": 318
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "parseAddrPort",
+          "lineNumber": 323
+        },
+        {
+          "caller": "enrichFromMetrics",
+          "callee": "parseAddrPort",
+          "lineNumber": 327
+        },
+        {
+          "caller": "procUptime",
+          "callee": "os.ReadFile",
+          "lineNumber": 338
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strconv.Itoa",
+          "lineNumber": 338
+        },
+        {
+          "caller": "procUptime",
+          "callee": "string",
+          "lineNumber": 343
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strings.LastIndex",
+          "lineNumber": 344
+        },
+        {
+          "caller": "procUptime",
+          "callee": "len",
+          "lineNumber": 345
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strings.Fields",
+          "lineNumber": 348
+        },
+        {
+          "caller": "procUptime",
+          "callee": "len",
+          "lineNumber": 349
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strconv.ParseUint",
+          "lineNumber": 352
+        },
+        {
+          "caller": "procUptime",
+          "callee": "os.ReadFile",
+          "lineNumber": 356
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strings.Fields",
+          "lineNumber": 360
+        },
+        {
+          "caller": "procUptime",
+          "callee": "string",
+          "lineNumber": 360
+        },
+        {
+          "caller": "procUptime",
+          "callee": "len",
+          "lineNumber": 361
+        },
+        {
+          "caller": "procUptime",
+          "callee": "strconv.ParseFloat",
+          "lineNumber": 364
+        },
+        {
+          "caller": "procUptime",
+          "callee": "float64",
+          "lineNumber": 370
+        },
+        {
+          "caller": "procUptime",
+          "callee": "formatUptime",
+          "lineNumber": 374
+        },
+        {
+          "caller": "procUptime",
+          "callee": "time.Duration",
+          "lineNumber": 374
+        },
+        {
+          "caller": "procUptime",
+          "callee": "float64",
+          "lineNumber": 374
+        },
+        {
+          "caller": "ForeignTunnels",
+          "callee": "append",
+          "lineNumber": 395
+        },
+        {
+          "caller": "StopForeignTunnels",
+          "callee": "ForeignTunnels",
+          "lineNumber": 405
+        },
+        {
+          "caller": "StopForeignTunnels",
+          "callee": "ListLiveTunnels",
+          "lineNumber": 405
+        },
+        {
+          "caller": "StopForeignTunnels",
+          "callee": "StopPID",
+          "lineNumber": 409
+        },
+        {
+          "caller": "StopPID",
+          "callee": "os.FindProcess",
+          "lineNumber": 423
+        },
+        {
+          "caller": "StopPID",
+          "callee": "proc.Signal",
+          "lineNumber": 427
+        },
+        {
+          "caller": "StopPID",
+          "callee": "proc.Kill",
+          "lineNumber": 428
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 13,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/cfutil/discover_test.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 57,
+      "nonEmptyLines": 51,
+      "functions": [
+        {
+          "name": "TestTunnelFromCmdlineQuick",
+          "startLine": 5,
+          "endLine": 11,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestTunnelFromCmdlineToken",
+          "startLine": 13,
+          "endLine": 19,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestTunnelFromCmdlineNamed",
+          "startLine": 21,
+          "endLine": 33,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestIsCloudflaredCmd",
+          "startLine": 35,
+          "endLine": 45,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestForeignTunnels",
+          "startLine": 47,
+          "endLine": 57,
+          "params": [
+            "t"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TestTunnelFromCmdlineQuick",
+          "line": 5,
+          "isDefault": false
+        },
+        {
+          "name": "TestTunnelFromCmdlineToken",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "TestTunnelFromCmdlineNamed",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "TestIsCloudflaredCmd",
+          "line": 35,
+          "isDefault": false
+        },
+        {
+          "name": "TestForeignTunnels",
+          "line": 47,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TestTunnelFromCmdlineQuick",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 7
+        },
+        {
+          "caller": "TestTunnelFromCmdlineQuick",
+          "callee": "t.Fatalf",
+          "lineNumber": 9
+        },
+        {
+          "caller": "TestTunnelFromCmdlineToken",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 15
+        },
+        {
+          "caller": "TestTunnelFromCmdlineToken",
+          "callee": "t.Fatalf",
+          "lineNumber": 17
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 23
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 24
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "t.Fatalf",
+          "lineNumber": 25
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "tunnelFromCmdline",
+          "lineNumber": 27
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "t.Fatalf",
+          "lineNumber": 28
+        },
+        {
+          "caller": "TestTunnelFromCmdlineNamed",
+          "callee": "t.Fatalf",
+          "lineNumber": 31
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "isCloudflaredCmd",
+          "lineNumber": 36
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "t.Fatal",
+          "lineNumber": 37
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "isCloudflaredCmd",
+          "lineNumber": 39
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "t.Fatal",
+          "lineNumber": 40
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "isCloudflaredCmd",
+          "lineNumber": 42
+        },
+        {
+          "caller": "TestIsCloudflaredCmd",
+          "callee": "t.Fatal",
+          "lineNumber": 43
+        },
+        {
+          "caller": "TestForeignTunnels",
+          "callee": "ForeignTunnels",
+          "lineNumber": 53
+        },
+        {
+          "caller": "TestForeignTunnels",
+          "callee": "len",
+          "lineNumber": 54
+        },
+        {
+          "caller": "TestForeignTunnels",
+          "callee": "t.Fatalf",
+          "lineNumber": 55
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/dbutil/config.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 85,
+      "nonEmptyLines": 76,
+      "functions": [
+        {
+          "name": "ConfigPath",
+          "startLine": 37,
+          "endLine": 39,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "LoadProject",
+          "startLine": 41,
+          "endLine": 49,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "SaveProject",
+          "startLine": 51,
+          "endLine": 61,
+          "params": [
+            "projectPath",
+            "cfg"
+          ]
+        },
+        {
+          "name": "Upsert",
+          "startLine": 63,
+          "endLine": 75,
+          "params": [
+            "cred"
+          ]
+        },
+        {
+          "name": "Remove",
+          "startLine": 77,
+          "endLine": 85,
+          "params": [
+            "name"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Credential",
+          "startLine": 19,
+          "endLine": 30,
+          "methods": [],
+          "properties": [
+            "Name",
+            "Engine",
+            "Container",
+            "Host",
+            "Port",
+            "User",
+            "Password",
+            "Database",
+            "SSLMode",
+            "CreatedAt"
+          ]
+        },
+        {
+          "name": "ProjectConfig",
+          "startLine": 32,
+          "endLine": 35,
+          "methods": [
+            "Upsert",
+            "Remove"
+          ],
+          "properties": [
+            "Credentials",
+            "UpdatedAt"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Credential",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "ProjectConfig",
+          "line": 32,
+          "isDefault": false
+        },
+        {
+          "name": "ConfigPath",
+          "line": 37,
+          "isDefault": false
+        },
+        {
+          "name": "LoadProject",
+          "line": 41,
+          "isDefault": false
+        },
+        {
+          "name": "SaveProject",
+          "line": 51,
+          "isDefault": false
+        },
+        {
+          "name": "Upsert",
+          "line": 63,
+          "isDefault": false
+        },
+        {
+          "name": "Remove",
+          "line": 77,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ConfigPath",
+          "callee": "filepath.Join",
+          "lineNumber": 38
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "os.ReadFile",
+          "lineNumber": 43
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "ConfigPath",
+          "lineNumber": 43
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "json.Unmarshal",
+          "lineNumber": 47
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "time.Now",
+          "lineNumber": 52
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "devscopeutil.EnsureDir",
+          "lineNumber": 53
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "json.MarshalIndent",
+          "lineNumber": 56
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "os.WriteFile",
+          "lineNumber": 60
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "ConfigPath",
+          "lineNumber": 60
+        },
+        {
+          "caller": "Upsert",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 64
+        },
+        {
+          "caller": "Upsert",
+          "callee": "cred.CreatedAt.IsZero",
+          "lineNumber": 65
+        },
+        {
+          "caller": "Upsert",
+          "callee": "time.Now",
+          "lineNumber": 66
+        },
+        {
+          "caller": "Upsert",
+          "callee": "append",
+          "lineNumber": 74
+        },
+        {
+          "caller": "Remove",
+          "callee": "append",
+          "lineNumber": 81
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 7,
+        "functionCount": 5,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "internal/devscopeutil/dir.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 40,
+      "nonEmptyLines": 36,
+      "functions": [
+        {
+          "name": "EnsureDir",
+          "startLine": 17,
+          "endLine": 24,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "ensureGitignore",
+          "startLine": 26,
+          "endLine": 40,
+          "params": [
+            "projectPath"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "EnsureDir",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "EnsureDir",
+          "callee": "filepath.Join",
+          "lineNumber": 18
+        },
+        {
+          "caller": "EnsureDir",
+          "callee": "os.MkdirAll",
+          "lineNumber": 19
+        },
+        {
+          "caller": "EnsureDir",
+          "callee": "ensureGitignore",
+          "lineNumber": 22
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 27
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "os.ReadFile",
+          "lineNumber": 28
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "strings.Split",
+          "lineNumber": 29
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "string",
+          "lineNumber": 29
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "string",
+          "lineNumber": 34
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 35
+        },
+        {
+          "caller": "ensureGitignore",
+          "callee": "os.WriteFile",
+          "lineNumber": 39
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/devscopeutil/dir_test.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 49,
+      "nonEmptyLines": 44,
+      "functions": [
+        {
+          "name": "TestEnsureDirAddsAndDedupesGitignore",
+          "startLine": 10,
+          "endLine": 35,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestEnsureDirPreservesExistingGitignore",
+          "startLine": 37,
+          "endLine": 49,
+          "params": [
+            "t"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TestEnsureDirAddsAndDedupesGitignore",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "TestEnsureDirPreservesExistingGitignore",
+          "line": 37,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.TempDir",
+          "lineNumber": 11
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "EnsureDir",
+          "lineNumber": 13
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 14
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "os.Stat",
+          "lineNumber": 16
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 16
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 17
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "os.ReadFile",
+          "lineNumber": 19
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 19
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 21
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "strings.Count",
+          "lineNumber": 23
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "string",
+          "lineNumber": 23
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 24
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "string",
+          "lineNumber": 24
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "EnsureDir",
+          "lineNumber": 28
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 29
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "os.ReadFile",
+          "lineNumber": 31
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 31
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "strings.Count",
+          "lineNumber": 32
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "string",
+          "lineNumber": 32
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 33
+        },
+        {
+          "caller": "TestEnsureDirAddsAndDedupesGitignore",
+          "callee": "string",
+          "lineNumber": 33
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "t.TempDir",
+          "lineNumber": 38
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "os.WriteFile",
+          "lineNumber": 39
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 39
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "t.Fatal",
+          "lineNumber": 40
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "EnsureDir",
+          "lineNumber": 42
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "t.Fatal",
+          "lineNumber": 43
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "os.ReadFile",
+          "lineNumber": 45
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "filepath.Join",
+          "lineNumber": 45
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "strings.Contains",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "string",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "strings.Contains",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "string",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "t.Fatalf",
+          "lineNumber": 47
+        },
+        {
+          "caller": "TestEnsureDirPreservesExistingGitignore",
+          "callee": "string",
+          "lineNumber": 47
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/jenkinsutil/config.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 77,
+      "nonEmptyLines": 68,
+      "functions": [
+        {
+          "name": "ConfigPath",
+          "startLine": 22,
+          "endLine": 24,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "LoadProject",
+          "startLine": 26,
+          "endLine": 38,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "SaveProject",
+          "startLine": 40,
+          "endLine": 54,
+          "params": [
+            "projectPath",
+            "cfg"
+          ]
+        },
+        {
+          "name": "Configured",
+          "startLine": 56,
+          "endLine": 58,
+          "params": []
+        },
+        {
+          "name": "Host",
+          "startLine": 60,
+          "endLine": 67,
+          "params": []
+        },
+        {
+          "name": "MaskToken",
+          "startLine": 69,
+          "endLine": 77,
+          "params": [
+            "token"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "ProjectConfig",
+          "startLine": 13,
+          "endLine": 20,
+          "methods": [
+            "Configured",
+            "Host"
+          ],
+          "properties": [
+            "URL",
+            "User",
+            "Token",
+            "Folder",
+            "RefreshSec",
+            "UpdatedAt"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ProjectConfig",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "ConfigPath",
+          "line": 22,
+          "isDefault": false
+        },
+        {
+          "name": "LoadProject",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "SaveProject",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "Configured",
+          "line": 56,
+          "isDefault": false
+        },
+        {
+          "name": "Host",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "MaskToken",
+          "line": 69,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ConfigPath",
+          "callee": "filepath.Join",
+          "lineNumber": 23
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "os.ReadFile",
+          "lineNumber": 28
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "ConfigPath",
+          "lineNumber": 28
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "json.Unmarshal",
+          "lineNumber": 32
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "strings.TrimRight",
+          "lineNumber": 36
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 36
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "strings.TrimRight",
+          "lineNumber": 41
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 41
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "time.Now",
+          "lineNumber": 45
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "devscopeutil.EnsureDir",
+          "lineNumber": 46
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "json.MarshalIndent",
+          "lineNumber": 49
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "os.WriteFile",
+          "lineNumber": 53
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "ConfigPath",
+          "lineNumber": 53
+        },
+        {
+          "caller": "Host",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 61
+        },
+        {
+          "caller": "Host",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 62
+        },
+        {
+          "caller": "Host",
+          "callee": "strings.Index",
+          "lineNumber": 63
+        },
+        {
+          "caller": "MaskToken",
+          "callee": "len",
+          "lineNumber": 73
+        },
+        {
+          "caller": "MaskToken",
+          "callee": "strings.Repeat",
+          "lineNumber": 76
+        },
+        {
+          "caller": "MaskToken",
+          "callee": "len",
+          "lineNumber": 76
+        },
+        {
+          "caller": "MaskToken",
+          "callee": "len",
+          "lineNumber": 76
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 7,
+        "functionCount": 6,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/ngrokutil/config.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 188,
+      "nonEmptyLines": 175,
+      "functions": [
+        {
+          "name": "ConfigPath",
+          "startLine": 39,
+          "endLine": 41,
+          "params": [
+            "projectPath"
+          ]
+        },
+        {
+          "name": "LoadProject",
+          "startLine": 43,
+          "endLine": 57,
+          "params": [
+            "projectPath",
+            "projectName"
+          ]
+        },
+        {
+          "name": "SaveProject",
+          "startLine": 59,
+          "endLine": 69,
+          "params": [
+            "projectPath",
+            "cfg"
+          ]
+        },
+        {
+          "name": "UpsertTunnel",
+          "startLine": 71,
+          "endLine": 85,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "RemoveTunnel",
+          "startLine": 87,
+          "endLine": 95,
+          "params": [
+            "name"
+          ]
+        },
+        {
+          "name": "MergeTunnels",
+          "startLine": 99,
+          "endLine": 142,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        },
+        {
+          "name": "CountForeignLive",
+          "startLine": 145,
+          "endLine": 162,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        },
+        {
+          "name": "MergeTunnelsAll",
+          "startLine": 165,
+          "endLine": 188,
+          "params": [
+            "cfg",
+            "live"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "TunnelConfig",
+          "startLine": 12,
+          "endLine": 20,
+          "methods": [],
+          "properties": [
+            "Name",
+            "Port",
+            "Proto",
+            "Domain",
+            "Region",
+            "AutoStart",
+            "CreatedAt"
+          ]
+        },
+        {
+          "name": "ProjectConfig",
+          "startLine": 22,
+          "endLine": 28,
+          "methods": [
+            "UpsertTunnel",
+            "RemoveTunnel"
+          ],
+          "properties": [
+            "Project",
+            "Region",
+            "Tunnels",
+            "History",
+            "UpdatedAt"
+          ]
+        },
+        {
+          "name": "HistoryEntry",
+          "startLine": 30,
+          "endLine": 37,
+          "methods": [],
+          "properties": [
+            "Name",
+            "Port",
+            "Proto",
+            "Started",
+            "Stopped",
+            "Requests"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TunnelConfig",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "ProjectConfig",
+          "line": 22,
+          "isDefault": false
+        },
+        {
+          "name": "HistoryEntry",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "ConfigPath",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "LoadProject",
+          "line": 43,
+          "isDefault": false
+        },
+        {
+          "name": "SaveProject",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "UpsertTunnel",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "RemoveTunnel",
+          "line": 87,
+          "isDefault": false
+        },
+        {
+          "name": "MergeTunnels",
+          "line": 99,
+          "isDefault": false
+        },
+        {
+          "name": "CountForeignLive",
+          "line": 145,
+          "isDefault": false
+        },
+        {
+          "name": "MergeTunnelsAll",
+          "line": 165,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ConfigPath",
+          "callee": "filepath.Join",
+          "lineNumber": 40
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "os.ReadFile",
+          "lineNumber": 45
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "ConfigPath",
+          "lineNumber": 45
+        },
+        {
+          "caller": "LoadProject",
+          "callee": "json.Unmarshal",
+          "lineNumber": 49
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "time.Now",
+          "lineNumber": 60
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "devscopeutil.EnsureDir",
+          "lineNumber": 61
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "json.MarshalIndent",
+          "lineNumber": 64
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "os.WriteFile",
+          "lineNumber": 68
+        },
+        {
+          "caller": "SaveProject",
+          "callee": "ConfigPath",
+          "lineNumber": 68
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "t.CreatedAt.IsZero",
+          "lineNumber": 75
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "time.Now",
+          "lineNumber": 76
+        },
+        {
+          "caller": "UpsertTunnel",
+          "callee": "append",
+          "lineNumber": 84
+        },
+        {
+          "caller": "RemoveTunnel",
+          "callee": "append",
+          "lineNumber": 91
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 105
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "len",
+          "lineNumber": 112
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 128
+        },
+        {
+          "caller": "MergeTunnels",
+          "callee": "append",
+          "lineNumber": 131
+        },
+        {
+          "caller": "MergeTunnelsAll",
+          "callee": "MergeTunnels",
+          "lineNumber": 166
+        },
+        {
+          "caller": "MergeTunnelsAll",
+          "callee": "append",
+          "lineNumber": 185
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 11,
+        "functionCount": 8,
+        "classCount": 3
+      }
+    },
+    {
+      "path": "internal/routeutil/discover.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 117,
+      "nonEmptyLines": 109,
+      "functions": [
+        {
+          "name": "Discover",
+          "startLine": 10,
+          "endLine": 35,
+          "params": [
+            "projectPath",
+            "ports",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "mergeRoutes",
+          "startLine": 37,
+          "endLine": 86,
+          "params": [
+            "in"
+          ]
+        },
+        {
+          "name": "methodOrder",
+          "startLine": 88,
+          "endLine": 103,
+          "params": [
+            "m"
+          ]
+        },
+        {
+          "name": "normalizePath",
+          "startLine": 105,
+          "endLine": 117,
+          "params": [
+            "p"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Discover",
+          "line": 10,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Discover",
+          "callee": "DetectStacks",
+          "lineNumber": 11
+        },
+        {
+          "caller": "Discover",
+          "callee": "loadOpenAPIFromFiles",
+          "lineNumber": 14
+        },
+        {
+          "caller": "Discover",
+          "callee": "append",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Discover",
+          "callee": "len",
+          "lineNumber": 17
+        },
+        {
+          "caller": "Discover",
+          "callee": "loadOpenAPIFromHTTP",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Discover",
+          "callee": "append",
+          "lineNumber": 19
+        },
+        {
+          "caller": "Discover",
+          "callee": "s.Match",
+          "lineNumber": 24
+        },
+        {
+          "caller": "Discover",
+          "callee": "s.Scan",
+          "lineNumber": 27
+        },
+        {
+          "caller": "Discover",
+          "callee": "append",
+          "lineNumber": 31
+        },
+        {
+          "caller": "Discover",
+          "callee": "mergeRoutes",
+          "lineNumber": 34
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "strings.ToUpper",
+          "lineNumber": 41
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 41
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "normalizePath",
+          "lineNumber": 42
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "make",
+          "lineNumber": 75
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "len",
+          "lineNumber": 75
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "append",
+          "lineNumber": 77
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "sort.Slice",
+          "lineNumber": 79
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "methodOrder",
+          "lineNumber": 83
+        },
+        {
+          "caller": "mergeRoutes",
+          "callee": "methodOrder",
+          "lineNumber": 83
+        },
+        {
+          "caller": "normalizePath",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 106
+        },
+        {
+          "caller": "normalizePath",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 110
+        },
+        {
+          "caller": "normalizePath",
+          "callee": "len",
+          "lineNumber": 113
+        },
+        {
+          "caller": "normalizePath",
+          "callee": "strings.TrimRight",
+          "lineNumber": 114
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/routeutil/discover_test.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 179,
+      "nonEmptyLines": 166,
+      "functions": [
+        {
+          "name": "TestDiscoverOpenAPIAndParsers",
+          "startLine": 9,
+          "endLine": 83,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestDetectStacksAndExtraFrameworks",
+          "startLine": 85,
+          "endLine": 137,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "TestParseOpenAPIYAML",
+          "startLine": 139,
+          "endLine": 151,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "mustWrite",
+          "startLine": 153,
+          "endLine": 161,
+          "params": [
+            "t",
+            "path",
+            "content"
+          ]
+        },
+        {
+          "name": "hasRoute",
+          "startLine": 163,
+          "endLine": 170,
+          "params": [
+            "routes",
+            "method",
+            "path"
+          ]
+        },
+        {
+          "name": "containsStr",
+          "startLine": 172,
+          "endLine": 179,
+          "params": [
+            "ss",
+            "want"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TestDiscoverOpenAPIAndParsers",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "TestDetectStacksAndExtraFrameworks",
+          "line": 85,
+          "isDefault": false
+        },
+        {
+          "name": "TestParseOpenAPIYAML",
+          "line": 139,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.TempDir",
+          "lineNumber": 10
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 12
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 12
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 20
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 20
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 21
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 21
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 32
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 32
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 38
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 38
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 47
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 47
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "mustWrite",
+          "lineNumber": 48
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "filepath.Join",
+          "lineNumber": 48
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "Discover",
+          "lineNumber": 53
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.Fatal",
+          "lineNumber": 55
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "len",
+          "lineNumber": 57
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.Fatalf",
+          "lineNumber": 58
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "len",
+          "lineNumber": 60
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.Fatalf",
+          "lineNumber": 61
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "len",
+          "lineNumber": 61
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "hasRoute",
+          "lineNumber": 74
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.Fatalf",
+          "lineNumber": 75
+        },
+        {
+          "caller": "TestDiscoverOpenAPIAndParsers",
+          "callee": "t.Fatalf",
+          "lineNumber": 80
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "t.TempDir",
+          "lineNumber": 86
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 87
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 87
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 88
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 88
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 93
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 93
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 94
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 94
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 101
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 101
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 105
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 105
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "mustWrite",
+          "lineNumber": 106
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "filepath.Join",
+          "lineNumber": 106
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "DetectStacks",
+          "lineNumber": 113
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "containsStr",
+          "lineNumber": 115
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "t.Fatalf",
+          "lineNumber": 116
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "Discover",
+          "lineNumber": 120
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "t.Fatal",
+          "lineNumber": 122
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "hasRoute",
+          "lineNumber": 133
+        },
+        {
+          "caller": "TestDetectStacksAndExtraFrameworks",
+          "callee": "t.Fatalf",
+          "lineNumber": 134
+        },
+        {
+          "caller": "TestParseOpenAPIYAML",
+          "callee": "parseOpenAPI",
+          "lineNumber": 147
+        },
+        {
+          "caller": "TestParseOpenAPIYAML",
+          "callee": "hasRoute",
+          "lineNumber": 148
+        },
+        {
+          "caller": "TestParseOpenAPIYAML",
+          "callee": "t.Fatalf",
+          "lineNumber": 149
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "t.Helper",
+          "lineNumber": 154
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "os.MkdirAll",
+          "lineNumber": 155
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "filepath.Dir",
+          "lineNumber": 155
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "t.Fatal",
+          "lineNumber": 156
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "os.WriteFile",
+          "lineNumber": 158
+        },
+        {
+          "caller": "mustWrite",
+          "callee": "t.Fatal",
+          "lineNumber": 159
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/routeutil/openapi.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 161,
+      "nonEmptyLines": 153,
+      "functions": [
+        {
+          "name": "loadOpenAPIFromFiles",
+          "startLine": 29,
+          "endLine": 60,
+          "params": [
+            "root"
+          ]
+        },
+        {
+          "name": "loadOpenAPIFromHTTP",
+          "startLine": 62,
+          "endLine": 98,
+          "params": [
+            "ports"
+          ]
+        },
+        {
+          "name": "parseOpenAPI",
+          "startLine": 100,
+          "endLine": 157,
+          "params": [
+            "data"
+          ]
+        },
+        {
+          "name": "bytesTrimSpace",
+          "startLine": 159,
+          "endLine": 161,
+          "params": [
+            "b"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "walkProject",
+          "lineNumber": 31
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "strings.ToLower",
+          "lineNumber": 32
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "filepath.Base",
+          "lineNumber": 32
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "os.ReadFile",
+          "lineNumber": 43
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "parseOpenAPI",
+          "lineNumber": 47
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "filepath.Rel",
+          "lineNumber": 51
+        },
+        {
+          "caller": "loadOpenAPIFromFiles",
+          "callee": "append",
+          "lineNumber": 56
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "fmt.Sprintf",
+          "lineNumber": 71
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "client.Get",
+          "lineNumber": 76
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "io.ReadAll",
+          "lineNumber": 80
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "io.LimitReader",
+          "lineNumber": 80
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "resp.Body.Close",
+          "lineNumber": 81
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "parseOpenAPI",
+          "lineNumber": 85
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "len",
+          "lineNumber": 86
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 91
+        },
+        {
+          "caller": "loadOpenAPIFromHTTP",
+          "callee": "append",
+          "lineNumber": 93
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "bytesTrimSpace",
+          "lineNumber": 102
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "len",
+          "lineNumber": 103
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "fmt.Errorf",
+          "lineNumber": 104
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "json.Unmarshal",
+          "lineNumber": 107
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "yaml.Unmarshal",
+          "lineNumber": 111
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "fmt.Errorf",
+          "lineNumber": 117
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "strings.ToUpper",
+          "lineNumber": 126
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "len",
+          "lineNumber": 140
+        },
+        {
+          "caller": "parseOpenAPI",
+          "callee": "append",
+          "lineNumber": 147
+        },
+        {
+          "caller": "bytesTrimSpace",
+          "callee": "strings.TrimSpace",
+          "lineNumber": 160
+        },
+        {
+          "caller": "bytesTrimSpace",
+          "callee": "string",
+          "lineNumber": 160
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "internal/routeutil/route.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 41,
+      "nonEmptyLines": 36,
+      "functions": [
+        {
+          "name": "Register",
+          "startLine": 23,
+          "endLine": 25,
+          "params": [
+            "s"
+          ]
+        },
+        {
+          "name": "init",
+          "startLine": 27,
+          "endLine": 41,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Route",
+          "startLine": 4,
+          "endLine": 12,
+          "methods": [],
+          "properties": [
+            "Method",
+            "Path",
+            "Source",
+            "File",
+            "Line",
+            "Summary",
+            "Auth"
+          ]
+        },
+        {
+          "name": "Scanner",
+          "startLine": 15,
+          "endLine": 19,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Route",
+          "line": 4,
+          "isDefault": false
+        },
+        {
+          "name": "Scanner",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "Register",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Register",
+          "callee": "append",
+          "lineNumber": 24
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 28
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 29
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 30
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 31
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 32
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 33
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 34
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 35
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 36
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 37
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 38
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 39
+        },
+        {
+          "caller": "init",
+          "callee": "Register",
+          "lineNumber": 40
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 2,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_django.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 78,
+      "nonEmptyLines": 72,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 16,
+          "params": [
+            "root",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 23,
+          "endLine": 78,
+          "params": [
+            "root"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "djangoScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "fileExists",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "filepath.Join",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Scan",
+          "callee": "walkProject",
+          "lineNumber": 25
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 26
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 29
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 33
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 37
+        },
+        {
+          "caller": "Scan",
+          "callee": "reDjangoPath.FindAllStringSubmatchIndex",
+          "lineNumber": 38
+        },
+        {
+          "caller": "Scan",
+          "callee": "reDjangoPath.FindStringSubmatch",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 45
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 45
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Trim",
+          "lineNumber": 46
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 48
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 49
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.TrimSuffix",
+          "lineNumber": 50
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 51
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 55
+        },
+        {
+          "caller": "Scan",
+          "callee": "reDjangoRouter.FindAllStringSubmatchIndex",
+          "lineNumber": 57
+        },
+        {
+          "caller": "Scan",
+          "callee": "reDjangoRouter.FindStringSubmatch",
+          "lineNumber": 58
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 59
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 62
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Trim",
+          "lineNumber": 63
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 72
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_express.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 59,
+      "nonEmptyLines": 53,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 19,
+          "params": [
+            "root",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 23,
+          "endLine": 59,
+          "params": [
+            "root"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "expressScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "depsContain",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Scan",
+          "callee": "walkProject",
+          "lineNumber": 25
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Ext",
+          "lineNumber": 26
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 33
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 37
+        },
+        {
+          "caller": "Scan",
+          "callee": "reExpressRoute.MatchString",
+          "lineNumber": 38
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Scan",
+          "callee": "reExpressRoute.FindAllStringSubmatchIndex",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Scan",
+          "callee": "reExpressRoute.FindStringSubmatch",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 44
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 47
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 48
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.ToUpper",
+          "lineNumber": 49
+        },
+        {
+          "caller": "Scan",
+          "callee": "nestPath",
+          "lineNumber": 50
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_fastapi.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 83,
+      "nonEmptyLines": 76,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 19,
+          "params": [
+            "root",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "fastapiMarker",
+          "startLine": 21,
+          "endLine": 47,
+          "params": [
+            "root"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 51,
+          "endLine": 83,
+          "params": [
+            "root"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "fastapiScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 51,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "fastapiMarker",
+          "lineNumber": 18
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "os.ReadFile",
+          "lineNumber": 23
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "filepath.Join",
+          "lineNumber": 23
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "strings.ToLower",
+          "lineNumber": 27
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "string",
+          "lineNumber": 27
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "strings.Contains",
+          "lineNumber": 28
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "walkProject",
+          "lineNumber": 33
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 34
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "os.ReadFile",
+          "lineNumber": 37
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "strings.Contains",
+          "lineNumber": 41
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "string",
+          "lineNumber": 41
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "strings.Contains",
+          "lineNumber": 41
+        },
+        {
+          "caller": "fastapiMarker",
+          "callee": "string",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Scan",
+          "callee": "walkProject",
+          "lineNumber": 53
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 54
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 57
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 61
+        },
+        {
+          "caller": "Scan",
+          "callee": "reFastAPI.MatchString",
+          "lineNumber": 62
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 65
+        },
+        {
+          "caller": "Scan",
+          "callee": "reFastAPI.FindAllStringSubmatchIndex",
+          "lineNumber": 66
+        },
+        {
+          "caller": "Scan",
+          "callee": "reFastAPI.FindStringSubmatch",
+          "lineNumber": 67
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 68
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 71
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 72
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.ToUpper",
+          "lineNumber": 73
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_flask.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 54,
+      "nonEmptyLines": 48,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 16,
+          "params": [
+            "_",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 20,
+          "endLine": 54,
+          "params": [
+            "root"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "flaskScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 20,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Scan",
+          "callee": "walkProject",
+          "lineNumber": 22
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 23
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 26
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 31
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Scan",
+          "callee": "reFlaskRoute.FindAllStringSubmatchIndex",
+          "lineNumber": 35
+        },
+        {
+          "caller": "Scan",
+          "callee": "reFlaskRoute.FindStringSubmatch",
+          "lineNumber": 36
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 37
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Contains",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Scan",
+          "callee": "parseQuotedMethods",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 44
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 46
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_go.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 90,
+      "nonEmptyLines": 82,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 19,
+          "params": [
+            "root",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 29,
+          "endLine": 59,
+          "params": [
+            "root"
+          ]
+        },
+        {
+          "name": "goMethods",
+          "startLine": 61,
+          "endLine": 76,
+          "params": [
+            "m"
+          ]
+        },
+        {
+          "name": "goPath",
+          "startLine": 78,
+          "endLine": 90,
+          "params": [
+            "p"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "goScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 29,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "fileExists",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Match",
+          "callee": "filepath.Join",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Scan",
+          "callee": "walkProject",
+          "lineNumber": 31
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 35
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Scan",
+          "callee": "re.FindAllStringSubmatchIndex",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Scan",
+          "callee": "re.FindStringSubmatch",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Scan",
+          "callee": "len",
+          "lineNumber": 44
+        },
+        {
+          "caller": "Scan",
+          "callee": "goMethods",
+          "lineNumber": 47
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.Count",
+          "lineNumber": 48
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 50
+        },
+        {
+          "caller": "Scan",
+          "callee": "goPath",
+          "lineNumber": 51
+        },
+        {
+          "caller": "goMethods",
+          "callee": "strings.ToUpper",
+          "lineNumber": 62
+        },
+        {
+          "caller": "goMethods",
+          "callee": "strings.ToUpper",
+          "lineNumber": 70
+        },
+        {
+          "caller": "goMethods",
+          "callee": "strings.ToUpper",
+          "lineNumber": 72
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.Split",
+          "lineNumber": 80
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 82
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 83
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.HasPrefix",
+          "lineNumber": 85
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.TrimPrefix",
+          "lineNumber": 86
+        },
+        {
+          "caller": "goPath",
+          "callee": "strings.Join",
+          "lineNumber": 89
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 5,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_laravel.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 141,
+      "nonEmptyLines": 130,
+      "functions": [
+        {
+          "name": "Name",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "Match",
+          "startLine": 14,
+          "endLine": 19,
+          "params": [
+            "root",
+            "frameworks"
+          ]
+        },
+        {
+          "name": "Scan",
+          "startLine": 28,
+          "endLine": 47,
+          "params": [
+            "root"
+          ]
+        },
+        {
+          "name": "scanLaravelFile",
+          "startLine": 49,
+          "endLine": 129,
+          "params": [
+            "rel",
+            "content"
+          ]
+        },
+        {
+          "name": "laravelLineLooksPrivate",
+          "startLine": 131,
+          "endLine": 141,
+          "params": [
+            "line"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "laravelScanner",
+          "startLine": 10,
+          "endLine": 10,
+          "methods": [
+            "Name",
+            "Match",
+            "Scan"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Name",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Match",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Scan",
+          "line": 28,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Match",
+          "callee": "hasFramework",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Match",
+          "callee": "fileExists",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Match",
+          "callee": "filepath.Join",
+          "lineNumber": 18
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Join",
+          "lineNumber": 29
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.Stat",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Scan",
+          "callee": "st.IsDir",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.WalkDir",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Scan",
+          "callee": "d.IsDir",
+          "lineNumber": 35
+        },
+        {
+          "caller": "Scan",
+          "callee": "strings.HasSuffix",
+          "lineNumber": 35
+        },
+        {
+          "caller": "Scan",
+          "callee": "os.ReadFile",
+          "lineNumber": 38
+        },
+        {
+          "caller": "Scan",
+          "callee": "filepath.Rel",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Scan",
+          "callee": "append",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Scan",
+          "callee": "scanLaravelFile",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Scan",
+          "callee": "string",
+          "lineNumber": 43
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "strings.Split",
+          "lineNumber": 51
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "reLaravelAuthGroup.MatchString",
+          "lineNumber": 57
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "len",
+          "lineNumber": 60
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "laravelLineLooksPrivate",
+          "lineNumber": 60
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "reLaravelRoute.FindStringSubmatch",
+          "lineNumber": 62
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "len",
+          "lineNumber": 62
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "strings.ToUpper",
+          "lineNumber": 63
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "append",
+          "lineNumber": 71
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "append",
+          "lineNumber": 77
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "reLaravelRes.FindStringSubmatch",
+          "lineNumber": 83
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "len",
+          "lineNumber": 83
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "strings.Trim",
+          "lineNumber": 84
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "strings.TrimSuffix",
+          "lineNumber": 85
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "filepath.Base",
+          "lineNumber": 85
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "append",
+          "lineNumber": 103
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "append",
+          "lineNumber": 115
+        },
+        {
+          "caller": "scanLaravelFile",
+          "callee": "len",
+          "lineNumber": 119
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.ToLower",
+          "lineNumber": 132
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 133
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 133
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 136
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 137
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 138
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 139
+        },
+        {
+          "caller": "laravelLineLooksPrivate",
+          "callee": "strings.Contains",
+          "lineNumber": 140
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 5,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "internal/routeutil/scan_laravel_test.go",
+      "language": "go",
+      "fileCategory": "code",
+      "totalLines": 58,
+      "nonEmptyLines": 51,
+      "functions": [
+        {
+          "name": "TestLaravelPrivateAndChainedRoutes",
+          "startLine": 8,
+          "endLine": 58,
+          "params": [
+            "t"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "TestLaravelPrivateAndChainedRoutes",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "t.TempDir",
+          "lineNumber": 9
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "mustWrite",
+          "lineNumber": 10
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "filepath.Join",
+          "lineNumber": 10
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "mustWrite",
+          "lineNumber": 11
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "filepath.Join",
+          "lineNumber": 11
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "laravelScanner{}.Scan",
+          "lineNumber": 27
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "t.Fatal",
+          "lineNumber": 29
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "normalizePath",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "normalizePath",
+          "lineNumber": 46
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "t.Fatalf",
+          "lineNumber": 52
+        },
+        {
+          "caller": "TestLaravelPrivateAndChainedRoutes",
+          "callee": "t.Fatalf",
+          "lineNumber": 55
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,2245 @@
+{
+ "nodes": [
+  {
+   "id": "file:cmd/devscope/main.go",
+   "type": "file",
+   "name": "main.go",
+   "filePath": "cmd/devscope/main.go",
+   "summary": "Ponto de entrada do binário devscope: apenas delega para commands.Execute e encerra o processo com código de erro em caso de falha.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "bootstrap"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/manager.go",
+   "type": "file",
+   "name": "manager.go",
+   "filePath": "internal/collectors/manager.go",
+   "summary": "Orquestrador dos coletores em segundo plano: faz o scan rápido inicial, roda loops periódicos de scanner, Docker, health e métricas do host e publica tudo no StateStore compartilhado.",
+   "tags": [
+    "service",
+    "orchestration",
+    "concorrência",
+    "background-jobs",
+    "state-management"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Cada loop roda em goroutine própria com time.Ticker e cancelamento por context.Context; safeRunCtx recupera panics para não derrubar a TUI."
+  },
+  {
+   "id": "function:internal/collectors/manager.go:NewManager",
+   "type": "function",
+   "name": "NewManager",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    23,
+    31
+   ],
+   "summary": "Cria o Manager com coletor de host e pré-carrega domínios nginx e certificados SSL.",
+   "tags": [
+    "factory",
+    "constructor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:QuickScan",
+   "type": "function",
+   "name": "QuickScan",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    34,
+    52
+   ],
+   "summary": "Faz FastScan dos caminhos configurados, ordena fixados, associa containers via docker ps e publica os projetos antes da UI abrir.",
+   "tags": [
+    "scanner",
+    "startup",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:Start",
+   "type": "function",
+   "name": "Start",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    54,
+    59
+   ],
+   "summary": "Dispara em goroutines os loops de scanner, Docker, health e métricas, todos protegidos por safeRunCtx.",
+   "tags": [
+    "concorrência",
+    "goroutines",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:StartWithContext",
+   "type": "function",
+   "name": "StartWithContext",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    62,
+    64
+   ],
+   "summary": "Alias de Start mantido por compatibilidade.",
+   "tags": [
+    "alias",
+    "lifecycle"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:runScanner",
+   "type": "function",
+   "name": "runScanner",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    66,
+    81
+   ],
+   "summary": "Loop periódico que reexecuta o scan profundo a cada ScanInterval até o contexto ser cancelado.",
+   "tags": [
+    "loop",
+    "scanner",
+    "ticker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:deepScan",
+   "type": "function",
+   "name": "deepScan",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    83,
+    99
+   ],
+   "summary": "Executa FastScan (se necessário), MergeDiscovered e EnrichProjects e atualiza projetos no estado.",
+   "tags": [
+    "scanner",
+    "enrichment"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:runDocker",
+   "type": "function",
+   "name": "runDocker",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    101,
+    115
+   ],
+   "summary": "Loop periódico que atualiza containers e metadados dos projetos a cada DockerInterval.",
+   "tags": [
+    "loop",
+    "docker",
+    "ticker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:refreshProjects",
+   "type": "function",
+   "name": "refreshProjects",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    127,
+    146
+   ],
+   "summary": "Executa docker ps e associa containers, workers PM2, portas, domínios, SSL e scripts de deploy aos projetos, aplicando status e publicando o resultado.",
+   "tags": [
+    "docker",
+    "enrichment",
+    "state-update"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:runHealth",
+   "type": "function",
+   "name": "runHealth",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    156,
+    170
+   ],
+   "summary": "Loop periódico que reexecuta os health checks a cada HealthInterval.",
+   "tags": [
+    "loop",
+    "health-check",
+    "ticker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:refreshHealth",
+   "type": "function",
+   "name": "refreshHealth",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    172,
+    193
+   ],
+   "summary": "Executa CollectHealth sobre cópia dos projetos e grava apenas os campos de health no estado.",
+   "tags": [
+    "health-check",
+    "state-update"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:runMetrics",
+   "type": "function",
+   "name": "runMetrics",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    201,
+    215
+   ],
+   "summary": "Loop que coleta métricas do host periodicamente e as grava no StateStore.",
+   "tags": [
+    "loop",
+    "metrics",
+    "ticker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "type": "function",
+   "name": "EnrichSnapshot",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    227,
+    231
+   ],
+   "summary": "Executa um enriquecimento completo síncrono dos projetos para os comandos scan/watch do CLI.",
+   "tags": [
+    "cli",
+    "enrichment",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/collectors/manager.go:Manager",
+   "type": "class",
+   "name": "Manager",
+   "filePath": "internal/collectors/manager.go",
+   "lineRange": [
+    15,
+    21
+   ],
+   "summary": "Struct que agrega StateStore, configuração, coletor do host e domínios nginx/certificados SSL usados pelos loops de coleta.",
+   "tags": [
+    "service",
+    "orchestration",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/project_enrich.go",
+   "type": "file",
+   "name": "project_enrich.go",
+   "filePath": "internal/collectors/project_enrich.go",
+   "summary": "Funções de enriquecimento por projeto: religa containers, estatísticas Docker, workers PM2, health checks e Git a um projeto específico ou a todos (para o CLI scan).",
+   "tags": [
+    "service",
+    "docker",
+    "enrichment",
+    "projetos"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "type": "function",
+   "name": "EnrichProjectDockerDetail",
+   "filePath": "internal/collectors/project_enrich.go",
+   "lineRange": [
+    24,
+    56
+   ],
+   "summary": "Coleta estatísticas Docker, workers PM2 e health apenas para um projeto e atualiza o estado.",
+   "tags": [
+    "docker",
+    "enrichment",
+    "per-project"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "function",
+   "name": "RefreshProjectDocker",
+   "filePath": "internal/collectors/project_enrich.go",
+   "lineRange": [
+    59,
+    87
+   ],
+   "summary": "Religa containers e estatísticas de um único projeto após uma ação (start/stop etc.).",
+   "tags": [
+    "docker",
+    "refresh",
+    "per-project"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/project_enrich.go:assignContainersToProject",
+   "type": "function",
+   "name": "assignContainersToProject",
+   "filePath": "internal/collectors/project_enrich.go",
+   "lineRange": [
+    89,
+    102
+   ],
+   "summary": "Seleciona os containers que pertencem a um projeto específico considerando os demais projetos e metadados de compose.",
+   "tags": [
+    "docker",
+    "matching",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "type": "function",
+   "name": "enrichProjectsFull",
+   "filePath": "internal/collectors/project_enrich.go",
+   "lineRange": [
+    105,
+    137
+   ],
+   "summary": "Roda Docker, estatísticas, PM2, health e Git para todos os projetos (usado no CLI scan).",
+   "tags": [
+    "enrichment",
+    "docker",
+    "git",
+    "cli"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/commands/root.go",
+   "type": "file",
+   "name": "root.go",
+   "filePath": "internal/commands/root.go",
+   "summary": "Define o comando raiz Cobra 'devscope' com flags --config/--debug, que abre a TUI via app.Run, e registra os subcomandos version, scan e watch.",
+   "tags": [
+    "cli",
+    "cobra",
+    "entry-point",
+    "commands"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Subcomandos são registrados em func init(), idiomático em projetos Cobra."
+  },
+  {
+   "id": "function:internal/commands/root.go:init",
+   "type": "function",
+   "name": "init",
+   "filePath": "internal/commands/root.go",
+   "lineRange": [
+    28,
+    42
+   ],
+   "summary": "Registra flags persistentes --config/--debug e os subcomandos version, scan e watch no comando raiz.",
+   "tags": [
+    "cobra",
+    "registration",
+    "cli"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/commands/root.go:Execute",
+   "type": "function",
+   "name": "Execute",
+   "filePath": "internal/commands/root.go",
+   "lineRange": [
+    44,
+    46
+   ],
+   "summary": "Executa o comando raiz Cobra; chamado pelo main.",
+   "tags": [
+    "entry-point",
+    "cli",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/commands/scan.go",
+   "type": "file",
+   "name": "scan.go",
+   "filePath": "internal/commands/scan.go",
+   "summary": "Subcomandos Cobra 'scan' (imprime snapshot JSON dos projetos enriquecidos e métricas do host) e 'watch' (reimprime periodicamente um resumo textual dos projetos).",
+   "tags": [
+    "cli",
+    "cobra",
+    "commands",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/commands/scan.go:scanCmd",
+   "type": "function",
+   "name": "scanCmd",
+   "filePath": "internal/commands/scan.go",
+   "lineRange": [
+    18,
+    62
+   ],
+   "summary": "Constrói o subcomando 'scan' que carrega config, escaneia, mescla, filtra aninhados, enriquece e imprime um Snapshot JSON com métricas do host.",
+   "tags": [
+    "cobra",
+    "cli",
+    "json-output"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/commands/scan.go:watchCmd",
+   "type": "function",
+   "name": "watchCmd",
+   "filePath": "internal/commands/scan.go",
+   "lineRange": [
+    64,
+    103
+   ],
+   "summary": "Constrói o subcomando 'watch' que repete scan e enriquecimento em intervalo e imprime resumo textual com status e portas.",
+   "tags": [
+    "cobra",
+    "cli",
+    "polling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/commands/scan_test.go",
+   "type": "file",
+   "name": "scan_test.go",
+   "filePath": "internal/commands/scan_test.go",
+   "summary": "Testes do subcomando scan: valida a saída JSON do snapshot contra um diretório temporário e verifica que scan está registrado no comando raiz.",
+   "tags": [
+    "test",
+    "cli",
+    "cobra"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/config/config.go",
+   "type": "file",
+   "name": "config.go",
+   "filePath": "internal/config/config.go",
+   "summary": "Modelo de configuração do DevScope (scan, refresh, UI, health, ferramentas e atalhos de apps) carregado via Viper a partir de config.yaml, com defaults e caminhos de config/log.",
+   "tags": [
+    "config",
+    "data-model",
+    "viper",
+    "configuração"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/config/config.go:AppShortcuts",
+   "type": "function",
+   "name": "AppShortcuts",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    73,
+    94
+   ],
+   "summary": "Devolve os atalhos configurados na ordem das teclas 1-9,0, ignorando slots inválidos ou sem comando.",
+   "tags": [
+    "shortcuts",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/config.go:AppShortcutFor",
+   "type": "function",
+   "name": "AppShortcutFor",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    97,
+    104
+   ],
+   "summary": "Busca o atalho associado a uma tecla.",
+   "tags": [
+    "shortcuts",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/config.go:Default",
+   "type": "function",
+   "name": "Default",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    106,
+    164
+   ],
+   "summary": "Retorna a configuração padrão com caminhos de scan, intervalos, ignorados e health defaults.",
+   "tags": [
+    "defaults",
+    "factory"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/config/config.go:ConfigPath",
+   "type": "function",
+   "name": "ConfigPath",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    166,
+    169
+   ],
+   "summary": "Caminho padrão do config.yaml do usuário.",
+   "tags": [
+    "paths",
+    "config"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/config.go:LogPath",
+   "type": "function",
+   "name": "LogPath",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    175,
+    178
+   ],
+   "summary": "Caminho do log de erros dos coletores, evitando escrever em stdout/stderr enquanto a TUI ocupa o terminal.",
+   "tags": [
+    "paths",
+    "logging"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/config.go:Load",
+   "type": "function",
+   "name": "Load",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    180,
+    215
+   ],
+   "summary": "Carrega a configuração via Viper a partir do arquivo dado ou padrão, aplicando defaults e preferências do user_config.",
+   "tags": [
+    "viper",
+    "loading",
+    "config"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/config/config.go:setDefaults",
+   "type": "function",
+   "name": "setDefaults",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    217,
+    226
+   ],
+   "summary": "Registra os valores padrão no Viper.",
+   "tags": [
+    "viper",
+    "defaults"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:Config",
+   "type": "class",
+   "name": "Config",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    12,
+    20
+   ],
+   "summary": "Struct raiz da configuração com seções Scan, Refresh, UI, Health, Tools, Apps e projetos fixados.",
+   "tags": [
+    "data-model",
+    "config"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:ToolsConfig",
+   "type": "class",
+   "name": "ToolsConfig",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    25,
+    28
+   ],
+   "summary": "Programas externos (agente de IA, editor) que o DevScope abre; vazio significa autodetectar.",
+   "tags": [
+    "data-model",
+    "config"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:ScanConfig",
+   "type": "class",
+   "name": "ScanConfig",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    30,
+    34
+   ],
+   "summary": "Caminhos, profundidade máxima e padrões ignorados do scanner.",
+   "tags": [
+    "data-model",
+    "config",
+    "scanner"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:RefreshConfig",
+   "type": "class",
+   "name": "RefreshConfig",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    36,
+    41
+   ],
+   "summary": "Intervalos de atualização dos loops de scanner, Docker, health e métricas.",
+   "tags": [
+    "data-model",
+    "config",
+    "timing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:UIConfig",
+   "type": "class",
+   "name": "UIConfig",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    43,
+    45
+   ],
+   "summary": "Preferências de UI, como o tema.",
+   "tags": [
+    "data-model",
+    "config",
+    "ui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:HealthConfig",
+   "type": "class",
+   "name": "HealthConfig",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    47,
+    50
+   ],
+   "summary": "Configuração dos health checks (timeout e caminhos/endpoints).",
+   "tags": [
+    "data-model",
+    "config",
+    "health-check"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:AppShortcut",
+   "type": "class",
+   "name": "AppShortcut",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    56,
+    59
+   ],
+   "summary": "Atalho de programa externo aberto por tecla da tela inicial; comando vai para o shell.",
+   "tags": [
+    "data-model",
+    "config",
+    "shortcuts"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/config.go:AppEntry",
+   "type": "class",
+   "name": "AppEntry",
+   "filePath": "internal/config/config.go",
+   "lineRange": [
+    65,
+    69
+   ],
+   "summary": "Atalho resolvido com tecla, nome e comando, pronto para exibição/execução.",
+   "tags": [
+    "data-model",
+    "shortcuts"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:NewManager",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:NewManager",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:QuickScan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:QuickScan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:Start",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:Start",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:StartWithContext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:StartWithContext",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:runScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:deepScan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:runDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:refreshProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:runHealth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:refreshHealth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:runMetrics",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "class:internal/collectors/manager.go:Manager",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "class:internal/collectors/manager.go:Manager",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:assignContainersToProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "function:internal/commands/root.go:init",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "function:internal/commands/root.go:Execute",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "function:internal/commands/root.go:Execute",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "function:internal/commands/scan.go:scanCmd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "function:internal/commands/scan.go:watchCmd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:AppShortcuts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:AppShortcuts",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:AppShortcutFor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:AppShortcutFor",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:Default",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:Default",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:ConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:ConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:LogPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:LogPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:Load",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:Load",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "function:internal/config/config.go:setDefaults",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:Config",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:Config",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:ToolsConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:ToolsConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:ScanConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:ScanConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:RefreshConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:RefreshConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:UIConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:UIConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:HealthConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:HealthConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:AppShortcut",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:AppShortcut",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:AppEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "class:internal/config/config.go:AppEntry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:cmd/devscope/main.go",
+   "target": "file:internal/commands/root.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:cmd/devscope/main.go",
+   "target": "file:internal/commands/scan.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:cmd/devscope/main.go",
+   "target": "file:internal/commands/scan_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/metrics/disk_unix.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/metrics/disk_windows.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/metrics/host.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/manager.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/project_enrich.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "file:internal/app/app.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "file:pkg/version/version.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/metrics/disk_unix.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/metrics/disk_windows.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/metrics/host.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/markers.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/runtime.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/runtime_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/scanner.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/commands/scan_test.go",
+   "target": "file:internal/scanner/scanner_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:cmd/devscope/main.go",
+   "target": "function:internal/commands/root.go:Execute",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "function:internal/app/app.go:Run",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/root.go:init",
+   "target": "function:pkg/version/version.go:String",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/root.go:init",
+   "target": "function:internal/commands/scan.go:scanCmd",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/root.go:init",
+   "target": "function:internal/commands/scan.go:watchCmd",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/config/config.go:Load",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/scanner/scanner.go:Scan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/config/config.go:Load",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/scanner/scanner.go:Scan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/collectors/projects_filter.go:FilterNestedProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/metrics/host.go:NewHostCollector",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:scanCmd",
+   "target": "function:internal/metrics/host.go:Collect",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/commands/scan.go:watchCmd",
+   "target": "function:internal/collectors/ports.go:FormatPortsShort",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:NewManager",
+   "target": "function:internal/metrics/host.go:NewHostCollector",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:NewManager",
+   "target": "function:internal/collectors/nginx.go:CollectNginxDomains",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:NewManager",
+   "target": "function:internal/collectors/ssl.go:CollectSSLCerts",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "target": "function:internal/core/state.go:NewStateStore",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:EnrichSnapshot",
+   "target": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/scanner/scanner.go:FastScan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/collectors/docker.go:AssignContainersToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/collectors/project_status.go:SortPinnedFirst",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/collectors/project_status.go:ApplyProjectStatus",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:QuickScan",
+   "target": "function:internal/core/state.go:SetProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:runScanner",
+   "target": "function:internal/scanner/scanner.go:New",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:runScanner",
+   "target": "function:internal/collectors/manager.go:deepScan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:deepScan",
+   "target": "function:internal/scanner/scanner.go:FastScan",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:deepScan",
+   "target": "function:internal/scanner/scanner.go:MergeDiscovered",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:deepScan",
+   "target": "function:internal/scanner/scanner.go:EnrichProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/docker.go:AssignContainersToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/pm2.go:CollectPM2",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/pm2.go:AssignWorkersToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/ports.go:AssignPortsToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/nginx.go:AssignDomainsToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/ssl.go:AssignSSLToProjects",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshProjects",
+   "target": "function:internal/collectors/project_status.go:AssignDeployScripts",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:runHealth",
+   "target": "function:internal/collectors/manager.go:refreshHealth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:refreshHealth",
+   "target": "function:internal/collectors/health.go:CollectHealth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:runMetrics",
+   "target": "function:internal/metrics/host.go:Collect",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/manager.go:runMetrics",
+   "target": "function:internal/core/state.go:SetHostMetrics",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStatsForIDs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "target": "function:internal/collectors/docker_stats.go:ApplyDockerStats",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:EnrichProjectDockerDetail",
+   "target": "function:internal/collectors/health.go:CollectHealth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStatsForIDs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "target": "function:internal/collectors/project_enrich.go:assignContainersToProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/collectors/docker.go:CollectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/scanner/runtime.go:DiscoverRunningRoots",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/collectors/pm2.go:CollectPM2",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStats",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/collectors/health.go:CollectHealth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/project_enrich.go:enrichProjectsFull",
+   "target": "function:internal/collectors/git.go:CollectAt",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/commands/scan.go",
+   "target": "file:internal/commands/scan_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/commands/root.go",
+   "target": "file:internal/commands/scan_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/config/config.go",
+   "target": "file:internal/ui/tools_config_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

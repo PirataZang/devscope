@@ -1,0 +1,1335 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/git_compose.go",
+   "type": "file",
+   "name": "git_compose.go",
+   "filePath": "internal/ui/git_compose.go",
+   "summary": "Modal multilinha de composição de mensagem de commit na aba Git.",
+   "tags": [
+    "component",
+    "git",
+    "modal",
+    "commit"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_compose.go:startGitCompose",
+   "type": "function",
+   "name": "startGitCompose",
+   "filePath": "internal/ui/git_compose.go",
+   "lineRange": [
+    20,
+    30
+   ],
+   "summary": "Abre o modal multilinha de composição de mensagem de commit.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_compose.go:updateGitCompose",
+   "type": "function",
+   "name": "updateGitCompose",
+   "filePath": "internal/ui/git_compose.go",
+   "lineRange": [
+    39,
+    72
+   ],
+   "summary": "Trata as teclas do modal de composição de commit (edição multilinha, envio e cancelamento).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_compose.go:submitGitCompose",
+   "type": "function",
+   "name": "submitGitCompose",
+   "filePath": "internal/ui/git_compose.go",
+   "lineRange": [
+    74,
+    88
+   ],
+   "summary": "Valida a mensagem e dispara o commit assíncrono.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_compose.go:renderGitCompose",
+   "type": "function",
+   "name": "renderGitCompose",
+   "filePath": "internal/ui/git_compose.go",
+   "lineRange": [
+    100,
+    196
+   ],
+   "summary": "Renderiza o modal de composição de commit com área de texto e arquivos staged.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/git_graph.go",
+   "type": "file",
+   "name": "git_graph.go",
+   "filePath": "internal/ui/git_graph.go",
+   "summary": "Visão de grafo de commits da aba Git com painéis de lista, detalhe e arquivos, seletor de branch e glifos de desenho do grafo.",
+   "tags": [
+    "component",
+    "git",
+    "grafo-commits",
+    "renderizacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:cellGlyph",
+   "type": "function",
+   "name": "cellGlyph",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    17,
+    47
+   ],
+   "summary": "Mapeia o tipo de célula do grafo para o caractere de desenho de caixa correspondente.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGraphCells",
+   "type": "function",
+   "name": "renderGraphCells",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    49,
+    64
+   ],
+   "summary": "Converte as células de uma linha do grafo em string colorida.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:graphCommitIcon",
+   "type": "function",
+   "name": "graphCommitIcon",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    70,
+    90
+   ],
+   "summary": "Escolhe um ícone de largura simples para o commit conforme o assunto (feat, fix, merge etc.).",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:reloadGitGraph",
+   "type": "function",
+   "name": "reloadGitGraph",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    128,
+    144
+   ],
+   "summary": "Recarrega o grafo de commits (DAG) do repositório de forma assíncrona.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:selectedGitGraphNode",
+   "type": "function",
+   "name": "selectedGitGraphNode",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    150,
+    160
+   ],
+   "summary": "Retorna o nó de commit atualmente selecionado no grafo.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:requestGitGraphDetail",
+   "type": "function",
+   "name": "requestGitGraphDetail",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    182,
+    201
+   ],
+   "summary": "Solicita o detalhe do commit selecionado no grafo.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "function",
+   "name": "handleGitGraphKeys",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    232,
+    299
+   ],
+   "summary": "Trata as teclas da visão de grafo: navegação, troca de painéis, scroll e seletor de branch.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:gitGraphBranchNames",
+   "type": "function",
+   "name": "gitGraphBranchNames",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    307,
+    333
+   ],
+   "summary": "Lista os nomes de branches presentes no grafo e no cache para seleção.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:openGitGraphBranchPicker",
+   "type": "function",
+   "name": "openGitGraphBranchPicker",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    335,
+    347
+   ],
+   "summary": "Abre o seletor de branch para filtrar o grafo.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:gitGraphBranchList",
+   "type": "function",
+   "name": "gitGraphBranchList",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    352,
+    367
+   ],
+   "summary": "Retorna a lista de branches filtrada pelo texto digitado no seletor.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:handleGitGraphBranchPickerKeys",
+   "type": "function",
+   "name": "handleGitGraphBranchPickerKeys",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    369,
+    402
+   ],
+   "summary": "Trata as teclas do seletor de branch do grafo (digitação, navegação e aplicação do filtro).",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGitGraphBranchPicker",
+   "type": "function",
+   "name": "renderGitGraphBranchPicker",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    404,
+    441
+   ],
+   "summary": "Renderiza o popup do seletor de branch do grafo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGraphScrollPane",
+   "type": "function",
+   "name": "renderGraphScrollPane",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    470,
+    501
+   ],
+   "summary": "Renderiza um painel rolável vertical e horizontalmente, ajustando os offsets ao tamanho.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGitGraph",
+   "type": "function",
+   "name": "renderGitGraph",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    503,
+    536
+   ],
+   "summary": "Renderiza a tela do grafo de commits com lista, detalhe e arquivos.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGitGraphList",
+   "type": "function",
+   "name": "renderGitGraphList",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    538,
+    560
+   ],
+   "summary": "Renderiza a lista de linhas do grafo com scroll.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:renderGitGraphListRow",
+   "type": "function",
+   "name": "renderGitGraphListRow",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    562,
+    602
+   ],
+   "summary": "Renderiza uma linha do grafo com células, ícone, hash, assunto e refs.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:gitGraphDetailLines",
+   "type": "function",
+   "name": "gitGraphDetailLines",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    604,
+    639
+   ],
+   "summary": "Gera as linhas do painel de detalhe do commit selecionado no grafo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:gitGraphFilesTitle",
+   "type": "function",
+   "name": "gitGraphFilesTitle",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    641,
+    653
+   ],
+   "summary": "Monta o título do painel de arquivos alterados do commit.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_graph.go:gitGraphFilesLines",
+   "type": "function",
+   "name": "gitGraphFilesLines",
+   "filePath": "internal/ui/git_graph.go",
+   "lineRange": [
+    655,
+    674
+   ],
+   "summary": "Gera as linhas do painel de arquivos alterados do commit.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "function:internal/ui/git_compose.go:startGitCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "function:internal/ui/git_compose.go:updateGitCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "function:internal/ui/git_compose.go:submitGitCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "function:internal/ui/git_compose.go:renderGitCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:cellGlyph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGraphCells",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:graphCommitIcon",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:reloadGitGraph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:selectedGitGraphNode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:requestGitGraphDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:gitGraphBranchNames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:openGitGraphBranchPicker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:gitGraphBranchList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphBranchPickerKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGitGraphBranchPicker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGraphScrollPane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGitGraph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGitGraphList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:renderGitGraphListRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:gitGraphDetailLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:gitGraphFilesTitle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "function:internal/ui/git_graph.go:gitGraphFilesLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/git_compose.go:renderGitCompose",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:reloadGitGraph",
+   "target": "function:internal/collectors/git_graph.go:GitLogDAG",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:reloadGitGraph",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:requestGitGraphDetail",
+   "target": "function:internal/collectors/git.go:CollectCommitFullMessage",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:requestGitGraphDetail",
+   "target": "function:internal/collectors/git_graph.go:CollectCommitFileStats",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "target": "function:internal/ui/git_tab.go:openGitCommitDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:renderGitGraphBranchPicker",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:renderGitGraphBranchPicker",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:renderGraphScrollPane",
+   "target": "function:internal/ui/helpers.go:sliceColumns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_graph.go:renderGitGraphList",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_compose.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/git_graph.go",
+   "target": "file:internal/ui/graph_features_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

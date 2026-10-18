@@ -1,0 +1,429 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/projects_filter.go",
+   "type": "file",
+   "name": "projects_filter.go",
+   "filePath": "internal/collectors/projects_filter.go",
+   "summary": "Filtra a lista de projetos removendo duplicatas por caminho e projetos aninhados em outros.",
+   "tags": [
+    "filtering",
+    "projects",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/projects_filter.go:filterNestedProjectList",
+   "type": "function",
+   "name": "filterNestedProjectList",
+   "filePath": "internal/collectors/projects_filter.go",
+   "lineRange": [
+    10,
+    23
+   ],
+   "summary": "Remove projetos cujo caminho está aninhado dentro de outro projeto da lista.",
+   "tags": [
+    "filtering",
+    "projects",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/projects_filter.go:dedupProjectsByPath",
+   "type": "function",
+   "name": "dedupProjectsByPath",
+   "filePath": "internal/collectors/projects_filter.go",
+   "lineRange": [
+    28,
+    40
+   ],
+   "summary": "Remove entradas com o mesmo caminho exato, mantendo a primeira ocorrência.",
+   "tags": [
+    "filtering",
+    "deduplication",
+    "projects"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/projects_filter.go:isNestedPath",
+   "type": "function",
+   "name": "isNestedPath",
+   "filePath": "internal/collectors/projects_filter.go",
+   "lineRange": [
+    42,
+    54
+   ],
+   "summary": "Indica se um caminho está dentro do diretório de outro projeto da lista.",
+   "tags": [
+    "utility",
+    "filesystem",
+    "projects"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/projects_filter.go:FilterNestedProjects",
+   "type": "function",
+   "name": "FilterNestedProjects",
+   "filePath": "internal/collectors/projects_filter.go",
+   "lineRange": [
+    61,
+    63
+   ],
+   "summary": "API pública que deduplica e remove projetos aninhados da lista.",
+   "tags": [
+    "filtering",
+    "projects",
+    "api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/registry_inspect.go",
+   "type": "file",
+   "name": "registry_inspect.go",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "summary": "Cliente anônimo da Registry API do Docker Hub que resolve manifests e extrai portas, env e volumes da configuração de imagens públicas.",
+   "tags": [
+    "registry",
+    "docker-hub",
+    "http",
+    "serialization"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Implementa o fluxo de token anônimo + manifest list (multi-arch) da Registry API v2 usando apenas net/http."
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:InspectImageConfig",
+   "type": "function",
+   "name": "InspectImageConfig",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    48,
+    63
+   ],
+   "summary": "Busca anonimamente no Docker Hub a configuração de uma imagem pública (portas, env, volumes).",
+   "tags": [
+    "registry",
+    "docker-hub",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:splitRegistryImage",
+   "type": "function",
+   "name": "splitRegistryImage",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    65,
+    86
+   ],
+   "summary": "Separa uma referência de imagem em repositório (com library/ quando oficial) e tag.",
+   "tags": [
+    "parsing",
+    "docker",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:registryPullToken",
+   "type": "function",
+   "name": "registryPullToken",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    88,
+    110
+   ],
+   "summary": "Obtém um token anônimo de pull no auth.docker.io para o repositório.",
+   "tags": [
+    "registry",
+    "auth",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:registryConfigDigest",
+   "type": "function",
+   "name": "registryConfigDigest",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    112,
+    159
+   ],
+   "summary": "Resolve o manifest (incluindo listas multi-arquitetura) e retorna o digest do blob de configuração.",
+   "tags": [
+    "registry",
+    "manifest",
+    "http"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:registryFetchConfig",
+   "type": "function",
+   "name": "registryFetchConfig",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    161,
+    181
+   ],
+   "summary": "Baixa o blob de configuração da imagem pelo digest e o converte em ImageConfig.",
+   "tags": [
+    "registry",
+    "http",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect.go:ParseImageConfigJSON",
+   "type": "function",
+   "name": "ParseImageConfigJSON",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    184,
+    205
+   ],
+   "summary": "Extrai ExposedPorts, Env e Volumes de um blob JSON de configuração de imagem.",
+   "tags": [
+    "parsing",
+    "serialization",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/collectors/registry_inspect.go:ImageConfig",
+   "type": "class",
+   "name": "ImageConfig",
+   "filePath": "internal/collectors/registry_inspect.go",
+   "lineRange": [
+    13,
+    17
+   ],
+   "summary": "Subconjunto da configuração de imagem (portas, env, volumes) usado para pré-preencher YAML de compose.",
+   "tags": [
+    "data-model",
+    "docker",
+    "compose"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/registry_inspect_test.go",
+   "type": "file",
+   "name": "registry_inspect_test.go",
+   "filePath": "internal/collectors/registry_inspect_test.go",
+   "summary": "Testes do parsing de blobs de configuração de imagem e da separação de referências repositório/tag.",
+   "tags": [
+    "test",
+    "registry",
+    "parsing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect_test.go:TestParseImageConfigJSON",
+   "type": "function",
+   "name": "TestParseImageConfigJSON",
+   "filePath": "internal/collectors/registry_inspect_test.go",
+   "lineRange": [
+    8,
+    45
+   ],
+   "summary": "Testa a extração de portas, variáveis de ambiente e volumes de um blob de config de imagem.",
+   "tags": [
+    "test",
+    "parsing",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/registry_inspect_test.go:TestSplitRegistryImage",
+   "type": "function",
+   "name": "TestSplitRegistryImage",
+   "filePath": "internal/collectors/registry_inspect_test.go",
+   "lineRange": [
+    47,
+    56
+   ],
+   "summary": "Testa a separação de referências de imagem em repositório e tag, incluindo imagens oficiais.",
+   "tags": [
+    "test",
+    "parsing",
+    "docker"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "function:internal/collectors/projects_filter.go:filterNestedProjectList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "function:internal/collectors/projects_filter.go:dedupProjectsByPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "function:internal/collectors/projects_filter.go:isNestedPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "function:internal/collectors/projects_filter.go:FilterNestedProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "function:internal/collectors/projects_filter.go:FilterNestedProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:InspectImageConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:InspectImageConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:splitRegistryImage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:registryPullToken",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:registryConfigDigest",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:registryFetchConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:ParseImageConfigJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "function:internal/collectors/registry_inspect.go:ParseImageConfigJSON",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "class:internal/collectors/registry_inspect.go:ImageConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "class:internal/collectors/registry_inspect.go:ImageConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect_test.go",
+   "target": "function:internal/collectors/registry_inspect_test.go:TestParseImageConfigJSON",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect_test.go",
+   "target": "function:internal/collectors/registry_inspect_test.go:TestParseImageConfigJSON",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect_test.go",
+   "target": "function:internal/collectors/registry_inspect_test.go:TestSplitRegistryImage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect_test.go",
+   "target": "function:internal/collectors/registry_inspect_test.go:TestSplitRegistryImage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/projects_filter.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/registry_inspect.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

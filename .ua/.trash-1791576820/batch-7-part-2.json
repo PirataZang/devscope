@@ -1,0 +1,1479 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/config/userconfig.go",
+   "type": "file",
+   "name": "userconfig.go",
+   "filePath": "internal/config/userconfig.go",
+   "summary": "Gerencia o user_config.txt comentado (tema, atalhos de apps e agente de IA): cria, renderiza, faz parse tolerante a erros, reseta com backup e altera chaves preservando comentários.",
+   "tags": [
+    "config",
+    "serialization",
+    "parsing",
+    "preferências-do-usuário",
+    "persistence"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:UserConfigPath",
+   "type": "function",
+   "name": "UserConfigPath",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    25,
+    28
+   ],
+   "summary": "Caminho do user_config.txt no diretório de configuração.",
+   "tags": [
+    "paths"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:DefaultUserConfigPath",
+   "type": "function",
+   "name": "DefaultUserConfigPath",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    33,
+    36
+   ],
+   "summary": "Caminho da cópia de fábrica intocada do user_config.",
+   "tags": [
+    "paths",
+    "backup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:FactoryUserConfig",
+   "type": "function",
+   "name": "FactoryUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    40,
+    42
+   ],
+   "summary": "Conteúdo de fábrica com tema padrão e agentes de IA disponíveis.",
+   "tags": [
+    "defaults",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:WriteDefaultUserConfig",
+   "type": "function",
+   "name": "WriteDefaultUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    47,
+    53
+   ],
+   "summary": "Reescreve a cópia de fábrica para acompanhar a versão do binário.",
+   "tags": [
+    "persistence",
+    "defaults"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:EnsureUserConfig",
+   "type": "function",
+   "name": "EnsureUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    58,
+    68
+   ],
+   "summary": "Retorna o conteúdo do user_config, criando-o na primeira vez com tema atual, comando de exemplo e IAs encontradas.",
+   "tags": [
+    "persistence",
+    "bootstrap"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:BackupUserConfigPath",
+   "type": "function",
+   "name": "BackupUserConfigPath",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    72,
+    75
+   ],
+   "summary": "Caminho do backup gravado antes de um reset.",
+   "tags": [
+    "paths",
+    "backup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:ResetUserConfig",
+   "type": "function",
+   "name": "ResetUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    79,
+    87
+   ],
+   "summary": "Grava o padrão de fábrica guardando o arquivo anterior em user_config.bak.txt.",
+   "tags": [
+    "reset",
+    "backup",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:SaveUserConfig",
+   "type": "function",
+   "name": "SaveUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    89,
+    95
+   ],
+   "summary": "Grava o conteúdo do user_config criando o diretório se necessário.",
+   "tags": [
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:defaultOpenCommand",
+   "type": "function",
+   "name": "defaultOpenCommand",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    99,
+    108
+   ],
+   "summary": "Escolhe o comando de abrir pasta do SO atual (xdg-open, open, explorer) como exemplo para o slot 1.",
+   "tags": [
+    "cross-platform",
+    "defaults"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:DefaultUserConfig",
+   "type": "function",
+   "name": "DefaultUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    110,
+    120
+   ],
+   "summary": "Monta o user_config padrão com tema e comando de exemplo.",
+   "tags": [
+    "defaults",
+    "factory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:RenderUserConfig",
+   "type": "function",
+   "name": "RenderUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    125,
+    176
+   ],
+   "summary": "Escreve o user_config com valores e comentários explicativos, mantendo-o editável à mão.",
+   "tags": [
+    "serialization",
+    "rendering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:ParseUserConfig",
+   "type": "function",
+   "name": "ParseUserConfig",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    181,
+    220
+   ],
+   "summary": "Faz parse tolerante do user_config: aplica o que é válido e devolve avisos para erros.",
+   "tags": [
+    "parsing",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:splitCommandsBlock",
+   "type": "function",
+   "name": "splitCommandsBlock",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    224,
+    256
+   ],
+   "summary": "Separa o bloco JSON de Commands do resto do arquivo contando chaves e ignorando strings.",
+   "tags": [
+    "parsing",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:ApplyUserPrefs",
+   "type": "function",
+   "name": "ApplyUserPrefs",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    279,
+    290
+   ],
+   "summary": "Aplica as preferências do user_config por cima da configuração do YAML.",
+   "tags": [
+    "merge",
+    "config"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:SetUserConfigTheme",
+   "type": "function",
+   "name": "SetUserConfigTheme",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    294,
+    296
+   ],
+   "summary": "Troca apenas a linha do tema preservando comentários.",
+   "tags": [
+    "editing",
+    "themes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:SaveUserTheme",
+   "type": "function",
+   "name": "SaveUserTheme",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    300,
+    306
+   ],
+   "summary": "Persiste a escolha do seletor de tema (Shift+T) no user_config.",
+   "tags": [
+    "persistence",
+    "themes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:LoadUserPrefs",
+   "type": "function",
+   "name": "LoadUserPrefs",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    310,
+    316
+   ],
+   "summary": "Lê o user_config se existir; ausência não é erro.",
+   "tags": [
+    "loading",
+    "preferências-do-usuário"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:SaveUserAI",
+   "type": "function",
+   "name": "SaveUserAI",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    319,
+    325
+   ],
+   "summary": "Persiste a escolha do seletor de agente de IA no user_config.",
+   "tags": [
+    "persistence",
+    "ai"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/config/userconfig.go:setUserConfigLine",
+   "type": "function",
+   "name": "setUserConfigLine",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    329,
+    339
+   ],
+   "summary": "Troca o valor de uma chave preservando comentários, reinserindo-a no fim se tiver sumido.",
+   "tags": [
+    "editing",
+    "text-processing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/config/userconfig.go:UserPrefs",
+   "type": "class",
+   "name": "UserPrefs",
+   "filePath": "internal/config/userconfig.go",
+   "lineRange": [
+    19,
+    23
+   ],
+   "summary": "Preferências declaradas no user_config.txt: tema, atalhos de apps e agente de IA.",
+   "tags": [
+    "data-model",
+    "preferências-do-usuário"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/config/userconfig_test.go",
+   "type": "file",
+   "name": "userconfig_test.go",
+   "filePath": "internal/config/userconfig_test.go",
+   "summary": "Testes do user_config.txt: round-trip render/parse, tolerância a JSON quebrado, rejeição de slot inválido, preservação de comentários ao trocar tema e comentários finais.",
+   "tags": [
+    "test",
+    "config",
+    "parsing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/detectors/frameworks.go",
+   "type": "file",
+   "name": "frameworks.go",
+   "filePath": "internal/detectors/frameworks.go",
+   "summary": "Implementações concretas de Detector para 14 stacks (NestJS, Laravel, Django, Next, Nuxt, Vue, React, Node, PHP, Go, Rust, Python, Java, Docker) baseadas em arquivos marcadores e dependências do package.json/composer.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy-pattern",
+    "heuristics"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Cada framework é uma struct vazia que embute comportamento via métodos Name/Priority/Detect, satisfazendo implicitamente a interface Detector (tipagem estrutural de Go)."
+  },
+  {
+   "id": "function:internal/detectors/frameworks.go:readJSONField",
+   "type": "function",
+   "name": "readJSONField",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    22,
+    36
+   ],
+   "summary": "Lê um campo de um arquivo JSON (ex.: dependências do package.json) para apoiar a detecção.",
+   "tags": [
+    "utility",
+    "json",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:NestJS",
+   "type": "class",
+   "name": "NestJS",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    47,
+    47
+   ],
+   "summary": "Detector de framework para NestJS (dependência @nestjs/core), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Laravel",
+   "type": "class",
+   "name": "Laravel",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    59,
+    59
+   ],
+   "summary": "Detector de framework para Laravel (arquivo artisan/composer), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Django",
+   "type": "class",
+   "name": "Django",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    71,
+    71
+   ],
+   "summary": "Detector de framework para Django (manage.py), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:NextJS",
+   "type": "class",
+   "name": "NextJS",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    83,
+    83
+   ],
+   "summary": "Detector de framework para Next.js (next.config ou dependência next), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:NuxtJS",
+   "type": "class",
+   "name": "NuxtJS",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    100,
+    100
+   ],
+   "summary": "Detector de framework para Nuxt (nuxt.config ou dependência nuxt), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Vue",
+   "type": "class",
+   "name": "Vue",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    114,
+    114
+   ],
+   "summary": "Detector de framework para Vue (dependência vue), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:React",
+   "type": "class",
+   "name": "React",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    129,
+    129
+   ],
+   "summary": "Detector de framework para React (dependência react), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Node",
+   "type": "class",
+   "name": "Node",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    144,
+    144
+   ],
+   "summary": "Detector de framework para Node.js genérico (package.json), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:PHP",
+   "type": "class",
+   "name": "PHP",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    156,
+    156
+   ],
+   "summary": "Detector de framework para PHP genérico (composer.json), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:GoLang",
+   "type": "class",
+   "name": "GoLang",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    168,
+    168
+   ],
+   "summary": "Detector de framework para Go (go.mod), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Rust",
+   "type": "class",
+   "name": "Rust",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    180,
+    180
+   ],
+   "summary": "Detector de framework para Rust (Cargo.toml), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Python",
+   "type": "class",
+   "name": "Python",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    192,
+    192
+   ],
+   "summary": "Detector de framework para Python (requirements/pyproject), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:Java",
+   "type": "class",
+   "name": "Java",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    204,
+    204
+   ],
+   "summary": "Detector de framework para Java (pom.xml/build.gradle), implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/frameworks.go:DockerOnly",
+   "type": "class",
+   "name": "DockerOnly",
+   "filePath": "internal/detectors/frameworks.go",
+   "lineRange": [
+    219,
+    219
+   ],
+   "summary": "Detector de framework para projetos apenas com Dockerfile/compose, implementando Name, Priority e Detect.",
+   "tags": [
+    "detector",
+    "framework-detection",
+    "strategy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/detectors/frameworks_test.go",
+   "type": "file",
+   "name": "frameworks_test.go",
+   "filePath": "internal/detectors/frameworks_test.go",
+   "summary": "Testes de detecção de frameworks com diretórios temporários contendo marcadores de NestJS, Laravel, Go, Docker-only e Django.",
+   "tags": [
+    "test",
+    "framework-detection",
+    "detector"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/detectors/registry.go",
+   "type": "file",
+   "name": "registry.go",
+   "filePath": "internal/detectors/registry.go",
+   "summary": "Registro global de detectores de framework: interface Detector, tipo FrameworkInfo, registro por prioridade e funções DetectAll/DetectMatches; o init registra todos os detectores.",
+   "tags": [
+    "registry",
+    "interface",
+    "framework-detection",
+    "plugin-pattern"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/detectors/registry.go:Register",
+   "type": "function",
+   "name": "Register",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    22,
+    24
+   ],
+   "summary": "Adiciona um detector ao registro global.",
+   "tags": [
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/detectors/registry.go:DetectAll",
+   "type": "function",
+   "name": "DetectAll",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    26,
+    32
+   ],
+   "summary": "Retorna a primeira detecção de maior prioridade para a raiz do projeto.",
+   "tags": [
+    "framework-detection",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/detectors/registry.go:DetectMatches",
+   "type": "function",
+   "name": "DetectMatches",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    35,
+    54
+   ],
+   "summary": "Retorna todos os frameworks detectados na raiz, ordenados por prioridade.",
+   "tags": [
+    "framework-detection",
+    "exported"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/detectors/registry.go:init",
+   "type": "function",
+   "name": "init",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    56,
+    71
+   ],
+   "summary": "Registra os 14 detectores concretos no carregamento do pacote.",
+   "tags": [
+    "registration",
+    "init"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/registry.go:Detector",
+   "type": "class",
+   "name": "Detector",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    8,
+    12
+   ],
+   "summary": "Interface de detector de framework com Name, Priority e Detect(root).",
+   "tags": [
+    "interface",
+    "framework-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/detectors/registry.go:FrameworkInfo",
+   "type": "class",
+   "name": "FrameworkInfo",
+   "filePath": "internal/detectors/registry.go",
+   "lineRange": [
+    14,
+    18
+   ],
+   "summary": "Resultado de detecção com nome, linguagem e confiança.",
+   "tags": [
+    "data-model",
+    "framework-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/metrics/disk_unix.go",
+   "type": "file",
+   "name": "disk_unix.go",
+   "filePath": "internal/metrics/disk_unix.go",
+   "summary": "Implementação Unix de getDiskSpace usando syscall.Statfs para obter espaço total e livre do disco.",
+   "tags": [
+    "metrics",
+    "platform-specific",
+    "disk",
+    "build-tags"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Usa build tags (//go:build) para fornecer a mesma função getDiskSpace com implementações distintas por sistema operacional."
+  },
+  {
+   "id": "file:internal/metrics/disk_windows.go",
+   "type": "file",
+   "name": "disk_windows.go",
+   "filePath": "internal/metrics/disk_windows.go",
+   "summary": "Implementação Windows de getDiskSpace via chamada à API GetDiskFreeSpaceExW da kernel32.dll.",
+   "tags": [
+    "metrics",
+    "platform-specific",
+    "windows",
+    "disk",
+    "build-tags"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Carrega kernel32.dll em runtime via syscall.NewLazyDLL, padrão comum em Go para chamar APIs Win32 sem cgo."
+  },
+  {
+   "id": "function:internal/metrics/disk_windows.go:getDiskSpace",
+   "type": "function",
+   "name": "getDiskSpace",
+   "filePath": "internal/metrics/disk_windows.go",
+   "lineRange": [
+    15,
+    35
+   ],
+   "summary": "Obtém espaço total e livre do disco no Windows via GetDiskFreeSpaceExW.",
+   "tags": [
+    "windows",
+    "disk",
+    "syscall"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:UserConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:UserConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:DefaultUserConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:DefaultUserConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:FactoryUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:FactoryUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:WriteDefaultUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:WriteDefaultUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:EnsureUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:EnsureUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:BackupUserConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:BackupUserConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ResetUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ResetUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:defaultOpenCommand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:DefaultUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:DefaultUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:RenderUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:RenderUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ParseUserConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ParseUserConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:splitCommandsBlock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ApplyUserPrefs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:ApplyUserPrefs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SetUserConfigTheme",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SetUserConfigTheme",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserTheme",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserTheme",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:LoadUserPrefs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:LoadUserPrefs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserAI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:SaveUserAI",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "function:internal/config/userconfig.go:setUserConfigLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "class:internal/config/userconfig.go:UserPrefs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "class:internal/config/userconfig.go:UserPrefs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "function:internal/detectors/frameworks.go:readJSONField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NestJS",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NestJS",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Laravel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Laravel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Django",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Django",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NextJS",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NextJS",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NuxtJS",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:NuxtJS",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Vue",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Vue",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:React",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:React",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Node",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Node",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:PHP",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:PHP",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:GoLang",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:GoLang",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Rust",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Rust",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Python",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Python",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Java",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:Java",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:DockerOnly",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "class:internal/detectors/frameworks.go:DockerOnly",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:Register",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:Register",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:DetectAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:DetectAll",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:DetectMatches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:DetectMatches",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "function:internal/detectors/registry.go:init",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "class:internal/detectors/registry.go:FrameworkInfo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "class:internal/detectors/registry.go:FrameworkInfo",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/metrics/disk_windows.go",
+   "target": "function:internal/metrics/disk_windows.go:getDiskSpace",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/detectors/registry.go:init",
+   "target": "function:internal/detectors/registry.go:Register",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:NestJS",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Laravel",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Django",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:NextJS",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:NuxtJS",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Vue",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:React",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Node",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:PHP",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:GoLang",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Rust",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Python",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:Java",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "class:internal/detectors/frameworks.go:DockerOnly",
+   "target": "class:internal/detectors/registry.go:Detector",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/detectors/frameworks.go",
+   "target": "file:internal/detectors/frameworks_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/detectors/registry.go",
+   "target": "file:internal/detectors/frameworks_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "file:internal/ui/tools_config_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/config/userconfig.go",
+   "target": "file:internal/ui/theme_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

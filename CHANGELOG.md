@@ -7,6 +7,33 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-18
+
+### Added
+- **Módulo Worktrees (CÓDIGO)** — `git worktree` sem sair do DevScope, simplificado para o que se usa todo dia
+  - Lista com branch, pasta, commit e estado (`limpa`, `N alterações`, `travada`, `pasta sumiu`); `◆` marca a worktree aberta, e o detalhe abaixo mostra o caminho inteiro, o assunto do commit e o motivo da trava ou da poda
+  - `n` cria pedindo só o nome da branch: a pasta é sempre irmã da principal (`<repo>-<branch>`), branch existente (local ou remota) faz checkout e nome novo cria a branch a partir da atual
+  - `d` remove com uma confirmação só — com alteração pendente ela diz quantas se perdem e já usa `--force`; a principal e as travadas não se removem daqui
+  - `enter` abre a worktree como projeto (Git, Containers e o resto passam a olhar para a pasta dela); `shift+E` e `ctrl+O` abrem terminal e agente de IA nela; `p` poda registros de pastas apagadas à mão
+  - Aparece em todo repositório git; lock/unlock, move e repair ficam no terminal
+- **Conflito de portas entre projetos** — porta do host reivindicada por mais de um projeto aparece com aviso no resumo do dashboard e na lista de portas da abertura dos módulos (só um processo consegue escutar cada porta)
+
+### Changed
+- README refeito: instalação primeiro, tour em GIF da visão geral, do Git e do Docker, tabelas de atalhos e instalação avançada no fim
+- Gravação das demos reproduzível (fitas VHS, `record.sh`, `zoom.py`) com projetos de demonstração descartáveis, no lugar do antigo `docs/demo.tape`
+- O pacote de release leva só `docs/*.md` — GIFs e vídeos ficam fora do download
+
+### Fixed
+- Leitura do compose só considera porta solta dentro de `ports:` — `retries: 5` e `interval: 5s` não aparecem mais como porta 5; portas acima de 65535 são descartadas
+
+### Removed
+- **Aba Rotas** e o pacote `routeutil` — não fazia mais sentido no DevScope
+- **Aba SSH Tunnel** e o pacote `sshutil` — não funcionava de forma confiável
+
+## [1.6.9] - 2026-09-25
+
+> Acumula o que saiu entre a 1.6.4 e a 1.6.9.
+
 ### Added
 - **Aba API repaginada no padrão Postman/Thunder Client** — a tela foi refeita inteira, no padrão de telas do projeto (cabeçalho, régua de abas numerada, painéis e barra de comandos larga)
   - **Linha de requisição** no topo, como no Postman: método, URL inteira e o botão de enviar numa linha só. Antes a URL aparecia duas vezes (cabeçalho + caixa `[2]-URL`) e em nenhuma das duas dava pra ver a query
@@ -323,7 +350,9 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - GoReleaser + GitHub Releases
 - CLI: `devscope`, `scan --json`, `watch`, `version`
 
-[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/PirataZang/devscope/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/PirataZang/devscope/compare/v1.6.9...v1.7.0
+[1.6.9]: https://github.com/PirataZang/devscope/compare/v1.6.3...v1.6.9
 [1.6.3]: https://github.com/PirataZang/devscope/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/PirataZang/devscope/compare/v1.4.0...v1.6.2
 [1.4.0]: https://github.com/PirataZang/devscope/compare/v1.3.1...v1.4.0

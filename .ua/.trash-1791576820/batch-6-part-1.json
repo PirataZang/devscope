@@ -1,0 +1,1189 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/docker_add_render.go",
+   "type": "file",
+   "name": "docker_add_render.go",
+   "filePath": "internal/ui/docker_add_render.go",
+   "summary": "Renderização do assistente de adicionar container: busca no Docker Hub, seleção de imagem/tag, métricas e edição do serviço compose.",
+   "tags": [
+    "component",
+    "docker-hub",
+    "renderizacao",
+    "assistente"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:dockerAddStepBar",
+   "type": "function",
+   "name": "dockerAddStepBar",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    11,
+    38
+   ],
+   "summary": "Desenha a barra de etapas do assistente de adicionar container, destacando o passo ativo.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:dockerAddModalChrome",
+   "type": "function",
+   "name": "dockerAddModalChrome",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    40,
+    50
+   ],
+   "summary": "Monta o cabeçalho comum do modal de adicionar container (subtítulo, barra de etapas e régua).",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:dockerAddSourceBadge",
+   "type": "function",
+   "name": "dockerAddSourceBadge",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    56,
+    73
+   ],
+   "summary": "Gera o badge colorido que indica a origem da imagem (oficial, verificada, comunidade, preset).",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddSearchBox",
+   "type": "function",
+   "name": "renderDockerAddSearchBox",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    75,
+    136
+   ],
+   "summary": "Renderiza a etapa de busca de imagens no Docker Hub com campo de pesquisa, resultados e coluna de detalhes.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddResultsBox",
+   "type": "function",
+   "name": "renderDockerAddResultsBox",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    138,
+    179
+   ],
+   "summary": "Renderiza a caixa de resultados da busca no Docker Hub com a lista paginável de repositórios.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddRightColumn",
+   "type": "function",
+   "name": "renderDockerAddRightColumn",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    182,
+    199
+   ],
+   "summary": "Compõe a coluna direita do assistente: tags no topo, métricas no meio e detalhes com scroll embaixo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddImageBox",
+   "type": "function",
+   "name": "renderDockerAddImageBox",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    201,
+    227
+   ],
+   "summary": "Renderiza a caixa da imagem selecionada com a lista de tags disponíveis.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddTagList",
+   "type": "function",
+   "name": "renderDockerAddTagList",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    229,
+    257
+   ],
+   "summary": "Gera as linhas da lista de tags da imagem, com cursor e janela de scroll.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddMetricsBoxes",
+   "type": "function",
+   "name": "renderDockerAddMetricsBoxes",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    259,
+    315
+   ],
+   "summary": "Desenha os cards de métricas do repositório (pulls, estrelas, atualização) do Docker Hub.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddDetailsBox",
+   "type": "function",
+   "name": "renderDockerAddDetailsBox",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    317,
+    349
+   ],
+   "summary": "Renderiza a caixa de detalhes do repositório com conteúdo rolável.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:dockerAddDetailsContent",
+   "type": "function",
+   "name": "dockerAddDetailsContent",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    351,
+    419
+   ],
+   "summary": "Monta o texto de detalhes do repositório Docker Hub (descrição, flags e informações) quebrado na largura disponível.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddResultList",
+   "type": "function",
+   "name": "renderDockerAddResultList",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    421,
+    467
+   ],
+   "summary": "Gera as linhas da lista de resultados da busca com badge de origem e destaque da seleção.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:renderDockerAddEditBox",
+   "type": "function",
+   "name": "renderDockerAddEditBox",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    469,
+    515
+   ],
+   "summary": "Renderiza a etapa de edição do YAML do serviço compose gerado antes de gravar no arquivo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_render.go:dockerAddComposeSummary",
+   "type": "function",
+   "name": "dockerAddComposeSummary",
+   "filePath": "internal/ui/docker_add_render.go",
+   "lineRange": [
+    525,
+    579
+   ],
+   "summary": "Analisa o YAML do serviço compose e extrai um resumo (imagem, portas, volumes, variáveis) para exibição.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/docker_add_test.go",
+   "type": "file",
+   "name": "docker_add_test.go",
+   "filePath": "internal/ui/docker_add_test.go",
+   "summary": "Testes do fluxo de adicionar container via Docker Hub, cobrindo presets, editor de YAML, paginação e cache de detalhes.",
+   "tags": [
+    "test",
+    "docker-hub",
+    "compose"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/docker_add_test.go:TestDockerAddRefuseOpensEditor",
+   "type": "function",
+   "name": "TestDockerAddRefuseOpensEditor",
+   "filePath": "internal/ui/docker_add_test.go",
+   "lineRange": [
+    13,
+    45
+   ],
+   "summary": "Testa que recusar o preset sugerido abre o editor de YAML do serviço.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-hub"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/docker_add_test.go:TestDockerAddSelectImageOpensEditor",
+   "type": "function",
+   "name": "TestDockerAddSelectImageOpensEditor",
+   "filePath": "internal/ui/docker_add_test.go",
+   "lineRange": [
+    47,
+    147
+   ],
+   "summary": "Testa que selecionar uma imagem do Docker Hub gera o YAML e abre o editor do serviço compose.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-hub"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/docker_add_test.go:TestDockerAddUnknownImageUsesAsyncCompose",
+   "type": "function",
+   "name": "TestDockerAddUnknownImageUsesAsyncCompose",
+   "filePath": "internal/ui/docker_add_test.go",
+   "lineRange": [
+    149,
+    177
+   ],
+   "summary": "Testa que uma imagem sem preset gera o compose de forma assíncrona.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_test.go:TestDockerAddLoadMoreAppends",
+   "type": "function",
+   "name": "TestDockerAddLoadMoreAppends",
+   "filePath": "internal/ui/docker_add_test.go",
+   "lineRange": [
+    179,
+    200
+   ],
+   "summary": "Testa que carregar mais resultados anexa à lista existente em vez de substituí-la.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/docker_add_test.go:TestDockerHubDetailsDoneCaches",
+   "type": "function",
+   "name": "TestDockerHubDetailsDoneCaches",
+   "filePath": "internal/ui/docker_add_test.go",
+   "lineRange": [
+    202,
+    226
+   ],
+   "summary": "Testa que os detalhes recebidos do Docker Hub são armazenados em cache.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "docker-hub"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:dockerAddStepBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:dockerAddModalChrome",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:dockerAddSourceBadge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddSearchBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddResultsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddRightColumn",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddImageBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddTagList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddMetricsBoxes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddDetailsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:dockerAddDetailsContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddResultList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:renderDockerAddEditBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "function:internal/ui/docker_add_render.go:dockerAddComposeSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "function:internal/ui/docker_add_test.go:TestDockerAddRefuseOpensEditor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "function:internal/ui/docker_add_test.go:TestDockerAddSelectImageOpensEditor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "function:internal/ui/docker_add_test.go:TestDockerAddUnknownImageUsesAsyncCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "function:internal/ui/docker_add_test.go:TestDockerAddLoadMoreAppends",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "function:internal/ui/docker_add_test.go:TestDockerHubDetailsDoneCaches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/docker_add_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddTagList",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddTagList",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubBytes",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddMetricsBoxes",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddMetricsBoxes",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubBytes",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddMetricsBoxes",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubRelative",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:dockerAddDetailsContent",
+   "target": "function:internal/ui/helpers.go:wrapText",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:dockerAddDetailsContent",
+   "target": "function:internal/collectors/docker_hub.go:DockerHubURL",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/docker_add_render.go:renderDockerAddResultList",
+   "target": "function:internal/collectors/docker_hub.go:FormatHubCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/docker_add_render.go",
+   "target": "file:internal/ui/docker_add_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

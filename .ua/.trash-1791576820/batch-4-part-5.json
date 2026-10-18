@@ -1,0 +1,666 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/docker_images.go",
+   "type": "file",
+   "name": "docker_images.go",
+   "filePath": "internal/collectors/docker_images.go",
+   "summary": "Lista imagens Docker locais de nível superior, enriquece com labels de projeto compose (inclusive imagens dangling de rebuilds) e remove imagens via `docker rmi`.",
+   "tags": [
+    "docker",
+    "images",
+    "collector",
+    "command-runner"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_images.go:CollectDockerImages",
+   "type": "function",
+   "name": "CollectDockerImages",
+   "filePath": "internal/collectors/docker_images.go",
+   "lineRange": [
+    17,
+    45
+   ],
+   "summary": "Lista as imagens locais de nível superior como em `docker images`.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_images.go:applyImageComposeLabels",
+   "type": "function",
+   "name": "applyImageComposeLabels",
+   "filePath": "internal/collectors/docker_images.go",
+   "lineRange": [
+    51,
+    92
+   ],
+   "summary": "Associa imagens a projetos compose pelos labels de build, incluindo imagens dangling de rebuilds antigos.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_images.go:RemoveDockerImages",
+   "type": "function",
+   "name": "RemoveDockerImages",
+   "filePath": "internal/collectors/docker_images.go",
+   "lineRange": [
+    96,
+    107
+   ],
+   "summary": "Executa `docker rmi` para os IDs informados e retorna a saída combinada.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_stats.go",
+   "type": "file",
+   "name": "docker_stats.go",
+   "filePath": "internal/collectors/docker_stats.go",
+   "summary": "Coleta CPU% e memória dos containers via `docker stats --no-stream`, converte unidades de tamanho e agrega as métricas nos projetos.",
+   "tags": [
+    "docker",
+    "metrics",
+    "collector",
+    "parser"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats.go:CollectDockerStats",
+   "type": "function",
+   "name": "CollectDockerStats",
+   "filePath": "internal/collectors/docker_stats.go",
+   "lineRange": [
+    25,
+    30
+   ],
+   "summary": "Retorna CPU% e bytes de memória por ID curto de container.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats.go:CollectDockerStatsForIDs",
+   "type": "function",
+   "name": "CollectDockerStatsForIDs",
+   "filePath": "internal/collectors/docker_stats.go",
+   "lineRange": [
+    33,
+    38
+   ],
+   "summary": "Retorna stats apenas para os IDs de container informados.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats.go:collectDockerStats",
+   "type": "function",
+   "name": "collectDockerStats",
+   "filePath": "internal/collectors/docker_stats.go",
+   "lineRange": [
+    40,
+    82
+   ],
+   "summary": "Executa `docker stats --no-stream` em JSON e converte CPU e memória por container.",
+   "tags": [
+    "docker",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats.go:ApplyDockerStats",
+   "type": "function",
+   "name": "ApplyDockerStats",
+   "filePath": "internal/collectors/docker_stats.go",
+   "lineRange": [
+    84,
+    108
+   ],
+   "summary": "Aplica as stats aos containers e agrega CPU/memória por projeto.",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats.go:parseSizeBytes",
+   "type": "function",
+   "name": "parseSizeBytes",
+   "filePath": "internal/collectors/docker_stats.go",
+   "lineRange": [
+    125,
+    155
+   ],
+   "summary": "Converte strings de tamanho (KiB, MB, GiB...) em bytes.",
+   "tags": [
+    "docker",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/collectors/docker_stats_test.go",
+   "type": "file",
+   "name": "docker_stats_test.go",
+   "filePath": "internal/collectors/docker_stats_test.go",
+   "summary": "Testes de parsing de CPU/memória, aplicação de stats aos projetos, parsing/formatação de portas de containers, status degradado e ordenação de projetos fixados.",
+   "tags": [
+    "test",
+    "docker",
+    "metrics"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats_test.go:TestApplyDockerStats",
+   "type": "function",
+   "name": "TestApplyDockerStats",
+   "filePath": "internal/collectors/docker_stats_test.go",
+   "lineRange": [
+    21,
+    38
+   ],
+   "summary": "Testa a aplicação de stats aos containers e projetos.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats_test.go:TestParseContainerPortMappings",
+   "type": "function",
+   "name": "TestParseContainerPortMappings",
+   "filePath": "internal/collectors/docker_stats_test.go",
+   "lineRange": [
+    47,
+    58
+   ],
+   "summary": "Testa o parsing de mapeamentos de portas de containers.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats_test.go:TestApplyProjectStatusDegraded",
+   "type": "function",
+   "name": "TestApplyProjectStatusDegraded",
+   "filePath": "internal/collectors/docker_stats_test.go",
+   "lineRange": [
+    67,
+    77
+   ],
+   "summary": "Testa o status degradado de projetos com containers parados.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_stats_test.go:TestSortPinnedFirst",
+   "type": "function",
+   "name": "TestSortPinnedFirst",
+   "filePath": "internal/collectors/docker_stats_test.go",
+   "lineRange": [
+    79,
+    88
+   ],
+   "summary": "Testa a ordenação de projetos fixados primeiro.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_test.go",
+   "type": "file",
+   "name": "docker_test.go",
+   "filePath": "internal/collectors/docker_test.go",
+   "summary": "Testes da atribuição de containers a projetos: pontuação de match por compose root e mounts, parsing de linhas do docker ps, restart policies, recuperação de órfãos e serviços compose ausentes.",
+   "tags": [
+    "test",
+    "docker",
+    "matching"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestMatchScoreParentMountRejected",
+   "type": "function",
+   "name": "TestMatchScoreParentMountRejected",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    39,
+    48
+   ],
+   "summary": "Testa que mounts do diretório pai não pontuam.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestParseDockerPSLine",
+   "type": "function",
+   "name": "TestParseDockerPSLine",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    59,
+    74
+   ],
+   "summary": "Testa o parsing de linhas do docker ps.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestApplyRestartPolicies",
+   "type": "function",
+   "name": "TestApplyRestartPolicies",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    76,
+    94
+   ],
+   "summary": "Testa o preenchimento de restart policies via inspect.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestAssignContainersUnique",
+   "type": "function",
+   "name": "TestAssignContainersUnique",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    96,
+    118
+   ],
+   "summary": "Testa que cada container é atribuído a um único projeto.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestAssignContainersProjectPathFallback",
+   "type": "function",
+   "name": "TestAssignContainersProjectPathFallback",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    120,
+    129
+   ],
+   "summary": "Testa o fallback de atribuição pelo caminho do projeto.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestAssignStoppedContainerFromNestedCompose",
+   "type": "function",
+   "name": "TestAssignStoppedContainerFromNestedCompose",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    131,
+    146
+   ],
+   "summary": "Testa a atribuição de containers parados de compose aninhado.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestReclaimOrphanByComposeName",
+   "type": "function",
+   "name": "TestReclaimOrphanByComposeName",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    148,
+    171
+   ],
+   "summary": "Testa a recuperação de órfãos pelo nome do serviço compose.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_test.go:TestMissingComposeServiceListed",
+   "type": "function",
+   "name": "TestMissingComposeServiceListed",
+   "filePath": "internal/collectors/docker_test.go",
+   "lineRange": [
+    173,
+    199
+   ],
+   "summary": "Testa a listagem de serviços compose sem container.",
+   "tags": [
+    "test",
+    "docker",
+    "unit-test"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "function:internal/collectors/docker_images.go:CollectDockerImages",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "function:internal/collectors/docker_images.go:CollectDockerImages",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "function:internal/collectors/docker_images.go:applyImageComposeLabels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "function:internal/collectors/docker_images.go:RemoveDockerImages",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "function:internal/collectors/docker_images.go:RemoveDockerImages",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_images.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStats",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStatsForIDs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:CollectDockerStatsForIDs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:collectDockerStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:ApplyDockerStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:ApplyDockerStats",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "function:internal/collectors/docker_stats.go:parseSizeBytes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "function:internal/collectors/docker_stats_test.go:TestApplyDockerStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "function:internal/collectors/docker_stats_test.go:TestParseContainerPortMappings",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "function:internal/collectors/docker_stats_test.go:TestApplyProjectStatusDegraded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "function:internal/collectors/docker_stats_test.go:TestSortPinnedFirst",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestMatchScoreParentMountRejected",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestParseDockerPSLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestApplyRestartPolicies",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestAssignContainersUnique",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestAssignContainersProjectPathFallback",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestAssignStoppedContainerFromNestedCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestReclaimOrphanByComposeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "function:internal/collectors/docker_test.go:TestMissingComposeServiceListed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_stats.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

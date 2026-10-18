@@ -73,11 +73,10 @@ func TestWatchTabsFollowModuleShell(t *testing.T) {
 		}
 	}
 	for name, view := range map[string]string{
-		"api":    stripANSI(a.renderApiLanding(&p)),
-		"db":     stripANSI(a.renderDbLanding(&p)),
-		"json":   stripANSI(a.renderJsonLanding(&p)),
-		"jwt":    stripANSI(a.renderJwtLanding(&p)),
-		"routes": stripANSI(a.renderRoutesLanding(&p)),
+		"api":  stripANSI(a.renderApiLanding(&p)),
+		"db":   stripANSI(a.renderDbLanding(&p)),
+		"json": stripANSI(a.renderJsonLanding(&p)),
+		"jwt":  stripANSI(a.renderJwtLanding(&p)),
 	} {
 		// A barra de topo identifica módulo + projeto aberto. DETALHES e AÇÕES
 		// eram duas caixas no trilho da direita; viraram fatos rotulados e uma

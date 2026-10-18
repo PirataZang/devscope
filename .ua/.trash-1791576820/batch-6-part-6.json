@@ -1,0 +1,4512 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/git_tab.go",
+   "type": "file",
+   "name": "git_tab.go",
+   "filePath": "internal/ui/git_tab.go",
+   "summary": "Núcleo da aba Git: renderização das colunas de branches/commits/arquivos, histórico de branch, detalhe de commit com árvore e diff, busca, navegação e atalhos.",
+   "tags": [
+    "component",
+    "git",
+    "renderizacao",
+    "event-handler",
+    "diff"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitListViewport",
+   "type": "function",
+   "name": "gitListViewport",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    67,
+    77
+   ],
+   "summary": "Calcula quantas linhas cabem nas listas da aba Git.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitBranchColWidth",
+   "type": "function",
+   "name": "gitBranchColWidth",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    83,
+    100
+   ],
+   "summary": "Calcula a largura da coluna de branches com base no painel.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitCommitColWidth",
+   "type": "function",
+   "name": "gitCommitColWidth",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    102,
+    114
+   ],
+   "summary": "Calcula a largura da coluna de commits com base no painel.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitTab",
+   "type": "function",
+   "name": "renderGitTab",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    116,
+    201
+   ],
+   "summary": "Renderiza a aba Git escolhendo entre tela principal, grafo, histórico, detalhe de commit, diff e modais.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommandBar",
+   "type": "function",
+   "name": "renderGitCommandBar",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    206,
+    243
+   ],
+   "summary": "Renderiza a barra de comandos da aba Git, quebrando em linhas em vez de esconder teclas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitStashPanel",
+   "type": "function",
+   "name": "renderGitStashPanel",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    247,
+    264
+   ],
+   "summary": "Renderiza o painel de stashes com assuntos legíveis.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitStashSubject",
+   "type": "function",
+   "name": "gitStashSubject",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    268,
+    281
+   ],
+   "summary": "Remove o prefixo WIP da mensagem de stash para destacar o que a distingue.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchFilterLine",
+   "type": "function",
+   "name": "renderGitBranchFilterLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    283,
+    293
+   ],
+   "summary": "Renderiza a linha do filtro inline de branches.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitHeader",
+   "type": "function",
+   "name": "renderGitHeader",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    298,
+    318
+   ],
+   "summary": "Renderiza o cabeçalho da aba Git com branch, sincronia e remoto.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitPrimaryRemote",
+   "type": "function",
+   "name": "gitPrimaryRemote",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    325,
+    341
+   ],
+   "summary": "Encontra o remoto principal no campo de URL ou na lista de remotos.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitBranchChip",
+   "type": "function",
+   "name": "gitBranchChip",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    351,
+    364
+   ],
+   "summary": "Gera o chip de branch atual com estado de sincronia (ahead/behind).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitStatsRow",
+   "type": "function",
+   "name": "renderGitStatsRow",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    369,
+    398
+   ],
+   "summary": "Renderiza a linha de estatísticas do repositório (staged, modificados, conflitos etc.).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitNotifLine",
+   "type": "function",
+   "name": "renderGitNotifLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    400,
+    429
+   ],
+   "summary": "Renderiza a linha de notificação de resultado das ações Git.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitStatusBar",
+   "type": "function",
+   "name": "renderGitStatusBar",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    431,
+    464
+   ],
+   "summary": "Renderiza a barra de status da aba Git.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitMainColumnsSized",
+   "type": "function",
+   "name": "renderGitMainColumnsSized",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    470,
+    503
+   ],
+   "summary": "Compõe as colunas principais (branches, commits, arquivos) no tamanho informado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitWorkingRow",
+   "type": "function",
+   "name": "renderGitWorkingRow",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    517,
+    542
+   ],
+   "summary": "Compõe a linha inferior com working tree, stash e log de comandos.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:wtFileTreeFrom",
+   "type": "function",
+   "name": "wtFileTreeFrom",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    544,
+    553
+   ],
+   "summary": "Constrói a árvore de arquivos do working tree a partir dos status.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:wtConflictRows",
+   "type": "function",
+   "name": "wtConflictRows",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    556,
+    572
+   ],
+   "summary": "Lista só os caminhos não mesclados, de forma plana, para não esconder conflitos.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:snapWTFileTreeCursor",
+   "type": "function",
+   "name": "snapWTFileTreeCursor",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    581,
+    600
+   ],
+   "summary": "Ajusta o cursor da árvore para a linha de arquivo mais próxima, pulando pastas.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:moveWTFileTreeCursor",
+   "type": "function",
+   "name": "moveWTFileTreeCursor",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    602,
+    624
+   ],
+   "summary": "Move o cursor da árvore de arquivos pulando linhas de pasta.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:syncWTFileTreeCursor",
+   "type": "function",
+   "name": "syncWTFileTreeCursor",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    626,
+    636
+   ],
+   "summary": "Sincroniza cursor e scroll da árvore do working tree com os arquivos atuais.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:selectedWTFile",
+   "type": "function",
+   "name": "selectedWTFile",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    638,
+    651
+   ],
+   "summary": "Retorna o arquivo do working tree sob o cursor.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:focusFirstConflict",
+   "type": "function",
+   "name": "focusFirstConflict",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    653,
+    664
+   ],
+   "summary": "Posiciona o cursor no primeiro arquivo em conflito.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitFileLines",
+   "type": "function",
+   "name": "gitFileLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    666,
+    713
+   ],
+   "summary": "Gera as linhas da árvore de arquivos alterados com badges de staged e status.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitConflictFileLines",
+   "type": "function",
+   "name": "gitConflictFileLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    715,
+    757
+   ],
+   "summary": "Gera as linhas da lista de arquivos em conflito.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitCommandLogFlatLines",
+   "type": "function",
+   "name": "gitCommandLogFlatLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    759,
+    786
+   ],
+   "summary": "Achata o log de comandos Git em linhas exibíveis.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommandLog",
+   "type": "function",
+   "name": "renderGitCommandLog",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    795,
+    840
+   ],
+   "summary": "Renderiza o painel de log de comandos Git com scroll e links.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:openGitCmdLogURLAt",
+   "type": "function",
+   "name": "openGitCmdLogURLAt",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    842,
+    859
+   ],
+   "summary": "Abre no navegador a URL presente na linha clicada do log de comandos.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:handleGitMouseClick",
+   "type": "function",
+   "name": "handleGitMouseClick",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    867,
+    885
+   ],
+   "summary": "Trata cliques do mouse na aba Git (links do log de comandos).",
+   "tags": [
+    "event-handler",
+    "mensagens-tea",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:fitGitPanelLines",
+   "type": "function",
+   "name": "fitGitPanelLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    887,
+    896
+   ],
+   "summary": "Ajusta o conteúdo de um painel para exatamente N linhas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:trimEdgeBlanks",
+   "type": "function",
+   "name": "trimEdgeBlanks",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    902,
+    913
+   ],
+   "summary": "Remove o título interno e linhas em branco das pontas.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchHistory",
+   "type": "function",
+   "name": "renderGitBranchHistory",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    929,
+    967
+   ],
+   "summary": "Renderiza a tela de histórico de uma branch com cards, tabela e inspetor.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchHistoryHeader",
+   "type": "function",
+   "name": "renderGitBranchHistoryHeader",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    969,
+    983
+   ],
+   "summary": "Renderiza o cabeçalho do histórico de branch.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchHistoryCards",
+   "type": "function",
+   "name": "renderGitBranchHistoryCards",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    988,
+    1011
+   ],
+   "summary": "Renderiza os cards de resumo do histórico (commits, autores, período).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchHistoryTable",
+   "type": "function",
+   "name": "renderGitBranchHistoryTable",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1013,
+    1036
+   ],
+   "summary": "Renderiza a tabela de commits do histórico da branch.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchCommitLine",
+   "type": "function",
+   "name": "renderGitBranchCommitLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1038,
+    1063
+   ],
+   "summary": "Renderiza uma linha de commit da tabela de histórico.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchHistoryInspector",
+   "type": "function",
+   "name": "renderGitBranchHistoryInspector",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1065,
+    1121
+   ],
+   "summary": "Renderiza o inspetor lateral com mensagem completa e autores do commit selecionado.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:wrapGitMessage",
+   "type": "function",
+   "name": "wrapGitMessage",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1123,
+    1147
+   ],
+   "summary": "Quebra a mensagem de commit na largura informada preservando parágrafos.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitUniqueAuthors",
+   "type": "function",
+   "name": "gitUniqueAuthors",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1154,
+    1165
+   ],
+   "summary": "Lista os autores únicos de um conjunto de commits.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitAuthorCounts",
+   "type": "function",
+   "name": "gitAuthorCounts",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1167,
+    1188
+   ],
+   "summary": "Conta commits por autor, ordenando por frequência.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitDetail",
+   "type": "function",
+   "name": "renderGitCommitDetail",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1190,
+    1248
+   ],
+   "summary": "Renderiza a tela de detalhe do commit com cabeçalho, árvore de arquivos e diff.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitDiffSearchLine",
+   "type": "function",
+   "name": "renderGitDiffSearchLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1250,
+    1265
+   ],
+   "summary": "Renderiza a linha de busca no diff com contagem de ocorrências.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:commitFileChangeCounts",
+   "type": "function",
+   "name": "commitFileChangeCounts",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1267,
+    1284
+   ],
+   "summary": "Conta arquivos adicionados, modificados e removidos em um commit.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitFileStatsLine",
+   "type": "function",
+   "name": "renderGitCommitFileStatsLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1286,
+    1305
+   ],
+   "summary": "Renderiza a linha de estatísticas de arquivos do commit.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitFixedBox",
+   "type": "function",
+   "name": "renderGitFixedBox",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1307,
+    1326
+   ],
+   "summary": "Renderiza uma caixa de tamanho fixo com as linhas informadas.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitHeaderLines",
+   "type": "function",
+   "name": "renderGitCommitHeaderLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1328,
+    1363
+   ],
+   "summary": "Gera as linhas de cabeçalho do commit (hash, autor, data, mensagem expansível).",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitCommitFilesPanelWidth",
+   "type": "function",
+   "name": "gitCommitFilesPanelWidth",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1365,
+    1374
+   ],
+   "summary": "Calcula a largura do painel lateral de arquivos do commit.",
+   "tags": [
+    "layout",
+    "dimensionamento",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:buildCommitFileTree",
+   "type": "function",
+   "name": "buildCommitFileTree",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1408,
+    1437
+   ],
+   "summary": "Constrói a árvore de arquivos de um commit com pastas compactadas e colapsáveis.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:flattenCommitFileTree",
+   "type": "function",
+   "name": "flattenCommitFileTree",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1439,
+    1460
+   ],
+   "summary": "Achata recursivamente a árvore de caminhos em linhas exibíveis respeitando pastas colapsadas.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:compactGitPathDir",
+   "type": "function",
+   "name": "compactGitPathDir",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1462,
+    1473
+   ],
+   "summary": "Compacta cadeias de diretórios com filho único em um só nó.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitFilesSidebarLines",
+   "type": "function",
+   "name": "renderGitCommitFilesSidebarLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1494,
+    1551
+   ],
+   "summary": "Gera as linhas da barra lateral de arquivos do commit com ícones e contagens.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitDiffPanelLines",
+   "type": "function",
+   "name": "renderGitCommitDiffPanelLines",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1560,
+    1596
+   ],
+   "summary": "Gera as linhas do painel de diff do commit com scroll e destaque de busca.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitCommitDiffHScrollBy",
+   "type": "function",
+   "name": "gitCommitDiffHScrollBy",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1617,
+    1627
+   ],
+   "summary": "Rola horizontalmente o diff do commit respeitando a linha mais longa.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:parseDiffContent",
+   "type": "function",
+   "name": "parseDiffContent",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1646,
+    1688
+   ],
+   "summary": "Analisa o texto de um diff unificado em linhas tipadas com números de linha.",
+   "tags": [
+    "parsing",
+    "utility",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:parseDiffHunkHeader",
+   "type": "function",
+   "name": "parseDiffHunkHeader",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1690,
+    1710
+   ],
+   "summary": "Extrai os números de início antigo e novo de um cabeçalho de hunk.",
+   "tags": [
+    "parsing",
+    "utility",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:atoiPrefix",
+   "type": "function",
+   "name": "atoiPrefix",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1712,
+    1724
+   ],
+   "summary": "Converte o prefixo numérico de uma string em inteiro.",
+   "tags": [
+    "parsing",
+    "utility",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitCommitDiffPosition",
+   "type": "function",
+   "name": "gitCommitDiffPosition",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1726,
+    1737
+   ],
+   "summary": "Gera o indicador de posição de scroll do diff.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitDiffLine",
+   "type": "function",
+   "name": "renderGitDiffLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1739,
+    1770
+   ],
+   "summary": "Renderiza uma linha de diff colorida com scroll horizontal e destaque de busca.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranches",
+   "type": "function",
+   "name": "renderGitBranches",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1777,
+    1811
+   ],
+   "summary": "Renderiza a lista de branches com filtro e cursor.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitBranchLine",
+   "type": "function",
+   "name": "renderGitBranchLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1813,
+    1861
+   ],
+   "summary": "Renderiza uma linha de branch com marcadores de HEAD, visualizada, marcada e sincronia.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitSyncTag",
+   "type": "function",
+   "name": "gitSyncTag",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1864,
+    1877
+   ],
+   "summary": "Gera a versão curta do chip de sincronia para caber na coluna.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommits",
+   "type": "function",
+   "name": "renderGitCommits",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1886,
+    1922
+   ],
+   "summary": "Renderiza a lista de commits da branch visualizada.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitCommitLine",
+   "type": "function",
+   "name": "renderGitCommitLine",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1924,
+    1974
+   ],
+   "summary": "Renderiza uma linha de commit com hash, assunto, autor, data e marcação de cherry-pick.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitFiles",
+   "type": "function",
+   "name": "renderGitFiles",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    1976,
+    2024
+   ],
+   "summary": "Renderiza o painel de arquivos alterados do working tree.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:commitChangeStyle",
+   "type": "function",
+   "name": "commitChangeStyle",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2055,
+    2071
+   ],
+   "summary": "Escolhe o estilo de cor para o status de alteração de arquivo.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:initGitTab",
+   "type": "function",
+   "name": "initGitTab",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2073,
+    2150
+   ],
+   "summary": "Inicializa o estado da aba Git ao entrar no projeto e dispara as cargas iniciais.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:filteredGitBranches",
+   "type": "function",
+   "name": "filteredGitBranches",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2152,
+    2164
+   ],
+   "summary": "Filtra branches pelo texto do filtro inline.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "type": "function",
+   "name": "syncGitBranchCursor",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2166,
+    2177
+   ],
+   "summary": "Mantém o cursor de branches dentro dos limites após filtragem.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitFocusNext",
+   "type": "function",
+   "name": "gitFocusNext",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2179,
+    2200
+   ],
+   "summary": "Move o foco para o próximo painel da aba Git.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitFocusPrev",
+   "type": "function",
+   "name": "gitFocusPrev",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2202,
+    2221
+   ],
+   "summary": "Move o foco para o painel anterior da aba Git.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:updateGitCursor",
+   "type": "function",
+   "name": "updateGitCursor",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2223,
+    2312
+   ],
+   "summary": "Move o cursor do painel focado (branches, commits, arquivos) com suporte a seleção por Shift.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitSelectCommitRange",
+   "type": "function",
+   "name": "gitSelectCommitRange",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2314,
+    2326
+   ],
+   "summary": "Seleciona um intervalo de commits entre âncora e cursor.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:selectGitBranch",
+   "type": "function",
+   "name": "selectGitBranch",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2335,
+    2344
+   ],
+   "summary": "Troca a branch visualizada e carrega seus commits.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:openGitBranchHistory",
+   "type": "function",
+   "name": "openGitBranchHistory",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2346,
+    2360
+   ],
+   "summary": "Abre a tela de histórico da branch selecionada.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:openGitFileDiff",
+   "type": "function",
+   "name": "openGitFileDiff",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2362,
+    2387
+   ],
+   "summary": "Abre o diff do arquivo do working tree selecionado.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "type": "function",
+   "name": "renderGitFileDiff",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2389,
+    2433
+   ],
+   "summary": "Renderiza a tela de diff de arquivo do working tree.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:renderGitFileDiffBody",
+   "type": "function",
+   "name": "renderGitFileDiffBody",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2435,
+    2480
+   ],
+   "summary": "Renderiza o corpo rolável do diff de arquivo.",
+   "tags": [
+    "renderizacao",
+    "view",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitWTDiffHScrollBy",
+   "type": "function",
+   "name": "gitWTDiffHScrollBy",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2488,
+    2504
+   ],
+   "summary": "Rola horizontalmente o diff do working tree.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:openGitCommitDetail",
+   "type": "function",
+   "name": "openGitCommitDetail",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2506,
+    2533
+   ],
+   "summary": "Abre a tela de detalhe de um commit e solicita seus dados.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:previewGitCommitTreeSelection",
+   "type": "function",
+   "name": "previewGitCommitTreeSelection",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2535,
+    2556
+   ],
+   "summary": "Pré-visualiza o diff do arquivo selecionado na árvore do commit.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:openSelectedGitCommitFile",
+   "type": "function",
+   "name": "openSelectedGitCommitFile",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2558,
+    2571
+   ],
+   "summary": "Abre o arquivo selecionado na árvore do commit ou expande a pasta.",
+   "tags": [
+    "carregamento-async",
+    "tea-cmd",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:collapseGitCommitTree",
+   "type": "function",
+   "name": "collapseGitCommitTree",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2582,
+    2610
+   ],
+   "summary": "Colapsa a pasta selecionada ou sobe para a pasta pai na árvore do commit.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:expandGitCommitTree",
+   "type": "function",
+   "name": "expandGitCommitTree",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2612,
+    2624
+   ],
+   "summary": "Expande a pasta selecionada na árvore do commit.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:switchGitCommitFile",
+   "type": "function",
+   "name": "switchGitCommitFile",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2626,
+    2638
+   ],
+   "summary": "Avança ou recua para outro arquivo do commit usando cache de diffs.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitDiffSearchMatches",
+   "type": "function",
+   "name": "gitDiffSearchMatches",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2654,
+    2666
+   ],
+   "summary": "Lista os índices de linhas do diff que casam com a busca.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitDiffMatchLineSet",
+   "type": "function",
+   "name": "gitDiffMatchLineSet",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2668,
+    2678
+   ],
+   "summary": "Retorna o conjunto de linhas do diff que casam com a busca.",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:jumpGitDiffSearch",
+   "type": "function",
+   "name": "jumpGitDiffSearch",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2680,
+    2691
+   ],
+   "summary": "Salta para a próxima ou anterior ocorrência da busca no diff.",
+   "tags": [
+    "utility",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:updateGitDiffSearch",
+   "type": "function",
+   "name": "updateGitDiffSearch",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2712,
+    2734
+   ],
+   "summary": "Trata as teclas da busca inline no diff.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "function",
+   "name": "handleGitDedicatedKeys",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2736,
+    2901
+   ],
+   "summary": "Trata as teclas da aba Git dedicada: foco, ações de branch, commit, stage, pull/push, cherry-pick e telas.",
+   "tags": [
+    "event-handler",
+    "atalhos-teclado",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab.go:gitSpaceAction",
+   "type": "function",
+   "name": "gitSpaceAction",
+   "filePath": "internal/ui/git_tab.go",
+   "lineRange": [
+    2903,
+    2929
+   ],
+   "summary": "Executa a ação da tecla espaço conforme o painel focado (stage, marcar branch ou commit).",
+   "tags": [
+    "acao",
+    "logica-ui",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/git_tab_test.go",
+   "type": "file",
+   "name": "git_tab_test.go",
+   "filePath": "internal/ui/git_tab_test.go",
+   "summary": "Testes extensivos da aba Git cobrindo layout, árvore de arquivos, conflitos, diff, busca, histórico, commit detail, compose e cabeçalho.",
+   "tags": [
+    "test",
+    "git",
+    "diff"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestRenderGitMainShowsBottomBoxes",
+   "type": "function",
+   "name": "TestRenderGitMainShowsBottomBoxes",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    15,
+    107
+   ],
+   "summary": "Testa que a tela principal Git mostra os painéis inferiores (working tree, stash, log).",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestExtractGitURL",
+   "type": "function",
+   "name": "TestExtractGitURL",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    109,
+    114
+   ],
+   "summary": "Testa a extração de URLs da saída de comandos Git.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestRenderGitCommandLogShowsOutput",
+   "type": "function",
+   "name": "TestRenderGitCommandLogShowsOutput",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    116,
+    128
+   ],
+   "summary": "Testa que o log de comandos exibe a saída dos comandos Git.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsStagedBadge",
+   "type": "function",
+   "name": "TestGitFileLinesShowsStagedBadge",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    130,
+    149
+   ],
+   "summary": "Testa o badge de staged nas linhas de arquivos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestMoveWTFileTreeCursorSkipsFolders",
+   "type": "function",
+   "name": "TestMoveWTFileTreeCursorSkipsFolders",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    151,
+    175
+   ],
+   "summary": "Testa que o cursor da árvore pula linhas de pasta.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsTree",
+   "type": "function",
+   "name": "TestGitFileLinesShowsTree",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    177,
+    196
+   ],
+   "summary": "Testa a exibição em árvore dos arquivos alterados.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitConflictFileLinesOnlyUnmerged",
+   "type": "function",
+   "name": "TestGitConflictFileLinesOnlyUnmerged",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    198,
+    226
+   ],
+   "summary": "Testa que a lista de conflitos mostra apenas arquivos não mesclados.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitConflictDiffScreen",
+   "type": "function",
+   "name": "TestGitConflictDiffScreen",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    228,
+    254
+   ],
+   "summary": "Testa a tela de diff de conflito.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitAddFileTogglesUnstage",
+   "type": "function",
+   "name": "TestGitAddFileTogglesUnstage",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    256,
+    271
+   ],
+   "summary": "Testa que adicionar um arquivo já staged faz unstage.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "type": "function",
+   "name": "TestOpenGitFileDiffAllowsScroll",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    273,
+    327
+   ],
+   "summary": "Testa que o diff de arquivo permite scroll vertical.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestFilteredGitBranches",
+   "type": "function",
+   "name": "TestFilteredGitBranches",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    329,
+    341
+   ],
+   "summary": "Testa a filtragem de branches pelo texto.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitBranchFilterLiveInline",
+   "type": "function",
+   "name": "TestGitBranchFilterLiveInline",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    343,
+    379
+   ],
+   "summary": "Testa o filtro inline de branches em tempo real.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitDiffSearchInlineLive",
+   "type": "function",
+   "name": "TestGitDiffSearchInlineLive",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    381,
+    401
+   ],
+   "summary": "Testa a busca inline no diff em tempo real.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitPromptEditsAtCursor",
+   "type": "function",
+   "name": "TestGitPromptEditsAtCursor",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    403,
+    413
+   ],
+   "summary": "Testa a edição de texto na posição do cursor no prompt Git.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestSyncGitBranchCursor",
+   "type": "function",
+   "name": "TestSyncGitBranchCursor",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    415,
+    425
+   ],
+   "summary": "Testa o ajuste do cursor de branches após filtragem.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitSelectCommitRange",
+   "type": "function",
+   "name": "TestGitSelectCommitRange",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    427,
+    444
+   ],
+   "summary": "Testa a seleção de intervalo de commits.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestFitGitPanelLines",
+   "type": "function",
+   "name": "TestFitGitPanelLines",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    446,
+    452
+   ],
+   "summary": "Testa o ajuste de conteúdo a um número fixo de linhas.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestIsGitCommitInCherryBufferMarked",
+   "type": "function",
+   "name": "TestIsGitCommitInCherryBufferMarked",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    454,
+    462
+   ],
+   "summary": "Testa a verificação de commit presente no buffer de cherry-pick.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestOpenGitBranchHistoryDoesNotOpenCommit",
+   "type": "function",
+   "name": "TestOpenGitBranchHistoryDoesNotOpenCommit",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    464,
+    508
+   ],
+   "summary": "Testa que abrir o histórico da branch não abre o detalhe de commit.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestRenderGitDiffLineColors",
+   "type": "function",
+   "name": "TestRenderGitDiffLineColors",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    510,
+    525
+   ],
+   "summary": "Testa as cores das linhas de diff adicionadas e removidas.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitDiffHorizontalScrollRevealsTail",
+   "type": "function",
+   "name": "TestGitDiffHorizontalScrollRevealsTail",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    527,
+    538
+   ],
+   "summary": "Testa que o scroll horizontal revela o fim de linhas longas.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestBuildCommitFileTreeCompactsFolders",
+   "type": "function",
+   "name": "TestBuildCommitFileTreeCompactsFolders",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    540,
+    569
+   ],
+   "summary": "Testa a compactação de pastas na árvore de arquivos do commit.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "type": "function",
+   "name": "TestGitCommitTreeKeysOpenCollapse",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    571,
+    618
+   ],
+   "summary": "Testa as teclas de abrir e colapsar a árvore do commit.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitDetailShowsSidebarAndDiff",
+   "type": "function",
+   "name": "TestGitCommitDetailShowsSidebarAndDiff",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    620,
+    647
+   ],
+   "summary": "Testa que o detalhe do commit mostra barra lateral e diff.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestCommitFileChangeCounts",
+   "type": "function",
+   "name": "TestCommitFileChangeCounts",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    649,
+    661
+   ],
+   "summary": "Testa a contagem de arquivos adicionados, modificados e removidos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitDetailShowsFileStats",
+   "type": "function",
+   "name": "TestGitCommitDetailShowsFileStats",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    663,
+    686
+   ],
+   "summary": "Testa a linha de estatísticas de arquivos no detalhe do commit.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitMessageExpandToggle",
+   "type": "function",
+   "name": "TestGitCommitMessageExpandToggle",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    688,
+    705
+   ],
+   "summary": "Testa a alternância de expansão da mensagem do commit.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitDetailKeepsFileColumnClean",
+   "type": "function",
+   "name": "TestGitCommitDetailKeepsFileColumnClean",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    707,
+    731
+   ],
+   "summary": "Testa que a coluna de arquivos do detalhe não é poluída pelo diff.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitDiffSearchJumpsToMatch",
+   "type": "function",
+   "name": "TestGitDiffSearchJumpsToMatch",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    733,
+    750
+   ],
+   "summary": "Testa o salto para ocorrências da busca no diff.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestSwitchGitCommitFileUsesCache",
+   "type": "function",
+   "name": "TestSwitchGitCommitFileUsesCache",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    752,
+    776
+   ],
+   "summary": "Testa que trocar de arquivo do commit usa o cache de diffs.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommitDiffScrollReachesEnd",
+   "type": "function",
+   "name": "TestGitCommitDiffScrollReachesEnd",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    778,
+    795
+   ],
+   "summary": "Testa que o scroll do diff do commit alcança o final.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitComposeModalMultiline",
+   "type": "function",
+   "name": "TestGitComposeModalMultiline",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    797,
+    842
+   ],
+   "summary": "Testa o modal de composição de commit multilinha.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitNewBranchPromptIsModal",
+   "type": "function",
+   "name": "TestGitNewBranchPromptIsModal",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    844,
+    865
+   ],
+   "summary": "Testa que o prompt de nova branch é exibido como modal.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitGraphRowFitsBox",
+   "type": "function",
+   "name": "TestGitGraphRowFitsBox",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    869,
+    889
+   ],
+   "summary": "Testa que a linha do grafo cabe na caixa sem cortar o hash.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGraphCommitIconsAreSingleWidth",
+   "type": "function",
+   "name": "TestGraphCommitIconsAreSingleWidth",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    893,
+    903
+   ],
+   "summary": "Testa que os ícones de commit do grafo têm largura simples.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitHeaderFindsRemoteInEitherField",
+   "type": "function",
+   "name": "TestGitHeaderFindsRemoteInEitherField",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    909,
+    921
+   ],
+   "summary": "Testa que o cabeçalho encontra o remoto na URL ou na lista de remotos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitHeaderShowsSyncState",
+   "type": "function",
+   "name": "TestGitHeaderShowsSyncState",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    923,
+    939
+   ],
+   "summary": "Testa que o cabeçalho mostra o estado de sincronia da branch.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitStashSubjectStripsWipPrefix",
+   "type": "function",
+   "name": "TestGitStashSubjectStripsWipPrefix",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    943,
+    953
+   ],
+   "summary": "Testa a remoção do prefixo WIP no assunto do stash.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitColumnWidthsFollowPanelNotTerminal",
+   "type": "function",
+   "name": "TestGitColumnWidthsFollowPanelNotTerminal",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    958,
+    971
+   ],
+   "summary": "Testa que as larguras de coluna seguem o painel e não o terminal.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/git_tab_test.go:TestGitCommandBarWrapsInsteadOfHiding",
+   "type": "function",
+   "name": "TestGitCommandBarWrapsInsteadOfHiding",
+   "filePath": "internal/ui/git_tab_test.go",
+   "lineRange": [
+    974,
+    990
+   ],
+   "summary": "Testa que a barra de comandos quebra linha em vez de esconder comandos.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "git"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitListViewport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitBranchColWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitCommitColWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommandBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitStashPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitStashSubject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchFilterLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitPrimaryRemote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitBranchChip",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitStatsRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitNotifLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitStatusBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitMainColumnsSized",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitWorkingRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:wtFileTreeFrom",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:wtConflictRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:snapWTFileTreeCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:moveWTFileTreeCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:syncWTFileTreeCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:selectedWTFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:focusFirstConflict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitFileLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitConflictFileLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitCommandLogFlatLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommandLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:openGitCmdLogURLAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:handleGitMouseClick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:fitGitPanelLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:trimEdgeBlanks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchHistoryHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchHistoryCards",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchHistoryTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchCommitLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchHistoryInspector",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:wrapGitMessage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitUniqueAuthors",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitAuthorCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitDiffSearchLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:commitFileChangeCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitFileStatsLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitFixedBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitHeaderLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitCommitFilesPanelWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:buildCommitFileTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:flattenCommitFileTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:compactGitPathDir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitFilesSidebarLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitDiffPanelLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitCommitDiffHScrollBy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:parseDiffContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:parseDiffHunkHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:atoiPrefix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitCommitDiffPosition",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitDiffLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitSyncTag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommits",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitFiles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:commitChangeStyle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:initGitTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:filteredGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitFocusNext",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitFocusPrev",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:updateGitCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitSelectCommitRange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:selectGitBranch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:openGitBranchHistory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:openGitFileDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:renderGitFileDiffBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitWTDiffHScrollBy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:openGitCommitDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:previewGitCommitTreeSelection",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:openSelectedGitCommitFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:collapseGitCommitTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:expandGitCommitTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:switchGitCommitFile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitDiffSearchMatches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitDiffMatchLineSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:jumpGitDiffSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:updateGitDiffSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "function:internal/ui/git_tab.go:gitSpaceAction",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestRenderGitMainShowsBottomBoxes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestExtractGitURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestRenderGitCommandLogShowsOutput",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsStagedBadge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestMoveWTFileTreeCursorSkipsFolders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsTree",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitConflictFileLinesOnlyUnmerged",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitConflictDiffScreen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitAddFileTogglesUnstage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestFilteredGitBranches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitBranchFilterLiveInline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitDiffSearchInlineLive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitPromptEditsAtCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestSyncGitBranchCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitSelectCommitRange",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestFitGitPanelLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestIsGitCommitInCherryBufferMarked",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestOpenGitBranchHistoryDoesNotOpenCommit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestRenderGitDiffLineColors",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitDiffHorizontalScrollRevealsTail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestBuildCommitFileTreeCompactsFolders",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitDetailShowsSidebarAndDiff",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestCommitFileChangeCounts",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitDetailShowsFileStats",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitMessageExpandToggle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitDetailKeepsFileColumnClean",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitDiffSearchJumpsToMatch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestSwitchGitCommitFileUsesCache",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommitDiffScrollReachesEnd",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitComposeModalMultiline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitNewBranchPromptIsModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitGraphRowFitsBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGraphCommitIconsAreSingleWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitHeaderFindsRemoteInEitherField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitHeaderShowsSyncState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitStashSubjectStripsWipPrefix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitColumnWidthsFollowPanelNotTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "function:internal/ui/git_tab_test.go:TestGitCommandBarWrapsInsteadOfHiding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/git_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitListViewport",
+   "target": "function:internal/ui/helpers.go:contentPanelHeight",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitTab",
+   "target": "function:internal/ui/git_graph.go:renderGitGraph",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitHeader",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitNotifLine",
+   "target": "function:internal/ui/git_messages.go:conflictStatusMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitNotifLine",
+   "target": "function:internal/ui/git_messages.go:gitCherryPickSummary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitWorkingRow",
+   "target": "function:internal/collectors/git.go:GitUnmergedCount",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:wtFileTreeFrom",
+   "target": "function:internal/ui/helpers.go:gitStatusLabel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:wtConflictRows",
+   "target": "function:internal/collectors/git.go:GitFileUnmerged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:snapWTFileTreeCursor",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:syncWTFileTreeCursor",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitFileLines",
+   "target": "function:internal/ui/helpers.go:gitStatusStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitFileLines",
+   "target": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitConflictFileLines",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitCommandLog",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitCommandLog",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitBranchHistory",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitBranchHistoryHeader",
+   "target": "function:internal/ui/project_sidebar.go:tabAccentColor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitBranchHistoryTable",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitBranchHistoryInspector",
+   "target": "function:internal/ui/project_sidebar.go:meterBar",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitCommitHeaderLines",
+   "target": "function:internal/ui/helpers.go:wrapText",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitDiffLine",
+   "target": "function:internal/ui/helpers.go:sliceColumns",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitBranches",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitCommits",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitCommitLine",
+   "target": "function:internal/ui/git_messages.go:isGitCommitInCherryBuffer",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitFiles",
+   "target": "function:internal/ui/helpers.go:gitStatusStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:updateGitCursor",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:updateGitCursor",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:openGitFileDiff",
+   "target": "function:internal/ui/git_messages.go:openGitConflictDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:openGitFileDiff",
+   "target": "function:internal/ui/git_messages.go:requestGitWorkingTreeDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "target": "function:internal/ui/helpers.go:gitStatusLabel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "target": "function:internal/ui/helpers.go:gitStatusStyle",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:openGitCommitDetail",
+   "target": "function:internal/ui/git_messages.go:loadGitCommitDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:previewGitCommitTreeSelection",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:previewGitCommitTreeSelection",
+   "target": "function:internal/ui/git_messages.go:requestGitCommitFileDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:openSelectedGitCommitFile",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:collapseGitCommitTree",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:expandGitCommitTree",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:switchGitCommitFile",
+   "target": "function:internal/ui/helpers.go:clampCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:switchGitCommitFile",
+   "target": "function:internal/ui/git_messages.go:requestGitCommitFileDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:jumpGitDiffSearch",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "target": "function:internal/ui/helpers.go:ensureVisible",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitSpaceAction",
+   "target": "function:internal/ui/git_prompt.go:selectedGitBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab.go:gitSpaceAction",
+   "target": "function:internal/ui/git_messages.go:gitCheckoutBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestRenderGitMainShowsBottomBoxes",
+   "target": "function:internal/ui/git_tab.go:renderGitTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestRenderGitCommandLogShowsOutput",
+   "target": "function:internal/ui/git_tab.go:renderGitCommandLog",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsStagedBadge",
+   "target": "function:internal/ui/git_tab.go:gitFileLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsStagedBadge",
+   "target": "function:internal/ui/helpers.go:gitFileStaged",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestMoveWTFileTreeCursorSkipsFolders",
+   "target": "function:internal/ui/git_tab.go:wtFileTreeFrom",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestMoveWTFileTreeCursorSkipsFolders",
+   "target": "function:internal/ui/git_tab.go:moveWTFileTreeCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitFileLinesShowsTree",
+   "target": "function:internal/ui/git_tab.go:gitFileLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitConflictFileLinesOnlyUnmerged",
+   "target": "function:internal/ui/git_tab.go:gitFileLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitConflictFileLinesOnlyUnmerged",
+   "target": "function:internal/ui/git_tab.go:renderGitWorkingRow",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitConflictDiffScreen",
+   "target": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitAddFileTogglesUnstage",
+   "target": "function:internal/ui/git_messages.go:gitAddFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "target": "function:internal/ui/git_tab.go:openGitFileDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "target": "function:internal/ui/git_tab.go:renderGitFileDiff",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "target": "function:internal/ui/git_tab.go:gitWTDiffHScrollBy",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestOpenGitFileDiffAllowsScroll",
+   "target": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestFilteredGitBranches",
+   "target": "function:internal/ui/git_tab.go:filteredGitBranches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitBranchFilterLiveInline",
+   "target": "function:internal/ui/git_tab.go:filteredGitBranches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitBranchFilterLiveInline",
+   "target": "function:internal/ui/git_tab.go:renderGitBranchFilterLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffSearchInlineLive",
+   "target": "function:internal/ui/git_tab.go:updateGitDiffSearch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffSearchInlineLive",
+   "target": "function:internal/ui/git_tab.go:gitDiffSearchMatches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffSearchInlineLive",
+   "target": "function:internal/ui/git_tab.go:renderGitDiffSearchLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitPromptEditsAtCursor",
+   "target": "function:internal/ui/git_prompt.go:updateGitPrompt",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestSyncGitBranchCursor",
+   "target": "function:internal/ui/git_tab.go:syncGitBranchCursor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitSelectCommitRange",
+   "target": "function:internal/ui/git_tab.go:gitSelectCommitRange",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestFitGitPanelLines",
+   "target": "function:internal/ui/git_tab.go:fitGitPanelLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestIsGitCommitInCherryBufferMarked",
+   "target": "function:internal/ui/git_messages.go:isGitCommitInCherryBuffer",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestOpenGitBranchHistoryDoesNotOpenCommit",
+   "target": "function:internal/ui/git_tab.go:renderGitTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestRenderGitDiffLineColors",
+   "target": "function:internal/ui/git_tab.go:renderGitDiffLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffHorizontalScrollRevealsTail",
+   "target": "function:internal/ui/git_tab.go:renderGitDiffLine",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestBuildCommitFileTreeCompactsFolders",
+   "target": "function:internal/ui/git_tab.go:buildCommitFileTree",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "target": "function:internal/ui/git_tab.go:collapseGitCommitTree",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "target": "function:internal/ui/git_tab.go:expandGitCommitTree",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "target": "function:internal/ui/git_tab.go:previewGitCommitTreeSelection",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "target": "function:internal/ui/git_tab.go:openSelectedGitCommitFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitTreeKeysOpenCollapse",
+   "target": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestCommitFileChangeCounts",
+   "target": "function:internal/ui/git_tab.go:commitFileChangeCounts",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitDetailShowsFileStats",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitMessageExpandToggle",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitHeaderLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitCommitDetailKeepsFileColumnClean",
+   "target": "function:internal/ui/git_tab.go:renderGitCommitDetail",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffSearchJumpsToMatch",
+   "target": "function:internal/ui/git_tab.go:jumpGitDiffSearch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitDiffSearchJumpsToMatch",
+   "target": "function:internal/ui/git_tab.go:gitDiffSearchMatches",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestSwitchGitCommitFileUsesCache",
+   "target": "function:internal/ui/git_tab.go:switchGitCommitFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitComposeModalMultiline",
+   "target": "function:internal/ui/git_compose.go:startGitCompose",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitComposeModalMultiline",
+   "target": "function:internal/ui/git_compose.go:updateGitCompose",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitComposeModalMultiline",
+   "target": "function:internal/ui/git_compose.go:renderGitCompose",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitNewBranchPromptIsModal",
+   "target": "function:internal/ui/git_prompt.go:startGitNewBranch",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitNewBranchPromptIsModal",
+   "target": "function:internal/ui/git_prompt.go:renderGitPrompt",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitGraphRowFitsBox",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitGraphRowFitsBox",
+   "target": "function:internal/ui/git_graph.go:renderGitGraphListRow",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGraphCommitIconsAreSingleWidth",
+   "target": "function:internal/ui/git_graph.go:graphCommitIcon",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitHeaderFindsRemoteInEitherField",
+   "target": "function:internal/ui/git_tab.go:gitPrimaryRemote",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitHeaderShowsSyncState",
+   "target": "function:internal/ui/git_tab.go:gitBranchChip",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitStashSubjectStripsWipPrefix",
+   "target": "function:internal/ui/git_tab.go:gitStashSubject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitColumnWidthsFollowPanelNotTerminal",
+   "target": "function:internal/ui/git_tab.go:gitBranchColWidth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/git_tab_test.go:TestGitColumnWidthsFollowPanelNotTerminal",
+   "target": "function:internal/ui/git_tab.go:gitCommitColWidth",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/git_tab.go",
+   "target": "file:internal/ui/git_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,1271 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/graph_features_test.go",
+   "type": "file",
+   "name": "graph_features_test.go",
+   "filePath": "internal/ui/graph_features_test.go",
+   "summary": "Testes das visões gráficas: imagens e dependências de containers, layout do grafo de commits e navegação/seletor de branch do grafo.",
+   "tags": [
+    "test",
+    "grafo-commits",
+    "docker",
+    "git"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:testProjectWithContainer",
+   "type": "function",
+   "name": "testProjectWithContainer",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    13,
+    28
+   ],
+   "summary": "Cria um projeto de teste com um container para os testes de grafo e imagens.",
+   "tags": [
+    "test",
+    "fixture",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestRenderContainerImagesDoesNotPanic",
+   "type": "function",
+   "name": "TestRenderContainerImagesDoesNotPanic",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    30,
+    60
+   ],
+   "summary": "Testa que a renderização das imagens de container não entra em pânico.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestHandleContainerImagesKeysNavigatesAndCycles",
+   "type": "function",
+   "name": "TestHandleContainerImagesKeysNavigatesAndCycles",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    62,
+    91
+   ],
+   "summary": "Testa navegação e ciclagem de teclas na visão de imagens de container.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+   "type": "function",
+   "name": "TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    93,
+    114
+   ],
+   "summary": "Testa que a visão de dependências de containers monta a floresta sem pânico.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestBuildGraphLayoutRowsShareAUniformWidth",
+   "type": "function",
+   "name": "TestBuildGraphLayoutRowsShareAUniformWidth",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    133,
+    157
+   ],
+   "summary": "Testa que todas as linhas do layout do grafo têm largura uniforme.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestRenderGitGraphDoesNotPanic",
+   "type": "function",
+   "name": "TestRenderGitGraphDoesNotPanic",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    159,
+    180
+   ],
+   "summary": "Testa que a renderização do grafo Git não entra em pânico.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestHandleGitGraphKeysSkipsConnectorRows",
+   "type": "function",
+   "name": "TestHandleGitGraphKeysSkipsConnectorRows",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    182,
+    220
+   ],
+   "summary": "Testa que a navegação no grafo pula linhas de conector.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "type": "function",
+   "name": "TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    222,
+    246
+   ],
+   "summary": "Testa que Enter abre o detalhe do commit e Esc retorna ao grafo.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:graphAppFixture",
+   "type": "function",
+   "name": "graphAppFixture",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    250,
+    261
+   ],
+   "summary": "Cria uma App e um projeto de teste com grafo e detalhe de commit carregados.",
+   "tags": [
+    "test",
+    "fixture",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestGitGraphTabCyclesPanesAndScrollsThem",
+   "type": "function",
+   "name": "TestGitGraphTabCyclesPanesAndScrollsThem",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    263,
+    318
+   ],
+   "summary": "Testa que Tab cicla os painéis do grafo e permite rolá-los.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerFiltersTheGraph",
+   "type": "function",
+   "name": "TestGitGraphBranchPickerFiltersTheGraph",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    320,
+    354
+   ],
+   "summary": "Testa que o seletor de branch filtra o grafo.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerTypingNarrowsTheList",
+   "type": "function",
+   "name": "TestGitGraphBranchPickerTypingNarrowsTheList",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    356,
+    385
+   ],
+   "summary": "Testa que digitar no seletor de branch estreita a lista.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_features_test.go:TestDockerImageRowColorsProjectMembership",
+   "type": "function",
+   "name": "TestDockerImageRowColorsProjectMembership",
+   "filePath": "internal/ui/graph_features_test.go",
+   "lineRange": [
+    387,
+    422
+   ],
+   "summary": "Testa a coloração das linhas de imagem Docker conforme pertencerem ao projeto.",
+   "tags": [
+    "test",
+    "teste-unitario",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/graph_layout.go",
+   "type": "file",
+   "name": "graph_layout.go",
+   "filePath": "internal/ui/graph_layout.go",
+   "summary": "Algoritmo de layout do grafo de commits (lanes, cores e células de conexão), portado do git-graph.",
+   "tags": [
+    "algoritmo",
+    "grafo-commits",
+    "git",
+    "layout"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Algoritmo portado do git-graph (Rust) para Go; cores por lane com reserva para a lane principal."
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:assignColorAdvanced",
+   "type": "function",
+   "name": "assignColorAdvanced",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    123,
+    190
+   ],
+   "summary": "Atribui cor a uma lane do grafo evitando repetição entre irmãos de fork e lanes vizinhas.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:assignMainColor",
+   "type": "function",
+   "name": "assignMainColor",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    197,
+    206
+   ],
+   "summary": "Atribui a cor reservada da lane principal.",
+   "tags": [
+    "estilizacao",
+    "lipgloss",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:continueLane",
+   "type": "function",
+   "name": "continueLane",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    208,
+    217
+   ],
+   "summary": "Mantém a cor já atribuída a uma lane que continua.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "function",
+   "name": "buildGraphLayout",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    247,
+    486
+   ],
+   "summary": "Constrói o layout completo do grafo de commits (lanes, cores e células) a partir do DAG, inspirado no git-graph.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "grafo-commits"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:buildRowCells",
+   "type": "function",
+   "name": "buildRowCells",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    495,
+    571
+   ],
+   "summary": "Gera as células de uma linha do grafo com commit, lanes ativas e conexões aos pais.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/graph_layout.go:buildForkConnectorCells",
+   "type": "function",
+   "name": "buildForkConnectorCells",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    575,
+    636
+   ],
+   "summary": "Gera a linha de conectores quando várias lanes convergem para o mesmo commit de fork.",
+   "tags": [
+    "algoritmo",
+    "estrutura-dados",
+    "grafo-commits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/ui/graph_layout.go:colorAssigner",
+   "type": "class",
+   "name": "colorAssigner",
+   "filePath": "internal/ui/graph_layout.go",
+   "lineRange": [
+    79,
+    90
+   ],
+   "summary": "Gerenciador de atribuição de cores às lanes do grafo de commits, com cores reservadas e controle de vizinhança.",
+   "tags": [
+    "data-model",
+    "struct",
+    "grafo-commits"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:testProjectWithContainer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestRenderContainerImagesDoesNotPanic",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestHandleContainerImagesKeysNavigatesAndCycles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestRenderContainerDepsBuildsForestAndDoesNotPanic",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestBuildGraphLayoutRowsShareAUniformWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestRenderGitGraphDoesNotPanic",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestHandleGitGraphKeysSkipsConnectorRows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:graphAppFixture",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestGitGraphTabCyclesPanesAndScrollsThem",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerFiltersTheGraph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerTypingNarrowsTheList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "function:internal/ui/graph_features_test.go:TestDockerImageRowColorsProjectMembership",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_features_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:assignColorAdvanced",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:assignMainColor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:continueLane",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:buildRowCells",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "function:internal/ui/graph_layout.go:buildForkConnectorCells",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "class:internal/ui/graph_layout.go:colorAssigner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestBuildGraphLayoutRowsShareAUniformWidth",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestRenderGitGraphDoesNotPanic",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestRenderGitGraphDoesNotPanic",
+   "target": "function:internal/ui/git_graph.go:renderGitGraph",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestHandleGitGraphKeysSkipsConnectorRows",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestHandleGitGraphKeysSkipsConnectorRows",
+   "target": "function:internal/ui/git_graph.go:selectedGitGraphNode",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestHandleGitGraphKeysSkipsConnectorRows",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphEnterOpensCommitDetailAndEscReturnsToGraph",
+   "target": "function:internal/ui/git_tab.go:handleGitDedicatedKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:graphAppFixture",
+   "target": "function:internal/ui/graph_layout.go:buildGraphLayout",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphTabCyclesPanesAndScrollsThem",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphTabCyclesPanesAndScrollsThem",
+   "target": "function:internal/ui/git_graph.go:renderGitGraph",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerFiltersTheGraph",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerFiltersTheGraph",
+   "target": "function:internal/ui/git_graph.go:renderGitGraphList",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerTypingNarrowsTheList",
+   "target": "function:internal/ui/git_graph.go:handleGitGraphKeys",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/graph_features_test.go:TestGitGraphBranchPickerTypingNarrowsTheList",
+   "target": "function:internal/ui/git_graph.go:gitGraphBranchList",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/graph_layout.go",
+   "target": "file:internal/ui/graph_features_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

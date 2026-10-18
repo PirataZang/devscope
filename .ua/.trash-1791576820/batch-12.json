@@ -1,0 +1,76 @@
+{
+ "nodes": [
+  {
+   "id": "document:.github/ISSUE_TEMPLATE/bug_report.md",
+   "type": "document",
+   "name": "bug_report.md",
+   "summary": "Template de issue para reportar bugs, pedindo passos de reprodução, comportamento esperado, ambiente (OS, versão do DevScope/Go, Docker/PM2) e logs com `--debug`.",
+   "tags": [
+    "documentation",
+    "issue-template",
+    "github",
+    "bug-report"
+   ],
+   "complexity": "simple",
+   "filePath": ".github/ISSUE_TEMPLATE/bug_report.md"
+  },
+  {
+   "id": "document:.github/ISSUE_TEMPLATE/detector_request.md",
+   "type": "document",
+   "name": "detector_request.md",
+   "summary": "Template de issue para pedir suporte a um novo framework/stack, listando os arquivos marcadores (package.json, go.mod, composer.json etc.) usados na detecção.",
+   "tags": [
+    "documentation",
+    "issue-template",
+    "github",
+    "detectores"
+   ],
+   "complexity": "simple",
+   "filePath": ".github/ISSUE_TEMPLATE/detector_request.md"
+  },
+  {
+   "id": "document:.github/ISSUE_TEMPLATE/feature_request.md",
+   "type": "document",
+   "name": "feature_request.md",
+   "summary": "Template de issue para sugerir melhorias, com seções de problema, solução proposta, alternativas e contexto.",
+   "tags": [
+    "documentation",
+    "issue-template",
+    "github",
+    "feature-request"
+   ],
+   "complexity": "simple",
+   "filePath": ".github/ISSUE_TEMPLATE/feature_request.md"
+  }
+ ],
+ "edges": [
+  {
+   "source": "document:.github/ISSUE_TEMPLATE/bug_report.md",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:.github/ISSUE_TEMPLATE/detector_request.md",
+   "target": "file:internal/detectors/registry.go",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:.github/ISSUE_TEMPLATE/detector_request.md",
+   "target": "file:internal/detectors/frameworks.go",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:.github/ISSUE_TEMPLATE/feature_request.md",
+   "target": "document:README.md",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

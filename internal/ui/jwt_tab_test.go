@@ -102,7 +102,7 @@ func TestJwtHScrollAndEditorSelect(t *testing.T) {
 }
 
 func TestSidebarHidesJWT(t *testing.T) {
-	a := &App{width: 120, height: 40, tab: TabRoutes}
+	a := &App{width: 120, height: 40, tab: TabNginx}
 	got := stripANSI(a.renderProjectSidebar())
 	if strings.Contains(got, "JWT") {
 		t.Fatalf("sidebar should not list JWT: %q", got)

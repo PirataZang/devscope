@@ -1,0 +1,2871 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/container_detail.go",
+   "type": "file",
+   "name": "container_detail.go",
+   "filePath": "internal/ui/container_detail.go",
+   "summary": "Tela de detalhe do container com abas numeradas, rolagem bidirecional, busca e acompanhamento ao vivo dos logs.",
+   "tags": [
+    "component",
+    "docker",
+    "logs",
+    "search",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:label",
+   "type": "function",
+   "name": "label",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    36,
+    55
+   ],
+   "summary": "Retorna o rótulo completo de cada aba do detalhe do container.",
+   "tags": [
+    "enum",
+    "labels",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:shortLabel",
+   "type": "function",
+   "name": "shortLabel",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    57,
+    76
+   ],
+   "summary": "Retorna o rótulo abreviado de cada aba do detalhe do container para telas estreitas.",
+   "tags": [
+    "enum",
+    "labels",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailStatusBadge",
+   "type": "function",
+   "name": "containerDetailStatusBadge",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    95,
+    128
+   ],
+   "summary": "Resume o modo de acompanhamento (follow), busca e posição no cabeçalho do detalhe.",
+   "tags": [
+    "rendering",
+    "status",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailPosition",
+   "type": "function",
+   "name": "containerDetailPosition",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    130,
+    141
+   ],
+   "summary": "Calcula o indicador de posição de rolagem (linhas/percentual) do detalhe.",
+   "tags": [
+    "rendering",
+    "scroll",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:renderContainerDetailTabBar",
+   "type": "function",
+   "name": "renderContainerDetailTabBar",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    149,
+    178
+   ],
+   "summary": "Renderiza a régua de abas numeradas do detalhe do container, adaptando-se à largura.",
+   "tags": [
+    "rendering",
+    "tabs",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerTabsWidth",
+   "type": "function",
+   "name": "containerTabsWidth",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    180,
+    192
+   ],
+   "summary": "Calcula a largura total que uma lista de rótulos de abas ocupa.",
+   "tags": [
+    "utility",
+    "layout",
+    "tabs"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailLines",
+   "type": "function",
+   "name": "containerDetailLines",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    204,
+    216
+   ],
+   "summary": "Retorna o conteúdo da aba atual do detalhe dividido em linhas sanitizadas.",
+   "tags": [
+    "content",
+    "utility",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailGotoTab",
+   "type": "function",
+   "name": "containerDetailGotoTab",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    240,
+    252
+   ],
+   "summary": "Troca para a aba numerada do detalhe e carrega seu conteúdo.",
+   "tags": [
+    "navigation",
+    "tabs",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailHScrollBy",
+   "type": "function",
+   "name": "containerDetailHScrollBy",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    267,
+    277
+   ],
+   "summary": "Rola o texto do detalhe na horizontal, limitado à largura do conteúdo.",
+   "tags": [
+    "scroll",
+    "navigation",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:clampScroll",
+   "type": "function",
+   "name": "clampScroll",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    285,
+    297
+   ],
+   "summary": "Limita um deslocamento de rolagem ao intervalo válido.",
+   "tags": [
+    "utility",
+    "scroll",
+    "math"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailSearchMatches",
+   "type": "function",
+   "name": "containerDetailSearchMatches",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    299,
+    311
+   ],
+   "summary": "Encontra as linhas do detalhe que casam com o termo de busca.",
+   "tags": [
+    "search",
+    "utility",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:containerDetailMatchLineSet",
+   "type": "function",
+   "name": "containerDetailMatchLineSet",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    313,
+    323
+   ],
+   "summary": "Converte as ocorrências de busca em um conjunto de linhas para realce.",
+   "tags": [
+    "search",
+    "utility",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:jumpContainerDetailSearch",
+   "type": "function",
+   "name": "jumpContainerDetailSearch",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    325,
+    340
+   ],
+   "summary": "Salta para a próxima/anterior ocorrência da busca ajustando a rolagem.",
+   "tags": [
+    "search",
+    "navigation",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:updateContainerDetailSearch",
+   "type": "function",
+   "name": "updateContainerDetailSearch",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    352,
+    370
+   ],
+   "summary": "Trata o modo de digitação da busca no detalhe do container.",
+   "tags": [
+    "search",
+    "keyboard",
+    "event-handler"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:renderContainerDetailSearchPrompt",
+   "type": "function",
+   "name": "renderContainerDetailSearchPrompt",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    372,
+    381
+   ],
+   "summary": "Renderiza o prompt de busca do detalhe do container.",
+   "tags": [
+    "rendering",
+    "search",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:toggleContainerDetailFollow",
+   "type": "function",
+   "name": "toggleContainerDetailFollow",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    389,
+    401
+   ],
+   "summary": "Liga/desliga o acompanhamento ao vivo dos logs do container.",
+   "tags": [
+    "logs",
+    "follow",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:scheduleContainerDetailFollow",
+   "type": "function",
+   "name": "scheduleContainerDetailFollow",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    403,
+    413
+   ],
+   "summary": "Agenda o próximo tick de acompanhamento dos logs do container.",
+   "tags": [
+    "logs",
+    "scheduling",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:appendContainerLogs",
+   "type": "function",
+   "name": "appendContainerLogs",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    415,
+    439
+   ],
+   "summary": "Anexa um novo bloco de logs ao conteúdo existente, evitando duplicação e limitando o tamanho.",
+   "tags": [
+    "logs",
+    "utility",
+    "text"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:handleContainerDetailFollow",
+   "type": "function",
+   "name": "handleContainerDetailFollow",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    441,
+    461
+   ],
+   "summary": "Processa o tick de follow: busca logs novos e reagenda enquanto ativo.",
+   "tags": [
+    "logs",
+    "event-handler",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:reloadContainerDetailLogs",
+   "type": "function",
+   "name": "reloadContainerDetailLogs",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    463,
+    472
+   ],
+   "summary": "Recarrega os logs do container exibidos no detalhe.",
+   "tags": [
+    "logs",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_detail.go:handleContainerDetailKeys",
+   "type": "function",
+   "name": "handleContainerDetailKeys",
+   "filePath": "internal/ui/container_detail.go",
+   "lineRange": [
+    474,
+    545
+   ],
+   "summary": "Despacha as teclas do detalhe do container: abas, rolagem, busca, follow e ações.",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/container_images.go",
+   "type": "file",
+   "name": "container_images.go",
+   "filePath": "internal/ui/container_images.go",
+   "summary": "Tela de imagens Docker com escopos (repositório, projeto, todas), tabela e modal de remoção.",
+   "tags": [
+    "component",
+    "docker-images",
+    "table",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:openContainerImages",
+   "type": "function",
+   "name": "openContainerImages",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    48,
+    58
+   ],
+   "summary": "Abre a tela de imagens Docker focada no repositório do container selecionado e dispara o carregamento.",
+   "tags": [
+    "navigation",
+    "docker-images",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:handleDockerImagesLoaded",
+   "type": "function",
+   "name": "handleDockerImagesLoaded",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    70,
+    81
+   ],
+   "summary": "Aplica a lista de imagens carregada (ou o erro) ao estado da tela.",
+   "tags": [
+    "event-handler",
+    "docker-images",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:handleDockerImagesRemoved",
+   "type": "function",
+   "name": "handleDockerImagesRemoved",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    83,
+    95
+   ],
+   "summary": "Processa o resultado da remoção de imagens, notificando e recarregando a lista.",
+   "tags": [
+    "event-handler",
+    "docker-images",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:currentImageList",
+   "type": "function",
+   "name": "currentImageList",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    97,
+    106
+   ],
+   "summary": "Retorna as imagens visíveis conforme o escopo atual (repositório, projeto ou todas).",
+   "tags": [
+    "filtering",
+    "docker-images",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:cycleImageScope",
+   "type": "function",
+   "name": "cycleImageScope",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    108,
+    119
+   ],
+   "summary": "Alterna o escopo da lista de imagens entre repositório, projeto e todas.",
+   "tags": [
+    "state",
+    "filtering",
+    "docker-images"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:repoOf",
+   "type": "function",
+   "name": "repoOf",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    126,
+    137
+   ],
+   "summary": "Extrai o nome do repositório de uma referência de imagem, ignorando tag e digest.",
+   "tags": [
+    "parsing",
+    "docker",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:filterImagesByRepo",
+   "type": "function",
+   "name": "filterImagesByRepo",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    150,
+    161
+   ],
+   "summary": "Filtra imagens pelo repositório exato.",
+   "tags": [
+    "filtering",
+    "docker-images",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:imageBelongsToProject",
+   "type": "function",
+   "name": "imageBelongsToProject",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    167,
+    186
+   ],
+   "summary": "Indica se a imagem pertence ao projeto pela referência em uso ou pelos labels de build do compose.",
+   "tags": [
+    "matching",
+    "docker-images",
+    "compose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:handleContainerImagesKeys",
+   "type": "function",
+   "name": "handleContainerImagesKeys",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    198,
+    230
+   ],
+   "summary": "Trata navegação, troca de escopo e remoção na tela de imagens.",
+   "tags": [
+    "keyboard",
+    "event-handler",
+    "docker-images"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:handleImageRemoveModalKeys",
+   "type": "function",
+   "name": "handleImageRemoveModalKeys",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    232,
+    249
+   ],
+   "summary": "Trata as teclas do modal de confirmação de remoção de imagens.",
+   "tags": [
+    "keyboard",
+    "modal",
+    "event-handler"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:runImageRemoveOption",
+   "type": "function",
+   "name": "runImageRemoveOption",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    251,
+    282
+   ],
+   "summary": "Executa a opção escolhida no modal de remoção (imagem selecionada, dangling ou do projeto).",
+   "tags": [
+    "action",
+    "docker-images",
+    "async"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:imageScopeLabel",
+   "type": "function",
+   "name": "imageScopeLabel",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    284,
+    293
+   ],
+   "summary": "Retorna o rótulo do escopo atual da lista de imagens.",
+   "tags": [
+    "labels",
+    "docker-images",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderContainerImages",
+   "type": "function",
+   "name": "renderContainerImages",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    295,
+    328
+   ],
+   "summary": "Renderiza a tela de imagens Docker com cabeçalho, tabela, notificações e ações.",
+   "tags": [
+    "rendering",
+    "docker-images",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImagesHeader",
+   "type": "function",
+   "name": "renderImagesHeader",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    330,
+    343
+   ],
+   "summary": "Renderiza o cabeçalho da tela de imagens com escopo e contagem.",
+   "tags": [
+    "rendering",
+    "docker-images",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImagesNotif",
+   "type": "function",
+   "name": "renderImagesNotif",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    345,
+    354
+   ],
+   "summary": "Renderiza a linha de notificação ou erro da tela de imagens.",
+   "tags": [
+    "rendering",
+    "notification",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:imageColumns",
+   "type": "function",
+   "name": "imageColumns",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    360,
+    371
+   ],
+   "summary": "Distribui a largura disponível entre as colunas da tabela de imagens.",
+   "tags": [
+    "layout",
+    "table",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImagesTable",
+   "type": "function",
+   "name": "renderImagesTable",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    373,
+    395
+   ],
+   "summary": "Renderiza a tabela rolável de imagens com cabeçalho e linha selecionada.",
+   "tags": [
+    "rendering",
+    "table",
+    "docker-images"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImagesHeaderRow",
+   "type": "function",
+   "name": "renderImagesHeaderRow",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    397,
+    414
+   ],
+   "summary": "Renderiza a linha de cabeçalho das colunas da tabela de imagens.",
+   "tags": [
+    "rendering",
+    "table",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImageRow",
+   "type": "function",
+   "name": "renderImageRow",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    429,
+    468
+   ],
+   "summary": "Renderiza uma linha de imagem com repositório, tag, ID, tamanho, idade e dono.",
+   "tags": [
+    "rendering",
+    "table",
+    "docker-images"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:imageActionItems",
+   "type": "function",
+   "name": "imageActionItems",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    470,
+    485
+   ],
+   "summary": "Lista os atalhos disponíveis na tela de imagens.",
+   "tags": [
+    "keybindings",
+    "docker-images",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_images.go:renderImageRemoveModal",
+   "type": "function",
+   "name": "renderImageRemoveModal",
+   "filePath": "internal/ui/container_images.go",
+   "lineRange": [
+    496,
+    531
+   ],
+   "summary": "Renderiza o modal de confirmação com as opções de remoção de imagens.",
+   "tags": [
+    "rendering",
+    "modal",
+    "docker-images"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/container_messages.go",
+   "type": "file",
+   "name": "container_messages.go",
+   "filePath": "internal/ui/container_messages.go",
+   "summary": "Mensagens e comandos assíncronos das ações de container (start/stop/restart/pause/remove/shell), carregamento das abas de detalhe e refresh do Docker.",
+   "tags": [
+    "event-handler",
+    "docker",
+    "async",
+    "tea-cmd"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Segue o padrão Elm do Bubble Tea: ações demoradas viram tea.Cmd que devolvem mensagens tipadas tratadas em Update."
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "type": "function",
+   "name": "loadContainerDetailTab",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    40,
+    74
+   ],
+   "summary": "Cria o tea.Cmd que carrega assincronamente o conteúdo de uma aba do detalhe (logs, inspect, env, volumes, compose, Dockerfile etc.).",
+   "tags": [
+    "async",
+    "docker",
+    "tea-cmd"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:App.loadContainerDetailTab",
+   "type": "function",
+   "name": "App.loadContainerDetailTab",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    76,
+    97
+   ],
+   "summary": "Método que carrega a aba atual do detalhe do container selecionado, usando cache quando disponível.",
+   "tags": [
+    "async",
+    "state",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "type": "function",
+   "name": "handleContainerDetailLoaded",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    99,
+    120
+   ],
+   "summary": "Aplica o conteúdo carregado de uma aba do detalhe e inicia live stats quando é a aba de stats.",
+   "tags": [
+    "event-handler",
+    "docker",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:beginContainerAction",
+   "type": "function",
+   "name": "beginContainerAction",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    129,
+    139
+   ],
+   "summary": "Marca uma ação em andamento sobre um container, evitando ações concorrentes no mesmo container.",
+   "tags": [
+    "state",
+    "concurrency-guard",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerActionPrefix",
+   "type": "function",
+   "name": "containerActionPrefix",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    158,
+    177
+   ],
+   "summary": "Retorna o prefixo/ícone de status exibido durante cada tipo de ação.",
+   "tags": [
+    "labels",
+    "docker",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:updateContainerStatusSummary",
+   "type": "function",
+   "name": "updateContainerStatusSummary",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    179,
+    202
+   ],
+   "summary": "Atualiza a mensagem de status resumindo as ações de container em andamento.",
+   "tags": [
+    "status",
+    "state",
+    "docker"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerPause",
+   "type": "function",
+   "name": "containerPause",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    211,
+    229
+   ],
+   "summary": "Pausa ou retoma um container de forma assíncrona.",
+   "tags": [
+    "action",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerStart",
+   "type": "function",
+   "name": "containerStart",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    231,
+    243
+   ],
+   "summary": "Inicia um container de forma assíncrona.",
+   "tags": [
+    "action",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerStop",
+   "type": "function",
+   "name": "containerStop",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    245,
+    257
+   ],
+   "summary": "Para um container de forma assíncrona.",
+   "tags": [
+    "action",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerRestart",
+   "type": "function",
+   "name": "containerRestart",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    259,
+    271
+   ],
+   "summary": "Reinicia um container de forma assíncrona.",
+   "tags": [
+    "action",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerToggleRestartAlways",
+   "type": "function",
+   "name": "containerToggleRestartAlways",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    273,
+    291
+   ],
+   "summary": "Alterna a política de restart do container entre always e no.",
+   "tags": [
+    "action",
+    "docker",
+    "restart-policy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerRemove",
+   "type": "function",
+   "name": "containerRemove",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    300,
+    309
+   ],
+   "summary": "Remove um container de forma assíncrona.",
+   "tags": [
+    "action",
+    "docker",
+    "async"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerExecShell",
+   "type": "function",
+   "name": "containerExecShell",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    311,
+    325
+   ],
+   "summary": "Abre um shell interativo dentro do container via tea.ExecProcess.",
+   "tags": [
+    "exec",
+    "shell",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:containerExecShellFallback",
+   "type": "function",
+   "name": "containerExecShellFallback",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    327,
+    342
+   ],
+   "summary": "Tenta novamente o shell com /bin/sh quando o bash não está disponível no container.",
+   "tags": [
+    "exec",
+    "shell",
+    "fallback"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:handleContainerActionDone",
+   "type": "function",
+   "name": "handleContainerActionDone",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    344,
+    381
+   ],
+   "summary": "Processa o fim de uma ação de container: notifica, atualiza políticas e dispara refresh do Docker.",
+   "tags": [
+    "event-handler",
+    "docker",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:markContainerRestartPolicy",
+   "type": "function",
+   "name": "markContainerRestartPolicy",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    384,
+    404
+   ],
+   "summary": "Mantém o indicador de restart policy sincronizado mesmo se o inspect atrasar.",
+   "tags": [
+    "state",
+    "docker",
+    "restart-policy"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:handleContainerShellDone",
+   "type": "function",
+   "name": "handleContainerShellDone",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    406,
+    421
+   ],
+   "summary": "Trata o retorno do shell no container, acionando o fallback ou restaurando a tela.",
+   "tags": [
+    "event-handler",
+    "shell",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:refreshDocker",
+   "type": "function",
+   "name": "refreshDocker",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    425,
+    437
+   ],
+   "summary": "Reconsulta os containers Docker dos projetos de forma assíncrona.",
+   "tags": [
+    "async",
+    "docker",
+    "refresh"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:openContainerDetail",
+   "type": "function",
+   "name": "openContainerDetail",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    439,
+    465
+   ],
+   "summary": "Abre a tela de detalhe de um container, reiniciando o estado e carregando a primeira aba.",
+   "tags": [
+    "navigation",
+    "docker",
+    "state"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:restoreContainerCursor",
+   "type": "function",
+   "name": "restoreContainerCursor",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    477,
+    495
+   ],
+   "summary": "Mantém o container selecionado após refreshes e ações usando a lista visível.",
+   "tags": [
+    "state",
+    "cursor",
+    "docker"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/container_messages.go:Error",
+   "type": "function",
+   "name": "Error",
+   "filePath": "internal/ui/container_messages.go",
+   "lineRange": [
+    501,
+    501
+   ],
+   "summary": "Implementa a interface error para o tipo errString.",
+   "tags": [
+    "error-handling",
+    "interface",
+    "utility"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:label",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:shortLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailStatusBadge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailPosition",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:renderContainerDetailTabBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerTabsWidth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailLines",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailGotoTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailHScrollBy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:clampScroll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailSearchMatches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:containerDetailMatchLineSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:jumpContainerDetailSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:updateContainerDetailSearch",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:renderContainerDetailSearchPrompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:toggleContainerDetailFollow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:scheduleContainerDetailFollow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:appendContainerLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:handleContainerDetailFollow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:reloadContainerDetailLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "function:internal/ui/container_detail.go:handleContainerDetailKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:openContainerImages",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:handleDockerImagesLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:handleDockerImagesRemoved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:currentImageList",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:cycleImageScope",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:repoOf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:filterImagesByRepo",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:imageBelongsToProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:handleContainerImagesKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:handleImageRemoveModalKeys",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:runImageRemoveOption",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:imageScopeLabel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderContainerImages",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImagesHeader",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImagesNotif",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:imageColumns",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImagesTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImagesHeaderRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImageRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:imageActionItems",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "function:internal/ui/container_images.go:renderImageRemoveModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:App.loadContainerDetailTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:beginContainerAction",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerActionPrefix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:updateContainerStatusSummary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerPause",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerStart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerStop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerRestart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerToggleRestartAlways",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerExecShell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:containerExecShellFallback",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:handleContainerActionDone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:markContainerRestartPolicy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:handleContainerShellDone",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:refreshDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:openContainerDetail",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:restoreContainerCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:Error",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "function:internal/ui/container_messages.go:Error",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_detail.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_images.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/container_messages.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/container_detail.go:containerDetailGotoTab",
+   "target": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail.go:handleContainerDetailKeys",
+   "target": "function:internal/ui/container_stats.go:fetchContainerDetailStatsOnce",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail.go:reloadContainerDetailLogs",
+   "target": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_detail.go:scheduleContainerDetailFollow",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogsSince",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_images.go:handleContainerImagesKeys",
+   "target": "function:internal/ui/containers_tab.go:requestContainerPreview",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_images.go:runImageRemoveOption",
+   "target": "function:internal/collectors/docker_images.go:RemoveDockerImages",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:App.loadContainerDetailTab",
+   "target": "function:internal/ui/container_detail.go:containerDetailLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShell",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShell",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShell",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShell",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerRunning",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShellFallback",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellBash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShellFallback",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellFallback",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerExecShellFallback",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerPause",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerPause",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRemove",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRemove",
+   "target": "function:internal/collectors/docker_actions.go:DockerRemove",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRemove",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRestart",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRestart",
+   "target": "function:internal/collectors/docker_actions.go:DockerRestart",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerRestart",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStart",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStart",
+   "target": "function:internal/collectors/docker_actions.go:DockerStart",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStart",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStop",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStop",
+   "target": "function:internal/collectors/docker_actions.go:DockerStop",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerStop",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerToggleRestartAlways",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerToggleRestartAlways",
+   "target": "function:internal/collectors/docker_actions.go:DockerSetRestartPolicy",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:containerToggleRestartAlways",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:handleContainerActionDone",
+   "target": "function:internal/ui/containers_tab.go:filteredContainers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "target": "function:internal/ui/container_detail.go:containerDetailLines",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "target": "function:internal/ui/container_detail.go:scheduleContainerDetailFollow",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "target": "function:internal/ui/container_stats.go:applyContainerDetailStats",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:handleContainerDetailLoaded",
+   "target": "function:internal/ui/container_stats.go:parseDockerStatsFull",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogs",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerConfig",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerEnv",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerStats",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:DockerContainerTop",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:DockerfileForContainer",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:loadContainerDetailTab",
+   "target": "function:internal/collectors/docker_detail.go:ReadComposeForContainer",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:refreshDocker",
+   "target": "function:internal/collectors/project_enrich.go:RefreshProjectDocker",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/container_messages.go:restoreContainerCursor",
+   "target": "function:internal/ui/containers_tab.go:filteredContainers",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

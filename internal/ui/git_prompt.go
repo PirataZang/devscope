@@ -16,6 +16,7 @@ type gitPromptKind int
 const (
 	gitPromptNewBranch gitPromptKind = iota
 	gitPromptRenameBranch
+	gitPromptNewWorktree
 )
 
 func (a *App) gitTabReady(p *core.Project) bool {
@@ -210,6 +211,11 @@ func (a *App) updateGitPrompt(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			a.gitPromptInput = ""
 			a.gitPromptCursor = 0
 			return a, a.gitRenameBranch(p, oldName, name)
+		case gitPromptNewWorktree:
+			a.gitPromptBranch = ""
+			a.gitPromptInput = ""
+			a.gitPromptCursor = 0
+			return a, a.wtAdd(p, name)
 		}
 	case "left":
 		if a.gitPromptCursor > 0 {
@@ -306,6 +312,8 @@ func (a *App) updateGitConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return a, a.gitDeleteBranch(p, branch)
 		case "merge":
 			return a, a.gitMergeBranch(p, branch)
+		case "wt-remove":
+			return a, a.wtRemove(p, branch)
 		}
 	case "esc", "n", "N":
 		a.gitConfirmOn = false
@@ -340,6 +348,19 @@ func (a *App) renderGitConfirm() string {
 		opts.Title = "Mesclar branch"
 		opts.Subtitle = "git merge na branch atual"
 		opts.Detail = truncate(branch+"  →  "+into, 48)
+	case "wt-remove":
+		opts.Brand = "WORKTREES"
+		opts.Color = tabAccentColor(TabWorktrees)
+		opts.Title = "Remover worktree"
+		opts.Subtitle = "git worktree remove — apaga a pasta, a branch fica"
+		opts.Label = "worktree"
+		opts.Target = worktreeFolder(a.wtMainPath(a.currentProject()), branch)
+		opts.Detail = "sem alterações pendentes"
+		for _, w := range a.wtList {
+			if pathsMatch(w.Path, branch) && w.Changes > 0 {
+				opts.Detail = countOf(w.Changes, "alteração não commitada será perdida", "alterações não commitadas serão perdidas")
+			}
+		}
 	default:
 		opts.Title = "Excluir branch"
 		opts.Subtitle = "git branch -D — remove a branch local"
@@ -390,6 +411,11 @@ func (a *App) renderGitPrompt() string {
 		baseLabel = "branch atual"
 		actionHint = "enter renomeia"
 	}
+	isWorktree := a.gitPromptKind == gitPromptNewWorktree
+	if isWorktree {
+		title = "Nova worktree"
+		subtitle = "branch existente faz checkout; nome novo cria a branch"
+	}
 
 	baseBranch := strings.TrimSpace(a.gitPromptBranch)
 	if baseBranch == "" {
@@ -422,6 +448,8 @@ func (a *App) renderGitPrompt() string {
 	preview := StyleMuted.Render("preview  ")
 	if name == "" {
 		preview += StyleMuted.Render("(digite um nome)")
+	} else if isWorktree {
+		preview += StyleHealthy.Render(truncate(shortenPath(collectors.GitWorktreePath(a.wtMainPath(a.currentProject()), name)), maxInt(12, innerW-10)))
 	} else {
 		preview += StyleWarning.Render(truncate(baseBranch, 18)) +
 			StyleMuted.Render("  →  ") +

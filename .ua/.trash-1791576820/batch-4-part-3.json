@@ -1,0 +1,1200 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/collectors/docker.go",
+   "type": "file",
+   "name": "docker.go",
+   "filePath": "internal/collectors/docker.go",
+   "summary": "Coleta containers Docker (docker ps + inspect), extrai metadados de compose, políticas de restart e saúde, e atribui cada container ao projeto mais provável via pontuação de caminhos, incluindo serviços compose sem container.",
+   "tags": [
+    "docker",
+    "collector",
+    "containers",
+    "matching"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:composeRoot",
+   "type": "function",
+   "name": "composeRoot",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    22,
+    35
+   ],
+   "summary": "Calcula o diretório raiz do compose a partir dos labels working_dir/config_files do container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:CollectDocker",
+   "type": "function",
+   "name": "CollectDocker",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    37,
+    54
+   ],
+   "summary": "Coleta containers via docker ps e enriquece com metadados completos de inspect.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "function",
+   "name": "CollectDockerPS",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    60,
+    88
+   ],
+   "summary": "Lista containers apenas via docker ps (sem inspect), caminho rápido para o dashboard.",
+   "tags": [
+    "docker",
+    "collector",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:applyRestartPolicies",
+   "type": "function",
+   "name": "applyRestartPolicies",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    91,
+    129
+   ],
+   "summary": "Preenche a política de restart dos containers com um único docker inspect em lote.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:parseDockerPSLine",
+   "type": "function",
+   "name": "parseDockerPSLine",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    131,
+    164
+   ],
+   "summary": "Interpreta uma linha formatada do docker ps em Container e metadados de compose.",
+   "tags": [
+    "docker",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:inspectContainerMeta",
+   "type": "function",
+   "name": "inspectContainerMeta",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    166,
+    210
+   ],
+   "summary": "Executa docker inspect em todos os containers para obter labels de compose e mounts.",
+   "tags": [
+    "docker",
+    "collector",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:lookupMeta",
+   "type": "function",
+   "name": "lookupMeta",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    212,
+    222
+   ],
+   "summary": "Busca metadados de container por ID completo ou curto.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:AssignContainersToProjects",
+   "type": "function",
+   "name": "AssignContainersToProjects",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    226,
+    261
+   ],
+   "summary": "Associa cada container a no máximo um projeto pela melhor pontuação e retorna os órfãos.",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:reclaimOrphansByComposeName",
+   "type": "function",
+   "name": "reclaimOrphansByComposeName",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    266,
+    321
+   ],
+   "summary": "Puxa containers órfãos para projetos quando nome/serviço corresponde a um serviço compose, expondo conflitos no `compose up`.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:containerMatchesComposeService",
+   "type": "function",
+   "name": "containerMatchesComposeService",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    323,
+    345
+   ],
+   "summary": "Verifica se o nome do container corresponde ao padrão de nome de um serviço compose do projeto.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:EnrichProjectsWithMissingComposeServices",
+   "type": "function",
+   "name": "EnrichProjectsWithMissingComposeServices",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    349,
+    378
+   ],
+   "summary": "Adiciona linhas sintéticas (Status=missing) para serviços compose sem container.",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:matchScore",
+   "type": "function",
+   "name": "matchScore",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    380,
+    420
+   ],
+   "summary": "Pontua a afinidade entre um projeto e um container por compose root e mounts dentro do diretório do projeto.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:ProjectRunning",
+   "type": "function",
+   "name": "ProjectRunning",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    422,
+    429
+   ],
+   "summary": "Indica se algum container do projeto está em execução.",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker.go:parseHealthFromStatus",
+   "type": "function",
+   "name": "parseHealthFromStatus",
+   "filePath": "internal/collectors/docker.go",
+   "lineRange": [
+    431,
+    443
+   ],
+   "summary": "Extrai o estado de saúde (healthy/unhealthy/starting) do texto de status do docker ps.",
+   "tags": [
+    "docker",
+    "parser",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_actions.go",
+   "type": "file",
+   "name": "docker_actions.go",
+   "filePath": "internal/collectors/docker_actions.go",
+   "summary": "Wrappers finos sobre o CLI do Docker para ações de ciclo de vida de containers (pause, start, stop, restart, rm, logs, restart policy, shell exec) e para religar containers ao projeto após uma ação.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "containers",
+    "actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerPause",
+   "type": "function",
+   "name": "DockerPause",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    12,
+    14
+   ],
+   "summary": "Pausa um container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerUnpause",
+   "type": "function",
+   "name": "DockerUnpause",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    16,
+    18
+   ],
+   "summary": "Retoma um container pausado.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerStart",
+   "type": "function",
+   "name": "DockerStart",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    20,
+    22
+   ],
+   "summary": "Inicia um container parado.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerStop",
+   "type": "function",
+   "name": "DockerStop",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    24,
+    26
+   ],
+   "summary": "Para um container em execução.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerRestart",
+   "type": "function",
+   "name": "DockerRestart",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    28,
+    30
+   ],
+   "summary": "Reinicia um container.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerSetRestartPolicy",
+   "type": "function",
+   "name": "DockerSetRestartPolicy",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    33,
+    45
+   ],
+   "summary": "Define a RestartPolicy do container (always, no, unless-stopped, on-failure) via docker update.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerRemove",
+   "type": "function",
+   "name": "DockerRemove",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    47,
+    49
+   ],
+   "summary": "Remove um container forçadamente.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerLogs",
+   "type": "function",
+   "name": "DockerLogs",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    51,
+    63
+   ],
+   "summary": "Retorna os últimos logs de um container com timestamps.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerLogsSince",
+   "type": "function",
+   "name": "DockerLogsSince",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    66,
+    73
+   ],
+   "summary": "Retorna logs dos últimos N segundos para polling em modo follow.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "function",
+   "name": "DockerExecTarget",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    76,
+    81
+   ],
+   "summary": "Escolhe o alvo de exec preferindo o nome do container ao ID curto.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerExecShell",
+   "type": "function",
+   "name": "DockerExecShell",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    83,
+    87
+   ],
+   "summary": "Monta o comando de shell interativo no container com fallback de bash para sh.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerExecShellBash",
+   "type": "function",
+   "name": "DockerExecShellBash",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    89,
+    91
+   ],
+   "summary": "Monta o comando `docker exec -it` com bash.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:DockerExecShellFallback",
+   "type": "function",
+   "name": "DockerExecShellFallback",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    93,
+    95
+   ],
+   "summary": "Monta o comando `docker exec -it` com sh como fallback.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:RefreshProjectsDocker",
+   "type": "function",
+   "name": "RefreshProjectsDocker",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    103,
+    105
+   ],
+   "summary": "Religa os containers ao projeto após uma ação Docker atualizando o StateStore.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:IsContainerRunning",
+   "type": "function",
+   "name": "IsContainerRunning",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    107,
+    109
+   ],
+   "summary": "Indica se o container está em execução.",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_actions.go:IsContainerStopped",
+   "type": "function",
+   "name": "IsContainerStopped",
+   "filePath": "internal/collectors/docker_actions.go",
+   "lineRange": [
+    111,
+    118
+   ],
+   "summary": "Indica se o container está parado (exited/created/dead).",
+   "tags": [
+    "docker",
+    "utility",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_close_port.go",
+   "type": "file",
+   "name": "docker_close_port.go",
+   "filePath": "internal/collectors/docker_close_port.go",
+   "summary": "Fecha uma porta publicada no host recriando o container sem aquele binding, preservando imagem, env, cmd, binds, redes e demais portas.",
+   "tags": [
+    "docker",
+    "containers",
+    "networking",
+    "ports"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/collectors/docker_close_port.go:dockerCloseInspect",
+   "type": "class",
+   "name": "dockerCloseInspect",
+   "filePath": "internal/collectors/docker_close_port.go",
+   "lineRange": [
+    11,
+    33
+   ],
+   "summary": "Subconjunto do JSON de docker inspect necessário para recriar o container (config, HostConfig, redes).",
+   "tags": [
+    "data-model",
+    "docker",
+    "struct",
+    "serialization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_close_port.go:DockerCloseHostPort",
+   "type": "function",
+   "name": "DockerCloseHostPort",
+   "filePath": "internal/collectors/docker_close_port.go",
+   "lineRange": [
+    37,
+    159
+   ],
+   "summary": "Recria o container sem publicar a porta de host indicada, preservando imagem, env, cmd, binds, redes e demais portas.",
+   "tags": [
+    "docker",
+    "command-runner",
+    "public-api"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/collectors/docker_close_port.go:firstNetworkName",
+   "type": "function",
+   "name": "firstNetworkName",
+   "filePath": "internal/collectors/docker_close_port.go",
+   "lineRange": [
+    161,
+    173
+   ],
+   "summary": "Retorna o nome da primeira rede do container, de forma determinística.",
+   "tags": [
+    "docker",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/collectors/docker_deps.go",
+   "type": "file",
+   "name": "docker_deps.go",
+   "filePath": "internal/collectors/docker_deps.go",
+   "summary": "Lê relações depends_on do arquivo compose do projeto (forma lista e forma mapa com condition), ordenadas por serviço, para o grafo de dependências de containers.",
+   "tags": [
+    "docker-compose",
+    "parser",
+    "dependencies"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/collectors/docker_deps.go:ComposeDependency",
+   "type": "class",
+   "name": "ComposeDependency",
+   "filePath": "internal/collectors/docker_deps.go",
+   "lineRange": [
+    11,
+    14
+   ],
+   "summary": "Arestas depends_on de um serviço do compose.",
+   "tags": [
+    "data-model",
+    "docker-compose",
+    "struct",
+    "public-api"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "type": "function",
+   "name": "ParseComposeDependencies",
+   "filePath": "internal/collectors/docker_deps.go",
+   "lineRange": [
+    18,
+    44
+   ],
+   "summary": "Lê as relações depends_on do compose do projeto, ordenadas por nome de serviço.",
+   "tags": [
+    "docker-compose",
+    "parser",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/collectors/docker_deps.go:dependsOnNames",
+   "type": "function",
+   "name": "dependsOnNames",
+   "filePath": "internal/collectors/docker_deps.go",
+   "lineRange": [
+    46,
+    66
+   ],
+   "summary": "Normaliza depends_on nas formas lista ou mapa com condition em nomes de serviços ordenados.",
+   "tags": [
+    "docker-compose",
+    "utility",
+    "internal-helper"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:composeRoot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:CollectDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:CollectDocker",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:CollectDockerPS",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:applyRestartPolicies",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:parseDockerPSLine",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:inspectContainerMeta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:lookupMeta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:AssignContainersToProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:AssignContainersToProjects",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:reclaimOrphansByComposeName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:containerMatchesComposeService",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:EnrichProjectsWithMissingComposeServices",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:EnrichProjectsWithMissingComposeServices",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:matchScore",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:ProjectRunning",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:ProjectRunning",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "function:internal/collectors/docker.go:parseHealthFromStatus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerPause",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerPause",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerUnpause",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerUnpause",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerStart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerStart",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerStop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerStop",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerRestart",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerRestart",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerSetRestartPolicy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerSetRestartPolicy",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerRemove",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerRemove",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogsSince",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerLogsSince",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecTarget",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellBash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellBash",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellFallback",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:DockerExecShellFallback",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:RefreshProjectsDocker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:RefreshProjectsDocker",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerRunning",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerRunning",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerStopped",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "function:internal/collectors/docker_actions.go:IsContainerStopped",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_actions.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/collectors/docker_close_port.go",
+   "target": "class:internal/collectors/docker_close_port.go:dockerCloseInspect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_close_port.go",
+   "target": "function:internal/collectors/docker_close_port.go:DockerCloseHostPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_close_port.go",
+   "target": "function:internal/collectors/docker_close_port.go:DockerCloseHostPort",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_close_port.go",
+   "target": "function:internal/collectors/docker_close_port.go:firstNetworkName",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_deps.go",
+   "target": "class:internal/collectors/docker_deps.go:ComposeDependency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_deps.go",
+   "target": "class:internal/collectors/docker_deps.go:ComposeDependency",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_deps.go",
+   "target": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/collectors/docker_deps.go",
+   "target": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker_deps.go",
+   "target": "function:internal/collectors/docker_deps.go:dependsOnNames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/collectors/docker.go:reclaimOrphansByComposeName",
+   "target": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/docker.go:EnrichProjectsWithMissingComposeServices",
+   "target": "function:internal/collectors/compose.go:ListComposeServiceNames",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "target": "function:internal/collectors/compose.go:ComposeFile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "target": "function:internal/collectors/compose_edit.go:parseComposeServices",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/collectors/docker_deps.go:ParseComposeDependencies",
+   "target": "function:internal/collectors/compose_edit.go:asStringMap",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/collectors/docker.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

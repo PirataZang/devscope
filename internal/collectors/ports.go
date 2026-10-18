@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -49,6 +50,39 @@ func AssignPortsToProjects(projects []core.Project, _ map[int]bool) {
 			add(p)
 		}
 		projects[i].Ports = ports
+	}
+	assignPortConflicts(projects)
+}
+
+// assignPortConflicts preenche Project.PortConflicts: para cada porta de host
+// reivindicada por mais de um projeto, registra em cada envolvido os nomes dos
+// demais. Só um processo consegue fazer bind numa porta, então essa colisão é o
+// que trava subir dois projetos ao mesmo tempo.
+func assignPortConflicts(projects []core.Project) {
+	owners := make(map[int][]int) // porta -> índices dos projetos que a publicam
+	for i := range projects {
+		projects[i].PortConflicts = nil
+		for _, p := range projects[i].Ports {
+			owners[p] = append(owners[p], i)
+		}
+	}
+	for port, idxs := range owners {
+		if len(idxs) < 2 {
+			continue
+		}
+		for _, i := range idxs {
+			others := make([]string, 0, len(idxs)-1)
+			for _, j := range idxs {
+				if j != i {
+					others = append(others, projects[j].Name)
+				}
+			}
+			sort.Strings(others)
+			if projects[i].PortConflicts == nil {
+				projects[i].PortConflicts = make(map[int][]string)
+			}
+			projects[i].PortConflicts[port] = others
+		}
 	}
 }
 

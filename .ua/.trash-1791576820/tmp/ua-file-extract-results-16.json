@@ -1,0 +1,317 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 5,
+  "filesSkipped": [
+    "docs/media/tapes/docker.tape",
+    "docs/media/tapes/git.tape",
+    "docs/media/tapes/head.tape",
+    "docs/media/tapes/overview.tape",
+    "scripts/install.ps1"
+  ],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 5,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 1,
+      "failed": 0,
+      "skipped": 4
+    }
+  },
+  "results": [
+    {
+      "path": "configs/devscope.example.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 38,
+      "nonEmptyLines": 33,
+      "sections": [
+        {
+          "heading": "scan",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "refresh",
+          "level": 1,
+          "line": 23
+        },
+        {
+          "heading": "ui",
+          "level": 1,
+          "line": 29
+        },
+        {
+          "heading": "health",
+          "level": 1,
+          "line": 33
+        },
+        {
+          "heading": "pinned",
+          "level": 1,
+          "line": 37
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "docs/media/tapes/zoom.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 78,
+      "nonEmptyLines": 64,
+      "functions": [
+        {
+          "name": "state",
+          "startLine": 33,
+          "endLine": 41,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "box",
+          "startLine": 44,
+          "endLine": 49,
+          "params": [
+            "t"
+          ]
+        },
+        {
+          "name": "ff",
+          "startLine": 52,
+          "endLine": 53,
+          "params": [
+            "*args"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "state",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "box",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "ff",
+          "line": 52,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "state",
+          "callee": "zip",
+          "lineNumber": 36
+        },
+        {
+          "caller": "state",
+          "callee": "tuple",
+          "lineNumber": 40
+        },
+        {
+          "caller": "box",
+          "callee": "state",
+          "lineNumber": 45
+        },
+        {
+          "caller": "box",
+          "callee": "min",
+          "lineNumber": 47
+        },
+        {
+          "caller": "box",
+          "callee": "max",
+          "lineNumber": 47
+        },
+        {
+          "caller": "box",
+          "callee": "min",
+          "lineNumber": 48
+        },
+        {
+          "caller": "box",
+          "callee": "max",
+          "lineNumber": 48
+        },
+        {
+          "caller": "ff",
+          "callee": "subprocess.run",
+          "lineNumber": 53
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-12-git-pull-conflict.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 81,
+      "nonEmptyLines": 59,
+      "sections": [
+        {
+          "heading": "Git Pull Divergence + Conflict Resolution Implementation Plan",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Global Constraints",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "Task 1: Collector helpers + tests",
+          "level": 3,
+          "line": 20
+        },
+        {
+          "heading": "Task 2: UI pull strategy modal + conflict mode",
+          "level": 3,
+          "line": 53
+        },
+        {
+          "heading": "Task 3: Docs touch-up",
+          "level": 3,
+          "line": 76
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-12-git-pull-conflict-design.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 76,
+      "nonEmptyLines": 58,
+      "sections": [
+        {
+          "heading": "Git Pull Divergence + Conflict Resolution",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Problem",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Goals",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "Non-goals",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Flow",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "Conflict mode",
+          "level": 2,
+          "line": 36
+        },
+        {
+          "heading": "Collector API (new)",
+          "level": 2,
+          "line": 51
+        },
+        {
+          "heading": "UI touchpoints",
+          "level": 2,
+          "line": 63
+        },
+        {
+          "heading": "Success criteria",
+          "level": 2,
+          "line": 72
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "scripts/install.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 210,
+      "nonEmptyLines": 179,
+      "functions": [
+        {
+          "name": "err",
+          "startLine": 8,
+          "endLine": 11,
+          "params": []
+        },
+        {
+          "name": "info",
+          "startLine": 13,
+          "endLine": 15,
+          "params": []
+        },
+        {
+          "name": "need_cmd",
+          "startLine": 17,
+          "endLine": 19,
+          "params": []
+        },
+        {
+          "name": "print_banner",
+          "startLine": 21,
+          "endLine": 36,
+          "params": []
+        },
+        {
+          "name": "sha256",
+          "startLine": 39,
+          "endLine": 47,
+          "params": []
+        },
+        {
+          "name": "add_to_path",
+          "startLine": 170,
+          "endLine": 182,
+          "params": []
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    }
+  ]
+}

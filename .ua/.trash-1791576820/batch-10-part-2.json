@@ -1,0 +1,2236 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/routeutil/scan_spring.go",
+   "type": "file",
+   "name": "scan_spring.go",
+   "filePath": "internal/routeutil/scan_spring.go",
+   "summary": "Scanner de rotas para Spring Boot que combina @RequestMapping de classe com @GetMapping/@PostMapping etc. para montar os caminhos dos endpoints.",
+   "tags": [
+    "route-scanner",
+    "spring",
+    "java",
+    "regex"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/scan_spring.go:Match",
+   "type": "function",
+   "name": "Match",
+   "filePath": "internal/routeutil/scan_spring.go",
+   "lineRange": [
+    14,
+    24
+   ],
+   "summary": "Decide se o projeto é Spring pelos frameworks conhecidos ou pela presença de pom.xml/build.gradle.",
+   "tags": [
+    "detection",
+    "spring",
+    "build-files"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/scan_spring.go:Scan",
+   "type": "function",
+   "name": "Scan",
+   "filePath": "internal/routeutil/scan_spring.go",
+   "lineRange": [
+    32,
+    88
+   ],
+   "summary": "Varre arquivos Java/Kotlin e monta rotas a partir de @RequestMapping de classe e anotações de método do Spring.",
+   "tags": [
+    "route-scanner",
+    "spring",
+    "java"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/routeutil/scan_spring.go:springScanner",
+   "type": "class",
+   "name": "springScanner",
+   "filePath": "internal/routeutil/scan_spring.go",
+   "lineRange": [
+    10,
+    10
+   ],
+   "summary": "Implementação de Scanner para controllers Spring.",
+   "tags": [
+    "route-scanner",
+    "strategy",
+    "interface-impl"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/routeutil/stacks.go",
+   "type": "file",
+   "name": "stacks.go",
+   "filePath": "internal/routeutil/stacks.go",
+   "summary": "Detecta quais stacks de rotas se aplicam a um projeto, unindo frameworks já conhecidos com marcadores no disco (artisan, manage.py, go.mod, Cargo.toml, pom.xml) e normalizando os nomes.",
+   "tags": [
+    "detection",
+    "stack-detection",
+    "utility",
+    "heuristic"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/routeutil/stacks.go:DetectStacks",
+   "type": "function",
+   "name": "DetectStacks",
+   "filePath": "internal/routeutil/stacks.go",
+   "lineRange": [
+    11,
+    148
+   ],
+   "summary": "Resolve a lista deduplicada de stacks de rota do projeto a partir dos frameworks e de arquivos marcadores na árvore.",
+   "tags": [
+    "detection",
+    "stack-detection",
+    "heuristic"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/stacks.go:canonicalizeStack",
+   "type": "function",
+   "name": "canonicalizeStack",
+   "filePath": "internal/routeutil/stacks.go",
+   "lineRange": [
+    150,
+    211
+   ],
+   "summary": "Normaliza nomes brutos de frameworks (ex.: nest, express, fastapi) para identificadores canônicos de stack.",
+   "tags": [
+    "utility",
+    "normalization",
+    "mapping"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/routeutil/walk.go",
+   "type": "file",
+   "name": "walk.go",
+   "filePath": "internal/routeutil/walk.go",
+   "summary": "Helpers compartilhados pelos scanners de rotas: percorre a árvore do projeto ignorando diretórios pesados, verifica arquivos/frameworks e junta prefixos de rota.",
+   "tags": [
+    "utility",
+    "filesystem",
+    "route-scanner",
+    "helpers"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/routeutil/walk.go:walkProject",
+   "type": "function",
+   "name": "walkProject",
+   "filePath": "internal/routeutil/walk.go",
+   "lineRange": [
+    15,
+    31
+   ],
+   "summary": "Percorre a árvore do projeto chamando um callback por arquivo, pulando node_modules, vendor, .git e similares.",
+   "tags": [
+    "utility",
+    "filesystem",
+    "traversal"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/walk.go:hasFramework",
+   "type": "function",
+   "name": "hasFramework",
+   "filePath": "internal/routeutil/walk.go",
+   "lineRange": [
+    38,
+    47
+   ],
+   "summary": "Testa se a lista de frameworks do projeto contém algum dos nomes informados.",
+   "tags": [
+    "utility",
+    "detection",
+    "helpers"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/walk.go:parseQuotedMethods",
+   "type": "function",
+   "name": "parseQuotedMethods",
+   "filePath": "internal/routeutil/walk.go",
+   "lineRange": [
+    49,
+    63
+   ],
+   "summary": "Extrai métodos HTTP de uma lista entre aspas, como em methods=['GET','POST'].",
+   "tags": [
+    "utility",
+    "parser",
+    "http"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/routeutil/walk.go:joinRoute",
+   "type": "function",
+   "name": "joinRoute",
+   "filePath": "internal/routeutil/walk.go",
+   "lineRange": [
+    65,
+    84
+   ],
+   "summary": "Concatena prefixo e caminho de rota garantindo barras corretas.",
+   "tags": [
+    "utility",
+    "path",
+    "normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/sshutil/config.go",
+   "type": "file",
+   "name": "config.go",
+   "filePath": "internal/sshutil/config.go",
+   "summary": "Persistência por projeto dos túneis SSH (local/remote/dynamic) em .devscope, com upsert/remoção e fusão da configuração salva com os túneis ssh vivos detectados.",
+   "tags": [
+    "configuration",
+    "ssh",
+    "tunnel",
+    "persistence",
+    "data-model"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:ConfigPath",
+   "type": "function",
+   "name": "ConfigPath",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    61,
+    63
+   ],
+   "summary": "Retorna o caminho do arquivo de configuração SSH dentro de .devscope.",
+   "tags": [
+    "utility",
+    "path",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:LoadProject",
+   "type": "function",
+   "name": "LoadProject",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    65,
+    79
+   ],
+   "summary": "Carrega a configuração de túneis SSH do projeto em .devscope, retornando padrão quando o arquivo não existe.",
+   "tags": [
+    "persistence",
+    "ssh",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:SaveProject",
+   "type": "function",
+   "name": "SaveProject",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    81,
+    91
+   ],
+   "summary": "Grava a configuração de túneis SSH do projeto, garantindo o diretório .devscope via EnsureDir.",
+   "tags": [
+    "persistence",
+    "ssh",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:UpsertTunnel",
+   "type": "function",
+   "name": "UpsertTunnel",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    93,
+    105
+   ],
+   "summary": "Insere ou substitui um túnel SSH pelo nome na configuração do projeto.",
+   "tags": [
+    "data-model",
+    "ssh",
+    "mutation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:NormalizeMode",
+   "type": "function",
+   "name": "NormalizeMode",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    117,
+    126
+   ],
+   "summary": "Normaliza aliases de modo (L/R/D) para local, remote ou dynamic.",
+   "tags": [
+    "utility",
+    "ssh",
+    "normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:MergeTunnels",
+   "type": "function",
+   "name": "MergeTunnels",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    128,
+    182
+   ],
+   "summary": "Funde túneis salvos com processos ssh vivos que pertencem ao projeto, marcando quais estão ativos.",
+   "tags": [
+    "ssh",
+    "tunnel",
+    "merge"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:CountForeignLive",
+   "type": "function",
+   "name": "CountForeignLive",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    184,
+    201
+   ],
+   "summary": "Conta túneis ssh vivos que não correspondem à configuração do projeto.",
+   "tags": [
+    "ssh",
+    "tunnel",
+    "detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/sshutil/config.go:MergeTunnelsAll",
+   "type": "function",
+   "name": "MergeTunnelsAll",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    203,
+    226
+   ],
+   "summary": "Como MergeTunnels, mas inclui também túneis ssh vivos estranhos ao projeto.",
+   "tags": [
+    "ssh",
+    "tunnel",
+    "merge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/sshutil/config.go:TunnelConfig",
+   "type": "class",
+   "name": "TunnelConfig",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    20,
+    30
+   ],
+   "summary": "Definição persistida de um túnel SSH (modo, portas, alvo, identidade, autostart).",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/sshutil/config.go:ProjectConfig",
+   "type": "class",
+   "name": "ProjectConfig",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    45,
+    50
+   ],
+   "summary": "Configuração SSH do projeto com lista de túneis, histórico e métodos de upsert/remoção.",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/sshutil/config.go:HistoryEntry",
+   "type": "class",
+   "name": "HistoryEntry",
+   "filePath": "internal/sshutil/config.go",
+   "lineRange": [
+    52,
+    59
+   ],
+   "summary": "Entrada de histórico de uso de túnel SSH.",
+   "tags": [
+    "data-model",
+    "struct"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/app.go",
+   "type": "file",
+   "name": "app.go",
+   "filePath": "internal/ui/app.go",
+   "summary": "Modelo raiz Bubble Tea do DevScope: guarda o estado global da TUI, roteia mensagens e teclas entre dashboard, projeto e módulos, e compõe a tela com header, painel lateral, conteúdo da aba e barra de status.",
+   "tags": [
+    "entry-point",
+    "tui",
+    "bubbletea",
+    "state-machine",
+    "component"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Segue a arquitetura Elm do Bubble Tea (Init/Update/View); o App é passado por valor e cada Update devolve uma cópia modificada junto com um tea.Cmd."
+  },
+  {
+   "id": "function:internal/ui/app.go:NewApp",
+   "type": "function",
+   "name": "NewApp",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    766,
+    782
+   ],
+   "summary": "Construtor do App: liga o StateStore e a configuração, inicializando o estado padrão da TUI.",
+   "tags": [
+    "factory",
+    "tui",
+    "constructor"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:Init",
+   "type": "function",
+   "name": "Init",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    784,
+    800
+   ],
+   "summary": "Init do Bubble Tea: agenda o tick periódico e os comandos iniciais de coleta.",
+   "tags": [
+    "bubbletea",
+    "lifecycle",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:Run",
+   "type": "function",
+   "name": "Run",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    823,
+    828
+   ],
+   "summary": "Inicia o programa Bubble Tea em tela alternativa com o App como modelo.",
+   "tags": [
+    "entry-point",
+    "bubbletea",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:Update",
+   "type": "function",
+   "name": "Update",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    830,
+    1185
+   ],
+   "summary": "Despachante central de mensagens: trata ticks, snapshots, resultados assíncronos dos módulos, redimensionamento e teclas, delegando aos handlers de cada visão.",
+   "tags": [
+    "bubbletea",
+    "event-handler",
+    "state-machine",
+    "dispatcher"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateGitBranchFilter",
+   "type": "function",
+   "name": "updateGitBranchFilter",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1187,
+    1222
+   ],
+   "summary": "Trata a digitação no filtro de branches do Git.",
+   "tags": [
+    "event-handler",
+    "git",
+    "filter"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateFilter",
+   "type": "function",
+   "name": "updateFilter",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1224,
+    1254
+   ],
+   "summary": "Trata a digitação no filtro da lista de projetos do dashboard.",
+   "tags": [
+    "event-handler",
+    "filter",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateKey",
+   "type": "function",
+   "name": "updateKey",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1256,
+    1320
+   ],
+   "summary": "Trata atalhos globais (ajuda, tema, sair, config) antes de delegar à visão ativa.",
+   "tags": [
+    "event-handler",
+    "keybindings",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateHelp",
+   "type": "function",
+   "name": "updateHelp",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1322,
+    1349
+   ],
+   "summary": "Navegação dentro do overlay de ajuda (rolagem e grupos).",
+   "tags": [
+    "event-handler",
+    "help",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateDashboard",
+   "type": "function",
+   "name": "updateDashboard",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1359,
+    1428
+   ],
+   "summary": "Teclas do dashboard: navegação na lista de projetos, filtro, abertura de projeto e ações rápidas.",
+   "tags": [
+    "event-handler",
+    "dashboard",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:closeToolClients",
+   "type": "function",
+   "name": "closeToolClients",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1430,
+    1465
+   ],
+   "summary": "Encerra clientes de módulos abertos (sessões, túneis, logs) ao sair de um projeto.",
+   "tags": [
+    "cleanup",
+    "lifecycle",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:cycleProjectTab",
+   "type": "function",
+   "name": "cycleProjectTab",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1478,
+    1491
+   ],
+   "summary": "Avança/retrocede apenas entre os módulos visíveis na sidebar.",
+   "tags": [
+    "navigation",
+    "tabs",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:switchProjectTab",
+   "type": "function",
+   "name": "switchProjectTab",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1493,
+    1564
+   ],
+   "summary": "Troca a aba ativa do projeto, saindo da anterior e entrando na nova com seus comandos de carga.",
+   "tags": [
+    "navigation",
+    "tabs",
+    "lifecycle"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:openProject",
+   "type": "function",
+   "name": "openProject",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1566,
+    1643
+   ],
+   "summary": "Abre a visão de projeto para o projeto selecionado e dispara as coletas iniciais.",
+   "tags": [
+    "navigation",
+    "project",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateProject",
+   "type": "function",
+   "name": "updateProject",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    1645,
+    2214
+   ],
+   "summary": "Handler gigante de teclas na visão de projeto, roteando para Git, Docker, compose e demais módulos.",
+   "tags": [
+    "event-handler",
+    "project",
+    "state-machine"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/app.go:currentProject",
+   "type": "function",
+   "name": "currentProject",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2224,
+    2236
+   ],
+   "summary": "Retorna o projeto atualmente selecionado a partir do snapshot.",
+   "tags": [
+    "accessor",
+    "project",
+    "state"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:filteredProjects",
+   "type": "function",
+   "name": "filteredProjects",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2245,
+    2270
+   ],
+   "summary": "Aplica o filtro textual e regras de visibilidade à lista de projetos do dashboard.",
+   "tags": [
+    "filter",
+    "dashboard",
+    "projects"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:View",
+   "type": "function",
+   "name": "View",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2272,
+    2311
+   ],
+   "summary": "View do Bubble Tea: compõe a tela final aplicando overlays de ajuda, tema e config sobre a visão atual.",
+   "tags": [
+    "bubbletea",
+    "rendering",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderCurrentView",
+   "type": "function",
+   "name": "renderCurrentView",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2313,
+    2322
+   ],
+   "summary": "Escolhe o renderizador conforme a visão ativa (dashboard ou projeto).",
+   "tags": [
+    "rendering",
+    "dispatcher",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderProject",
+   "type": "function",
+   "name": "renderProject",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2334,
+    2448
+   ],
+   "summary": "Renderiza a visão de projeto com header, painel lateral de módulos, conteúdo da aba e barra de status.",
+   "tags": [
+    "rendering",
+    "project",
+    "layout"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:projectPanelHeight",
+   "type": "function",
+   "name": "projectPanelHeight",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2450,
+    2463
+   ],
+   "summary": "Calcula a altura disponível para o painel lateral do projeto.",
+   "tags": [
+    "layout",
+    "utility",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderProjectPanel",
+   "type": "function",
+   "name": "renderProjectPanel",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2465,
+    2501
+   ],
+   "summary": "Renderiza o painel lateral com a lista de módulos do projeto.",
+   "tags": [
+    "rendering",
+    "sidebar",
+    "layout"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:projectPanelIndicator",
+   "type": "function",
+   "name": "projectPanelIndicator",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2503,
+    2517
+   ],
+   "summary": "Gera o indicador de status ao lado de cada módulo no painel.",
+   "tags": [
+    "rendering",
+    "status",
+    "sidebar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:fitProjectPanel",
+   "type": "function",
+   "name": "fitProjectPanel",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2519,
+    2534
+   ],
+   "summary": "Ajusta/trunca linhas do painel lateral à altura disponível.",
+   "tags": [
+    "layout",
+    "utility",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderTabContent",
+   "type": "function",
+   "name": "renderTabContent",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2536,
+    2575
+   ],
+   "summary": "Despacha a renderização para o conteúdo da aba de módulo ativa.",
+   "tags": [
+    "rendering",
+    "tabs",
+    "dispatcher"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/app.go:updateThemePicker",
+   "type": "function",
+   "name": "updateThemePicker",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2591,
+    2622
+   ],
+   "summary": "Teclas do seletor de tema, aplicando e persistindo o tema escolhido com SaveUserTheme.",
+   "tags": [
+    "event-handler",
+    "theme",
+    "persistence"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderThemePopup",
+   "type": "function",
+   "name": "renderThemePopup",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2624,
+    2646
+   ],
+   "summary": "Renderiza o popup do seletor de tema.",
+   "tags": [
+    "rendering",
+    "theme",
+    "popup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:overlayCentered",
+   "type": "function",
+   "name": "overlayCentered",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2648,
+    2673
+   ],
+   "summary": "Sobrepõe um bloco centralizado sobre o conteúdo de fundo, célula a célula.",
+   "tags": [
+    "rendering",
+    "overlay",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:cellSlice",
+   "type": "function",
+   "name": "cellSlice",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2675,
+    2689
+   ],
+   "summary": "Recorta uma linha por colunas de célula preservando sequências ANSI.",
+   "tags": [
+    "utility",
+    "ansi",
+    "text"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:renderStatusBar",
+   "type": "function",
+   "name": "renderStatusBar",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2691,
+    2707
+   ],
+   "summary": "Renderiza a barra de status inferior com dicas de teclas e tempo desde o último scan.",
+   "tags": [
+    "rendering",
+    "status-bar",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:moduleClientOpen",
+   "type": "function",
+   "name": "moduleClientOpen",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2713,
+    2745
+   ],
+   "summary": "Indica se o cliente do módulo atual já está aberto, para a landing anunciar ou não o enter.",
+   "tags": [
+    "state",
+    "modules",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/app.go:projectHints",
+   "type": "function",
+   "name": "projectHints",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    2758,
+    2796
+   ],
+   "summary": "Monta as dicas de teclas da visão de projeto, truncando pelo fim conforme a largura.",
+   "tags": [
+    "hints",
+    "keybindings",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:internal/ui/app.go:App",
+   "type": "class",
+   "name": "App",
+   "filePath": "internal/ui/app.go",
+   "lineRange": [
+    27,
+    764
+   ],
+   "summary": "Modelo Bubble Tea principal com todo o estado da TUI (snapshot, visão, cursores, overlays e estado de cada módulo).",
+   "tags": [
+    "bubbletea",
+    "model",
+    "state",
+    "tui"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/routeutil/scan_spring.go",
+   "target": "function:internal/routeutil/scan_spring.go:Match",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_spring.go",
+   "target": "function:internal/routeutil/scan_spring.go:Scan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/scan_spring.go",
+   "target": "class:internal/routeutil/scan_spring.go:springScanner",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "class:internal/routeutil/scan_spring.go:springScanner",
+   "target": "class:internal/routeutil/route.go:Scanner",
+   "type": "implements",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "file:internal/routeutil/stacks.go",
+   "target": "function:internal/routeutil/stacks.go:DetectStacks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/stacks.go",
+   "target": "function:internal/routeutil/stacks.go:DetectStacks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/routeutil/stacks.go",
+   "target": "function:internal/routeutil/stacks.go:canonicalizeStack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/walk.go",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/walk.go",
+   "target": "function:internal/routeutil/walk.go:hasFramework",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/walk.go",
+   "target": "function:internal/routeutil/walk.go:parseQuotedMethods",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/routeutil/walk.go",
+   "target": "function:internal/routeutil/walk.go:joinRoute",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "file:internal/devscopeutil/dir.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "file:internal/devscopeutil/dir_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:ConfigPath",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:ConfigPath",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:LoadProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:LoadProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:SaveProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:SaveProject",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:UpsertTunnel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:UpsertTunnel",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:NormalizeMode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:NormalizeMode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:MergeTunnels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:MergeTunnels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:CountForeignLive",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:CountForeignLive",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:MergeTunnelsAll",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "function:internal/sshutil/config.go:MergeTunnelsAll",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:TunnelConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:TunnelConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:ProjectConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:ProjectConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:HistoryEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/sshutil/config.go",
+   "target": "class:internal/sshutil/config.go:HistoryEntry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/cfutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/cfutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/cfutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/cfutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/cfutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose_edit.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose_edit_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose_presets.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose_presets_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/compose_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/database.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/database_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_actions.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_close_port.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_deps.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_detail.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_detail_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_hub.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_hub_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_images.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_stats.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_stats_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/docker_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/gha.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/gha_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/git.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/git_graph.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/git_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/health.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/integration_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/k8s.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/k8s_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/manager.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/nginx.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/pm2.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/ports.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/ports_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/project_enrich.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/project_status.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/projects_filter.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/registry_inspect.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/registry_inspect_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/shell.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/shell_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/ssl.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/swarm.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/collectors/swarm_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/config/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/config/userconfig.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/config/userconfig_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/jenkinsutil/client.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/jenkinsutil/client_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/jenkinsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/nginxutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/nginxutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ngrokutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ngrokutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ngrokutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/discover.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/discover_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/openapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/route.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_django.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_express.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_fastapi.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_flask.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_go.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_laravel.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_laravel_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_nestjs.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_next_nuxt.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_node_extra.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_rails.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_rust.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/scan_spring.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/stacks.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/routeutil/walk.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/sshutil/agent.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/sshutil/agent_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/sshutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/wsutil/config.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/wsutil/config_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/wsutil/session.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/wsutil/session_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:NewApp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:NewApp",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Init",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Init",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Run",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Run",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Update",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:Update",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateGitBranchFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateFilter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateKey",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateHelp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateDashboard",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:closeToolClients",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:cycleProjectTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:switchProjectTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:openProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:currentProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:filteredProjects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:View",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:View",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderCurrentView",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderProject",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:projectPanelHeight",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderProjectPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:projectPanelIndicator",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:fitProjectPanel",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderTabContent",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:updateThemePicker",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderThemePopup",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:overlayCentered",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:cellSlice",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:renderStatusBar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:moduleClientOpen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "function:internal/ui/app.go:projectHints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "class:internal/ui/app.go:App",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "class:internal/ui/app.go:App",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_spring.go:Scan",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_spring.go:Scan",
+   "target": "function:internal/routeutil/walk.go:joinRoute",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/stacks.go:DetectStacks",
+   "target": "function:internal/routeutil/stacks.go:canonicalizeStack",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/stacks.go:DetectStacks",
+   "target": "function:internal/routeutil/walk.go:walkProject",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/routeutil/scan_spring.go:Match",
+   "target": "function:internal/routeutil/walk.go:hasFramework",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/config.go:SaveProject",
+   "target": "function:internal/devscopeutil/dir.go:EnsureDir",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/config.go:LoadProject",
+   "target": "function:internal/sshutil/config.go:ConfigPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/sshutil/config.go:SaveProject",
+   "target": "function:internal/sshutil/config.go:ConfigPath",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:updateThemePicker",
+   "target": "function:internal/config/userconfig.go:SaveUserTheme",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:Update",
+   "target": "function:internal/ui/landing_probe.go:handleToolLandingMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:Update",
+   "target": "function:internal/ui/cf_tab.go:handleCFMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:Update",
+   "target": "function:internal/ui/ws_tab.go:handleWsMsg",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:Update",
+   "target": "function:internal/ui/routes_tab.go:handleRoutesLoaded",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:renderProject",
+   "target": "function:internal/ui/app.go:renderProjectPanel",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:renderProject",
+   "target": "function:internal/ui/app.go:renderTabContent",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:View",
+   "target": "function:internal/ui/app.go:overlayCentered",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:internal/ui/app.go:switchProjectTab",
+   "target": "function:internal/ui/landing_probe.go:probeToolLanding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ui/cf_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ui/routes_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/app.go",
+   "target": "file:internal/ui/ws_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

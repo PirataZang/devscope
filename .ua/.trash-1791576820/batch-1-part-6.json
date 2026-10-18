@@ -1,0 +1,807 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/api_select_test.go",
+   "type": "file",
+   "name": "api_select_test.go",
+   "filePath": "internal/ui/api_select_test.go",
+   "summary": "Testes de seleção de texto nos campos do cliente de API (selecionar tudo, Shift+seleção, realce).",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_select_test.go:TestApiSelectAllAndDeleteURL",
+   "type": "function",
+   "name": "TestApiSelectAllAndDeleteURL",
+   "filePath": "internal/ui/api_select_test.go",
+   "lineRange": [
+    11,
+    31
+   ],
+   "summary": "Verifica que selecionar tudo e apagar limpa a URL.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_select_test.go:TestApiShiftSelectReplaceBody",
+   "type": "function",
+   "name": "TestApiShiftSelectReplaceBody",
+   "filePath": "internal/ui/api_select_test.go",
+   "lineRange": [
+    33,
+    54
+   ],
+   "summary": "Verifica a seleção com Shift e substituição de texto no corpo.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_select_test.go:TestApiSelectAllHeadersAuth",
+   "type": "function",
+   "name": "TestApiSelectAllHeadersAuth",
+   "filePath": "internal/ui/api_select_test.go",
+   "lineRange": [
+    56,
+    80
+   ],
+   "summary": "Verifica selecionar tudo nos campos de headers e auth.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_select_test.go:TestApiSelHighlightInWindow",
+   "type": "function",
+   "name": "TestApiSelHighlightInWindow",
+   "filePath": "internal/ui/api_select_test.go",
+   "lineRange": [
+    82,
+    93
+   ],
+   "summary": "Verifica que o realce da seleção aparece dentro da janela visível do campo.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/api_tab_test.go",
+   "type": "file",
+   "name": "api_tab_test.go",
+   "filePath": "internal/ui/api_tab_test.go",
+   "summary": "Suíte de testes da aba de API: navegação, foco, sincronização params/URL, headers, envio, curl e layout da tela.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestAllTabsIncludesAPI",
+   "type": "function",
+   "name": "TestAllTabsIncludesAPI",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    14,
+    28
+   ],
+   "summary": "Verifica que a aba de API está registrada na lista de abas.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestInitApiTabSuggestsPort",
+   "type": "function",
+   "name": "TestInitApiTabSuggestsPort",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    30,
+    43
+   ],
+   "summary": "Verifica que a inicialização da aba sugere a URL com a porta do projeto.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestPushApiHistoryDedupAndCap",
+   "type": "function",
+   "name": "TestPushApiHistoryDedupAndCap",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    63,
+    75
+   ],
+   "summary": "Verifica deduplicação e limite do histórico de requisições.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiSearchMatches",
+   "type": "function",
+   "name": "TestApiSearchMatches",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    77,
+    86
+   ],
+   "summary": "Verifica a busca de ocorrências na resposta.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiLandingEnterAndEsc",
+   "type": "function",
+   "name": "TestApiLandingEnterAndEsc",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    97,
+    125
+   ],
+   "summary": "Verifica a entrada e saída da aba de API a partir da landing.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestFitApiFieldWindowFollowsCursor",
+   "type": "function",
+   "name": "TestFitApiFieldWindowFollowsCursor",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    127,
+    145
+   ],
+   "summary": "Verifica que a janela do campo de texto acompanha o cursor.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiTabsSwitchBySpecificNumberAndMoveFocus",
+   "type": "function",
+   "name": "TestApiTabsSwitchBySpecificNumberAndMoveFocus",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    169,
+    191
+   ],
+   "summary": "Verifica a troca de aba pelo número e o deslocamento de foco.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiTabCyclesThreeFocuses",
+   "type": "function",
+   "name": "TestApiTabCyclesThreeFocuses",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    194,
+    205
+   ],
+   "summary": "Verifica que Tab alterna entre as três faixas de foco.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiParamsTableAndURLStayInSync",
+   "type": "function",
+   "name": "TestApiParamsTableAndURLStayInSync",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    209,
+    241
+   ],
+   "summary": "Verifica a sincronização bidirecional entre a tabela de params e a URL.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiParamsRowAddAndDelete",
+   "type": "function",
+   "name": "TestApiParamsRowAddAndDelete",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    243,
+    266
+   ],
+   "summary": "Verifica adicionar e remover linhas de params.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiHeaderRowsRoundTripThroughText",
+   "type": "function",
+   "name": "TestApiHeaderRowsRoundTripThroughText",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    270,
+    287
+   ],
+   "summary": "Verifica o round-trip das linhas de headers via texto.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiEnterSendsExceptInsideTable",
+   "type": "function",
+   "name": "TestApiEnterSendsExceptInsideTable",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    291,
+    308
+   ],
+   "summary": "Verifica que Enter envia a requisição exceto quando o foco está na tabela.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiBodyEditingKeepsBracketsLiteral",
+   "type": "function",
+   "name": "TestApiBodyEditingKeepsBracketsLiteral",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    310,
+    330
+   ],
+   "summary": "Garante que colchetes digitados no corpo são texto literal, não atalhos.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiResponseViewToggle",
+   "type": "function",
+   "name": "TestApiResponseViewToggle",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    344,
+    355
+   ],
+   "summary": "Verifica a alternância entre corpo e headers na resposta.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiCurlCommandCarriesEverything",
+   "type": "function",
+   "name": "TestApiCurlCommandCarriesEverything",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    357,
+    375
+   ],
+   "summary": "Verifica que o comando curl gerado inclui método, headers, auth e corpo.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestRenderApiScreenHasPostmanAnatomy",
+   "type": "function",
+   "name": "TestRenderApiScreenHasPostmanAnatomy",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    379,
+    407
+   ],
+   "summary": "Verifica que a tela renderizada tem cabeçalho, abas numeradas, requisição e resposta.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestRenderApiScreenFitsShortTerminal",
+   "type": "function",
+   "name": "TestRenderApiScreenFitsShortTerminal",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    411,
+    428
+   ],
+   "summary": "Verifica que a tela cabe em terminais de pouca altura.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/api_tab_test.go:TestApiHumanSize",
+   "type": "function",
+   "name": "TestApiHumanSize",
+   "filePath": "internal/ui/api_tab_test.go",
+   "lineRange": [
+    430,
+    439
+   ],
+   "summary": "Verifica a formatação de tamanhos em bytes.",
+   "tags": [
+    "test",
+    "api-client",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/confirm_modal.go",
+   "type": "file",
+   "name": "confirm_modal.go",
+   "filePath": "internal/ui/confirm_modal.go",
+   "summary": "Modal compartilhado de confirmação y/n para ações destrutivas (containers, túneis, branches).",
+   "tags": [
+    "component",
+    "modal",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal.go:renderDeleteConfirmBox",
+   "type": "function",
+   "name": "renderDeleteConfirmBox",
+   "filePath": "internal/ui/confirm_modal.go",
+   "lineRange": [
+    20,
+    54
+   ],
+   "summary": "Renderiza o modal compartilhado de confirmação y/n para ações destrutivas, com marca, título e alvo.",
+   "tags": [
+    "helper",
+    "component",
+    "modal"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal.go:renderTunnelDeleteConfirmBox",
+   "type": "function",
+   "name": "renderTunnelDeleteConfirmBox",
+   "filePath": "internal/ui/confirm_modal.go",
+   "lineRange": [
+    56,
+    66
+   ],
+   "summary": "Atalho que renderiza o modal de exclusão de túnel (ssh/ngrok) reaproveitando o modal compartilhado.",
+   "tags": [
+    "helper",
+    "component",
+    "modal"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/confirm_modal_test.go",
+   "type": "file",
+   "name": "confirm_modal_test.go",
+   "filePath": "internal/ui/confirm_modal_test.go",
+   "summary": "Testes dos modais de confirmação de exclusão de containers, túneis, branches Git e escolha de estratégia de pull.",
+   "tags": [
+    "test",
+    "modal",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal_test.go:TestRenderDeleteConfirmBox",
+   "type": "function",
+   "name": "TestRenderDeleteConfirmBox",
+   "filePath": "internal/ui/confirm_modal_test.go",
+   "lineRange": [
+    10,
+    25
+   ],
+   "summary": "Verifica que o modal de exclusão mostra marca, título, alvo e dicas de tecla.",
+   "tags": [
+    "test",
+    "modal",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal_test.go:TestGitDeleteConfirmModal",
+   "type": "function",
+   "name": "TestGitDeleteConfirmModal",
+   "filePath": "internal/ui/confirm_modal_test.go",
+   "lineRange": [
+    34,
+    47
+   ],
+   "summary": "Verifica o modal de confirmação de exclusão de branch Git.",
+   "tags": [
+    "test",
+    "modal",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal_test.go:TestGitPullStrategyModal",
+   "type": "function",
+   "name": "TestGitPullStrategyModal",
+   "filePath": "internal/ui/confirm_modal_test.go",
+   "lineRange": [
+    49,
+    62
+   ],
+   "summary": "Verifica o modal de escolha de estratégia de pull do Git.",
+   "tags": [
+    "test",
+    "modal",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/confirm_modal_test.go:TestContainerDeleteConfirmOverlay",
+   "type": "function",
+   "name": "TestContainerDeleteConfirmOverlay",
+   "filePath": "internal/ui/confirm_modal_test.go",
+   "lineRange": [
+    64,
+    80
+   ],
+   "summary": "Verifica o overlay de confirmação de exclusão de container.",
+   "tags": [
+    "test",
+    "modal",
+    "tui"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "function:internal/ui/api_select_test.go:TestApiSelectAllAndDeleteURL",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "function:internal/ui/api_select_test.go:TestApiShiftSelectReplaceBody",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "function:internal/ui/api_select_test.go:TestApiSelectAllHeadersAuth",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "function:internal/ui/api_select_test.go:TestApiSelHighlightInWindow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_select_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestAllTabsIncludesAPI",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestInitApiTabSuggestsPort",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestPushApiHistoryDedupAndCap",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiSearchMatches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiLandingEnterAndEsc",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestFitApiFieldWindowFollowsCursor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiTabsSwitchBySpecificNumberAndMoveFocus",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiTabCyclesThreeFocuses",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiParamsTableAndURLStayInSync",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiParamsRowAddAndDelete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiHeaderRowsRoundTripThroughText",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiEnterSendsExceptInsideTable",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiBodyEditingKeepsBracketsLiteral",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiResponseViewToggle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiCurlCommandCarriesEverything",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestRenderApiScreenHasPostmanAnatomy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestRenderApiScreenFitsShortTerminal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "function:internal/ui/api_tab_test.go:TestApiHumanSize",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/api_tab_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/confirm_modal.go",
+   "target": "function:internal/ui/confirm_modal.go:renderDeleteConfirmBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/confirm_modal.go",
+   "target": "function:internal/ui/confirm_modal.go:renderTunnelDeleteConfirmBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "function:internal/ui/confirm_modal.go:renderTunnelDeleteConfirmBox",
+   "target": "function:internal/ui/confirm_modal.go:renderDeleteConfirmBox",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "function:internal/ui/confirm_modal_test.go:TestRenderDeleteConfirmBox",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "function:internal/ui/confirm_modal_test.go:TestGitDeleteConfirmModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "function:internal/ui/confirm_modal_test.go:TestGitPullStrategyModal",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "function:internal/ui/confirm_modal_test.go:TestContainerDeleteConfirmOverlay",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/confirm_modal_test.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/confirm_modal.go",
+   "target": "file:internal/ui/confirm_modal_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

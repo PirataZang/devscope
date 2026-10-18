@@ -1,0 +1,352 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_nebula.go",
+   "type": "file",
+   "name": "relax_nebula.go",
+   "filePath": "internal/ui/relax_nebula.go",
+   "summary": "Cena da Nebulosa do modo Relax: duas nuvens de emissão (hidrogênio rosa e oxigênio azul) mais camada de poeira subtrativa, calculadas por ondas planas separáveis sem trigonometria no laço interno.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "procedural-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_nebula.go:relaxNebulaInit",
+   "type": "function",
+   "name": "relaxNebulaInit",
+   "filePath": "internal/ui/relax_nebula.go",
+   "lineRange": [
+    60,
+    82
+   ],
+   "summary": "Inicializa a nebulosa sorteando fases e frequências das ondas de cada camada.",
+   "tags": [
+    "initialization",
+    "procedural-generation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_nebula.go:relaxNebulaField",
+   "type": "function",
+   "name": "relaxNebulaField",
+   "filePath": "internal/ui/relax_nebula.go",
+   "lineRange": [
+    87,
+    134
+   ],
+   "summary": "Monta o campo estático de ionização e poeira, incluindo a auréola da estrela jovem que ilumina o gás por dentro.",
+   "tags": [
+    "procedural-generation",
+    "precomputation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_nebula.go:relaxNebulaFrames",
+   "type": "function",
+   "name": "relaxNebulaFrames",
+   "filePath": "internal/ui/relax_nebula.go",
+   "lineRange": [
+    152,
+    260
+   ],
+   "summary": "Renderiza a nebulosa combinando emissão rosa e azul menos a poeira em cada subpixel Braille colorido.",
+   "tags": [
+    "rendering",
+    "color-blending"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_ridge.go",
+   "type": "file",
+   "name": "relax_ridge.go",
+   "filePath": "internal/ui/relax_ridge.go",
+   "summary": "Cena 'Montanha com nuvens' do modo Relax: cinco cadeias de morro com perspectiva aérea e nuvens desenhadas entre as cadeias conforme a profundidade.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "procedural-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_ridge.go:relaxRgNewCloud",
+   "type": "function",
+   "name": "relaxRgNewCloud",
+   "filePath": "internal/ui/relax_ridge.go",
+   "lineRange": [
+    87,
+    102
+   ],
+   "summary": "Cria uma nuvem com profundidade, tamanho e velocidade sorteados para atravessar o vale.",
+   "tags": [
+    "factory",
+    "procedural-generation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ridge.go:stepRelaxRidge",
+   "type": "function",
+   "name": "stepRelaxRidge",
+   "filePath": "internal/ui/relax_ridge.go",
+   "lineRange": [
+    104,
+    151
+   ],
+   "summary": "Passo de simulação: move as nuvens e recicla as que saíram do palco.",
+   "tags": [
+    "simulation",
+    "animation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_ridge.go:relaxRidgeFrames",
+   "type": "function",
+   "name": "relaxRidgeFrames",
+   "filePath": "internal/ui/relax_ridge.go",
+   "lineRange": [
+    153,
+    170
+   ],
+   "summary": "Ponto de entrada de render da cena da serra, avançando pelo tempo real.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ridge.go:relaxRgDrawCloud",
+   "type": "function",
+   "name": "relaxRgDrawCloud",
+   "filePath": "internal/ui/relax_ridge.go",
+   "lineRange": [
+    174,
+    201
+   ],
+   "summary": "Desenha uma nuvem como aglomerado de bolhas em Braille.",
+   "tags": [
+    "rendering",
+    "drawing"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_ridge.go:relaxRidgeDraw",
+   "type": "function",
+   "name": "relaxRidgeDraw",
+   "filePath": "internal/ui/relax_ridge.go",
+   "lineRange": [
+    203,
+    274
+   ],
+   "summary": "Desenha as cinco cadeias com perspectiva aérea e intercala as nuvens conforme a profundidade.",
+   "tags": [
+    "rendering",
+    "layering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/relax_sea.go",
+   "type": "file",
+   "name": "relax_sea.go",
+   "filePath": "internal/ui/relax_sea.go",
+   "summary": "Cena 'Mar à noite' do modo Relax: horizonte pontilhado com cúmulos à deriva, lua e ondas em perspectiva com o reflexo da lua quebrando em cada crista.",
+   "tags": [
+    "relax-scene",
+    "animation",
+    "braille-rendering",
+    "simulation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_sea.go:relaxSeaInit",
+   "type": "function",
+   "name": "relaxSeaInit",
+   "filePath": "internal/ui/relax_sea.go",
+   "lineRange": [
+    67,
+    99
+   ],
+   "summary": "Inicializa o mar com cúmulos sorteados e parâmetros do swell.",
+   "tags": [
+    "initialization",
+    "procedural-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_sea.go:relaxSeaFrames",
+   "type": "function",
+   "name": "relaxSeaFrames",
+   "filePath": "internal/ui/relax_sea.go",
+   "lineRange": [
+    125,
+    146
+   ],
+   "summary": "Ponto de entrada de render do mar à noite, avançando a cena pelo tempo real.",
+   "tags": [
+    "rendering",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sea.go:relaxSeaPuffDen",
+   "type": "function",
+   "name": "relaxSeaPuffDen",
+   "filePath": "internal/ui/relax_sea.go",
+   "lineRange": [
+    148,
+    176
+   ],
+   "summary": "Calcula a densidade de um cúmulo em um ponto para o pontilhado das nuvens.",
+   "tags": [
+    "math",
+    "procedural-generation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_sea.go:relaxSeaDraw",
+   "type": "function",
+   "name": "relaxSeaDraw",
+   "filePath": "internal/ui/relax_sea.go",
+   "lineRange": [
+    178,
+    326
+   ],
+   "summary": "Desenha céu, cúmulos, lua, ondas em perspectiva e o caminho de brilho do reflexo lunar.",
+   "tags": [
+    "rendering",
+    "braille-rendering"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_nebula.go",
+   "target": "function:internal/ui/relax_nebula.go:relaxNebulaInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_nebula.go",
+   "target": "function:internal/ui/relax_nebula.go:relaxNebulaField",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_nebula.go",
+   "target": "function:internal/ui/relax_nebula.go:relaxNebulaFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "function:internal/ui/relax_ridge.go:relaxRgNewCloud",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "function:internal/ui/relax_ridge.go:stepRelaxRidge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "function:internal/ui/relax_ridge.go:relaxRidgeFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "function:internal/ui/relax_ridge.go:relaxRgDrawCloud",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "function:internal/ui/relax_ridge.go:relaxRidgeDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "function:internal/ui/relax_sea.go:relaxSeaInit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "function:internal/ui/relax_sea.go:relaxSeaFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "function:internal/ui/relax_sea.go:relaxSeaPuffDen",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "function:internal/ui/relax_sea.go:relaxSeaDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "file:internal/ui/relax_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/relax_nebula.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_ridge.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_sea.go",
+   "target": "file:internal/ui/relax_motion.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

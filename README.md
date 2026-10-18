@@ -15,34 +15,71 @@ numa tela só, dentro do terminal.
   <img src="https://img.shields.io/badge/linux%20%C2%B7%20macos%20%C2%B7%20windows-informational?style=for-the-badge&labelColor=0d1117&color=334155" alt="Plataformas">
 </p>
 
-**[Instalar](#-instalação)** ·
+</div>
+
+## 🚀 Instalação
+
+Um comando, um binário. Sem Node, sem Python, sem daemon.
+
+<table>
+<tr>
+<th width="50%">🐧 Linux &nbsp;·&nbsp; 🍎 macOS</th>
+<th width="50%">🪟 Windows (PowerShell)</th>
+</tr>
+<tr>
+<td valign="top">
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
+```
+
+Detecta sistema e arquitetura (x64 / ARM64, Intel / Apple Silicon),
+confere o checksum e instala em `/usr/local/bin` — ou em
+`~/.local/bin`, já adicionado ao `PATH` do seu `.bashrc` / `.zshrc`.
+
+</td>
+<td valign="top">
+
+```powershell
+irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
+```
+
+Instala em `%USERPROFILE%\.devscope\bin` e coloca a pasta no `PATH`
+do usuário. Abra um terminal novo e pronto.
+
+</td>
+</tr>
+</table>
+
+Depois é só rodar:
+
+```bash
+devscope               # abre a TUI
+devscope scan --json   # snapshot da máquina em JSON, para automação
+devscope watch         # painel com auto-refresh, sem TUI interativa
+devscope version       # versão, commit e data de build
+```
+
+<sub>Versão específica, outra pasta, download manual ou build from source? → [Instalação avançada](#-instalação-avançada)</sub>
+
+---
+
+<p align="center">
+  <img src="docs/media/overview.gif" alt="DevScope: lista de projetos, filtro, busca fuzzy, módulos do projeto, ajuda e temas" width="100%">
+</p>
+
+<div align="center">
+
+**[Git](#-git-sem-sair-do-terminal)** ·
+**[Docker](#-docker-por-projeto)** ·
 **[Por que existe](#-por-que-existe)** ·
-**[Tour](#-tour)** ·
 **[Módulos](#-15-módulos-um-contexto)** ·
+**[Atalhos](#-atalhos-essenciais)** ·
 **[Preferências](#-preferências)** ·
 **[Arquitetura](#-como-funciona)**
 
-</div>
+<sub>Todas as gravações são do DevScope de verdade, rodando contra projetos de demonstração.</sub>
 
-```
-  ╭ DevScope v0.1.0  Developer Command Center                     CPU 4%  RAM 22%  DISK 40%   09:34:23
-  │ Linux arm64 · up 149d 12h · load 0.03 · docker 8 · 1.6/7.3 GB                        varrido agora
-  ├ PROJETOS 5   ⣷ 4 rodando  ⣄ 1 parado                   / filtrar · nome, path, branch ou framework
-  │        NOME                    STACK     BRANCH             CTR COMMIT CAMINHO
-  │ ──────────────────────────────────────────────────────────────────────────────────────────────────
-  │ ▌ ⣷⣄⣀⡀ botrpg                  Node.js   main                 2      — ~/bots/botrpg
-  │   ⣷⣄⣀⡀ laravel-sync            Laravel   main                 7      — ~/projetos/laravel-sync
-  │   ⣷⣄⣀⡀ nginx-main              Docker    —                    1      — ~/projetos/nginx-main
-  │   ⣷⣄⣀⡀ portfolio               Node.js   main                 1      — ~/projetos/portfolio
-  │   ⣀⣀⣀⡀ peppercore-site         Vue       main                 1      — …projetos/peppercore-site
-  │ ──────────────────────────────────────────────────────────────────────────────────────────────────
-  │ ⣷⣄⣀⡀ botrpg   ~/bots/botrpg
-  │ Node.js · main · 2 containers
-  ╰  ↑↓ navegar · ENTER git · c containers · / filtrar · ^p fuzzy · S-E terminal     ? ajuda · q sair
-```
-
-<div align="center">
-<sub><b>Uma linha por projeto:</b> estado animado · stack detectada · branch · containers · portas · caminho</sub>
 </div>
 
 ---
@@ -73,7 +110,7 @@ Ele acha seus projetos<br>sozinho no disco
 ### ⚙️
 **Opera, não só observa**
 
-Subir, parar, commitar,<br>deploy, túnel, SQL
+Commitar, subir, parar,<br>deploy, túnel, SQL
 
 </td>
 <td width="25%" align="center">
@@ -87,6 +124,111 @@ Coleta concorrente,<br>UI sobre snapshot imutável
 </tr>
 </table>
 </div>
+
+**O que aparece no GIF acima:**
+
+- 🌊 **Lista de projetos** — uma linha por projeto, com a **onda Braille** de estado (verde subindo é
+  saudável, vermelho baixo é parado), stack detectada, branch e caminho. Embaixo, o resumo do projeto
+  selecionado: stack, containers, portas, branch e último commit.
+- 🔎 **Filtro ao vivo** (<kbd>/</kbd>) por nome, caminho, branch ou framework, e **busca fuzzy**
+  (<kbd>Ctrl</kbd>+<kbd>P</kbd>) para pular direto para um projeto.
+- 🧭 **Módulos do projeto** — <kbd>Tab</kbd> passa por Git, Worktrees, Containers, API e Database. Só
+  aparecem os módulos que fazem sentido para aquele projeto.
+- ❓ **Ajuda** (<kbd>?</kbd>) com todos os atalhos agrupados por cor, e **12 temas**
+  (<kbd>Shift</kbd>+<kbd>T</kbd>) com preview na hora.
+
+---
+
+## 🌿 Git, sem sair do terminal
+
+<p align="center">
+  <img src="docs/media/git.gif" alt="Módulo Git do DevScope: branches, commits, diff, Git Graph, stage, commit, log de comandos e stashes" width="100%">
+</p>
+
+<p align="center">
+  <a href="docs/media/git.mp4"><b>▶ Assistir em vídeo (MP4, melhor qualidade)</b></a>
+</p>
+
+Abra um projeto com <kbd>Enter</kbd> (ou <kbd>g</kbd> direto da lista) e o Git do projeto está ali —
+sem `cd`, sem decorar flag. O que o vídeo mostra, na ordem:
+
+| | O que acontece | Tecla |
+|---|---|---|
+| 1 | **Cabeçalho** com branch atual, commits à frente do remoto (`↑2 p/ enviar`), modificados, novos e stashes | — |
+| 2 | **Branches e commits lado a lado.** Mover o cursor numa branch mostra os commits dela *sem* fazer checkout (`(view)`) | <kbd>↑</kbd> <kbd>↓</kbd> |
+| 3 | **Diff de um commit**, arquivo por arquivo, com numeração de linhas e busca no diff | <kbd>→</kbd> <kbd>Enter</kbd> |
+| 4 | **Git Graph** — o DAG do repositório desenhado no terminal, com branches, tags, merges, stash e o detalhe do commit | <kbd>Ctrl</kbd>+<kbd>G</kbd> |
+| 5 | **Diff do arquivo modificado** na árvore de alterações | <kbd>→</kbd> <kbd>Enter</kbd> |
+| 6 | **Stage de tudo** — a árvore marca cada arquivo como `staged` | <kbd>Shift</kbd>+<kbd>A</kbd> |
+| 7 | **Commit** num modal com contagem de staged/modified/untracked e preview da mensagem | <kbd>c</kbd> |
+| 8 | **Log de comandos** abre sozinho: mostra o `git` exato que o DevScope rodou e a saída — nada acontece escondido | <kbd>Ctrl</kbd>+<kbd>L</kbd> |
+| 9 | **Gaveta de stashes** | <kbd>s</kbd> |
+
+<details>
+<summary><b>⌨️ Todos os atalhos do Git</b></summary>
+
+<br>
+
+| Navegar | | Branches | | Alterações e commits | |
+|---|---|---|---|---|---|
+| <kbd>←</kbd> <kbd>→</kbd> | Branches / Commits / Arquivos | <kbd>Space</kbd> | checkout | <kbd>a</kbd> | stage / unstage do arquivo |
+| <kbd>↑</kbd> <kbd>↓</kbd> | mover na coluna | <kbd>n</kbd> | criar branch | <kbd>Shift</kbd>+<kbd>A</kbd> | stage / unstage de todos |
+| <kbd>Enter</kbd> | detalhe / diff | <kbd>d</kbd> | apagar (confirma) | <kbd>c</kbd> | novo commit |
+| <kbd>b</kbd> | filtrar branches | <kbd>Shift</kbd>+<kbd>R</kbd> | renomear | <kbd>x</kbd> | marcar commit (cherry-pick) |
+| <kbd>s</kbd> | gaveta de stashes | <kbd>Shift</kbd>+<kbd>M</kbd> | merge na atual | <kbd>Shift</kbd>+<kbd>C</kbd> | copiar marcados |
+| <kbd>Ctrl</kbd>+<kbd>L</kbd> | log de comandos | <kbd>p</kbd> | pull | <kbd>Shift</kbd>+<kbd>V</kbd> | colar na branch atual |
+| <kbd>Ctrl</kbd>+<kbd>G</kbd> | Git Graph | <kbd>Shift</kbd>+<kbd>P</kbd> | push | | |
+| <kbd>r</kbd> | atualizar | <kbd>o</kbd> | abrir Pull Request no GitHub | | |
+
+No **Git Graph**: <kbd>Tab</kbd> alterna commits / detalhe / arquivos, <kbd>Shift</kbd>+<kbd>B</kbd>
+filtra por branch e <kbd>←</kbd> <kbd>→</kbd> rolam na horizontal.
+
+</details>
+
+---
+
+## 🐳 Docker, por projeto
+
+<p align="center">
+  <img src="docs/media/docker.gif" alt="Módulo Containers do DevScope: lista, portas com preview HTTP, logs, métricas, env com segredos mascarados, parar e iniciar" width="100%">
+</p>
+
+<p align="center">
+  <a href="docs/media/docker.mp4"><b>▶ Assistir em vídeo (MP4, melhor qualidade)</b></a>
+</p>
+
+<kbd>c</kbd> na lista abre os containers **só daquele projeto** — a correlação é feita pelo diretório
+do `docker compose` e pelos mounts, então o `postgres` do projeto A não se mistura com o do projeto B.
+
+| | O que acontece | Tecla |
+|---|---|---|
+| 1 | **Lista com estado, imagem, portas, CPU e memória**, e embaixo o detalhe e os **logs ao vivo** do container selecionado | <kbd>↑</kbd> <kbd>↓</kbd> |
+| 2 | **Portas publicadas** e **preview HTTP**: o DevScope faz o `GET` e mostra status, headers e corpo ali mesmo | <kbd>Enter</kbd> <kbd>Enter</kbd> |
+| 3 | **Detalhe em 7 abas** — logs · métricas · env · config · processos · compose · arquivos | <kbd>m</kbd> · <kbd>1</kbd>…<kbd>7</kbd> |
+| 4 | **Métricas** de CPU, memória, rede, I/O de bloco e PIDs | <kbd>2</kbd> |
+| 5 | **Variáveis de ambiente com segredos mascarados** — `POSTGRES_PASSWORD` vira `s3••••••••`. Pode abrir em call e tirar print | <kbd>3</kbd> |
+| 6 | **Parar e iniciar** o container; a onda de estado e o status acompanham em tempo real | <kbd>s</kbd> · <kbd>r</kbd> |
+
+<details>
+<summary><b>⌨️ Todos os atalhos de Containers</b></summary>
+
+<br>
+
+| Containers | | Compose e imagens | | Detalhe do container | |
+|---|---|---|---|---|---|
+| <kbd>Enter</kbd> | portas + preview HTTP | <kbd>Shift</kbd>+<kbd>U</kbd> | `compose up` | <kbd>1</kbd>…<kbd>7</kbd> | trocar de aba |
+| <kbd>m</kbd> | detalhe (7 abas) | <kbd>Shift</kbd>+<kbd>D</kbd> | `compose down` | <kbd>/</kbd> <kbd>n</kbd> <kbd>N</kbd> | buscar nos logs |
+| <kbd>s</kbd> · <kbd>r</kbd> | parar / iniciar e reiniciar | <kbd>Shift</kbd>+<kbd>B</kbd> | `compose up --build` | <kbd>f</kbd> · <kbd>p</kbd> | acompanhar / pausar logs |
+| <kbd>p</kbd> · <kbd>d</kbd> | pausar / remover (confirma) | <kbd>n</kbd> | novo serviço (Docker Hub ou YAML) | <kbd>←</kbd> <kbd>→</kbd> | rolar na horizontal |
+| <kbd>Shift</kbd>+<kbd>E</kbd> | shell dentro do container | <kbd>i</kbd> | imagens do container | <kbd>r</kbd> | recarregar |
+| <kbd>Shift</kbd>+<kbd>R</kbd> | alternar `restart=always` | <kbd>Shift</kbd>+<kbd>A</kbd> | (em imagens) escopo: container → projeto → todas | | |
+| <kbd>Shift</kbd>+<kbd>A</kbd> | incluir containers de outros projetos | <kbd>Shift</kbd>+<kbd>D</kbd> | (em imagens) remover imagem | | |
+
+Nas **portas**: <kbd>Enter</kbd> faz o preview HTTP, <kbd>o</kbd> abre no navegador e <kbd>x</kbd>
+fecha a porta no Docker. Também há módulos de **Swarm** (services, nodes, stacks, deploy, rollback) e
+**Kubernetes** (workloads, logs, yaml, escalar) para quando o projeto pede.
+
+</details>
 
 ---
 
@@ -137,159 +279,10 @@ do terminal.
 
 ---
 
-## 🚀 Instalação
-
-**🐧 Linux · 🍎 macOS**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
-```
-
-**🪟 Windows (PowerShell)**
-
-```powershell
-irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
-```
-
-Pronto — quatro comandos, um binário:
-
-```bash
-devscope               # abre a TUI
-devscope scan --json   # snapshot da máquina em JSON, para automação
-devscope watch         # painel com auto-refresh, sem TUI interativa
-devscope version       # versão, commit e data de build
-```
-
-<details>
-<summary><b>📥 Versão específica, diretório customizado, download manual e build from source</b></summary>
-
-<br>
-
-**Versão específica**
-
-```bash
-DEVSCOPE_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
-```
-
-```powershell
-$env:DEVSCOPE_VERSION="0.1.0"; irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
-```
-
-**Diretório de instalação**
-
-```bash
-DEVSCOPE_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
-```
-
-```powershell
-$env:DEVSCOPE_INSTALL_DIR="C:\Tools\devscope"; irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
-```
-
-**Download direto** — binários em [Releases](https://github.com/PirataZang/devscope/releases),
-cada um com `checksums.txt`:
-
-| Plataforma | Arquivo |
-|---|---|
-| Linux x64 / ARM64 | `devscope_*_linux_amd64.tar.gz` · `devscope_*_linux_arm64.tar.gz` |
-| macOS Intel / Apple Silicon | `devscope_*_darwin_amd64.tar.gz` · `devscope_*_darwin_arm64.tar.gz` |
-| Windows x64 / ARM64 | `devscope_*_windows_amd64.zip` · `devscope_*_windows_arm64.zip` |
-
-**Build from source** (Go 1.24+)
-
-```bash
-git clone https://github.com/PirataZang/devscope.git && cd devscope
-make build        # binário em ./bin/devscope
-make run          # compila e executa
-make install-dev  # instala no PATH de desenvolvimento
-```
-
-Ou `go install github.com/devscope/devscope/cmd/devscope@latest` — com `$GOPATH/bin` no `PATH`.
-
-</details>
-
----
-
-## 🎬 Tour
-
-Três telas, o mesmo padrão. Tudo abaixo é o DevScope de verdade — desenhado com
-caractere de terminal, não com imagem.
-
-### 1 · A lista de projetos
-
-```
- ⌂ INÍCIO   5 projetos                              CPU 4% ⣤⣦ · RAM 22% ⣀⣄ · DISK 40%   09:34:23
- ─────────────────────────────────────────────────────────────────────────────────────────────
-        NOME               STACK      BRANCH        CTR   CAMINHO
- ▌ ⣷⣄⣀⡀ botrpg             Node.js    main            2   ~/bots/botrpg
-   ⣷⣄⣀⡀ laravel-sync       Laravel    main            7   ~/projetos/laravel-sync
-   ⣷⣄⣀⡀ portfolio          Node.js    main            1   ~/projetos/portfolio
-   ⣀⣀⣀⡀ peppercore-site    Vue        main            1   …/projetos/peppercore-site
- ─────────────────────────────────────────────────────────────────────────────────────────────
- ⣷⣄⣀⡀ botrpg   ~/bots/botrpg
-   stack     Node.js · pnpm          git       main · limpo
-   runtime   2 containers · :3000    saúde     ⣤ HTTP 200 · SSL 61d
-  ↑↓ navegar · enter git · c containers · / filtrar · ^p fuzzy · ? ajuda · q sair
-```
-
-> 🌊 A **onda Braille** à esquerda do nome é o estado, animado — verde subindo é saudável,
-> vermelho baixo é parado. É a *altura* que separa os estados: legível em print, sem cor e
-> para daltônicos. 🔎 <kbd>/</kbd> filtra ao vivo · <kbd>Ctrl</kbd>+<kbd>P</kbd> é fuzzy ·
-> <kbd>Enter</kbd> entra no projeto.
-
-### 2 · Git, sem sair do lugar
-
-```
- ⑂ GIT   ~/projetos/laravel-sync                    main ⣷⣄⣀⣴ limpa · ↑2 ↓0        09:41:12
-  1 GIT │ 2 ACTIONS │ 3 CONTAINERS │ 4 NGINX │ 5 API                          ↑2 p/ enviar
- ┌─BRANCHES · 4──────────────────────┐ ┌─COMMITS · main───────────────────────────────┐
- │ ▸ main            ↑2 ↓0           │ │ a1b2c3d  fix: valida webhook          2h  você │
- │   feat/pix        ↑5              │ │ 9f8e7d6  feat: fila de eventos        1d  você │
- │   hotfix/ssl                      │ │ 3c2b1a0  chore: bump deps             2d  time │
- └───────────────────────────────────┘ └────────────────────────────────────────────────┘
- ALTERAÇÕES  3 modificados · 1 novo · 2 stash                          3 stash s · a stage
-   M  app/Http/Controllers/WebhookController.php
-   M  routes/api.php
-   ?  database/seeders/DemoSeeder.php
-  c commit · a stage · space checkout · p pull · S-P push · ^g graph · esc voltar
-```
-
-> 🌿 Branches e commits **lado a lado**, alterações e stashes na mesma tela. 📝 O log de
-> comandos mostra o `git` exato que o DevScope rodou — nada acontece escondido, e o link do PR
-> fica clicável. <kbd>Ctrl</kbd>+<kbd>G</kbd> abre o **Git Graph**, o DAG desenhado no terminal.
-
-### 3 · Containers do projeto
-
-```
- ▣ CONTAINER   ~/projetos/laravel-sync                     ⣴⣾⣦ 7 running        09:42:05
-  1 GIT │ 2 ACTIONS │ 3 CONTAINERS │ 4 NGINX │ 5 API                            7 · ↓0
- ┌─CONTAINERS · 7─────────────────────────────────────────────────────────────────────┐
- │ ⣴⣾⣦ app        laravel:8.2     3.1%   220M   :9000 → 9000/tcp        2h             │
- │ ⣴⣾⣦ queue      laravel:8.2     0.4%    88M   —                       2h             │
- │ ⣴⣾⣦ redis      redis:7-alpine  0.1%    12M   :6379 → 6379/tcp        2h             │
- │ ⣀⣀⣀ scheduler  laravel:8.2     0.0%     0M   —                   exited (0)         │
- └──────────────────────────────────────────────────────────────────────────────────────┘
- ────────────────────────────────────────────────────────────────────────────────────────
- ⣴⣾⣦ app   running   laravel:8.2                                             ⧗ 2h
-   portas    :9000 → 9000/tcp
-   recursos  CPU 3.1% ⣤⣦ · MEM 220M ⣴⣤ · NET 1.2MB
- ┌─LOGS · app─────────────────────────────────────────────────────────────────────────┐
- │ 09:41:58 [info] worker booted, listening on 9000                                     │
- │ 09:42:03 production.INFO: PixWebhook processed id=8842                                │
- └──────────────────────────────────────────────────────────────────────────────────────┘
-  enter portas · m detalhe · e shell · s parar · f logs · / buscar · esc voltar
-```
-
-> 🐳 **Só os containers daquele projeto** — a correlação é por mount path e label do compose.
-> 📡 Logs ao vivo, stats e portas na mesma tela. 🔐 <kbd>m</kbd> abre o detalhe em 7 abas
-> (logs · métricas · env · config · processos · compose · Dockerfile) com **mascaramento
-> automático de segredos** no env — essa tela costuma aparecer em call e em print.
-
----
-
-## 🧩 15 módulos, um contexto
+## 🧩 14 módulos, um contexto
 
 Cada módulo aparece **só quando faz sentido** para o projeto aberto — um projeto Go sem Docker
-não mostra a aba de containers. A cor é a cor da categoria, no app inteiro.
+não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da categoria, no app inteiro.
 
 <table>
 <tr>
@@ -301,9 +294,9 @@ não mostra a aba de containers. A cor é a cor da categoria, no app inteiro.
 > git e atividade num painel
 
 #### 🟡 CÓDIGO
-`Git` · `GH Actions` · `Jenkins`
+`Git` · `Worktrees` · `GH Actions` · `Jenkins`
 > branches, commits, PR, graph,
-> runs, workflows, logs, trigger
+> worktrees, runs, workflows, trigger
 
 </td>
 <td width="33%" valign="top">
@@ -314,10 +307,9 @@ não mostra a aba de containers. A cor é a cor da categoria, no app inteiro.
 > services, nodes, pods, manifests
 
 #### 🟢 REDE
-`Nginx` · `Rotas` · `Ngrok`
-`SSH` · `CF Tunnel`
-> vhosts, endpoints, expor o
-> local, requests ao vivo, URL
+`Nginx` · `Ngrok` · `CF Tunnel`
+> vhosts, expor o local,
+> requests ao vivo, URL
 
 </td>
 <td width="33%" valign="top">
@@ -344,6 +336,25 @@ workers PM2 · `docker compose up/down/restart` · deploy com confirmação · 1
 
 </sub>
 </div>
+
+---
+
+## ⌨️ Atalhos essenciais
+
+O DevScope tem três camadas de atalho: **global** (vale em qualquer tela), **contextual** (vale na
+tela atual) e **local** (vale no módulo aberto). A local vence. <kbd>?</kbd> mostra tudo, em qualquer tela.
+
+| Tecla | Na tela inicial | Tecla | Em qualquer lugar |
+|---|---|---|---|
+| <kbd>↑</kbd> <kbd>↓</kbd> | navegar nos projetos | <kbd>Tab</kbd> · <kbd>Shift</kbd>+<kbd>Tab</kbd> | próximo / anterior módulo |
+| <kbd>Enter</kbd> · <kbd>g</kbd> | abrir no Git | <kbd>Esc</kbd> | voltar um nível |
+| <kbd>c</kbd> | abrir nos Containers | <kbd>t</kbd> | mostrar todos os módulos |
+| <kbd>/</kbd> | filtrar ao vivo | <kbd>?</kbd> | ajuda |
+| <kbd>Ctrl</kbd>+<kbd>P</kbd> | busca fuzzy | <kbd>Ctrl</kbd>+<kbd>O</kbd> | agente de IA na pasta do projeto |
+| <kbd>Shift</kbd>+<kbd>E</kbd> | terminal no diretório do projeto | <kbd>q</kbd> | sair |
+| <kbd>Shift</kbd>+<kbd>T</kbd> | escolher tema | | |
+| <kbd>Shift</kbd>+<kbd>C</kbd> | preferências | | |
+| <kbd>1</kbd>…<kbd>9</kbd> <kbd>0</kbd> | seus comandos cadastrados | | |
 
 ---
 
@@ -409,6 +420,53 @@ DEVSCOPE_SCAN_PATHS=/var/www,/home/usuario/projetos devscope
 
 ---
 
+## 📥 Instalação avançada
+
+**Versão específica**
+
+```bash
+DEVSCOPE_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
+```
+
+```powershell
+$env:DEVSCOPE_VERSION="0.1.0"; irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
+```
+
+**Outra pasta de instalação**
+
+```bash
+DEVSCOPE_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.sh | bash
+```
+
+```powershell
+$env:DEVSCOPE_INSTALL_DIR="C:\Tools\devscope"; irm https://raw.githubusercontent.com/PirataZang/devscope/main/scripts/install.ps1 | iex
+```
+
+**Git Bash / MSYS2 no Windows** — o `install.sh` também funciona lá e instala em `~/.local/bin`.
+
+**Download direto** — binários em [Releases](https://github.com/PirataZang/devscope/releases),
+cada um com `checksums.txt`:
+
+| Plataforma | Arquivo |
+|---|---|
+| Linux x64 / ARM64 | `devscope_*_linux_amd64.tar.gz` · `devscope_*_linux_arm64.tar.gz` |
+| macOS Intel / Apple Silicon | `devscope_*_darwin_amd64.tar.gz` · `devscope_*_darwin_arm64.tar.gz` |
+| Windows x64 / ARM64 | `devscope_*_windows_amd64.zip` · `devscope_*_windows_arm64.zip` |
+
+**Build from source** (Go 1.24+)
+
+```bash
+git clone https://github.com/PirataZang/devscope.git && cd devscope
+make build        # binário em ./bin/devscope
+make run          # compila e executa
+make install-dev  # substitui o devscope que está no seu PATH
+```
+
+**Desinstalar** — é um binário só: apague o `devscope` de onde ele foi instalado (`command -v devscope`
+mostra onde) e, se quiser, a pasta `~/.config/devscope`.
+
+---
+
 ## 🏗️ Como funciona
 
 ```mermaid
@@ -456,6 +514,10 @@ Go 1.24+ · [Bubble Tea](https://github.com/charmbracelet/bubbletea) (modelo Elm
 
 Antes de mexer na UI, leia o **[DESIGN.md](docs/DESIGN.md)** — ele define o padrão de todas as
 telas e é o que evita cada módulo virar uma ilha.
+
+Mudou uma tela que aparece nos GIFs? Regrave com `docs/media/tapes/record.sh` (precisa só de Docker,
+ffmpeg e Python com Pillow). Ele cria projetos de demonstração, grava com o
+[VHS](https://github.com/charmbracelet/vhs) e aplica o zoom — nada da sua máquina aparece no vídeo.
 
 ---
 

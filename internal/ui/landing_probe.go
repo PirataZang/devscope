@@ -10,7 +10,6 @@ import (
 	"github.com/devscope/devscope/internal/jenkinsutil"
 	"github.com/devscope/devscope/internal/nginxutil"
 	"github.com/devscope/devscope/internal/ngrokutil"
-	"github.com/devscope/devscope/internal/sshutil"
 )
 
 // toolLandingMsg carries async probe results for module landings.
@@ -29,10 +28,6 @@ type toolLandingMsg struct {
 	ghaProcNames []string
 
 	cfAuth cfutil.AuthInfo
-
-	sshAvail bool
-	sshVer   string
-	sshLive  int
 
 	swarmAvail   bool
 	swarmInfo    collectors.SwarmInfo
@@ -78,12 +73,6 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 			}
 		case TabCFTunnel:
 			msg.cfAuth = cfutil.Auth()
-		case TabSSH:
-			msg.sshAvail = sshutil.Available()
-			msg.sshLive = len(sshutil.ListLiveTunnels())
-			if msg.sshAvail {
-				msg.sshVer = sshutil.Version()
-			}
 		case TabSwarm:
 			msg.swarmAvail = collectors.SwarmAvailable()
 			msg.swarmInfo = collectors.SwarmClusterInfo()
@@ -131,11 +120,6 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 	case TabCFTunnel:
 		a.landingCF = msg.cfAuth
 		a.landingCFOK = true
-	case TabSSH:
-		a.landingSSHAvail = msg.sshAvail
-		a.landingSSHVer = msg.sshVer
-		a.landingSSHLive = msg.sshLive
-		a.landingSSHOK = true
 	case TabSwarm:
 		a.landingSwarmAvail = msg.swarmAvail
 		a.landingSwarm = msg.swarmInfo

@@ -1,0 +1,928 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/relax_burst.go",
+   "type": "file",
+   "name": "relax_burst.go",
+   "filePath": "internal/ui/relax_burst.go",
+   "summary": "Cena Relax de supernova: partículas caem em espiral até a estrela estourar, deixando uma estrela azul que apaga devagar; ciclo dirigido por máquina de fases com quatro famílias de cor.",
+   "tags": [
+    "relax",
+    "animacao",
+    "particulas",
+    "astronomia",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_burst.go:relaxNovaDur",
+   "type": "function",
+   "name": "relaxNovaDur",
+   "filePath": "internal/ui/relax_burst.go",
+   "lineRange": [
+    103,
+    116
+   ],
+   "summary": "Devolve a duração de cada fase do ciclo da cena supernova.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_burst.go:relaxNovaDiscreteTick",
+   "type": "function",
+   "name": "relaxNovaDiscreteTick",
+   "filePath": "internal/ui/relax_burst.go",
+   "lineRange": [
+    127,
+    169
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena supernova: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_burst.go:relaxNovaAdvance",
+   "type": "function",
+   "name": "relaxNovaAdvance",
+   "filePath": "internal/ui/relax_burst.go",
+   "lineRange": [
+    176,
+    238
+   ],
+   "summary": "Avança a simulação da cena supernova por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_burst.go:relaxBurstFrames",
+   "type": "function",
+   "name": "relaxBurstFrames",
+   "filePath": "internal/ui/relax_burst.go",
+   "lineRange": [
+    249,
+    367
+   ],
+   "summary": "Renderiza um quadro da cena supernova no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_cat.go",
+   "type": "file",
+   "name": "relax_cat.go",
+   "filePath": "internal/ui/relax_cat.go",
+   "summary": "Cena Relax de gato dormindo: line art Braille embutida colorida com gradiente de pelo e manchas brancas, respiração contínua, corrida periódica da ponta do rabo e 'zzz' subindo.",
+   "tags": [
+    "relax",
+    "animacao",
+    "braille",
+    "sprite",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatSpawnZ",
+   "type": "function",
+   "name": "relaxCatSpawnZ",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    80,
+    100
+   ],
+   "summary": "Cria um 'zzz' que sobe pelo canto vazio acima da cabeça do gato.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatDiscreteTick",
+   "type": "function",
+   "name": "relaxCatDiscreteTick",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    113,
+    141
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena gato dormindo: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatAdvance",
+   "type": "function",
+   "name": "relaxCatAdvance",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    146,
+    155
+   ],
+   "summary": "Avança a simulação da cena gato dormindo por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatShade",
+   "type": "function",
+   "name": "relaxCatShade",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    194,
+    205
+   ],
+   "summary": "Escurece um nível de cor dentro da própria rampa, transformando o traço em contorno.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatLevelAt",
+   "type": "function",
+   "name": "relaxCatLevelAt",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    303,
+    323
+   ],
+   "summary": "Devolve o nível de cor de um ponto da arte do gato considerando o balanço da cauda.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatTailSeam",
+   "type": "function",
+   "name": "relaxCatTailSeam",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    335,
+    344
+   ],
+   "summary": "Calcula a distância até a curva que separa a cauda do corpo.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatFrames",
+   "type": "function",
+   "name": "relaxCatFrames",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    372,
+    389
+   ],
+   "summary": "Renderiza um quadro da cena gato dormindo no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_cat.go:relaxCatDraw",
+   "type": "function",
+   "name": "relaxCatDraw",
+   "filePath": "internal/ui/relax_cat.go",
+   "lineRange": [
+    391,
+    462
+   ],
+   "summary": "Desenha o gato no buffer Braille com pelo em gradiente, manchas e respiração.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_chess.go",
+   "type": "file",
+   "name": "relax_chess.go",
+   "filePath": "internal/ui/relax_chess.go",
+   "summary": "Cena Relax de uma dama de xadrez girando: sólido de revolução com caneluras e colar de contas para quebrar a simetria, desenhado com z-buffer próprio e brilho especular.",
+   "tags": [
+    "relax",
+    "animacao",
+    "3d",
+    "z-buffer",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_chess.go:stepRelaxChess",
+   "type": "function",
+   "name": "stepRelaxChess",
+   "filePath": "internal/ui/relax_chess.go",
+   "lineRange": [
+    106,
+    116
+   ],
+   "summary": "Avança um passo da simulação da cena dama de xadrez girando, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_chess.go:put",
+   "type": "function",
+   "name": "put",
+   "filePath": "internal/ui/relax_chess.go",
+   "lineRange": [
+    136,
+    145
+   ],
+   "summary": "Grava um subponto no z-buffer apenas se estiver à frente do conteúdo existente.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_chess.go:relaxChessFrames",
+   "type": "function",
+   "name": "relaxChessFrames",
+   "filePath": "internal/ui/relax_chess.go",
+   "lineRange": [
+    159,
+    179
+   ],
+   "summary": "Renderiza um quadro da cena dama de xadrez girando no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_chess.go:relaxChessDraw",
+   "type": "function",
+   "name": "relaxChessDraw",
+   "filePath": "internal/ui/relax_chess.go",
+   "lineRange": [
+    181,
+    295
+   ],
+   "summary": "Desenha a dama girando como sólido de revolução com caneluras, colar de contas e brilho especular.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:internal/ui/relax_chess.go:relaxChessBuf",
+   "type": "class",
+   "name": "relaxChessBuf",
+   "filePath": "internal/ui/relax_chess.go",
+   "lineRange": [
+    120,
+    124
+   ],
+   "summary": "Z-buffer por subponto que guarda nível e profundidade, usado para desenhar a dama sem erros de ordenação.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:internal/ui/relax_city.go",
+   "type": "file",
+   "name": "relax_city.go",
+   "filePath": "internal/ui/relax_city.go",
+   "summary": "Cena Relax de cidade dormindo: silhueta de prédios à noite com janelas que acendem e apagam com fade em tempos próprios, carro na rua e poste com defeito.",
+   "tags": [
+    "relax",
+    "animacao",
+    "braille",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_city.go:relaxCityBuild",
+   "type": "function",
+   "name": "relaxCityBuild",
+   "filePath": "internal/ui/relax_city.go",
+   "lineRange": [
+    85,
+    163
+   ],
+   "summary": "Inicializa ou reconstrói o estado da cena cidade dormindo para um novo ciclo.",
+   "tags": [
+    "relax",
+    "factory",
+    "inicializacao"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_city.go:stepRelaxCity",
+   "type": "function",
+   "name": "stepRelaxCity",
+   "filePath": "internal/ui/relax_city.go",
+   "lineRange": [
+    165,
+    207
+   ],
+   "summary": "Avança um passo da simulação da cena cidade dormindo, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_city.go:relaxCityDrawBld",
+   "type": "function",
+   "name": "relaxCityDrawBld",
+   "filePath": "internal/ui/relax_city.go",
+   "lineRange": [
+    210,
+    246
+   ],
+   "summary": "Desenha o corpo e o remate de um prédio no buffer Braille.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_city.go:relaxCityFrames",
+   "type": "function",
+   "name": "relaxCityFrames",
+   "filePath": "internal/ui/relax_city.go",
+   "lineRange": [
+    248,
+    261
+   ],
+   "summary": "Renderiza um quadro da cena cidade dormindo no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_city.go:relaxCityDraw",
+   "type": "function",
+   "name": "relaxCityDraw",
+   "filePath": "internal/ui/relax_city.go",
+   "lineRange": [
+    263,
+    390
+   ],
+   "summary": "Desenha a cidade: céu, prédios, janelas com fade, rua, carro e poste com defeito.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_clouds.go",
+   "type": "file",
+   "name": "relax_clouds.go",
+   "filePath": "internal/ui/relax_clouds.go",
+   "summary": "Cena Relax de nuvens: céu com ciclo de dia de ~4 minutos interpolando paletas de manhã a noite, e iluminação de nuvens por comparação de densidade na direção do sol.",
+   "tags": [
+    "relax",
+    "animacao",
+    "iluminacao",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_clouds.go:stepRelaxClouds",
+   "type": "function",
+   "name": "stepRelaxClouds",
+   "filePath": "internal/ui/relax_clouds.go",
+   "lineRange": [
+    75,
+    113
+   ],
+   "summary": "Avança um passo da simulação da cena nuvens, atualizando entidades e eventos.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_clouds.go:relaxCldRamp",
+   "type": "function",
+   "name": "relaxCldRamp",
+   "filePath": "internal/ui/relax_clouds.go",
+   "lineRange": [
+    121,
+    132
+   ],
+   "summary": "Monta uma rampa de n cores a partir de três paradas RGB.",
+   "tags": [
+    "relax",
+    "cor",
+    "styling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_clouds.go:relaxCloudsFrames",
+   "type": "function",
+   "name": "relaxCloudsFrames",
+   "filePath": "internal/ui/relax_clouds.go",
+   "lineRange": [
+    134,
+    143
+   ],
+   "summary": "Renderiza um quadro da cena nuvens no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_clouds.go:relaxCloudsDraw",
+   "type": "function",
+   "name": "relaxCloudsDraw",
+   "filePath": "internal/ui/relax_clouds.go",
+   "lineRange": [
+    145,
+    300
+   ],
+   "summary": "Desenha céu e nuvens iluminadas pela comparação de densidade na direção do sol, além do sol e pássaros.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:internal/ui/relax_coffee.go",
+   "type": "file",
+   "name": "relax_coffee.go",
+   "filePath": "internal/ui/relax_coffee.go",
+   "summary": "Cena Relax de café visto de cima: bule entra, inclina e enche a xícara, depois o nível baixa em goles com pausas, com ondas na superfície e parede interna em sombra.",
+   "tags": [
+    "relax",
+    "animacao",
+    "braille",
+    "maquina-de-estados",
+    "cena"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeeDur",
+   "type": "function",
+   "name": "relaxCoffeeDur",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    97,
+    112
+   ],
+   "summary": "Devolve a duração de cada fase do ciclo da cena café.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeeDiscreteTick",
+   "type": "function",
+   "name": "relaxCoffeeDiscreteTick",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    136,
+    181
+   ],
+   "summary": "Executa os eventos discretos de passo cheio (100ms) da cena café: contadores, máquina de fases e spawns.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeeAdvance",
+   "type": "function",
+   "name": "relaxCoffeeAdvance",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    188,
+    225
+   ],
+   "summary": "Avança a simulação da cena café por um número fracionário de ticks, disparando eventos discretos via acumulador e integrando a física contínua.",
+   "tags": [
+    "relax",
+    "simulacao",
+    "game-loop"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeeFrames",
+   "type": "function",
+   "name": "relaxCoffeeFrames",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    236,
+    261
+   ],
+   "summary": "Renderiza um quadro da cena café no tamanho do palco, aplicando o fade global e devolvendo as linhas coloridas e o status.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeeDraw",
+   "type": "function",
+   "name": "relaxCoffeeDraw",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    263,
+    481
+   ],
+   "summary": "Desenha pires, xícara vista de cima, parede interna em sombra, café com ondas e o bule.",
+   "tags": [
+    "relax",
+    "render",
+    "tui"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:internal/ui/relax_coffee.go:relaxCoffeePot",
+   "type": "function",
+   "name": "relaxCoffeePot",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    485,
+    523
+   ],
+   "summary": "Desenha o bule inclinado e devolve a ponta do bico, de onde o café cai.",
+   "tags": [
+    "relax",
+    "utility",
+    "helper"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:internal/ui/relax_coffee.go:relaxCoffeeState",
+   "type": "class",
+   "name": "relaxCoffeeState",
+   "filePath": "internal/ui/relax_coffee.go",
+   "lineRange": [
+    70,
+    94
+   ],
+   "summary": "Estado mutável da cena café: entidades, contadores e parâmetros sorteados do ciclo atual.",
+   "tags": [
+    "data-model",
+    "state",
+    "relax"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/relax_burst.go",
+   "target": "function:internal/ui/relax_burst.go:relaxNovaDur",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_burst.go",
+   "target": "function:internal/ui/relax_burst.go:relaxNovaDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_burst.go",
+   "target": "function:internal/ui/relax_burst.go:relaxNovaAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_burst.go",
+   "target": "function:internal/ui/relax_burst.go:relaxBurstFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatSpawnZ",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatShade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatLevelAt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatTailSeam",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "function:internal/ui/relax_cat.go:relaxCatDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "function:internal/ui/relax_chess.go:stepRelaxChess",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "function:internal/ui/relax_chess.go:put",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "function:internal/ui/relax_chess.go:relaxChessFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "function:internal/ui/relax_chess.go:relaxChessDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "class:internal/ui/relax_chess.go:relaxChessBuf",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "function:internal/ui/relax_city.go:relaxCityBuild",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "function:internal/ui/relax_city.go:stepRelaxCity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "function:internal/ui/relax_city.go:relaxCityDrawBld",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "function:internal/ui/relax_city.go:relaxCityFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "function:internal/ui/relax_city.go:relaxCityDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_clouds.go",
+   "target": "function:internal/ui/relax_clouds.go:stepRelaxClouds",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_clouds.go",
+   "target": "function:internal/ui/relax_clouds.go:relaxCldRamp",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_clouds.go",
+   "target": "function:internal/ui/relax_clouds.go:relaxCloudsFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_clouds.go",
+   "target": "function:internal/ui/relax_clouds.go:relaxCloudsDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeeDur",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeeDiscreteTick",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeeAdvance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeeFrames",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeeDraw",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "function:internal/ui/relax_coffee.go:relaxCoffeePot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "class:internal/ui/relax_coffee.go:relaxCoffeeState",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/relax_burst.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_cat.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_chess.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_city.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_clouds.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:internal/ui/relax_coffee.go",
+   "target": "file:internal/ui/relax_braille.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

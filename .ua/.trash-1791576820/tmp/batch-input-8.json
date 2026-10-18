@@ -1,0 +1,933 @@
+{
+ "batchIndex": 8,
+ "totalBatches": 16,
+ "batchFiles": [
+  {
+   "path": "internal/ui/relax_jackpot.go",
+   "language": "go",
+   "sizeLines": 791,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_moon.go",
+   "language": "go",
+   "sizeLines": 284,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_motion.go",
+   "language": "go",
+   "sizeLines": 65,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_nebula.go",
+   "language": "go",
+   "sizeLines": 260,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_ridge.go",
+   "language": "go",
+   "sizeLines": 274,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_sea.go",
+   "language": "go",
+   "sizeLines": 326,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_sky.go",
+   "language": "go",
+   "sizeLines": 699,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_smoke.go",
+   "language": "go",
+   "sizeLines": 440,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_sword.go",
+   "language": "go",
+   "sizeLines": 1040,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_test.go",
+   "language": "go",
+   "sizeLines": 1179,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_tetris.go",
+   "language": "go",
+   "sizeLines": 423,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_tetris_draw.go",
+   "language": "go",
+   "sizeLines": 57,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_tree.go",
+   "language": "go",
+   "sizeLines": 312,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/relax_v4.go",
+   "language": "go",
+   "sizeLines": 553,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/responsive_test.go",
+   "language": "go",
+   "sizeLines": 480,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/shell_return.go",
+   "language": "go",
+   "sizeLines": 21,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/small_terminal_test.go",
+   "language": "go",
+   "sizeLines": 56,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/spark.go",
+   "language": "go",
+   "sizeLines": 232,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/spark_test.go",
+   "language": "go",
+   "sizeLines": 125,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/ssh_tab.go",
+   "language": "go",
+   "sizeLines": 1300,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/ssh_tab_test.go",
+   "language": "go",
+   "sizeLines": 148,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/styles.go",
+   "language": "go",
+   "sizeLines": 226,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/theme.go",
+   "language": "go",
+   "sizeLines": 354,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/tunnel_modals.go",
+   "language": "go",
+   "sizeLines": 74,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/views.go",
+   "language": "go",
+   "sizeLines": 98,
+   "fileCategory": "code"
+  },
+  {
+   "path": "internal/ui/ws_compose.go",
+   "language": "go",
+   "sizeLines": 239,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "internal/ui/relax_jackpot.go": [],
+  "internal/ui/relax_moon.go": [],
+  "internal/ui/relax_motion.go": [],
+  "internal/ui/relax_nebula.go": [],
+  "internal/ui/relax_ridge.go": [],
+  "internal/ui/relax_sea.go": [],
+  "internal/ui/relax_sky.go": [],
+  "internal/ui/relax_smoke.go": [],
+  "internal/ui/relax_sword.go": [],
+  "internal/ui/relax_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/relax_tetris.go": [],
+  "internal/ui/relax_tetris_draw.go": [],
+  "internal/ui/relax_tree.go": [],
+  "internal/ui/relax_v4.go": [],
+  "internal/ui/responsive_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/shell_return.go": [],
+  "internal/ui/small_terminal_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/spark.go": [],
+  "internal/ui/spark_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ],
+  "internal/ui/ssh_tab.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go",
+   "internal/sshutil/agent.go",
+   "internal/sshutil/agent_test.go",
+   "internal/sshutil/config.go"
+  ],
+  "internal/ui/ssh_tab_test.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go",
+   "internal/sshutil/agent.go",
+   "internal/sshutil/agent_test.go",
+   "internal/sshutil/config.go"
+  ],
+  "internal/ui/styles.go": [],
+  "internal/ui/theme.go": [],
+  "internal/ui/tunnel_modals.go": [],
+  "internal/ui/views.go": [],
+  "internal/ui/ws_compose.go": [
+   "internal/core/models.go",
+   "internal/core/state.go",
+   "internal/core/state_test.go"
+  ]
+ },
+ "neighborMap": {
+  "internal/ui/relax_jackpot.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_moon.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_motion.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_nebula.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_ridge.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_sea.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_sky.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_smoke.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_sword.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_test.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_tetris.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_tetris_draw.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_tree.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/relax_v4.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/responsive_test.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/shell_return.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/small_terminal_test.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/spark.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/spark_test.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/ssh_tab.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/sshutil/agent.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Tunnel",
+     "Available",
+     "Version",
+     "SuggestPort",
+     "FormatForward",
+     "ListLiveTunnels",
+     "StartTunnel",
+     "StopTunnel",
+     "RecentLogs",
+     "TunnelArgs",
+     "SuggestSSHTarget",
+     "DefaultRemoteTunnel",
+     "ParseBind"
+    ]
+   },
+   {
+    "path": "internal/sshutil/agent_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestNormalizeMode",
+     "TestSuggestPort",
+     "TestParseBind",
+     "TestTunnelArgs",
+     "TestMergeTunnels",
+     "TestConfigRoundTrip",
+     "TestFormatForward",
+     "TestSuggestSSHTargetAndDefaultRemote"
+    ]
+   },
+   {
+    "path": "internal/sshutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TunnelConfig",
+     "ProjectConfig",
+     "HistoryEntry",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject",
+     "UpsertTunnel",
+     "RemoveTunnel",
+     "NormalizeMode",
+     "MergeTunnels",
+     "CountForeignLive",
+     "MergeTunnelsAll"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/ssh_tab_test.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/sshutil/agent.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Tunnel",
+     "Available",
+     "Version",
+     "SuggestPort",
+     "FormatForward",
+     "ListLiveTunnels",
+     "StartTunnel",
+     "StopTunnel",
+     "RecentLogs",
+     "TunnelArgs",
+     "SuggestSSHTarget",
+     "DefaultRemoteTunnel",
+     "ParseBind"
+    ]
+   },
+   {
+    "path": "internal/sshutil/agent_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestNormalizeMode",
+     "TestSuggestPort",
+     "TestParseBind",
+     "TestTunnelArgs",
+     "TestMergeTunnels",
+     "TestConfigRoundTrip",
+     "TestFormatForward",
+     "TestSuggestSSHTargetAndDefaultRemote"
+    ]
+   },
+   {
+    "path": "internal/sshutil/config.go",
+    "batchIndex": 10,
+    "symbols": [
+     "TunnelConfig",
+     "ProjectConfig",
+     "HistoryEntry",
+     "ConfigPath",
+     "LoadProject",
+     "SaveProject",
+     "UpsertTunnel",
+     "RemoveTunnel",
+     "NormalizeMode",
+     "MergeTunnels",
+     "CountForeignLive",
+     "MergeTunnelsAll"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/styles.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/theme.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/tunnel_modals.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/views.go": [
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ],
+  "internal/ui/ws_compose.go": [
+   {
+    "path": "internal/core/models.go",
+    "batchIndex": 1,
+    "symbols": [
+     "FrameworkInfo",
+     "GitFileStatus",
+     "GitCommit",
+     "GitCommitFileChange",
+     "GitBranch",
+     "GitStash",
+     "GitRemote",
+     "GitInfo",
+     "Service",
+     "Container",
+     "Image",
+     "Worker",
+     "Domain",
+     "SSLCert",
+     "ProjectModule",
+     "ProjectMetrics",
+     "HealthCheckResult",
+     "Project",
+     "HostMetrics",
+     "Snapshot"
+    ]
+   },
+   {
+    "path": "internal/core/state.go",
+    "batchIndex": 1,
+    "symbols": [
+     "StateStore",
+     "NewStateStore",
+     "Get",
+     "Update",
+     "Clone",
+     "SetProjects",
+     "SetOrphanContainers",
+     "SetHostMetrics",
+     "UpdateProjectGit",
+     "UpdateProjectRuntime",
+     "UpdateProjectStatus"
+    ]
+   },
+   {
+    "path": "internal/core/state_test.go",
+    "batchIndex": 1,
+    "symbols": [
+     "TestStateStoreConcurrency",
+     "TestSetProjectsPreservesGit",
+     "TestSetProjectsDoesNotReplaceFullGitWithSummary",
+     "TestSnapshotClone"
+    ]
+   },
+   {
+    "path": "internal/app/app.go",
+    "batchIndex": 1,
+    "symbols": [
+     "Run"
+    ]
+   }
+  ]
+ }
+}

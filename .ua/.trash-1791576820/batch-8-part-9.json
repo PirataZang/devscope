@@ -1,0 +1,251 @@
+{
+ "nodes": [
+  {
+   "id": "file:internal/ui/views.go",
+   "type": "file",
+   "name": "views.go",
+   "filePath": "internal/ui/views.go",
+   "summary": "Declara os enums de navegação da UI (View, subviews do dashboard e Tab) com nomes em português e a lista AllTabs que fixa a ordem do Tab igual à da sidebar.",
+   "tags": [
+    "type-definition",
+    "navigation",
+    "enum",
+    "tui"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/views.go:String",
+   "type": "function",
+   "name": "String",
+   "filePath": "internal/ui/views.go",
+   "lineRange": [
+    42,
+    83
+   ],
+   "summary": "Devolve o nome em português de cada aba (Tab) para exibição na sidebar e no cabeçalho.",
+   "tags": [
+    "formatting",
+    "enum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:internal/ui/ws_compose.go",
+   "type": "file",
+   "name": "ws_compose.go",
+   "filePath": "internal/ui/ws_compose.go",
+   "summary": "Modal de composição de mensagens WebSocket: editor com foco cíclico entre texto, tipo, Enviar e Cancelar, envio da mensagem e render sobre o fundo da aba.",
+   "tags": [
+    "component",
+    "websocket",
+    "modal",
+    "event-handler"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:updateWsCompose",
+   "type": "function",
+   "name": "updateWsCompose",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    34,
+    68
+   ],
+   "summary": "Trata o teclado do modal de composição: Esc cancela, Tab cicla foco e Enter envia ou edita.",
+   "tags": [
+    "event-handler",
+    "keybinding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:wsComposeTab",
+   "type": "function",
+   "name": "wsComposeTab",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    70,
+    103
+   ],
+   "summary": "Cicla o foco entre editor, tipo, Enviar e Cancelar.",
+   "tags": [
+    "focus",
+    "navigation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:submitWsCompose",
+   "type": "function",
+   "name": "submitWsCompose",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    105,
+    127
+   ],
+   "summary": "Valida e envia a mensagem composta ao servidor WebSocket.",
+   "tags": [
+    "command",
+    "websocket"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:renderWsCompose",
+   "type": "function",
+   "name": "renderWsCompose",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    129,
+    207
+   ],
+   "summary": "Renderiza o modal de composição com editor, seletor de tipo e botões.",
+   "tags": [
+    "rendering",
+    "modal"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:renderWsComposeTypes",
+   "type": "function",
+   "name": "renderWsComposeTypes",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    209,
+    227
+   ],
+   "summary": "Renderiza o seletor de tipo de mensagem (texto/binário/JSON).",
+   "tags": [
+    "rendering",
+    "form"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:internal/ui/ws_compose.go:renderWsTabBackground",
+   "type": "function",
+   "name": "renderWsTabBackground",
+   "filePath": "internal/ui/ws_compose.go",
+   "lineRange": [
+    229,
+    239
+   ],
+   "summary": "Renderiza a aba WebSocket como fundo atrás do modal.",
+   "tags": [
+    "rendering",
+    "layout"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:internal/ui/views.go",
+   "target": "function:internal/ui/views.go:String",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/views.go",
+   "target": "function:internal/ui/views.go:String",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:updateWsCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:wsComposeTab",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:submitWsCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:renderWsCompose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:renderWsComposeTypes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "function:internal/ui/ws_compose.go:renderWsTabBackground",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "file:internal/core/models.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "file:internal/core/state.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "file:internal/core/state_test.go",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:internal/ui/ws_compose.go:renderWsCompose",
+   "target": "function:internal/ui/tunnel_modals.go:tunnelModalChrome",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:internal/ui/views.go",
+   "target": "file:internal/ui/responsive_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/views.go",
+   "target": "file:internal/ui/ssh_tab_test.go",
+   "type": "tested_by",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "file:internal/ui/ws_compose.go",
+   "target": "file:internal/ui/tunnel_modals.go",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

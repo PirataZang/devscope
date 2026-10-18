@@ -1,0 +1,99 @@
+[
+  {
+    "order": 1,
+    "title": "Visão geral do DevScope",
+    "description": "O README apresenta o DevScope como \"o htop dos seus projetos\": uma TUI em Go que reúne containers, Git, CI, túneis, banco e saúde de todos os projetos numa única tela. Ele mostra a instalação por script, os comandos principais (devscope, scan --json, watch, version) e os módulos disponíveis. Leia-o primeiro para entender o que o resto do tour vai destrinchar.",
+    "nodeIds": ["document:README.md"]
+  },
+  {
+    "order": 2,
+    "title": "Arquitetura e princípios",
+    "description": "O ARCHITECTURE.md explica as decisões centrais: Go + Bubble Tea, um snapshot imutável do estado, um pipeline de descoberta de projetos, detectores em formato de plugin e health checks. Ele também descreve cada pacote de internal/ e o fluxo de execução, servindo de mapa para as próximas paradas, que seguem exatamente essa ordem: entrada, núcleo, descoberta, coleta e interface.",
+    "nodeIds": ["document:docs/ARCHITECTURE.md"]
+  },
+  {
+    "order": 3,
+    "title": "Binário e comandos Cobra",
+    "description": "O main.go é intencionalmente mínimo: apenas delega para commands.Execute e devolve o código de erro. O comando raiz Cobra em root.go define as flags --config/--debug e abre a TUI, enquanto scan.go implementa 'scan' (snapshot JSON para automação) e 'watch' (resumo textual periódico). A versão vem de variáveis injetadas por ldflags no build.",
+    "nodeIds": ["file:cmd/devscope/main.go", "file:internal/commands/root.go", "file:internal/commands/scan.go", "file:pkg/version/version.go"],
+    "languageLesson": "Em Go, `-ldflags \"-X pacote.Var=valor\"` sobrescreve variáveis string de pacote em tempo de link. É o padrão idiomático para embutir versão, commit e data de build sem gerar código."
+  },
+  {
+    "order": 4,
+    "title": "Bootstrap da aplicação",
+    "description": "O internal/app/app.go é o verdadeiro ponto de entrada do runtime e o arquivo com maior fan-out do projeto: redireciona os logs (para não corromper a TUI), carrega a configuração, cria o StateStore, inicia os collectors e executa o programa Bubble Tea com tratamento de sinais. É aqui que todas as camadas vistas no ARCHITECTURE.md se conectam.",
+    "nodeIds": ["file:internal/app/app.go"]
+  },
+  {
+    "order": 5,
+    "title": "Modelos e estado compartilhado",
+    "description": "O pacote internal/core é o mais importado do projeto (mais de 110 dependentes). models.go define o vocabulário do domínio, como Project, Container, GitInfo, Snapshot e HostMetrics, e state.go implementa o StateStore thread-safe que guarda o Snapshot global com atualizações atômicas. Collectors escrevem nele, e a UI apenas lê, o que desacopla a coleta da renderização.",
+    "nodeIds": ["file:internal/core/models.go", "file:internal/core/state.go"],
+    "languageLesson": "Um store thread-safe em Go normalmente combina `sync.RWMutex` com cópias de valor: leitores pegam um snapshot sob RLock e escritores substituem o estado sob Lock, evitando data races entre goroutines de coleta e o loop da UI."
+  },
+  {
+    "order": 6,
+    "title": "Configuração e preferências",
+    "description": "O config.go carrega via Viper o modelo de configuração (caminhos e profundidade do scan, intervalos de refresh, UI, health, ferramentas e atalhos), com defaults sensatos. Já userconfig.go cuida do user_config.txt comentado (tema, atalhos de apps, agente de IA), com parse tolerante a erros e edição que preserva comentários. O devscope.example.yaml documenta todas as opções na prática.",
+    "nodeIds": ["file:internal/config/config.go", "file:internal/config/userconfig.go", "config:configs/devscope.example.yaml"]
+  },
+  {
+    "order": 7,
+    "title": "Descoberta de projetos",
+    "description": "Antes de monitorar algo, o DevScope precisa descobrir os projetos no disco. O scanner.go percorre os caminhos configurados com cache por fingerprint, markers.go classifica diretórios por marcadores (.git, package.json, go.mod, compose) e runtime.go encontra raízes a partir de serviços em execução (labels do Compose, containers, PM2). O registry.go mantém detectores de framework registrados por prioridade, cobrindo 14 stacks.",
+    "nodeIds": ["file:internal/scanner/scanner.go", "file:internal/scanner/markers.go", "file:internal/scanner/runtime.go", "file:internal/detectors/registry.go", "file:internal/detectors/frameworks.go"],
+    "languageLesson": "O padrão de registro via `func init()` permite que cada detector se registre sozinho num registro global ao ser importado. A interface `Detector` funciona como contrato de plugin: adicionar uma stack é só criar um tipo que a implemente."
+  },
+  {
+    "order": 8,
+    "title": "Orquestração dos collectors",
+    "description": "O manager.go é o maestro da coleta em segundo plano: faz um scan rápido inicial e roda loops periódicos de scanner, Docker, health e métricas do host, publicando tudo no StateStore da etapa 5. O host.go lê CPU, memória, disco e uptime a partir de /proc no Linux ou de comandos no Windows, e health.go dispara checagens HTTP/TCP concorrentes com status e latência por projeto.",
+    "nodeIds": ["file:internal/collectors/manager.go", "file:internal/metrics/host.go", "file:internal/collectors/health.go"],
+    "languageLesson": "Loops periódicos em Go costumam usar `time.Ticker` dentro de uma goroutine com `select` sobre o ticker e um `context.Context`; cancelar o contexto encerra todos os loops de forma limpa no shutdown."
+  },
+  {
+    "order": 9,
+    "title": "Collectors de Docker e Git",
+    "description": "Estes são os collectors mais usados pela UI. O docker.go coleta containers (docker ps + inspect) e atribui cada um ao projeto mais provável por pontuação de caminhos, o compose.go executa up/build/down/logs capturando a saída para não quebrar a TUI, e o git.go lê status, branches, commits e diffs e expõe operações como commit, pull/push, merge e resolução de conflitos. O ports.go detecta conflitos de porta entre projetos.",
+    "nodeIds": ["file:internal/collectors/docker.go", "file:internal/collectors/compose.go", "file:internal/collectors/git.go", "file:internal/collectors/ports.go"]
+  },
+  {
+    "order": 10,
+    "title": "Integrações externas",
+    "description": "Os pacotes *util encapsulam clientes e agentes para serviços externos e persistem preferências no diretório .devscope de cada projeto. O cfutil gerencia túneis Cloudflare via cloudflared, o sshutil mantém túneis SSH como processos em segundo plano e o routeutil descobre rotas HTTP combinando specs OpenAPI com scanners por framework, registrados no mesmo estilo de plugin dos detectores.",
+    "nodeIds": ["file:internal/cfutil/agent.go", "file:internal/sshutil/agent.go", "file:internal/routeutil/discover.go", "file:internal/routeutil/route.go", "file:internal/dbutil/config.go"]
+  },
+  {
+    "order": 11,
+    "title": "Modelo raiz da TUI",
+    "description": "O internal/ui/app.go é o modelo raiz Bubble Tea: guarda o estado global da interface, roteia mensagens e teclas entre dashboard, projeto e módulos e compõe a tela com header, sidebar, conteúdo da aba e barra de status. O dashboard.go mostra as métricas do host e a lista de projetos lidas do Snapshot, e project_sidebar.go organiza os módulos de cada projeto.",
+    "nodeIds": ["file:internal/ui/app.go", "file:internal/ui/dashboard.go", "file:internal/ui/project_sidebar.go"],
+    "languageLesson": "Bubble Tea segue a Elm Architecture: um `Model` com `Init()`, `Update(msg) (Model, Cmd)` e `View() string`. Trabalho assíncrono volta como mensagens via `tea.Cmd`, então o `Update` nunca bloqueia e o estado só muda num único lugar."
+  },
+  {
+    "order": 12,
+    "title": "Design system da interface",
+    "description": "O DESIGN.md define o padrão de telas: navegação por módulos, lista+detalhe, gaveta, responsividade, vocabulário Braille e microcópia. A implementação desse padrão está em foundation.go (medição de colunas sem quebrar ANSI, cabeçalhos, panelBox, densidades), em styles.go (paleta e estilos Lip Gloss globais) e em theme.go (catálogo de temas que reconstrói os estilos ao trocar a paleta).",
+    "nodeIds": ["document:docs/DESIGN.md", "file:internal/ui/foundation.go", "file:internal/ui/styles.go", "file:internal/ui/theme.go"]
+  },
+  {
+    "order": 13,
+    "title": "Abas de módulos",
+    "description": "Com a fundação e os collectors em mente, as abas de módulo mostram como tudo se junta. A aba de containers exibe uma lista com faixas de estado animadas em Braille e roteia para subviews de logs e recursos, a aba Git renderiza colunas de branches, commits e arquivos com diff, e a aba de rotas consome o routeutil da etapa 10. Cada aba segue o padrão lista+detalhe do DESIGN.md.",
+    "nodeIds": ["file:internal/ui/containers_tab.go", "file:internal/ui/git_tab.go", "file:internal/ui/routes_tab.go"]
+  },
+  {
+    "order": 14,
+    "title": "Modo Relax",
+    "description": "O modo Relax é um subsistema isolado de cenas animadas em ASCII/Braille (aquário, galáxia, Tetris, fogos etc.). O relax.go mantém o registro tabular das cenas com troca por crossfade, o relax_engine.go fornece um relógio de passo fixo com acumulador de tempo real, e o relax_braille.go converte cada célula em 2x4 subpixels com primitivas de desenho compartilhadas por todas as cenas.",
+    "nodeIds": ["file:internal/ui/relax.go", "file:internal/ui/relax_engine.go", "file:internal/ui/relax_braille.go", "file:internal/ui/relax_galaxy.go"],
+    "languageLesson": "Um loop de passo fixo acumula o tempo real decorrido e consome fatias constantes (dt fixo) da física. Isso torna a simulação determinística e independente da taxa de quadros do terminal."
+  },
+  {
+    "order": 15,
+    "title": "Build, CI e distribuição",
+    "description": "O Makefile reúne os alvos de build, teste, lint e instalação local. O ci.yml roda `go test ./... -race` em todo push/PR, e o release.yml, disparado por tags v*, executa o GoReleaser, que compila ./cmd/devscope sem CGO para Linux, macOS e Windows. Os scripts install.sh e install.ps1 vistos no README baixam esses binários, verificam o SHA-256 e ajustam o PATH.",
+    "nodeIds": ["pipeline:Makefile", "pipeline:.github/workflows/ci.yml", "pipeline:.github/workflows/release.yml", "config:.goreleaser.yaml", "file:scripts/install.sh"],
+    "languageLesson": "No GitHub Actions, o gatilho `on: push: tags: ['v*']` separa o fluxo de release do CI comum. Compilar com `CGO_ENABLED=0` gera binários estáticos, o que permite cross-compilation trivial para vários sistemas a partir de um único runner."
+  }
+]
