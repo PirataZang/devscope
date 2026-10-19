@@ -895,6 +895,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tickMsg:
 		a.snapshot = a.store.Get()
+		// Projeto apagado encolhe a lista: o cursor não pode ficar apontando pro nada.
+		if n := len(a.filteredProjects()); n > 0 && a.cursor >= n {
+			a.cursor = n - 1
+		}
 		a.now = time.Now()
 		a.sampleHostMetrics()
 		var cmds []tea.Cmd

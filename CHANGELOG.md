@@ -19,6 +19,12 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 - Repositório sem remoto `origin` agora bloqueia o lançamento com o motivo, em vez de falhar no push
 - README ganhou a seção "Releases" com os requisitos e o que bloqueia ou só avisa
 
+### Fixed
+- **A lista de projetos acompanha o disco sem reabrir o DevScope** — antes o disco só era varrido na abertura
+  - Pasta apagada some da tela inicial em até 2 segundos
+  - Projeto novo aparece em até 10 segundos (`refresh.scan_interval` passou de 60s para 10s)
+  - Troca de branch feita no terminal ou no editor aparece na coluna BRANCH
+
 ## [1.7.0] - 2026-10-18
 
 ### Added

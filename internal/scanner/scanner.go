@@ -13,16 +13,6 @@ import (
 	"github.com/devscope/devscope/internal/detectors"
 )
 
-var scanPathCache = struct {
-	mu sync.Mutex
-	m  map[string]scanCacheEntry
-}{m: make(map[string]scanCacheEntry)}
-
-type scanCacheEntry struct {
-	fingerprint int64
-	projects    []core.Project
-}
-
 type Scanner struct {
 	paths    []string
 	maxDepth int
@@ -59,11 +49,6 @@ func (s *Scanner) discover(ctx context.Context, deep bool) ([]core.Project, erro
 		}
 
 		if _, err := os.Stat(root); err != nil {
-			continue
-		}
-
-		if cached, ok := s.cachedProjects(root, deep); ok {
-			projects = append(projects, cached...)
 			continue
 		}
 
@@ -107,7 +92,6 @@ func (s *Scanner) discover(ctx context.Context, deep bool) ([]core.Project, erro
 		if err != nil {
 			return projects, err
 		}
-		s.storeCache(root, deep, rootProjects)
 		projects = append(projects, rootProjects...)
 	}
 
@@ -166,6 +150,8 @@ func (s *Scanner) EnrichProjects(ctx context.Context, stubs []core.Project) []co
 			if stub.Git != nil {
 				enriched.Git = stub.Git
 			}
+			// A saúde tem ciclo próprio; zerar aqui piscaria o ponto a cada varredura.
+			enriched.Health, enriched.HealthChecks = stub.Health, stub.HealthChecks
 			results[i] = enriched
 		}(i, stub)
 	}
@@ -286,42 +272,4 @@ func (s *Scanner) BuildProject(path string) core.Project {
 func projectID(path string) string {
 	h := sha256.Sum256([]byte(path))
 	return hex.EncodeToString(h[:8])
-}
-
-func (s *Scanner) rootFingerprint(root string) int64 {
-	info, err := os.Stat(root)
-	if err != nil {
-		return 0
-	}
-	return info.ModTime().UnixNano()
-}
-
-func (s *Scanner) cachedProjects(root string, deep bool) ([]core.Project, bool) {
-	scanPathCache.mu.Lock()
-	defer scanPathCache.mu.Unlock()
-	key := root + fmtDeep(deep)
-	fp := s.rootFingerprint(root)
-	if e, ok := scanPathCache.m[key]; ok && e.fingerprint == fp {
-		return e.projects, true
-	}
-	return nil, false
-}
-
-func (s *Scanner) storeCache(root string, deep bool, projects []core.Project) {
-	scanPathCache.mu.Lock()
-	defer scanPathCache.mu.Unlock()
-	key := root + fmtDeep(deep)
-	copied := make([]core.Project, len(projects))
-	copy(copied, projects)
-	scanPathCache.m[key] = scanCacheEntry{
-		fingerprint: s.rootFingerprint(root),
-		projects:    copied,
-	}
-}
-
-func fmtDeep(deep bool) string {
-	if deep {
-		return ":deep"
-	}
-	return ":fast"
 }

@@ -150,7 +150,7 @@ func Default() *Config {
 			},
 		},
 		Refresh: RefreshConfig{
-			ScanInterval:    60 * time.Second,
+			ScanInterval:    10 * time.Second,
 			MetricsInterval: 2 * time.Second,
 			HealthInterval:  10 * time.Second,
 			GitInterval:     30 * time.Second,
@@ -216,7 +216,7 @@ func Load(cfgFile string) (*Config, error) {
 
 func setDefaults(v *viper.Viper) {
 	v.SetDefault("scan.max_depth", 6)
-	v.SetDefault("refresh.scan_interval", "60s")
+	v.SetDefault("refresh.scan_interval", "10s")
 	v.SetDefault("refresh.metrics_interval", "2s")
 	v.SetDefault("refresh.health_interval", "10s")
 	v.SetDefault("refresh.git_interval", "30s")

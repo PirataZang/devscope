@@ -3,6 +3,8 @@ package collectors
 import (
 	"context"
 	"log"
+	"os"
+	"path/filepath"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -129,17 +131,16 @@ func (m *Manager) runScanner(ctx context.Context) {
 	}
 }
 
+// deepScan varre o disco de novo a cada ciclo: pasta criada vira projeto sem
+// precisar reabrir o DevScope. O que já era conhecido entra como estava (com o
+// que foi coletado dele) enquanto a pasta existir.
 func (m *Manager) deepScan(ctx context.Context, s *scanner.Scanner) {
-	snap := m.store.Get()
-	stubs := snap.Projects
-	if len(stubs) == 0 {
-		var err error
-		stubs, err = s.FastScan(ctx)
-		if err != nil {
-			log.Printf("scanner error: %v", err)
-			return
-		}
+	found, err := s.FastScan(ctx)
+	if err != nil {
+		log.Printf("scanner error: %v", err)
+		return
 	}
+	stubs := reconcileProjects(m.store.Get().Projects, found)
 	stubs = s.MergeDiscovered(ctx, stubs)
 	stubs = filterNestedProjectList(stubs)
 
@@ -172,8 +173,38 @@ func (m *Manager) refreshDocker(ctx context.Context) {
 	m.refreshProjects(ctx, projects)
 }
 
+// reconcileProjects junta a lista conhecida com a varredura nova. Conhecido que a
+// varredura não vê (aberto pela worktree, achado pelo docker) fica enquanto a
+// pasta existir.
+func reconcileProjects(known, found []core.Project) []core.Project {
+	out := existingProjects(known)
+	seen := make(map[string]bool, len(out))
+	for _, p := range out {
+		seen[filepath.Clean(p.Path)] = true
+	}
+	for _, p := range found {
+		if !seen[filepath.Clean(p.Path)] {
+			seen[filepath.Clean(p.Path)] = true
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// existingProjects tira da lista quem teve a pasta apagada.
+func existingProjects(projects []core.Project) []core.Project {
+	out := projects[:0:0]
+	for _, p := range projects {
+		if _, err := os.Stat(p.Path); err == nil {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
 // refreshProjects runs a fast docker ps + lightweight metadata for the dashboard.
 func (m *Manager) refreshProjects(ctx context.Context, projects []core.Project) {
+	projects = existingProjects(projects)
 	populateGitSummaries(projects)
 	var orphans []core.Container
 	if containers, meta, err := CollectDockerPS(ctx); err != nil {
@@ -199,6 +230,13 @@ func populateGitSummaries(projects []core.Project) {
 	for i := range projects {
 		if projects[i].Git == nil {
 			projects[i].Git = CollectGitSummary(projects[i].Path)
+			continue
+		}
+		// Troca de branch feita fora do DevScope: o HEAD é um arquivo, ler é barato.
+		if g := CollectGitSummary(projects[i].Path); g.Branch != "" && g.Branch != projects[i].Git.Branch {
+			info := *projects[i].Git
+			info.Branch = g.Branch
+			projects[i].Git = &info
 		}
 	}
 }

@@ -437,7 +437,7 @@ scan:
   ignore: [node_modules, vendor, .git]
 
 refresh:
-  scan_interval: 60s
+  scan_interval: 10s
   metrics_interval: 2s
   health_interval: 10s
   git_interval: 30s
