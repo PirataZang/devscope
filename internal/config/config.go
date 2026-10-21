@@ -16,6 +16,7 @@ type Config struct {
 	Health  HealthConfig           `mapstructure:"health" yaml:"health"`
 	Tools   ToolsConfig            `mapstructure:"tools" yaml:"tools"`
 	Apps    map[string]AppShortcut `mapstructure:"apps" yaml:"apps"`
+	Nginx   NginxPrefs             `mapstructure:"-" yaml:"-"`
 	Pinned  []string               `mapstructure:"pinned" yaml:"pinned"`
 }
 

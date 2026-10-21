@@ -14,6 +14,15 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - Commita só esses arquivos e envia a branch, porque o GitHub roda o workflow que está no commit da tag; o resto das suas alterações fica como estava
   - Recusou: o próximo `enter` lança sem eles; arquivo existente nunca é sobrescrito
 
+- **Publicar projeto no nginx (aba Nginx, `p` → `enter`)** — um projeto de `~/projetos` vira `sites/<projeto>.inc` no nginx-main sem digitar caminho nem porta
+  - Detecta porta do back-end (`BACKEND_PORT` no `.env` → compose → container no ar), build do front e perfil (`saas`, `front`, `api`), mostrando de onde veio cada valor; com duas candidatas pede para escolher em vez de chutar
+  - Checagens antes de publicar: conflito com outra `.inc` do hub (bloqueia, `o` abre a existente), `base` do Vite, `VITE_API_URL`, build com `/assets/` na raiz, `APP_URL` e `TrustProxies` do Laravel
+  - Uma tela de revisão com a `.inc` pronta (e o diff ao republicar); `e` edita slug, porta, dist, perfil e limites, `+` adiciona rota extra como o `/portal/`
+  - Publica com escrita atômica e `.inc.bak`, `nginx -t` (recusou: desfaz e não recarrega, com a linha destacada), reload e smoke test dos três caminhos; `c` copia a URL (OSC52 via SSH)
+  - No próprio nginx-main, `p` pergunta qual projeto publicar e mostra quais já estão no ar
+  - `devscope nginx publish|unpublish <projeto>` faz o mesmo sem a TUI, com `--dry-run`; sai com erro se bloquear, se o `nginx -t` recusar ou se o smoke test falhar
+  - Ambiente lido do compose e do `conf.d/` do nginx-main; o que precisar fixar vai na seção `Nginx:` do `user_config.txt`
+
 ### Changed
 - **Releases documentado na própria tela** — nova seção COMO FUNCIONA com cada peça que o módulo usa (tags `vX.Y.Z`, `CHANGELOG.md`, workflow de tag, `gh`, remoto `origin`), se o repositório aberto tem e para que serve; o que falta vem com o formato ou o comando para configurar, marcado como opcional ou obrigatório
 - Repositório sem remoto `origin` agora bloqueia o lançamento com o motivo, em vez de falhar no push
@@ -24,6 +33,7 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - Pasta apagada some da tela inicial em até 2 segundos
   - Projeto novo aparece em até 10 segundos (`refresh.scan_interval` passou de 60s para 10s)
   - Troca de branch feita no terminal ou no editor aparece na coluna BRANCH
+- Digitar `q` no formulário de nova rota do Nginx fechava o DevScope
 
 ## [1.7.0] - 2026-10-18
 

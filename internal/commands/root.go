@@ -39,6 +39,7 @@ func init() {
 
 	rootCmd.AddCommand(scanCmd())
 	rootCmd.AddCommand(watchCmd())
+	rootCmd.AddCommand(nginxCmd())
 }
 
 func Execute() error {

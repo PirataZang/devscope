@@ -190,7 +190,7 @@ func (a *App) renderNginxCommandBar(width int) string {
 	} else {
 		items = append(items, [2]string{"n", "novo .conf"})
 	}
-	items = append(items, [2]string{"d", "apagar"})
+	items = append(items, [2]string{"d", "apagar"}, [2]string{"p", "publicar projeto"})
 	if a.nginxHub == nil {
 		scope := "ver todos os projetos"
 		if a.nginxShowAll {

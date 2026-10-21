@@ -379,6 +379,56 @@ seção **COMO FUNCIONA**, com o estado do repositório aberto.
 
 ---
 
+## 🌐 Publicar um projeto no nginx em um passo
+
+Para quem hospeda vários projetos atrás de um **nginx-main** (container nginx com `conf.d/main.conf`
+incluindo `sites/*.inc`): abra o projeto, aba **Nginx**, <kbd>p</kbd> e <kbd>Enter</kbd>. Nenhum
+caminho nem porta digitados.
+
+O DevScope detecta tudo e mostra a `.inc` pronta antes de publicar:
+
+| o quê | de onde |
+|---|---|
+| **slug** (`/<projeto>/`) | o nome da pasta |
+| **porta do back-end** | `BACKEND_PORT` no `.env` → `ports` do serviço `backend` no compose (com `${VAR:-padrão}` resolvido) → container `<projeto>_backend` no ar |
+| **build do front** | o primeiro de `frontend/dist`, `dist`, `web/dist`, `client/dist`, `frontend/build`, `build` com `index.html`; sem build e com Vite no `package.json`, "build pendente" |
+| **perfil** | back-end + build → `saas` · só build → `front` · só back-end → `api` |
+
+Duas portas ou dois builds candidatos? Ele não chuta: <kbd>e</kbd> cai no campo e <kbd>↑</kbd><kbd>↓</kbd>
+percorre as opções. **Bloqueiam:** outra `.inc` do hub já usando `/<projeto>` (<kbd>o</kbd> abre
+ela), porta ou build não encontrados, pasta fora de `~/projetos`. **Só avisam:** `base` do
+`vite.config` diferente de `/<projeto>/`, `VITE_API_URL` que não termina em `/<projeto>/api`, build
+com assets em `/assets/`, `APP_URL` do Laravel sem o prefixo e `TrustProxies` que não confia no
+gateway.
+
+<kbd>Enter</kbd> executa, mostrando cada passo ao vivo:
+
+1. escreve `sites/<projeto>.inc` (temporário + rename; a anterior vira `.inc.bak`);
+2. `docker exec nginx-main nginx -t` — **recusou, desfaz a escrita e não recarrega** (a linha apontada
+   fica destacada na prévia);
+3. `nginx -s reload`;
+4. smoke test: `GET /<projeto>` → 301, `GET /<projeto>/` → 200 html, `GET /<projeto>/api/` → qualquer
+   coisa menos 502/504.
+
+Republicar mostra o diff com a que está no ar e pede confirmação; rotas extras (<kbd>+</kbd>, ex.:
+`/portal/` → `/<projeto>$request_uri`) e limites ajustados à mão na `.inc` publicada são mantidos.
+O DevScope nunca toca em `conf.d/`, `nginx.conf` nem na `.inc` de outro projeto.
+
+Sem a TUI, o mesmo código:
+
+```bash
+devscope nginx publish financial-bot --dry-run    # .inc + checagens, sem tocar em nada
+devscope nginx publish financial-bot --port 8001  # --dist, --profile, --slug, --extra /portal/
+devscope nginx unpublish financial-bot            # remove, testa e recarrega
+```
+
+Sai com código ≠ 0 se uma checagem bloquear, o `nginx -t` recusar ou o smoke test falhar. O
+ambiente — pasta do nginx-main, container, IP público, gateway `172.17.0.1`, `~/projetos` →
+`/var/www/html` — é lido do `docker-compose.yml` e do `conf.d/` do nginx-main; o que precisar
+fixar vai na seção `Nginx:` do `user_config.txt`.
+
+---
+
 ## ⌨️ Atalhos essenciais
 
 O DevScope tem três camadas de atalho: **global** (vale em qualquer tela), **contextual** (vale na
@@ -414,6 +464,11 @@ Commands: {
 }
 
 AI: claude
+
+Nginx: {
+  "dir": "~/projetos/nginx-main",
+  "public_host": "178.104.78.64"
+}
 ```
 
 <kbd>1</kbd>…<kbd>9</kbd> <kbd>0</kbd> disparam seus comandos (`&` no fim abre solto) ·

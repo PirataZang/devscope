@@ -235,6 +235,14 @@ func helpGroups() []helpGroup {
 				{"shift+A · shift+R", "confs de todos os projetos / rescan"},
 				{"esc", "voltar um nível"},
 			}},
+			{"PUBLICAR NO NGINX", []helpEntry{
+				{"p", "revisar a publicação (no nginx-main: escolher o projeto)"},
+				{"enter", "publicar: .inc → nginx -t → reload → smoke test"},
+				{"e · +", "editar campos / adicionar rota extra"},
+				{"tab · ↑↓", "na edição: próximo campo / opções detectadas"},
+				{"o", "abrir a .inc em conflito · depois de publicar, a URL"},
+				{"c · r", "copiar a URL / detectar de novo"},
+			}},
 			{"NGROK", []helpEntry{
 				{"1-3", "túneis / requests / config"},
 				{"tab", "trocar de painel"},

@@ -209,6 +209,10 @@ func (a *App) resolveProjectPath(name string) string {
 
 func (a *App) renderNginxLanding(p *core.Project) string {
 	found := a.landingNginxFound
+	pub := a.landingNginxPub
+	if a.landingNginxOK && !found && pub.publishable {
+		return a.renderNginxPublishLanding(p)
+	}
 	state, note := landingProbing(), ""
 	if a.landingNginxOK {
 		if found {
@@ -225,6 +229,10 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 			{"entradas", StyleNormal.Render(strconv.Itoa(a.landingNginxCount))},
 		}, facts...)
 	}
+	actions := [][2]string{{"enter", "abrir console"}}
+	if pub.relevant() {
+		actions = append(actions, [2]string{"p", "publicar projeto"})
+	}
 	return a.renderModuleLanding(p, moduleLanding{
 		title:        "NGINX ROUTES",
 		tagline:      "cadastra rota sem editar arquivo na mão — single ou hub de .inc",
@@ -235,7 +243,30 @@ func (a *App) renderNginxLanding(p *core.Project) string {
 		preview:      a.landingFileRows(a.landingNginxNames),
 		previewEmpty: "nenhuma rota ainda — enter abre o console e n cria a primeira",
 		previewFoot:  nginxRouteFoot(a.landingNginxCount),
-		actions:      [][2]string{{"enter", "abrir console"}, {"esc", "voltar"}},
+		actions:      append(actions, [2]string{"esc", "voltar"}),
+	})
+}
+
+// renderNginxPublishLanding: projeto sem nginx próprio dentro de ~/projetos —
+// o que a aba oferece é publicá-lo no nginx-main.
+func (a *App) renderNginxPublishLanding(p *core.Project) string {
+	pub := a.landingNginxPub
+	state := StyleMuted.Render("não publicado")
+	verb := "publicar no nginx"
+	if pub.published {
+		state = StyleHealthy.Render("◆ no ar em " + pub.url)
+		verb = "republicar"
+	}
+	return a.renderModuleLanding(p, moduleLanding{
+		title:   "NGINX",
+		tagline: "publica o projeto no nginx-main — detecta porta e build, testa e recarrega",
+		state:   state,
+		facts: [][2]string{
+			{"url", StyleNormal.Render(pub.url)},
+			{"arquivo", StyleNormal.Render("sites/"+nginxutil.Slug(p.Path)+".inc") + StyleMuted.Render("  só ela é escrita")},
+			{"passos", StyleMuted.Render("nginx -t → reload → GET /, /api/ — recusou, desfaz")},
+		},
+		actions: [][2]string{{"enter", verb}, {"esc", "voltar"}},
 	})
 }
 
@@ -534,6 +565,8 @@ func (a *App) handleNginxKeys(msg tea.KeyMsg, p *core.Project) (tea.Model, tea.C
 		a.nginxFileScroll, a.nginxFileHScroll = 0, 0
 		a.nginxStatus, a.nginxErr = "", ""
 		return a, a.refreshNginxIncs()
+	case "p":
+		return a, a.startNginxPublish(p)
 	case "n":
 		if a.nginxHub != nil {
 			if a.nginxHub.Project != "" {

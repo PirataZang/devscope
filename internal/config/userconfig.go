@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 )
@@ -20,6 +21,22 @@ type UserPrefs struct {
 	Theme    string
 	AI       string
 	Commands map[string]AppShortcut
+	Nginx    NginxPrefs
+}
+
+// NginxPrefs é o ambiente do "Publicar projeto" da aba Nginx. Campo vazio é
+// detectado: pelo docker-compose.yml e pelo conf.d/ da pasta do nginx, ou pelo
+// padrão de fábrica.
+type NginxPrefs struct {
+	Dir            string   `json:"dir"`                  // pasta do nginx no host (compose, conf.d/, sites/)
+	Container      string   `json:"container"`            // container que roda o nginx
+	PublicHost     string   `json:"public_host"`          // IP ou domínio do smoke test
+	Gateway        string   `json:"gateway"`              // como o nginx alcança as portas do host
+	HostRoot       string   `json:"host_root"`            // pasta dos projetos no host...
+	ContainerRoot  string   `json:"container_root"`       // ...e onde ela aparece dentro do container
+	BodySize       string   `json:"client_max_body_size"` // padrão das .inc novas
+	ReadTimeout    string   `json:"proxy_read_timeout"`
+	DistCandidates []string `json:"dist_candidates"` // onde procurar o build do front, em ordem
 }
 
 func UserConfigPath() string {
@@ -171,8 +188,29 @@ Commands: {
 # Aceita argumentos, por exemplo: claude --continue
 # Deixe vazio para o DevScope usar o primeiro que achar no PATH.
 AI: ` + strings.TrimSpace(prefs.AI) + `
-`)
+
+# NGINX — o "Publicar projeto" da aba Nginx (tecla p) e o comando
+# devscope nginx publish. Vazio = detectado: container, sites/ e pasta
+# dos projetos vêm do docker-compose.yml do "dir"; o IP público, do
+# server_name em conf.d/. Só o sites/<projeto>.inc é escrito — conf.d/,
+# nginx.conf e as .inc dos outros projetos nunca são tocados.
+#   dir             pasta do nginx no host (padrão: ~/projetos/nginx-main)
+#   gateway         como o nginx alcança a porta publicada (172.17.0.1)
+#   host_root       pasta dos projetos no host (~/projetos), que dentro
+#   container_root  do container aparece como /var/www/html
+#   dist_candidates onde procurar o build do front, nesta ordem
+Nginx: `)
+	b.WriteString(renderNginxPrefs(prefs.Nginx))
+	b.WriteString("\n")
 	return b.String()
+}
+
+func renderNginxPrefs(n NginxPrefs) string {
+	if n.DistCandidates == nil {
+		n.DistCandidates = []string{}
+	}
+	out, _ := json.MarshalIndent(n, "", "  ")
+	return string(out)
 }
 
 // ParseUserConfig lê o arquivo. Erro de digitação não pode derrubar a TUI nem
@@ -182,7 +220,13 @@ func ParseUserConfig(content string) (UserPrefs, []string) {
 	prefs := UserPrefs{}
 	var warnings []string
 
-	body, jsonPart := splitCommandsBlock(content)
+	body, nginxPart := splitJSONBlock(content, "Nginx")
+	body, jsonPart := splitJSONBlock(body, "Commands")
+	if nginxPart != "" {
+		if err := json.Unmarshal([]byte(nginxPart), &prefs.Nginx); err != nil {
+			warnings = append(warnings, "Nginx: JSON inválido — "+err.Error())
+		}
+	}
 	for _, line := range strings.Split(body, "\n") {
 		line = strings.TrimSpace(stripComment(line))
 		if line == "" {
@@ -219,13 +263,15 @@ func ParseUserConfig(content string) (UserPrefs, []string) {
 	return prefs, warnings
 }
 
-// splitCommandsBlock separa o JSON do Commands do resto do arquivo, contando
-// chaves e ignorando as que estiverem dentro de string.
-func splitCommandsBlock(content string) (rest, jsonPart string) {
-	i := indexFold(content, "Commands:")
-	if i < 0 {
+// splitJSONBlock separa o JSON de uma chave ("Commands", "Nginx") do resto do
+// arquivo, contando chaves e ignorando as que estiverem dentro de string. A
+// chave só vale no começo da linha: comentário que cita o nome não conta.
+func splitJSONBlock(content, key string) (rest, jsonPart string) {
+	loc := regexp.MustCompile(`(?mi)^` + regexp.QuoteMeta(key) + `:`).FindStringIndex(content)
+	if loc == nil {
 		return content, ""
 	}
+	i := loc[0]
 	open := strings.Index(content[i:], "{")
 	if open < 0 {
 		return content, ""
@@ -262,10 +308,6 @@ func stripComment(line string) string {
 	return line
 }
 
-func indexFold(s, sub string) int {
-	return strings.Index(strings.ToLower(s), strings.ToLower(sub))
-}
-
 func validAppSlot(key string) bool {
 	for _, k := range AppSlots {
 		if k == key {
@@ -287,6 +329,7 @@ func (c *Config) ApplyUserPrefs(p UserPrefs) {
 	if p.Commands != nil {
 		c.Apps = p.Commands
 	}
+	c.Nginx = p.Nginx
 }
 
 // SetUserConfigTheme troca só a linha do tema, preservando comentários e o

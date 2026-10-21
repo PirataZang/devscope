@@ -595,6 +595,7 @@ type App struct {
 	nginxNewLabel               string
 	nginxNewDist                string
 	nginxWizardForHub           bool
+	nginxPub                    *nginxPublish
 	nginxShowAll                bool
 	nginxForeign                int
 	nginxLayout                 nginxutil.Layout
@@ -691,6 +692,7 @@ type App struct {
 	landingGHANames     []string
 	landingK8sNames     []string
 	landingNginxNames   []string
+	landingNginxPub     nginxPubInfo
 	landingGHAOK        bool
 	landingGHA          collectors.GHAInfo
 	landingGHAProcs     int
@@ -1017,6 +1019,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case jenkinsLoadedMsg, jenkinsActionMsg, jenkinsTickMsg:
 		return a.handleJenkinsMsg(msg)
 
+	case nginxPubLoadedMsg, nginxPubStepMsg, nginxPubDoneMsg:
+		return a, a.handleNginxPublishMsg(msg)
+
 	case nginxLoadedMsg, nginxActionMsg, nginxIncsLoadedMsg:
 		return a.handleNginxMsg(msg)
 
@@ -1248,6 +1253,9 @@ func (a *App) updateKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return a.updateProject(msg)
 	}
 	if a.view == ViewProject && a.tab == TabJWT && a.jwtOpen && a.jwtEditing {
+		return a.updateProject(msg)
+	}
+	if a.view == ViewProject && a.tab == TabNginx && (a.nginxWizard || (a.nginxPub != nil && a.nginxPub.editing)) {
 		return a.updateProject(msg)
 	}
 
@@ -1682,6 +1690,14 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.handleJenkinsKeys(msg, p)
+	}
+	if a.tab == TabNginx && a.nginxPub != nil {
+		return a.handleNginxPublishKeys(msg, p)
+	}
+	// Projeto sem nginx próprio: a ação principal da abertura é publicar.
+	publishOnly := a.landingNginxOK && !a.landingNginxFound && a.landingNginxPub.publishable
+	if a.tab == TabNginx && !a.nginxOpen && (msg.String() == "p" || (msg.String() == "enter" && publishOnly)) {
+		return a, a.startNginxPublish(p)
 	}
 	if a.tab == TabNginx && a.nginxOpen {
 		return a.handleNginxKeys(msg, p)
@@ -2362,6 +2378,9 @@ func (a *App) renderProject() string {
 	}
 	if a.tab == TabJenkins && a.jenkinsOpen {
 		return a.renderJenkinsTab(p)
+	}
+	if a.tab == TabNginx && a.nginxPub != nil {
+		return a.renderNginxPublish(p)
 	}
 	if a.tab == TabNginx && a.nginxOpen {
 		return a.renderNginxTab(p)

@@ -95,6 +95,7 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 	// a UI vai trocar debaixo dela.
 	isRepo := p.Git != nil && p.Git.IsRepo
 	docker := p.HasDockerCompose || p.HasDockerfile || p.ContainerCount > 0
+	nginxPrefs := a.nginxPrefs()
 
 	return func() tea.Msg {
 		on := map[Tab]bool{
@@ -112,7 +113,7 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 			TabJenkins:    fileExists(path, "Jenkinsfile") || fileExists(path, ".devscope", "jenkins.json"),
 			TabSwarm:      hasTool("docker") && (dirExists(path, "swarm") || fileExists(path, "docker-stack.yml") || fileExists(path, "stack.yml")),
 			TabKubernetes: hasTool("kubectl") && k8sManifestDir(path),
-			TabNginx:      hasTool("nginx") || dirExists(path, "nginx") || fileExists(path, "nginx.conf"),
+			TabNginx:      hasTool("nginx") || dirExists(path, "nginx") || fileExists(path, "nginx.conf") || probeNginxPublish(path, nginxPrefs).relevant(),
 			TabNgrok:      hasTool("ngrok"),
 			TabCFTunnel:   hasTool("cloudflared"),
 		}

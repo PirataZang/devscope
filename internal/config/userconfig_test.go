@@ -78,3 +78,24 @@ func TestUserConfigIgnoresTrailingComment(t *testing.T) {
 		t.Fatalf("%+v", prefs)
 	}
 }
+
+// A seção Nginx vai e volta pelo arquivo sem bagunçar Commands, e um
+// comentário que cita "Nginx:" não é confundido com ela.
+func TestUserConfigNginxRoundTrip(t *testing.T) {
+	prefs := UserPrefs{
+		Theme:    "dracula",
+		Commands: map[string]AppShortcut{"1": {Name: "Abrir", Command: "xdg-open ."}},
+		Nginx:    NginxPrefs{Dir: "~/projetos/nginx-main", PublicHost: "178.104.78.64", DistCandidates: []string{"dist"}},
+	}
+	content := "# veja a seção Nginx: abaixo\n" + RenderUserConfig(prefs, nil)
+	got, warnings := ParseUserConfig(content)
+	if len(warnings) > 0 {
+		t.Fatal(warnings)
+	}
+	if got.Nginx.PublicHost != "178.104.78.64" || got.Nginx.Dir != "~/projetos/nginx-main" || len(got.Nginx.DistCandidates) != 1 {
+		t.Fatalf("%+v", got.Nginx)
+	}
+	if got.Theme != "dracula" || got.Commands["1"].Command != "xdg-open ." {
+		t.Fatalf("o resto do arquivo continua valendo: %+v", got)
+	}
+}

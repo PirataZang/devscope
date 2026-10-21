@@ -44,6 +44,7 @@ type toolLandingMsg struct {
 	nginxDir   string
 	nginxCount int
 	nginxNames []string
+	nginxPub   nginxPubInfo
 }
 
 func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
@@ -54,6 +55,7 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 			remote = p.Git.Remote
 		}
 	}
+	prefs := a.nginxPrefs()
 	return func() tea.Msg {
 		msg := toolLandingMsg{tab: tab}
 		switch tab {
@@ -97,6 +99,7 @@ func (a *App) probeToolLanding(tab Tab, p *core.Project) tea.Cmd {
 			if layout.SitesDir != "" {
 				msg.nginxDir = layout.SitesDir
 			}
+			msg.nginxPub = probeNginxPublish(path, prefs)
 		}
 		return msg
 	}
@@ -139,6 +142,7 @@ func (a *App) handleToolLandingMsg(msg toolLandingMsg) {
 		a.landingNginxDir = msg.nginxDir
 		a.landingNginxCount = msg.nginxCount
 		a.landingNginxNames = msg.nginxNames
+		a.landingNginxPub = msg.nginxPub
 		a.landingNginxOK = true
 	}
 }
