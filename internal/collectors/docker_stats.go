@@ -11,14 +11,14 @@ import (
 )
 
 type dockerStatRow struct {
-	ID           string `json:"ID"`
-	CPUPerc      string `json:"CPUPerc"`
-	MemUsage     string `json:"MemUsage"`
-	MemPerc      string `json:"MemPerc"`
-	BlockIO      string `json:"BlockIO"`
-	NetIO        string `json:"NetIO"`
-	PIDs         string `json:"PIDs"`
-	Name         string `json:"Name"`
+	ID       string `json:"ID"`
+	CPUPerc  string `json:"CPUPerc"`
+	MemUsage string `json:"MemUsage"`
+	MemPerc  string `json:"MemPerc"`
+	BlockIO  string `json:"BlockIO"`
+	NetIO    string `json:"NetIO"`
+	PIDs     string `json:"PIDs"`
+	Name     string `json:"Name"`
 }
 
 // CollectDockerStats returns CPU% and memory bytes keyed by short container ID.

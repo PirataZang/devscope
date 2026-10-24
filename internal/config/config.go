@@ -18,6 +18,32 @@ type Config struct {
 	Apps    map[string]AppShortcut `mapstructure:"apps" yaml:"apps"`
 	Nginx   NginxPrefs             `mapstructure:"-" yaml:"-"`
 	Pinned  []string               `mapstructure:"pinned" yaml:"pinned"`
+	Bot     BotConfig              `mapstructure:"bot" yaml:"bot"`
+}
+
+// DefaultHubURL é o hub do @devscope_vps_bot. Trocar aqui muda o padrão de
+// quem não escreveu bot.hub_url no config.yaml. Vazio enquanto o hub não tem
+// endereço público: o cliente procura um hub rodando nesta máquina.
+const DefaultHubURL = ""
+
+// BotConfig liga esta máquina ao hub do bot do Telegram (`devscope bot`).
+type BotConfig struct {
+	HubURL      string `mapstructure:"hub_url" yaml:"hub_url"`
+	Actions     string `mapstructure:"actions" yaml:"actions"`           // off | confirm
+	MachineName string `mapstructure:"machine_name" yaml:"machine_name"` // vazio = os.Hostname()
+}
+
+// ActionsEnabled só aceita o valor exato "confirm": qualquer outra coisa,
+// inclusive erro de digitação, deixa a máquina só leitura.
+func (b BotConfig) ActionsEnabled() bool { return b.Actions == "confirm" }
+
+// Name é o nome com que a máquina aparece no Telegram.
+func (b BotConfig) Name() string {
+	if n := strings.TrimSpace(b.MachineName); n != "" {
+		return n
+	}
+	h, _ := os.Hostname()
+	return h
 }
 
 // ToolsConfig aponta para os programas externos que o DevScope abre no lugar
@@ -161,6 +187,7 @@ func Default() *Config {
 			Timeout:    5 * time.Second,
 			Concurrent: 10,
 		},
+		Bot: BotConfig{HubURL: DefaultHubURL, Actions: "off"},
 	}
 }
 
@@ -196,6 +223,7 @@ func Load(cfgFile string) (*Config, error) {
 	}
 
 	v.SetEnvPrefix("DEVSCOPE")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // bot.hub_url → DEVSCOPE_BOT_HUB_URL
 	v.AutomaticEnv()
 	setDefaults(v)
 
@@ -224,6 +252,8 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("ui.theme", "dark")
 	v.SetDefault("health.timeout", "5s")
 	v.SetDefault("health.concurrent", 10)
+	v.SetDefault("bot.hub_url", DefaultHubURL)
+	v.SetDefault("bot.actions", "off")
 }
 
 // SaveValue faz merge de uma chave no config do usuário sem tocar no resto do

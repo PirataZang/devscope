@@ -266,9 +266,9 @@ func (c *HostCollector) collectWindows() core.HostMetrics {
 	// Executa query PowerShell em 1 comando rápido para obter CPU, RAM, Memória Virtual e Uptime
 	cmd := exec.Command("powershell", "-NoProfile", "-Command",
 		`$os = Get-CimInstance Win32_OperatingSystem; `+
-		`$cpu = (Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average; `+
-		`$uptime = [math]::Round([DateTime]::Now.Subtract($os.LastBootUpTime).TotalSeconds); `+
-		`Write-Host ("{0}|{1}|{2}|{3}|{4}|{5}" -f $cpu, $os.TotalVisibleMemorySize, $os.FreePhysicalMemory, $os.TotalVirtualMemorySize, $os.FreeVirtualMemory, $uptime)`)
+			`$cpu = (Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average; `+
+			`$uptime = [math]::Round([DateTime]::Now.Subtract($os.LastBootUpTime).TotalSeconds); `+
+			`Write-Host ("{0}|{1}|{2}|{3}|{4}|{5}" -f $cpu, $os.TotalVisibleMemorySize, $os.FreePhysicalMemory, $os.TotalVirtualMemorySize, $os.FreeVirtualMemory, $uptime)`)
 
 	out, err := cmd.Output()
 	if err != nil {

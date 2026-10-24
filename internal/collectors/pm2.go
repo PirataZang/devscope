@@ -11,16 +11,16 @@ import (
 )
 
 type pm2App struct {
-	Name   string `json:"name"`
-	Monit  struct {
-		CPU  float64 `json:"cpu"`
-		Memory int64 `json:"memory"`
+	Name  string `json:"name"`
+	Monit struct {
+		CPU    float64 `json:"cpu"`
+		Memory int64   `json:"memory"`
 	} `json:"monit"`
 	PM2Env struct {
 		Status string `json:"status"`
 		Cwd    string `json:"pm_cwd"`
 	} `json:"pm2_env"`
-	PMID      int `json:"pm_id"`
+	PMID        int `json:"pm_id"`
 	RestartTime int `json:"restart_time"`
 }
 

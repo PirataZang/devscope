@@ -13,6 +13,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/internal/hub"
 	"github.com/devscope/devscope/pkg/version"
 	"github.com/mattn/go-runewidth"
 )
@@ -860,6 +861,9 @@ func (a *App) renderDashboardFooter(width int) string {
 	// Ajuda e saída ficam ancoradas à direita: são o que não pode sumir quando
 	// a barra encolhe.
 	tail := fitKeybinds(inner, [2]string{"?", "ajuda"}, [2]string{"q", "sair"})
+	if bot := botIndicator(); bot != "" {
+		tail = bot + StyleMuted.Render(" · ") + tail
+	}
 	head := fitKeybinds(inner-lipgloss.Width(tail)-3,
 		[2]string{"↑↓", "navegar"},
 		[2]string{"ENTER", "git"},
@@ -879,6 +883,19 @@ func (a *App) renderDashboardFooter(width int) string {
 		return StyleStatusBar.Width(width).Render(tail)
 	}
 	return StyleStatusBar.Width(width).Render(joinWithSpacer(head, tail, inner))
+}
+
+// botIndicator é o "bot ●" do rodapé quando esta TUI está conectada ao hub
+// do Telegram ("bot ○" sem conexão). Sem pareamento não aparece nada.
+func botIndicator() string {
+	text, online := hub.Indicator()
+	switch {
+	case text == "":
+		return ""
+	case !online:
+		return StyleMuted.Render(text)
+	}
+	return StyleMuted.Render("bot ") + lipgloss.NewStyle().Foreground(ColorSuccess).Render("●")
 }
 
 // fitKeybindsWrap distribui os atalhos em até maxLines linhas. Numa barra

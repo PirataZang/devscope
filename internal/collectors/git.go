@@ -425,21 +425,24 @@ func parseCommitFileChanges(out string) []core.GitCommitFileChange {
 
 func collectGitCommits(path, branch string, limit int) []core.GitCommit {
 	logRef := branchLogRef(path, branch)
-	out := gitOutput(path, "log", logRef, fmt.Sprintf("-%d", limit), "--pretty=format:%h|%s|%an|%cr")
+	// O assunto vai por último: um "|" nele não desloca os outros campos.
+	out := gitOutput(path, "log", logRef, fmt.Sprintf("-%d", limit), "--pretty=format:%h|%ct|%an|%cr|%s")
 	if out == "" {
 		return nil
 	}
 	var commits []core.GitCommit
 	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
-		parts := strings.SplitN(line, "|", 4)
-		if len(parts) < 4 {
+		parts := strings.SplitN(line, "|", 5)
+		if len(parts) < 5 {
 			continue
 		}
+		unix, _ := strconv.ParseInt(parts[1], 10, 64)
 		commits = append(commits, core.GitCommit{
 			Hash:    parts[0],
-			Message: parts[1],
+			Message: parts[4],
 			Author:  parts[2],
 			Date:    parts[3],
+			Unix:    unix,
 		})
 	}
 	return commits

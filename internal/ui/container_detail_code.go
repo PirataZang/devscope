@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/devscope/devscope/internal/devscopeutil"
 )
 
 // Realce por tipo de conteúdo da tela de detalhe. Log, JSON, YAML, env e a
@@ -143,32 +144,11 @@ func highlightEnvLine(line string) string {
 	// jogaria justo a linha do segredo para fora da coluna.
 	pad := value[:len(value)-len(strings.TrimLeft(value, " "))]
 	shown := StyleNormal.Render(value)
-	if envLooksSecret(name) && strings.TrimSpace(value) != "" {
-		shown = StyleMuted.Render(pad + maskSecret(value))
+	if devscopeutil.EnvLooksSecret(name) && strings.TrimSpace(value) != "" {
+		shown = StyleMuted.Render(pad + devscopeutil.MaskSecret(value))
 	}
 	return lipgloss.NewStyle().Foreground(ColorAccent).Render(name) +
 		StyleMuted.Render("=") + shown
-}
-
-func envLooksSecret(name string) bool {
-	up := strings.ToUpper(name)
-	for _, needle := range []string{"SECRET", "PASSWORD", "PASSWD", "TOKEN", "APP_KEY",
-		"PRIVATE", "CREDENTIAL", "_KEY", "APIKEY", "API_KEY", "SALT", "DSN"} {
-		if strings.Contains(up, needle) {
-			return true
-		}
-	}
-	return false
-}
-
-// maskSecret deixa as duas primeiras letras: dá para conferir se a variável
-// está preenchida sem revelar o valor.
-func maskSecret(v string) string {
-	v = strings.TrimSpace(v)
-	if len(v) <= 2 {
-		return strings.Repeat("•", len(v))
-	}
-	return v[:2] + strings.Repeat("•", minInt(10, len(v)-2))
 }
 
 // highlightTopLine destaca o cabeçalho e o PID da saída do `docker top`.

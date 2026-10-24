@@ -52,3 +52,21 @@ func TestEscapeSQLLiteral(t *testing.T) {
 		t.Fatal(escapeSQLLiteral("a'b"))
 	}
 }
+
+func TestIsDataContainer(t *testing.T) {
+	for _, c := range []core.Container{
+		{Image: "postgres:16"}, {Image: "mariadb:11"}, {Image: "redis:7-alpine"},
+		{Image: "mongo:7"}, {Image: "memcached"}, {Image: "docker.elastic.co/elasticsearch/elasticsearch:8"},
+		{Image: "opensearchproject/opensearch"}, {Image: "rabbitmq:3-management"},
+		{Image: "getmeili/meilisearch"}, {Image: "custom:1", Name: "laradock-redis-1"},
+	} {
+		if !IsDataContainer(c) {
+			t.Errorf("%+v deveria ser de dados", c)
+		}
+	}
+	for _, c := range []core.Container{{Image: "nginx"}, {Image: "laradock-php-fpm", Name: "laradock-php-fpm-1"}} {
+		if IsDataContainer(c) {
+			t.Errorf("%+v não é de dados", c)
+		}
+	}
+}

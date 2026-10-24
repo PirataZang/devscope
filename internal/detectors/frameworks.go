@@ -46,8 +46,8 @@ func depsContain(root, dep string) bool {
 // NestJS
 type NestJS struct{}
 
-func (d *NestJS) Name() string     { return "nestjs" }
-func (d *NestJS) Priority() int    { return 90 }
+func (d *NestJS) Name() string  { return "nestjs" }
+func (d *NestJS) Priority() int { return 90 }
 func (d *NestJS) Detect(ctx context.Context, root string) (*FrameworkInfo, error) {
 	if fileExists(root, "package.json") && depsContain(root, "@nestjs/core") {
 		return &FrameworkInfo{Name: "NestJS", Language: "TypeScript"}, nil

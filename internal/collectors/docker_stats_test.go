@@ -66,8 +66,8 @@ func TestFormatPortsShort(t *testing.T) {
 
 func TestApplyProjectStatusDegraded(t *testing.T) {
 	projects := []core.Project{{
-		Path:   "/var/www/api",
-		Health: core.HealthUnhealthy,
+		Path:       "/var/www/api",
+		Health:     core.HealthUnhealthy,
 		Containers: []core.Container{{Status: "running"}},
 	}}
 	ApplyProjectStatus(projects, nil)

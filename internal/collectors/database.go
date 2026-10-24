@@ -160,6 +160,21 @@ func detectContainerDBEngine(c core.Container) DBEngine {
 	}
 }
 
+// IsDataContainer diz se o container guarda estado: banco, cache, fila ou
+// busca. São os que um "reiniciar a aplicação" deixa de fora.
+func IsDataContainer(c core.Container) bool {
+	if detectContainerDBEngine(c) != "" {
+		return true
+	}
+	s := strings.ToLower(c.Image + " " + c.Name)
+	for _, k := range []string{"redis", "mongo", "memcached", "elasticsearch", "opensearch", "rabbitmq", "meilisearch"} {
+		if strings.Contains(s, k) {
+			return true
+		}
+	}
+	return false
+}
+
 func readProjectDBEnv(projectPath string) (user, db, pass string) {
 	for _, name := range []string{".env", ".env.local", ".env.production", ".env.example"} {
 		data, err := os.ReadFile(filepath.Join(projectPath, name))

@@ -159,6 +159,7 @@ func parseDockerPSLine(line string) (core.Container, containerMeta, bool) {
 		State:       parts[4], // human status ("Up 2 hours" / "Exited (0) ...")
 		Health:      parseHealthFromStatus(parts[4]),
 		Ports:       parts[5],
+		Service:     m.ComposeService,
 		ProjectPath: m.composeRoot(),
 	}, m, true
 }

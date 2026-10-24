@@ -40,6 +40,7 @@ func init() {
 	rootCmd.AddCommand(scanCmd())
 	rootCmd.AddCommand(watchCmd())
 	rootCmd.AddCommand(nginxCmd())
+	rootCmd.AddCommand(botCmd())
 }
 
 func Execute() error {

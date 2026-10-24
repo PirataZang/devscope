@@ -22,11 +22,11 @@ const (
 type ServiceType string
 
 const (
-	ServiceDocker  ServiceType = "Docker"
-	ServicePM2     ServiceType = "PM2"
-	ServiceSystemd ServiceType = "Systemd"
-	ServiceNginx   ServiceType = "Nginx"
-	ServiceRedis   ServiceType = "Redis"
+	ServiceDocker   ServiceType = "Docker"
+	ServicePM2      ServiceType = "PM2"
+	ServiceSystemd  ServiceType = "Systemd"
+	ServiceNginx    ServiceType = "Nginx"
+	ServiceRedis    ServiceType = "Redis"
 	ServicePostgres ServiceType = "Postgres"
 )
 
@@ -47,6 +47,7 @@ type GitCommit struct {
 	Message     string `json:"message"`
 	Author      string `json:"author"`
 	Date        string `json:"date"`
+	Unix        int64  `json:"unix,omitempty"` // data do commit em segundos: "há quanto tempo" sem reparsear o texto de Date
 	FullMessage string `json:"full_message,omitempty"`
 }
 
@@ -130,6 +131,7 @@ type Container struct {
 	Memory      int64   `json:"memory"`
 	Ports       string  `json:"ports,omitempty"`
 	Restart     string  `json:"restart,omitempty"`
+	Service     string  `json:"service,omitempty"` // serviço do compose: o nome curto ("php-fpm" em laradock-php-fpm-1)
 	ProjectPath string  `json:"project_path,omitempty"`
 }
 
@@ -144,11 +146,11 @@ type Image struct {
 }
 
 type Worker struct {
-	Name    string  `json:"name"`
-	Status  string  `json:"status"`
-	CPU     float64 `json:"cpu"`
-	Memory  int64   `json:"memory"`
-	Restarts int    `json:"restarts"`
+	Name     string  `json:"name"`
+	Status   string  `json:"status"`
+	CPU      float64 `json:"cpu"`
+	Memory   int64   `json:"memory"`
+	Restarts int     `json:"restarts"`
 }
 
 type Domain struct {
@@ -186,32 +188,32 @@ type HealthCheckResult struct {
 }
 
 type Project struct {
-	ID              string          `json:"id"`
-	Name            string          `json:"name"`
-	Path            string          `json:"path"`
-	Framework       FrameworkInfo   `json:"framework"`
-	Frameworks      []FrameworkInfo `json:"frameworks,omitempty"`
-	Status          ProjectStatus   `json:"status"`
-	Health          HealthStatus    `json:"health"`
-	Git             *GitInfo        `json:"git,omitempty"`
-	Pending         *GitPending     `json:"git_pending,omitempty"`
-	Services        []Service       `json:"services,omitempty"`
-	Containers      []Container     `json:"containers,omitempty"`
-	Workers         []Worker        `json:"workers,omitempty"`
-	Domains         []Domain        `json:"domains,omitempty"`
-	SSL             []SSLCert       `json:"ssl,omitempty"`
-	Metrics         ProjectMetrics        `json:"metrics"`
-	HealthChecks    []HealthCheckResult   `json:"health_checks,omitempty"`
-	DeployScript    string                `json:"deploy_script,omitempty"`
-	Ports           []int                 `json:"ports,omitempty"`
-	PortConflicts   map[int][]string      `json:"port_conflicts,omitempty"` // host port -> outros projetos que disputam a mesma porta
-	LastDeploy      *time.Time      `json:"last_deploy,omitempty"`
-	Uptime          time.Duration   `json:"uptime"`
-	Modules         []ProjectModule `json:"modules,omitempty"`
-	ContainerCount  int             `json:"container_count"`
-	WorkerCount     int             `json:"worker_count"`
-	HasDockerCompose bool           `json:"has_docker_compose"`
-	HasDockerfile    bool           `json:"has_dockerfile"`
+	ID               string              `json:"id"`
+	Name             string              `json:"name"`
+	Path             string              `json:"path"`
+	Framework        FrameworkInfo       `json:"framework"`
+	Frameworks       []FrameworkInfo     `json:"frameworks,omitempty"`
+	Status           ProjectStatus       `json:"status"`
+	Health           HealthStatus        `json:"health"`
+	Git              *GitInfo            `json:"git,omitempty"`
+	Pending          *GitPending         `json:"git_pending,omitempty"`
+	Services         []Service           `json:"services,omitempty"`
+	Containers       []Container         `json:"containers,omitempty"`
+	Workers          []Worker            `json:"workers,omitempty"`
+	Domains          []Domain            `json:"domains,omitempty"`
+	SSL              []SSLCert           `json:"ssl,omitempty"`
+	Metrics          ProjectMetrics      `json:"metrics"`
+	HealthChecks     []HealthCheckResult `json:"health_checks,omitempty"`
+	DeployScript     string              `json:"deploy_script,omitempty"`
+	Ports            []int               `json:"ports,omitempty"`
+	PortConflicts    map[int][]string    `json:"port_conflicts,omitempty"` // host port -> outros projetos que disputam a mesma porta
+	LastDeploy       *time.Time          `json:"last_deploy,omitempty"`
+	Uptime           time.Duration       `json:"uptime"`
+	Modules          []ProjectModule     `json:"modules,omitempty"`
+	ContainerCount   int                 `json:"container_count"`
+	WorkerCount      int                 `json:"worker_count"`
+	HasDockerCompose bool                `json:"has_docker_compose"`
+	HasDockerfile    bool                `json:"has_dockerfile"`
 }
 
 type HostMetrics struct {
@@ -232,10 +234,10 @@ type HostMetrics struct {
 }
 
 type Snapshot struct {
-	Projects          []Project   `json:"projects"`
-	OrphanContainers  []Container `json:"orphan_containers,omitempty"` // docker ps -a sem projeto
-	HostMetrics       HostMetrics `json:"host_metrics"`
-	ScannedAt         time.Time   `json:"scanned_at"`
-	ScanPaths         []string    `json:"scan_paths"`
-	ProjectCount      int         `json:"project_count"`
+	Projects         []Project   `json:"projects"`
+	OrphanContainers []Container `json:"orphan_containers,omitempty"` // docker ps -a sem projeto
+	HostMetrics      HostMetrics `json:"host_metrics"`
+	ScannedAt        time.Time   `json:"scanned_at"`
+	ScanPaths        []string    `json:"scan_paths"`
+	ProjectCount     int         `json:"project_count"`
 }

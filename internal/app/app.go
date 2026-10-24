@@ -13,6 +13,7 @@ import (
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
+	"github.com/devscope/devscope/internal/hub"
 	"github.com/devscope/devscope/internal/ui"
 )
 
@@ -54,6 +55,11 @@ func Run(cfgFile string, debug bool) error {
 	manager := collectors.NewManager(store, cfg)
 	manager.QuickScan(ctx)
 	manager.StartWithContext(ctx)
+
+	// Máquina pareada com o bot: conecta enquanto a TUI estiver aberta. Sem
+	// pareamento não sobe nada nem faz chamada de rede.
+	stopBot := hub.StartTUI(store, cfg)
+	defer stopBot()
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
