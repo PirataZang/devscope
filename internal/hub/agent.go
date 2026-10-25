@@ -15,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/config"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/devscopeutil"
@@ -138,6 +139,11 @@ type Agent struct {
 	qMu   sync.Mutex
 	queue []Event
 
+	cfMu   sync.Mutex
+	cfAcct collectors.CFAccount
+	cfAt   time.Time
+	cfSec  map[string]cfSecEntry // zone ID → segurança lida, que muda pouco
+
 	touched atomic.Int64
 }
 
@@ -158,7 +164,7 @@ func (a *Agent) Run(ctx context.Context) error {
 	a.queue = LoadState().Queue
 
 	var wg sync.WaitGroup
-	for _, loop := range []func(context.Context){a.snapshotLoop, a.watchLoop, a.ciLoop} {
+	for _, loop := range []func(context.Context){a.snapshotLoop, a.watchLoop, a.ciLoop, a.cfLoop} {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

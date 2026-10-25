@@ -41,6 +41,7 @@ func init() {
 	rootCmd.AddCommand(watchCmd())
 	rootCmd.AddCommand(nginxCmd())
 	rootCmd.AddCommand(botCmd())
+	rootCmd.AddCommand(cloudflareCmd())
 }
 
 func Execute() error {

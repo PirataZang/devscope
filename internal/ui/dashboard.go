@@ -14,7 +14,6 @@ import (
 	"github.com/devscope/devscope/internal/collectors"
 	"github.com/devscope/devscope/internal/core"
 	"github.com/devscope/devscope/internal/hub"
-	"github.com/devscope/devscope/pkg/version"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -78,7 +77,7 @@ func (a *App) renderDashboard() string {
 // ─── cabeçalho ──────────────────────────────────────────────────────────────
 
 func (a *App) renderDashboardHeader(m core.HostMetrics, width int) []string {
-	brand := StyleBrand.Render("DevScope v" + version.Version)
+	brand := StyleBrand.Render("DevScope " + versionLabel())
 	subtitle := StyleSubtitle.Render("  Developer Command Center")
 	clock := StyleClock.Render(a.now.Format("15:04:05"))
 

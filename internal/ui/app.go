@@ -556,6 +556,7 @@ type App struct {
 	diskTargets                 []collectors.CleanTarget
 	diskLoading                 bool
 	diskStatus                  string
+	cfd                         cloudflareState
 	relPath                     string
 	relState                    collectors.ReleaseState
 	relRuns                     map[string]collectors.GHARun
@@ -735,6 +736,8 @@ func NewApp(store *core.StateStore, cfg *config.Config) *App {
 func (a *App) Init() tea.Cmd {
 	cmds := []tea.Cmd{
 		tea.Tick(300*time.Millisecond, func(t time.Time) tea.Msg { return tickMsg{} }),
+		// A conta decide em quais projetos o módulo Cloudflare aparece.
+		fetchCloudflareAccount(),
 	}
 	if cmd := a.kickAnim(); cmd != nil {
 		cmds = append(cmds, cmd)
@@ -1125,6 +1128,23 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.handleReleaseLoaded(msg)
 		return a, nil
 
+	case cfdAccountMsg:
+		return a, a.handleCloudflareAccount(msg)
+
+	case cfdAccountTickMsg:
+		return a, a.handleCloudflareTick()
+
+	case cfdListMsg:
+		a.handleCloudflareList(msg)
+		return a, nil
+
+	case cfdDetailMsg:
+		a.handleCloudflareDetail(msg)
+		return a, nil
+
+	case cfdLinkedMsg:
+		return a, a.handleCloudflareLinked(msg)
+
 	case relTaggedMsg:
 		return a, a.handleReleaseTagged(msg)
 
@@ -1489,6 +1509,8 @@ func (a *App) switchProjectTab(t Tab, p *core.Project) tea.Cmd {
 		cmds = append(cmds, a.loadWorktrees(p))
 	case TabTasks:
 		cmds = append(cmds, a.loadTasks(p))
+	case TabCloudflare:
+		cmds = append(cmds, a.loadCloudflare(p))
 	case TabReleases:
 		cmds = append(cmds, a.loadRelease(p))
 		if a.relWatch != "" {
@@ -1714,6 +1736,11 @@ func (a *App) updateProject(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	if a.tab == TabReleases {
 		if cmd, ok := a.handleReleaseKeys(msg, p); ok {
+			return a, cmd
+		}
+	}
+	if a.tab == TabCloudflare {
+		if cmd, ok := a.handleCloudflareKeys(msg, p); ok {
 			return a, cmd
 		}
 	}
@@ -2409,7 +2436,7 @@ func (a *App) renderProject() string {
 	content := a.renderTabContent(p)
 	a.width = originalWidth
 	StylePanel = originalPanel
-	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees || a.tab == TabTasks || a.tab == TabReleases ||
+	moduleDash := a.tab == TabOverview || a.tab == TabLogs || a.tab == TabWorktrees || a.tab == TabTasks || a.tab == TabReleases || a.tab == TabCloudflare ||
 		(a.tab == TabGit && a.gitSubview == gitSubviewMain) ||
 		(a.tab == TabContainers && (a.containerSubview == containerSubviewList || a.containerSubview == containerSubviewPorts)) ||
 		(a.tab == TabAPI && !a.apiOpen) || (a.tab == TabDatabase && !a.dbOpen) ||
@@ -2542,6 +2569,8 @@ func (a *App) renderTabContent(p *core.Project) string {
 		return a.renderTasksTab(p)
 	case TabReleases:
 		return a.renderReleasesTab(p)
+	case TabCloudflare:
+		return a.renderCloudflareTab(p)
 	case TabContainers:
 		return a.renderContainersTab(p)
 	case TabLogs:

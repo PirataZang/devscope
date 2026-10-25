@@ -144,6 +144,15 @@ func helpGroups() []helpGroup {
 				{"o", "abrir o workflow da release ou a página de releases"},
 				{"r · esc", "atualizar / voltar"},
 			}},
+			{"CLOUDFLARE", []helpEntry{
+				{"↑↓ · enter", "escolher e abrir o domínio (os deste projeto vêm primeiro)"},
+				{"1 2 3", "no domínio: tráfego · DNS · segurança"},
+				{"esc", "do domínio volta para a lista; da lista, sai do módulo"},
+				{"←→", "tráfego dos últimos 7 ou 30 dias"},
+				{"w · o", "abrir o site / a mesma tela no painel da Cloudflare"},
+				{"v", "vincular o domínio selecionado a este projeto"},
+				{"r", "atualizar"},
+			}},
 			{"GITHUB ACTIONS", []helpEntry{
 				{"1-3", "processos / runs / workflows"},
 				{"enter", "abrir o centro de controle ou o detalhe"},
