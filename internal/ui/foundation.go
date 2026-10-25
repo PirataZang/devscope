@@ -36,6 +36,8 @@ var glyphVocabulary = []string{
 	"⌂", "⑂", "▣", "⎈", "⬡", "≡", "↯", "▤", "{", "⚿", "⇄", "⇅", "⇪", "☁", "⇌",
 	"⚙", "▶", "◈", "·", "◆", "▌", "│", "─", "┌", "┐", "└", "┘", "├", "╭", "╰",
 	"█", "░", "▸", "◌", "⧗", "⚠", "⊕", "↑", "↓", "←", "→", "…", "—", "»", "±", "⇡", "✓", "✗",
+	// Blocos de oitavo e eixo dos gráficos da Cloudflare (cloudflare_view.go).
+	"▁", "▂", "▃", "▄", "▅", "▆", "▇", "▏", "▎", "▍", "▋", "▊", "▉", "┤",
 }
 
 // glyphBanned são os glifos que JÁ quebraram o alinhamento e não podem voltar:

@@ -8,6 +8,21 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Módulo Cloudflare (grupo REDE)** — os domínios da sua conta vistos de dentro do DevScope, só leitura
+  - Abre na lista de domínios, como no painel da Cloudflare: estado, plano, a semana de visitantes num minigráfico e a tendência, com os deste projeto no topo; `enter` abre o domínio e `esc` volta para a lista
+  - **1 Tráfego**: visitantes e páginas comparados com o período anterior (7 ou 30 dias, `←→`), cache, respostas 2xx–5xx numa barra, ameaças, países, gráfico das últimas 24 horas hora a hora, uma barra por dia ("hoje", "ontem", pico e erros 5xx do dia), páginas mais acessadas e caminhos com erro
+  - **2 DNS**: os registros, para onde apontam e quais passam pelo proxy
+  - **3 Segurança**: modo SSL explicado em palavras, HTTPS forçado, TLS mínimo, validade do certificado, avisos do Security Center e vencimento do registro do domínio (RDAP, inclusive registro.br)
+  - `w` abre o site, `o` abre a mesma tela no painel da Cloudflare
+  - Só aparece no projeto que tem um domínio da conta: site do Cloudflare Pages ligado ao mesmo repositório do GitHub, endereço do domínio no `.env`, `CNAME`, `package.json`, `astro.config`, `nginx.conf` ou `wrangler.toml`, ou vínculo feito à mão com `v` (grava `.devscope/cloudflare.txt`)
+  - `devscope cloudflare login|status|logout` guarda e confere o API Token (ou `CLOUDFLARE_API_TOKEN`)
+
+- **Cloudflare no bot do Telegram** — a máquina conectada (`devscope bot`) vigia os domínios dos projetos a cada 5 minutos e avisa
+  - 📈 pico de visitas: a última hora com 3× o normal (e pelo menos 50 visitantes)
+  - 🔥 pico de erros 5xx: 5% das requisições ou mais, com aviso de volta ao normal
+  - certificado a menos de 14 dias e registro do domínio a menos de 30 dias de vencer
+  - `/cloudflare` e o botão ☁️ Cloudflare no painel do projeto mostram no Telegram as visitas da semana contra a anterior, o desenho dos dias e das 24 horas com o pico, países, páginas mais acessadas, caminhos com erro e o SSL; os avisos da Cloudflare podem ser desligados em /avisos (precisa do hub atualizado)
+
 - **Releases prepara o repositório** — ao pedir o release sem workflow de tag ou sem CHANGELOG, o DevScope oferece criar o que faltar antes (também com `w`)
   - `.github/workflows/release.yml` pelo projeto: com `.goreleaser.yaml`, goreleaser (binários por sistema); sem, GitHub Release com a mensagem da tag — a seção do CHANGELOG — como notas
   - `CHANGELOG.md` no formato Keep a Changelog com `## [Unreleased]` e **instruções para IA** num comentário invisível no GitHub: como levantar as mudanças (`git log` desde a última tag), agrupar, escrever pelo efeito para o usuário, escolher a versão e renomear a seção na hora de lançar — no formato que o Releases lê
@@ -24,11 +39,13 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/).
   - Ambiente lido do compose e do `conf.d/` do nginx-main; o que precisar fixar vai na seção `Nginx:` do `user_config.txt`
 
 ### Changed
+- **O projeto aberto em destaque na barra lateral** — o nome vira uma faixa cheia na cor do módulo, com a pasta embaixo; a marca do DevScope desce para uma linha discreta. Em terminal baixo, a lista de módulos rola e o projeto fica fixo no topo (antes ele rolava para fora da caixa)
 - **Releases documentado na própria tela** — nova seção COMO FUNCIONA com cada peça que o módulo usa (tags `vX.Y.Z`, `CHANGELOG.md`, workflow de tag, `gh`, remoto `origin`), se o repositório aberto tem e para que serve; o que falta vem com o formato ou o comando para configurar, marcado como opcional ou obrigatório
 - Repositório sem remoto `origin` agora bloqueia o lançamento com o motivo, em vez de falhar no push
 - README ganhou a seção "Releases" com os requisitos e o que bloqueia ou só avisa
 
 ### Fixed
+- A versão aparecia como `vv1.7.4` na barra lateral e na tela inicial
 - **A lista de projetos acompanha o disco sem reabrir o DevScope** — antes o disco só era varrido na abertura
   - Pasta apagada some da tela inicial em até 2 segundos
   - Projeto novo aparece em até 10 segundos (`refresh.scan_interval` passou de 60s para 10s)

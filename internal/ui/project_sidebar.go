@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -73,8 +74,16 @@ func (a *App) renderProjectSidebarH(height int) string {
 		rows = append(rows, ruleColored(inner, ColorBorder))
 		rows = append(rows, foot...)
 	}
+	// Sem altura, rola só a navegação: o cabeçalho com o projeto fica preso
+	// no topo — rolar junto escondia justamente em qual projeto você está.
 	if len(rows) > contentH {
-		rows = sidebarWindow(rows, slices.Index(rows, a.renderProjectSidebarRow(a.tab, inner, p)), contentH)
+		head := len(a.sidebarBrandBlock(p, inner))
+		if head >= contentH {
+			head = 0
+		}
+		nav := rows[head:]
+		nav = sidebarWindow(nav, slices.Index(nav, a.renderProjectSidebarRow(a.tab, inner, p)), contentH-head)
+		rows = append(append([]string{}, rows[:head]...), nav...)
 	}
 
 	body := strings.Join(rows, "\n")
@@ -104,23 +113,30 @@ func sidebarWindow(rows []string, focus, height int) []string {
 	return rows[start : start+height]
 }
 
+// sidebarBrandBlock: o PROJETO é o destaque — uma faixa cheia na cor do
+// módulo, a mesma da borda, com a pasta embaixo. A marca do DevScope desce
+// para uma linha apagada em cima: quem está aqui já sabe que app é este,
+// mas precisa achar de relance EM QUAL projeto está mexendo.
 func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	accent := tabAccentColor(a.tab)
-	mark := lipgloss.NewStyle().Foreground(accent).Bold(true).Render("◆")
-	title := lipgloss.NewStyle().Foreground(ColorText).Bold(true).Render("devscope")
+	pill := func(name string) string {
+		return lipgloss.NewStyle().Foreground(ColorBg).Background(accent).Bold(true).
+			Render(padRight(" "+truncate(name, maxInt(4, width-2))+" ", width))
+	}
 	if a.projectTiny() {
 		name := "project"
 		if p != nil {
 			name = p.Name
 		}
-		return []string{
-			mark + " " + StyleNormal.Render(truncate(name, maxInt(6, width-2))),
-		}
+		return []string{pill(name)}
 	}
-	ver := StyleMuted.Render("v" + version.Version)
-	rows := []string{mark + " " + title + " " + ver}
+	rows := []string{StyleMuted.Render(truncate("devscope "+versionLabel(), width))}
 	if p == nil {
 		return rows
+	}
+	rows = append(rows, pill(p.Name))
+	if !a.projectCompact() {
+		rows = append(rows, StyleMuted.Render(truncate(" "+shortenPath(filepath.Dir(p.Path)), width)))
 	}
 	// Estado + saúde numa linha só — truncada na largura do trilho. Sem o
 	// corte, lipgloss QUEBRA a linha em duas e o rodapé cai para fora da caixa.
@@ -128,20 +144,19 @@ func (a *App) sidebarBrandBlock(p *core.Project, width int) []string {
 	if chip := healthChip(p.Health, a.animFrame); lipgloss.Width(state)+lipgloss.Width(chip)+2 <= width {
 		state += StyleMuted.Render("  ") + chip
 	}
-	rows = append(rows,
-		StyleMuted.Render(truncate(p.Name, width)),
-		truncateVisible(state, width),
-	)
 	if !a.projectCompact() {
 		if branch := sidebarBranchLine(p, width); branch != "" {
 			rows = append(rows, branch)
 		}
 	}
-	return rows
+	return append(rows, truncateVisible(state, width))
 }
 
 // healthChip: glifo + rótulo numa cor só. Glifos distintos por estado — cor
 // sozinha não resolve em terminal sem cor nem para quem não distingue.
+// versionLabel: o git describe já traz o "v" (v1.7.4); o build sem tag não.
+func versionLabel() string { return "v" + strings.TrimPrefix(version.Version, "v") }
+
 func healthChip(h core.HealthStatus, frame int) string {
 	glyph, st := healthGlyph(h, frame)
 	switch h {
@@ -260,7 +275,7 @@ func sidebarGroups() []sidebarGroup {
 		{"PROJETO", ColorAccent, []Tab{TabOverview}},
 		{"CÓDIGO", ColorWarning, []Tab{TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins}},
 		{"EXECUÇÃO", ColorDocker, []Tab{TabTasks, TabContainers, TabSwarm, TabKubernetes}},
-		{"REDE", ColorPrimary, []Tab{TabNginx, TabNgrok, TabCFTunnel}},
+		{"REDE", ColorPrimary, []Tab{TabNginx, TabCloudflare, TabNgrok, TabCFTunnel}},
 		{"DADOS", ColorPink, []Tab{TabAPI, TabDatabase}},
 	}
 }
@@ -379,6 +394,8 @@ func tabGlyph(t Tab) string {
 		return "▶"
 	case TabNginx:
 		return "◈"
+	case TabCloudflare:
+		return "⇅"
 	default:
 		return "·"
 	}

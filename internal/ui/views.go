@@ -38,6 +38,7 @@ const (
 	TabWorktrees
 	TabTasks
 	TabReleases
+	TabCloudflare
 )
 
 func (t Tab) String() string {
@@ -78,6 +79,8 @@ func (t Tab) String() string {
 		return "GH Actions"
 	case TabNginx:
 		return "Nginx"
+	case TabCloudflare:
+		return "Cloudflare"
 	default:
 		return "Overview"
 	}
@@ -94,6 +97,6 @@ var AllTabs = []Tab{
 	TabOverview,
 	TabGit, TabWorktrees, TabReleases, TabActions, TabJenkins,
 	TabTasks, TabContainers, TabSwarm, TabKubernetes,
-	TabNginx, TabNgrok, TabCFTunnel,
+	TabNginx, TabCloudflare, TabNgrok, TabCFTunnel,
 	TabAPI, TabDatabase,
 }

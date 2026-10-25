@@ -96,6 +96,11 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 	isRepo := p.Git != nil && p.Git.IsRepo
 	docker := p.HasDockerCompose || p.HasDockerfile || p.ContainerCount > 0
 	nginxPrefs := a.nginxPrefs()
+	remote := ""
+	if p.Git != nil {
+		remote = p.Git.Remote
+	}
+	cfAcct := a.cfd.acct
 
 	return func() tea.Msg {
 		on := map[Tab]bool{
@@ -116,6 +121,8 @@ func (a *App) probeModuleCaps(p *core.Project) tea.Cmd {
 			TabNginx:      hasTool("nginx") || dirExists(path, "nginx") || fileExists(path, "nginx.conf") || probeNginxPublish(path, nginxPrefs).relevant(),
 			TabNgrok:      hasTool("ngrok"),
 			TabCFTunnel:   hasTool("cloudflared"),
+			// Só no projeto que tem um domínio da conta (cloudflare_tab.go).
+			TabCloudflare: len(collectors.LinkCloudflare(path, remote, cfAcct)) > 0,
 		}
 		return moduleCapsMsg{path: path, on: on}
 	}

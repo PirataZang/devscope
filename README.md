@@ -279,7 +279,7 @@ do terminal.
 
 ---
 
-## 🧩 15 módulos, um contexto
+## 🧩 16 módulos, um contexto
 
 Cada módulo aparece **só quando faz sentido** para o projeto aberto — um projeto Go sem Docker
 não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da categoria, no app inteiro.
@@ -308,9 +308,9 @@ não mostra a aba de containers (<kbd>t</kbd> mostra todos). A cor é a cor da c
 > logs, stats, services, pods
 
 #### 🟢 REDE
-`Nginx` · `Ngrok` · `CF Tunnel`
-> vhosts, expor o local,
-> requests ao vivo, URL
+`Nginx` · `Cloudflare` · `Ngrok` · `CF Tunnel`
+> vhosts, acessos do domínio,
+> expor o local, URL
 
 </td>
 <td width="33%" valign="top">
@@ -426,6 +426,40 @@ Sai com código ≠ 0 se uma checagem bloquear, o `nginx -t` recusar ou o smoke 
 ambiente — pasta do nginx-main, container, IP público, gateway `172.17.0.1`, `~/projetos` →
 `/var/www/html` — é lido do `docker-compose.yml` e do `conf.d/` do nginx-main; o que precisar
 fixar vai na seção `Nginx:` do `user_config.txt`.
+
+---
+
+## ☁️ Cloudflare: quem acessa o domínio do projeto
+
+O módulo **Cloudflare** (grupo REDE) abre na lista de **domínios** da conta, como no painel da
+Cloudflare: estado, plano e a semana de visitantes de cada um, com os deste projeto no topo.
+<kbd>enter</kbd> abre o domínio em três abas, e <kbd>esc</kbd> volta para a lista:
+
+| aba | mostra |
+|---|---|
+| <kbd>1</kbd> tráfego | visitantes e páginas comparados com o período anterior (7 ou 30 dias, <kbd>←</kbd><kbd>→</kbd>), cache, respostas 2xx–5xx numa barra, ameaças, países, as últimas 24 horas hora a hora, uma barra por dia, as páginas mais acessadas e os caminhos com erro |
+| <kbd>2</kbd> DNS | os registros, para onde apontam e quais passam pelo proxy |
+| <kbd>3</kbd> segurança | modo SSL explicado em palavras, HTTPS forçado, TLS mínimo, validade do certificado, os avisos do Security Center e quando o registro do domínio vence (RDAP, inclusive registro.br) |
+
+<kbd>w</kbd> abre o site e <kbd>o</kbd> abre a mesma tela no painel da Cloudflare.
+
+**Conectar uma vez, só leitura:**
+
+```bash
+devscope cloudflare login     # cola um API Token (modelo "Read all resources")
+devscope cloudflare status    # os domínios que o token enxerga
+```
+
+Ou exporte `CLOUDFLARE_API_TOKEN`. O token fica em `~/.config/devscope/cloudflare.token`, só para o
+seu usuário, e o DevScope nunca muda nada na conta.
+
+**O módulo só aparece no projeto que tem um domínio da conta:**
+
+- o site do **Cloudflare Pages** está ligado ao mesmo repositório do GitHub; ou
+- um endereço do domínio aparece em `.env`, `CNAME`, `package.json`, `astro.config`, `nginx.conf`
+  ou `wrangler.toml`; ou
+- você vinculou à mão: <kbd>t</kbd> mostra todos os módulos, na aba Cloudflare escolha o domínio
+  e <kbd>v</kbd> grava `.devscope/cloudflare.txt` no projeto.
 
 ---
 

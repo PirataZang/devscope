@@ -81,6 +81,7 @@ type ProjectSummary struct {
 	Changes         int              `json:"changes"`
 	Upstream        bool             `json:"upstream"`
 	CI              *CI              `json:"ci"`
+	Domains         []string         `json:"domains,omitempty"` // endereços na Cloudflare
 	Ports           []int            `json:"ports"`
 	PortConflicts   map[int][]string `json:"port_conflicts"`
 }
@@ -190,6 +191,7 @@ var handlers = map[string]handler{
 	"git_worktrees": handleGitWorktrees,
 	"git_incoming":  handleGitIncoming,
 	"git_pending":   handleGitPending,
+	"cloudflare":    handleCloudflare,
 }
 
 // actionTypes são as ações do Contrato. Elas chegam na fase 2; até lá todas
@@ -639,6 +641,9 @@ func (a *Agent) summaries(projects []core.Project) []ProjectSummary {
 	var wg sync.WaitGroup
 	for i, p := range projects {
 		out[i] = summarize(p)
+		for _, l := range a.projectDomains(p) {
+			out[i].Domains = append(out[i].Domains, l.Host)
+		}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

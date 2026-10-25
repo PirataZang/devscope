@@ -51,12 +51,14 @@ type DockerHubTag struct {
 	LastUpdated time.Time
 }
 
+// hubSearchResponse é a busca do registry (a mesma do `docker search`). A
+// busca de hub.docker.com/v2 fica atrás de um desafio do Cloudflare que barra
+// o cliente HTTP do Go com 403.
 type hubSearchResponse struct {
-	Count   int    `json:"count"`
-	Next    string `json:"next"`
-	Results []struct {
-		RepoName         string `json:"repo_name"`
-		ShortDescription string `json:"short_description"`
+	NumPages int `json:"num_pages"`
+	Results  []struct {
+		RepoName         string `json:"name"`
+		ShortDescription string `json:"description"`
 		StarCount        int    `json:"star_count"`
 		PullCount        int64  `json:"pull_count"`
 		IsOfficial       bool   `json:"is_official"`
@@ -119,8 +121,8 @@ func SearchDockerHubPage(query string, page, pageSize int) (DockerHubSearchPage,
 	if pageSize <= 0 {
 		pageSize = 15
 	}
-	u := "https://hub.docker.com/v2/search/repositories/?query=" + url.QueryEscape(query) +
-		"&page_size=" + fmt.Sprintf("%d", pageSize) +
+	u := "https://index.docker.io/v1/search?q=" + url.QueryEscape(query) +
+		"&n=" + fmt.Sprintf("%d", pageSize) +
 		"&page=" + fmt.Sprintf("%d", page)
 	var body hubSearchResponse
 	if err := hubGetJSON(u, &body); err != nil {
@@ -144,7 +146,7 @@ func SearchDockerHubPage(query string, page, pageSize int) (DockerHubSearchPage,
 	return DockerHubSearchPage{
 		Results: out,
 		Page:    page,
-		HasMore: strings.TrimSpace(body.Next) != "",
+		HasMore: page < body.NumPages,
 	}, nil
 }
 
